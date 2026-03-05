@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Monolito - Sistema del Bar</title>
 
 <style>
@@ -16,13 +17,26 @@ flex-direction:column;
 height:100vh;
 }
 
-.header{
+.barra-superior{
+display:flex;
+justify-content:space-between;
+padding:10px;
 background:#2c2c2c;
 color:white;
-padding:15px;
-font-size:20px;
-font-weight:bold;
-text-align:center;
+}
+
+.boton-top{
+background:#444;
+color:white;
+border:none;
+padding:8px 15px;
+border-radius:8px;
+font-size:14px;
+cursor:pointer;
+}
+
+.boton-top:active{
+transform:scale(0.95);
 }
 
 .panel{
@@ -44,6 +58,13 @@ align-items:center;
 justify-content:center;
 font-size:16px;
 text-align:center;
+cursor:pointer;
+transition:0.1s;
+}
+
+.boton:active{
+transform:scale(0.95);
+filter:brightness(0.8);
 }
 
 .icono{
@@ -68,8 +89,20 @@ font-size:14px;
 
 <body>
 
-<div class="header">
+<div class="barra-superior">
+
+<button onclick="history.back()" class="boton-top">
+⬅ Atrás
+</button>
+
+<div>
 MONOLITO – Sistema del Bar
+</div>
+
+<button onclick="alert('Ayuda del sistema próximamente')" class="boton-top">
+🤖 Ayuda
+</button>
+
 </div>
 
 <div class="panel">
@@ -130,131 +163,5 @@ PAGOS
 ✉ Avisos del bar
 </div>
 
-</body><div class="topbar">
-
-<div class="circulo amarillo">
-✉
-<span>Comunicaciones</span>
-</div>
-
-<div class="circulo rojo">
-⚠
-<span>Incidencias</span>
-</div>
-
-</div>
-</html>.topbar{
-display:flex;
-justify-content:flex-end;
-gap:20px;
-padding:10px 20px;
-}
-
-.circulo{
-width:60px;
-height:60px;
-border-radius:50%;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-color:white;
-font-size:20px;
-position:relative;
-}
-
-.circulo span{
-position:absolute;
-top:70px;
-font-size:12px;
-color:#333;
-}
-
-.amarillo{
-background:#f1c40f;
-}
-
-.rojo{
-background:#e74c3c;
-}
-.boton{
-border-radius:12px;
-color:white;
-font-weight:bold;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-font-size:16px;
-text-align:center;
-transition:0.1s;
-cursor:pointer;
-}
-
-.boton:active{
-transform:scale(0.95);
-filter:brightness(0.8);
-}.boton{
-border-radius:12px;
-color:white;
-font-weight:bold;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-font-size:16px;
-text-align:center;
-transition:0.1s;
-cursor:pointer;
-}
-
-.boton:active{
-transform:scale(0.95);
-filter:brightness(0.8);.boton{
-border-radius:12px;
-color:white;
-font-weight:bold;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-font-size:16px;
-text-align:center;
-transition:0.1s;
-cursor:pointer;
-}
-
-.boton:active{
-transform:scale(0.95);
-filter:brightness(0.8);
-}<div class="barra-superior">
-
-<button onclick="history.back()" class="boton-top">
-⬅ Atrás
-</button>
-
-<button onclick="alert('Ayuda del sistema próximamente')" class="boton-top">
-🤖 Ayuda
-</button>
-
-</div>.barra-superior{
-display:flex;
-justify-content:space-between;
-padding:10px;
-background:#2c2c2c;
-}
-
-.boton-top{
-background:#444;
-color:white;
-border:none;
-padding:8px 15px;
-border-radius:8px;
-font-size:14px;
-cursor:pointer;
-}
-
-.boton-top:active{
-transform:scale(0.95);
-}
-}
+</body>
+</html>
