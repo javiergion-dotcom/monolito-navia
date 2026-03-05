@@ -1,60 +1,128 @@
-<!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>MONOLITO NAVIA</title><style>
-body {
-    margin:0;
-    font-family: Arial, sans-serif;
-    background:#111;
-    color:white;
-    text-align:center;
+<title>Monolito – Sistema del Bar</title>
+
+<style>
+body{
+font-family: Arial, sans-serif;
+background:#f4f4f4;
+margin:0;
+text-align:center;
 }
 
-header {
-    padding:30px;
+header{
+background:#222;
+color:white;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
-.logo img{
-    width:180px;
+#estado{
+background:#e8e8e8;
+padding:8px;
+font-size:14px;
 }
 
-.botones{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:20px;
-    padding:30px;
+.panel{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+padding:40px;
+max-width:800px;
+margin:auto;
 }
 
-button{
-    padding:25px;
-    font-size:20px;
-    border:none;
-    border-radius:10px;
-    color:white;
+.boton{
+background:white;
+border-radius:10px;
+padding:35px;
+font-size:18px;
+box-shadow:0 3px 6px rgba(0,0,0,0.2);
+cursor:pointer;
+transition:.2s;
 }
 
-.b1{background:#2E86DE;}
-.b2{background:#27AE60;}
-.b3{background:#E67E22;}
-.b4{background:#8E44AD;}
-.b5{background:#C0392B;}
-.b6{background:#16A085;}
-.b7{background:#2980B9;}
-.b8{background:#F1C40F;color:black;}
+.boton:hover{
+transform:scale(1.03);
+}
 
-</style></head><body><header>
-<div class="logo">
-<img src="monolito.png">
+footer{
+margin-top:20px;
+padding:10px;
+font-size:14px;
+}
+
+.herramientas{
+margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div>
+<img src="logo.png" height="30">
+<b> MONOLITO – Sistema del Bar</b>
 </div>
-<h1>MONOLITO NAVIA</h1>
-</header><div class="botones"><button class="b1">ARTÍCULOS</button>
-<button class="b2">PROVEEDORES</button>
-<button class="b3">PEDIDOS</button>
-<button class="b4">VENTAS</button>
-<button class="b5">CAJA</button>
-<button class="b6">ANÁLISIS</button>
-<button class="b7">CLIENTES</button>
-<button class="b8">CONFIGURACIÓN</button>
 
-</div></body>
+<div id="fechaHora"></div>
+</header>
+
+<div id="estado">
+Buenos días · Sin comunicaciones · Sin diferencias
+</div>
+
+<div class="panel">
+
+<div class="boton">Proveedores</div>
+<div class="boton">Artículos</div>
+
+<div class="boton">Pedidos</div>
+<div class="boton">A tener en cuenta</div>
+
+<div class="boton">Histórico pedidos</div>
+<div class="boton">Caja</div>
+
+<div class="boton">Pagos</div>
+<div class="boton">Diario del bar</div>
+
+<div class="boton">Comparador</div>
+<div class="boton">Configuración</div>
+
+</div>
+
+<footer>
+
+<div>
+✉ Avisos del bar
+</div>
+
+<div class="herramientas">
+🔎 Buscar | 🖨 Imprimir | 📤 Compartir | ❓ Ayuda | ⛔ Salir
+</div>
+
+</footer>
+
+<script>
+
+function actualizarHora(){
+let ahora = new Date();
+let fecha = ahora.toLocaleDateString("es-ES",{weekday:'short',day:'numeric',month:'short'});
+let hora = ahora.toLocaleTimeString("es-ES",{hour:'2-digit',minute:'2-digit'});
+
+document.getElementById("fechaHora").innerHTML = fecha + " · " + hora;
+}
+
+setInterval(actualizarHora,1000);
+actualizarHora();
+
+</script>
+
+</body>
 </html>
+  
