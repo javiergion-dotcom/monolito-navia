@@ -5,6 +5,7 @@
 <title>Monolito – Sistema del Bar</title>
 
 <style>
+
 body{
 font-family: Arial, sans-serif;
 background:#f4f4f4;
@@ -23,7 +24,7 @@ align-items:center;
 
 #estado{
 background:#e8e8e8;
-padding:8px;
+padding:10px;
 font-size:14px;
 }
 
@@ -32,45 +33,47 @@ display:grid;
 grid-template-columns:1fr 1fr;
 gap:20px;
 padding:40px;
-max-width:800px;
+max-width:900px;
 margin:auto;
 }
 
 .boton{
 background:white;
-border-radius:10px;
-padding:35px;
+border-radius:12px;
+padding:30px;
 font-size:18px;
-box-shadow:0 3px 6px rgba(0,0,0,0.2);
+box-shadow:0 4px 8px rgba(0,0,0,0.2);
 cursor:pointer;
 transition:.2s;
 }
 
 .boton:hover{
-transform:scale(1.03);
+transform:scale(1.04);
 }
 
 footer{
 margin-top:20px;
-padding:10px;
+padding:15px;
 font-size:14px;
 }
 
 .herramientas{
 margin-top:10px;
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
+
 <div>
-<img src="logo.png" height="30">
-<b> MONOLITO – Sistema del Bar</b>
+<b>MONOLITO – Sistema del Bar</b>
 </div>
 
 <div id="fechaHora"></div>
+
 </header>
 
 <div id="estado">
@@ -111,18 +114,22 @@ Buenos días · Sin comunicaciones · Sin diferencias
 <script>
 
 function actualizarHora(){
+
 let ahora = new Date();
+
 let fecha = ahora.toLocaleDateString("es-ES",{weekday:'short',day:'numeric',month:'short'});
+
 let hora = ahora.toLocaleTimeString("es-ES",{hour:'2-digit',minute:'2-digit'});
 
 document.getElementById("fechaHora").innerHTML = fecha + " · " + hora;
+
 }
 
 setInterval(actualizarHora,1000);
+
 actualizarHora();
 
 </script>
 
 </body>
 </html>
-  
