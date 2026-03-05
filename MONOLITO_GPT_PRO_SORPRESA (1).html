@@ -2,91 +2,130 @@
 <head>
 <meta charset="UTF-8">
 <title>Monolito GPT Pro</title><style>
+
 body{
-font-family: Arial;
+font-family:Arial;
 background:#0f172a;
 color:white;
 text-align:center;
 }
 
 h1{
-margin-top:40px;
-}
-
-.menu{
-margin-top:40px;
+margin-top:30px;
 }
 
 button{
-display:block;
-width:260px;
-margin:10px auto;
-padding:15px;
-font-size:18px;
-border-radius:10px;
+padding:12px;
+margin:8px;
+border-radius:8px;
 border:none;
 cursor:pointer;
+font-size:16px;
+}
+
+.menu button{
+width:220px;
+display:block;
+margin:10px auto;
 }
 
 .azul{background:#2563eb;color:white;}
-.amarillo{background:#facc15;color:black;}
 .rojo{background:#ef4444;color:white;}
+.amarillo{background:#facc15;color:black;}
 
-#historico{
-margin-top:40px;
+#pantallaPedidos{
 display:none;
+margin-top:30px;
 }
 
 table{
 margin:auto;
 border-collapse:collapse;
-width:80%;
+width:90%;
+background:#1e293b;
 }
 
-td,th{
-border:1px solid white;
+th,td{
+border:1px solid #334155;
 padding:10px;
 }
-</style></head><body><h1>MONOLITO GPT PRO</h1>
-<p>Sistema de control profesional – Cafetería Monolito</p><div class="menu"><button class="azul">Proveedores</button>
-<button class="azul">Artículos</button>
-<button class="azul">Pedidos</button>
 
-<button class="azul" onclick="abrirHistorico()">Histórico de pedidos</button>
+input{
+width:80px;
+}
+
+.totalFinal{
+margin-top:20px;
+font-size:22px;
+}
+
+</style></head><body><h1>MONOLITO GPT PRO</h1>
+<p>Sistema de control profesional – Cafetería Monolito</p><div class="menu"><button class="azul" onclick="abrirPedidos()">Pedidos</button>
 
 <button class="amarillo">Comunicaciones</button>
 <button class="rojo">Incidencias</button>
 
-</div><div id="historico"><h2>Histórico de pedidos</h2><table><tr>
-<th>Fecha</th>
-<th>Proveedor</th>
-<th>Producto</th>
-<th>Cantidad</th>
+</div><div id="pantallaPedidos"><h2>Pedido a proveedor</h2><table><tr>
+<th>Unidades</th>
+<th>Artículo</th>
+<th>Precio</th>
+<th>%</th>
+<th>Total</th>
 </tr><tr>
-<td>12/03/2026</td>
-<td>Estrella Galicia</td>
-<td>Barril 50L</td>
-<td>3</td>
+<td><input type="number" value="0" onchange="calcular()"></td>
+<td>Barril Estrella</td>
+<td><input type="number" value="85" onchange="calcular()"></td>
+<td><input type="number" value="4" onchange="calcular()"></td>
+<td class="totalLinea">0</td>
 </tr><tr>
-<td>12/03/2026</td>
-<td>Coca-Cola</td>
-<td>Caja botellín</td>
-<td>2</td>
+<td><input type="number" value="0" onchange="calcular()"></td>
+<td>Tercio Estrella</td>
+<td><input type="number" value="18" onchange="calcular()"></td>
+<td><input type="number" value="4" onchange="calcular()"></td>
+<td class="totalLinea">0</td>
 </tr><tr>
-<td>11/03/2026</td>
-<td>Café Delta</td>
-<td>Café mezcla</td>
-<td>5 kg</td>
-</tr></table><br><button onclick="cerrarHistorico()">Cerrar</button>
+<td><input type="number" value="0" onchange="calcular()"></td>
+<td>Coca-Cola caja</td>
+<td><input type="number" value="22" onchange="calcular()"></td>
+<td><input type="number" value="0" onchange="calcular()"></td>
+<td class="totalLinea">0</td>
+</tr></table><div class="totalFinal">
+TOTAL PEDIDO: <span id="totalPedido">0</span> €
+</div><br><button onclick="cerrarPedidos()">Cerrar</button>
 
 </div><script>
 
-function abrirHistorico(){
-document.getElementById("historico").style.display="block"
+function abrirPedidos(){
+document.getElementById("pantallaPedidos").style.display="block"
 }
 
-function cerrarHistorico(){
-document.getElementById("historico").style.display="none"
+function cerrarPedidos(){
+document.getElementById("pantallaPedidos").style.display="none"
+}
+
+function calcular(){
+
+let filas=document.querySelectorAll("table tr")
+let totalGeneral=0
+
+for(let i=1;i<filas.length;i++){
+
+let inputs=filas[i].querySelectorAll("input")
+
+let unidades=parseFloat(inputs[0].value)||0
+let precio=parseFloat(inputs[1].value)||0
+let descuento=parseFloat(inputs[2].value)||0
+
+let total=unidades*precio*(1-descuento/100)
+
+filas[i].querySelector(".totalLinea").innerText=total.toFixed(2)
+
+totalGeneral+=total
+
+}
+
+document.getElementById("totalPedido").innerText=totalGeneral.toFixed(2)
+
 }
 
 </script></body>
