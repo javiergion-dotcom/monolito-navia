@@ -1,60 +1,93 @@
-<select id="proveedor" onchange="mostrarArticulos()">
-<option value="">Seleccionar proveedor</option>
-<option value="estrella">Estrella Galicia</option>
-<option value="cocacola">Coca Cola</option>
-<option value="cafe">Cafés Candelas</option>
-</select>
-
-<br><br>
-
-<div id="articulos"></div>
-
-<script>
-
-function mostrarArticulos(){
-
-let proveedor = document.getElementById("proveedor").value;
-let html = "";
-
-if(proveedor === "estrella"){
-
-html = `
-<table>
-<tr><th>Artículo</th><th>Cantidad</th></tr>
-<tr><td>⭐ Barril Estrella</td><td><input type="number" value="0"></td></tr>
-<tr><td>⭐ Botellín caja</td><td><input type="number" value="0"></td></tr>
-</table>
-`;
-
+<!DOCTYPE html><html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Monolito GPT Pro</title><style>
+body{
+font-family: Arial;
+background:#0f172a;
+color:white;
+text-align:center;
 }
 
-if(proveedor === "cocacola"){
-
-html = `
-<table>
-<tr><th>Artículo</th><th>Cantidad</th></tr>
-<tr><td>⭐ Coca Cola caja</td><td><input type="number" value="0"></td></tr>
-<tr><td>⭐ Fanta naranja</td><td><input type="number" value="0"></td></tr>
-<tr><td>⭐ Aquarius</td><td><input type="number" value="0"></td></tr>
-</table>
-`;
-
+h1{
+margin-top:40px;
 }
 
-if(proveedor === "cafe"){
-
-html = `
-<table>
-<tr><th>Artículo</th><th>Cantidad</th></tr>
-<tr><td>⭐ Café mezcla</td><td><input type="number" value="0"></td></tr>
-<tr><td>⭐ Café descafeinado</td><td><input type="number" value="0"></td></tr>
-</table>
-`;
-
+.menu{
+margin-top:40px;
 }
 
-document.getElementById("articulos").innerHTML = html;
-
+button{
+display:block;
+width:260px;
+margin:10px auto;
+padding:15px;
+font-size:18px;
+border-radius:10px;
+border:none;
+cursor:pointer;
 }
 
-</script> 
+.azul{background:#2563eb;color:white;}
+.amarillo{background:#facc15;color:black;}
+.rojo{background:#ef4444;color:white;}
+
+#historico{
+margin-top:40px;
+display:none;
+}
+
+table{
+margin:auto;
+border-collapse:collapse;
+width:80%;
+}
+
+td,th{
+border:1px solid white;
+padding:10px;
+}
+</style></head><body><h1>MONOLITO GPT PRO</h1>
+<p>Sistema de control profesional – Cafetería Monolito</p><div class="menu"><button class="azul">Proveedores</button>
+<button class="azul">Artículos</button>
+<button class="azul">Pedidos</button>
+
+<button class="azul" onclick="abrirHistorico()">Histórico de pedidos</button>
+
+<button class="amarillo">Comunicaciones</button>
+<button class="rojo">Incidencias</button>
+
+</div><div id="historico"><h2>Histórico de pedidos</h2><table><tr>
+<th>Fecha</th>
+<th>Proveedor</th>
+<th>Producto</th>
+<th>Cantidad</th>
+</tr><tr>
+<td>12/03/2026</td>
+<td>Estrella Galicia</td>
+<td>Barril 50L</td>
+<td>3</td>
+</tr><tr>
+<td>12/03/2026</td>
+<td>Coca-Cola</td>
+<td>Caja botellín</td>
+<td>2</td>
+</tr><tr>
+<td>11/03/2026</td>
+<td>Café Delta</td>
+<td>Café mezcla</td>
+<td>5 kg</td>
+</tr></table><br><button onclick="cerrarHistorico()">Cerrar</button>
+
+</div><script>
+
+function abrirHistorico(){
+document.getElementById("historico").style.display="block"
+}
+
+function cerrarHistorico(){
+document.getElementById("historico").style.display="none"
+}
+
+</script></body>
+</html>
