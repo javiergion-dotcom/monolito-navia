@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Monolito - Sistema del Bar</title>
-
-<style>
+<title>Monolito – Sistema del Bar</title><style>
 
 body{
 margin:0;
@@ -17,19 +13,23 @@ flex-direction:column;
 height:100vh;
 }
 
+/* barra superior */
+
 .barra-superior{
 display:flex;
 justify-content:space-between;
+align-items:center;
 padding:10px;
 background:#2c2c2c;
 color:white;
+font-weight:bold;
 }
 
 .boton-top{
 background:#444;
 color:white;
 border:none;
-padding:8px 15px;
+padding:8px 14px;
 border-radius:8px;
 font-size:14px;
 cursor:pointer;
@@ -39,6 +39,8 @@ cursor:pointer;
 transform:scale(0.95);
 }
 
+/* panel principal */
+
 .panel{
 flex:1;
 display:grid;
@@ -47,6 +49,8 @@ grid-auto-rows:1fr;
 gap:15px;
 padding:15px;
 }
+
+/* botones */
 
 .boton{
 border-radius:12px;
@@ -72,6 +76,8 @@ font-size:36px;
 margin-bottom:8px;
 }
 
+/* colores */
+
 .azul{background:#3b6ea8;}
 .gris{background:#5b636a;}
 .naranja{background:#f18a2a;}
@@ -84,84 +90,41 @@ text-align:center;
 font-size:14px;
 }
 
-</style>
-</head>
+</style></head><body><div class="barra-superior"><button onclick="history.back()" class="boton-top">⬅ Atrás</button>
 
-<body>
+<div>MONOLITO – Sistema del Bar</div><button onclick="alert('Ayuda próximamente')" class="boton-top">🤖 Ayuda</button>
 
-<div class="barra-superior">
-
-<button onclick="history.back()" class="boton-top">
-⬅ Atrás
-</button>
-
-<div>
-MONOLITO – Sistema del Bar
-</div>
-
-<button onclick="alert('Ayuda del sistema próximamente')" class="boton-top">
-🤖 Ayuda
-</button>
-
-</div>
-
-<div class="panel">
-
-<div class="boton azul">
+</div><div class="panel"><div class="boton azul">
 <div class="icono">🚚</div>
 PROVEEDORES
-</div>
-
-<div class="boton gris">
+</div><div class="boton gris">
 <div class="icono">📦</div>
 ARTÍCULOS
-</div>
-
-<div class="boton gris">
+</div><div class="boton gris">
 <div class="icono">📊</div>
 COMPARADOR
-</div>
-
-<div class="boton azul">
+</div><div class="boton azul">
 <div class="icono">📝</div>
 PEDIDOS
-</div>
-
-<div class="boton naranja">
+</div><div class="boton naranja">
 <div class="icono">⚠</div>
 A TENER EN CUENTA
-</div>
-
-<div class="boton gris">
+</div><div class="boton gris">
 <div class="icono">⚙</div>
 CONFIGURACIÓN
-</div>
-
-<div class="boton verde">
+</div><div class="boton verde">
 <div class="icono">🗂</div>
 HISTÓRICO PEDIDOS
-</div>
-
-<div class="boton gris">
+</div><div class="boton gris">
 <div class="icono">💶</div>
 CAJA
-</div>
-
-<div class="boton gris">
+</div><div class="boton gris">
 <div class="icono">📖</div>
 DIARIO DEL BAR
-</div>
-
-<div class="boton gris">
+</div><div class="boton gris">
 <div class="icono">💰</div>
 PAGOS
-</div>
-
-</div>
-
-<div class="footer">
+</div></div><div class="footer">
 ✉ Avisos del bar
-</div>
-
-</body>
+</div></body>
 </html>
