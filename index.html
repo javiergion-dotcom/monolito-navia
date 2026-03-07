@@ -1,130 +1,175 @@
-<!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Monolito – Sistema del Bar</title><style>
+<title>Monolito GPT Pro</title>
+
+<style>
 
 body{
-margin:0;
 font-family:Arial, Helvetica, sans-serif;
-background:#f0f0f0;
-display:flex;
-flex-direction:column;
-height:100vh;
+background:#f2f2f2;
+margin:0;
+padding:0;
+text-align:center;
 }
 
-/* barra superior */
-
-.barra-superior{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:10px;
-background:#2c2c2c;
+header{
+background:#111;
 color:white;
+padding:20px;
+font-size:28px;
 font-weight:bold;
 }
 
-.boton-top{
-background:#444;
-color:white;
-border:none;
-padding:8px 14px;
-border-radius:8px;
+.sub{
 font-size:14px;
-cursor:pointer;
+color:#ccc;
 }
-
-.boton-top:active{
-transform:scale(0.95);
-}
-
-/* panel principal */
 
 .panel{
-flex:1;
 display:grid;
-grid-template-columns:repeat(3,1fr);
-grid-auto-rows:1fr;
-gap:15px;
-padding:15px;
+grid-template-columns:1fr 1fr;
+gap:20px;
+padding:30px;
+max-width:900px;
+margin:auto;
 }
-
-/* botones */
 
 .boton{
-border-radius:12px;
-color:white;
+background:white;
+border-radius:14px;
+padding:30px;
+font-size:20px;
 font-weight:bold;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-font-size:16px;
-text-align:center;
 cursor:pointer;
-transition:0.1s;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+transition:0.2s;
 }
 
-.boton:active{
-transform:scale(0.95);
-filter:brightness(0.8);
+.boton:hover{
+transform:scale(1.05);
 }
 
 .icono{
 font-size:36px;
-margin-bottom:8px;
+display:block;
+margin-bottom:10px;
 }
 
-/* colores */
-
-.azul{background:#3b6ea8;}
-.gris{background:#5b636a;}
-.naranja{background:#f18a2a;}
-.verde{background:#5fa84f;}
+.contador{
+font-size:14px;
+color:#666;
+margin-top:8px;
+}
 
 .footer{
-background:#ffffff;
-padding:10px;
-text-align:center;
+margin-top:40px;
+padding:20px;
 font-size:14px;
+color:#777;
 }
 
-</style></head><body><div class="barra-superior"><button onclick="history.back()" class="boton-top">⬅ Atrás</button>
+</style>
+</head>
 
-<div>MONOLITO – Sistema del Bar</div><button onclick="alert('Ayuda próximamente')" class="boton-top">🤖 Ayuda</button>
+<body>
 
-</div><div class="panel"><div class="boton azul">
-<div class="icono">🚚</div>
-PROVEEDORES
-</div><div class="boton gris">
-<div class="icono">📦</div>
-ARTÍCULOS
-</div><div class="boton gris">
-<div class="icono">📊</div>
-COMPARADOR
-</div><div class="boton azul">
-<div class="icono">📝</div>
-PEDIDOS
-</div><div class="boton naranja">
-<div class="icono">⚠</div>
-A TENER EN CUENTA
-</div><div class="boton gris">
-<div class="icono">⚙</div>
-CONFIGURACIÓN
-</div><div class="boton verde">
-<div class="icono">🗂</div>
-HISTÓRICO PEDIDOS
-</div><div class="boton gris">
-<div class="icono">💶</div>
-CAJA
-</div><div class="boton gris">
-<div class="icono">📖</div>
-DIARIO DEL BAR
-</div><div class="boton gris">
-<div class="icono">💰</div>
-PAGOS
-</div></div><div class="footer">
-✉ Avisos del bar
-</div></body>
+<header>
+Monolito GPT Pro
+<div class="sub">Sistema del bar</div>
+</header>
+
+<div class="panel">
+
+<div class="boton" onclick="abrir('proveedores')">
+<span class="icono">🚚</span>
+Proveedores
+<div class="contador">(0)</div>
+</div>
+
+<div class="boton" onclick="abrir('articulos')">
+<span class="icono">📦</span>
+Artículos
+<div class="contador">(0)</div>
+</div>
+
+<div class="boton" onclick="abrir('pedidos')">
+<span class="icono">📝</span>
+Pedidos
+</div>
+
+<div class="boton" onclick="abrir('historial')">
+<span class="icono">📊</span>
+Histórico
+</div>
+
+<div class="boton" onclick="abrir('ventas')">
+<span class="icono">💰</span>
+Ventas
+</div>
+
+<div class="boton" onclick="abrir('comparador')">
+<span class="icono">⚖️</span>
+Comparador precios
+</div>
+
+<div class="boton" onclick="abrir('configuracion')">
+<span class="icono">⚙️</span>
+Configuración
+</div>
+
+<div class="boton" onclick="abrir('buscar')">
+<span class="icono">🔍</span>
+Buscar artículo
+</div>
+
+<div class="boton" onclick="abrir('incidencias')">
+<span class="icono">📄</span>
+Incidencias
+<div class="contador">(0)</div>
+</div>
+
+<div class="boton" onclick="abrir('comunicaciones')">
+<span class="icono">✉</span>
+Comunicaciones
+<div class="contador">(0)</div>
+</div>
+
+<div class="boton" onclick="abrir('calendario')">
+<span class="icono">📅</span>
+Calendario
+</div>
+
+<div class="boton" onclick="abrir('ayuda')">
+<span class="icono">🤖</span>
+Ayuda
+</div>
+
+</div>
+
+<div class="footer">
+Monolito GPT Pro  
+<br>
+by Javier Gion  
+<br>
+IA ChatGPT
+</div>
+
+<script>
+
+function abrir(modulo){
+
+if(modulo=="ayuda"){
+alert("Ayuda Monolito GPT Pro\n\nSistema creado para control de compras, pedidos y gestión del bar.\n\nAsistente: ChatGPT");
+return;
+}
+
+alert("Abrir módulo: " + modulo);
+
+}
+
+</script>
+
+</body>
 </html>
