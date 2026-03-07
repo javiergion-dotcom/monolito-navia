@@ -40,4 +40,64 @@ margin:auto;
 .boton{
 border-radius:12px;
 color:white;
-font
+font-weight:bold;
+padding:28px;
+cursor:pointer;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+transition:0.15s;
+}
+
+.boton:active{
+transform:scale(0.95);
+filter:brightness(0.9);
+}
+
+.azul{background:#3c7ec4;}
+.gris{background:#5d666d;}
+.naranja{background:#e8892b;}
+.verde{background:#5cab4b;}
+
+.footer{
+margin-top:20px;
+color:#777;
+font-size:14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<span onclick="history.back()">⬅ Volver</span>
+<div>MONOLITO – Sistema del Bar</div>
+<span onclick="alert('Sistema Monolito GPT Pro\nControl del bar.\nPedidos, artículos, caja y análisis.')">❓ Ayuda</span>
+</div>
+
+<div class="container">
+
+<div class="boton azul">🚚 PROVEEDORES</div>
+<div class="boton gris">📦 ARTÍCULOS</div>
+<div class="boton gris">📊 COMPARADOR</div>
+
+<div class="boton azul">📝 PEDIDOS</div>
+<div class="boton naranja">⚠️ A TENER EN CUENTA</div>
+<div class="boton gris">⚙️ CONFIGURACIÓN</div>
+
+<div class="boton verde">📁 HISTÓRICO PEDIDOS</div>
+<div class="boton gris">💶 CAJA</div>
+<div class="boton gris">📖 DIARIO DEL BAR</div>
+
+<div class="boton gris">💰 PAGOS</div>
+
+</div>
+
+<div class="footer">
+Sistema MONOLITO GPT Pro – Javier Gión + IA
+</div>
+
+</body>
+</html>
