@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
+
 <meta charset="UTF-8">
-<title>MONOLITO – Sistema del Bar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MONOLITO GPT Pro</title>
 
 <style>
 
@@ -11,37 +13,46 @@ body{
 font-family: Arial, Helvetica, sans-serif;
 background:#f2f2f2;
 margin:0;
+padding:0;
 text-align:center;
 }
+
+/* CABECERA */
 
 .header{
 background:#222;
 color:white;
-padding:14px;
+padding:18px;
 font-weight:bold;
 display:flex;
 justify-content:space-between;
 align-items:center;
+font-size:18px;
 }
 
 .header span{
 cursor:pointer;
 }
 
+/* CONTENEDOR BOTONES */
+
 .container{
 display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:18px;
-padding:20px;
-max-width:1000px;
+grid-template-columns:repeat(2,1fr);
+gap:16px;
+padding:16px;
+max-width:650px;
 margin:auto;
 }
 
+/* BOTONES */
+
 .boton{
-border-radius:12px;
+border-radius:14px;
 color:white;
 font-weight:bold;
-padding:28px;
+padding:35px;
+font-size:18px;
 cursor:pointer;
 display:flex;
 flex-direction:column;
@@ -60,10 +71,13 @@ filter:brightness(0.9);
 .naranja{background:#e8892b;}
 .verde{background:#5cab4b;}
 
+/* PIE */
+
 .footer{
 margin-top:20px;
 color:#777;
 font-size:14px;
+padding-bottom:20px;
 }
 
 </style>
@@ -72,247 +86,116 @@ font-size:14px;
 <body>
 
 <div class="header">
-<span onclick="history.back()">⬅ Volver</span>
-<div>MONOLITO – Sistema del Bar</div>
-<span onclick="alert('Sistema Monolito GPT Pro\nControl del bar.\nPedidos, artículos, caja y análisis.')">❓ Ayuda</span>
+<span onclick="volver()">⬅ Volver</span>
+<div>MONOLITO GPT Pro</div>
+<span onclick="alert('Sistema de control del bar')">❓ Ayuda</span>
 </div>
 
 <div class="container">
 
-<div class="boton azul">🚚 PROVEEDORES</div>
-<div class="boton gris">📦 ARTÍCULOS</div>
-<div class="boton gris">📊 COMPARADOR</div>
+<div class="boton azul" onclick="abrirProveedores()">🚚 PROVEEDORES</div>
 
-<div class="boton azul">📝 PEDIDOS</div>
-<div class="boton naranja">⚠️ A TENER EN CUENTA</div>
-<div class="boton gris">⚙️ CONFIGURACIÓN</div>
+<div class="boton gris" onclick="abrirArticulos()">📦 ARTÍCULOS</div>
 
-<div class="boton verde">📁 HISTÓRICO PEDIDOS</div>
-<div class="boton gris">💶 CAJA</div>
-<div class="boton gris">📖 DIARIO DEL BAR</div>
+<div class="boton azul" onclick="abrirPedidos()">📝 PEDIDOS</div>
 
-<div class="boton gris">💰 PAGOS</div>
+<div class="boton verde" onclick="abrirHistorico()">📁 HISTÓRICO</div>
+
+<div class="boton gris" onclick="abrirComparador()">📊 COMPARADOR</div>
+
+<div class="boton gris" onclick="abrirConfiguracion()">⚙ CONFIGURACIÓN</div>
+
+<div class="boton gris" onclick="abrirVentas()">💶 VENTAS</div>
+
+<div class="boton gris" onclick="abrirDiario()">📖 DIARIO</div>
 
 </div>
 
 <div class="footer">
-Sistema MONOLITO GPT Pro – Javier Gión + IA
+Monolito GPT Pro — Javier Gión + IA ChatGPT
 </div>
 
-</body><script>
+<script>
+
+/* VOLVER */
+
+let salir=false;
+
+function volver(){
+
+if(!salir){
+alert("Pulsa volver otra vez para cerrar el programa");
+salir=true;
+
+setTimeout(function(){
+salir=false;
+},2000);
+
+}else{
+location.reload();
+}
+
+}
 
 /* PROVEEDORES */
 
 function abrirProveedores(){
 
-document.body.innerHTML = `
+document.body.innerHTML=`
 
 <div class="header">
 <span onclick="location.reload()">⬅ Volver</span>
 <div>PROVEEDORES</div>
-<span>❓ Ayuda</span>
+<span>❓</span>
 </div>
 
-<div style="padding:20px;max-width:600px;margin:auto">
+<div style="padding:20px">
 
 <h2>Nuevo proveedor</h2>
 
-<input placeholder="Nombre proveedor" style="width:100%;padding:10px;margin:5px">
-<input placeholder="Teléfono" style="width:100%;padding:10px;margin:5px">
-<input placeholder="Día de pedido" style="width:100%;padding:10px;margin:5px">
-<input placeholder="Día de reparto" style="width:100%;padding:10px;margin:5px">
+<input placeholder="Nombre proveedor" style="width:90%;padding:12px;margin:6px">
 
-<select style="width:100%;padding:10px;margin:5px">
+<input placeholder="Teléfono" style="width:90%;padding:12px;margin:6px">
+
+<input placeholder="Día de pedido" style="width:90%;padding:12px;margin:6px">
+
+<input placeholder="Día de reparto" style="width:90%;padding:12px;margin:6px">
+
+<select style="width:90%;padding:12px;margin:6px">
 <option>Forma de pago</option>
 <option>Reposición</option>
 <option>Contado</option>
 <option>Banco</option>
-<option>Entregas a cuenta</option>
+<option>Entrega a cuenta</option>
 </select>
 
-<button style="width:100%;padding:15px;margin-top:10px;background:#3c7ec4;color:white;border:none;border-radius:8px">
+<button style="width:90%;padding:16px;margin-top:12px;background:#3c7ec4;color:white;border:none;border-radius:8px;font-size:16px">
 Guardar proveedor
 </button>
 
 </div>
-`;
-
-}
-
-
-/* ARTICULOS */
-
-function abrirArticulos(){
-
-document.body.innerHTML = `
-
-<div class="header">
-<span onclick="location.reload()">⬅ Volver</span>
-<div>ARTÍCULOS</div>
-<span>❓ Ayuda</span>
-</div>
-
-<div style="padding:20px">
-
-<h2>Artículos</h2>
-
-<p>Aquí irá la base de datos de artículos.</p>
-
-</div>
 
 `;
 
 }
 
+/* PANTALLAS VACÍAS */
 
-/* PEDIDOS */
+function abrirArticulos(){alert("Módulo artículos");}
 
-function abrirPedidos(){
+function abrirPedidos(){alert("Módulo pedidos");}
 
-document.body.innerHTML = `
+function abrirHistorico(){alert("Módulo histórico");}
 
-<div class="header">
-<span onclick="location.reload()">⬅ Volver</span>
-<div>PEDIDOS</div>
-<span>❓ Ayuda</span>
-</div>
+function abrirComparador(){alert("Módulo comparador");}
 
-<div style="padding:20px">
+function abrirConfiguracion(){alert("Módulo configuración");}
 
-<h2>Pedido semanal</h2>
+function abrirVentas(){alert("Módulo ventas");}
 
-<p>Aquí se realizará el pedido al proveedor.</p>
-
-</div>
-
-`;
-
-}
-
-
-/* HISTORICO */
-
-function abrirHistorico(){
-
-document.body.innerHTML = `
-
-<div class="header">
-<span onclick="location.reload()">⬅ Volver</span>
-<div>HISTÓRICO PEDIDOS</div>
-<span>❓ Ayuda</span>
-</div>
-
-<div style="padding:20px">
-
-<h2>Histórico</h2>
-
-<p>Aquí podrás revisar pedidos anteriores.</p>
-
-</div>
-
-`;
-
-}
-
-
-/* COMPARADOR */
-
-function abrirComparador(){
-
-document.body.innerHTML = `
-
-<div class="header">
-<span onclick="location.reload()">⬅ Volver</span>
-<div>COMPARADOR DE PRECIOS</div>
-<span>❓ Ayuda</span>
-</div>
-
-<div style="padding:20px">
-
-<h2>Comparador</h2>
-
-<p>Aquí se compararán ofertas de proveedores.</p>
-
-</div>
-
-`;
-
-}
-
-
-/* CONFIGURACION */
-
-function abrirConfiguracion(){
-
-document.body.innerHTML = `
-
-<div class="header">
-<span onclick="location.reload()">⬅ Volver</span>
-<div>CONFIGURACIÓN</div>
-<span>❓ Ayuda</span>
-</div>
-
-<div style="padding:20px">
-
-<h2>Configuración del sistema</h2>
-
-<p>Zona reservada para Javier y Silvia.</p>
-
-</div>
-
-`;
-
-}
-
-
-/* VENTAS */
-
-function abrirVentas(){
-
-document.body.innerHTML = `
-
-<div class="header">
-<span onclick="location.reload()">⬅ Volver</span>
-<div>VENTAS</div>
-<span>❓ Ayuda</span>
-</div>
-
-<div style="padding:20px">
-
-<h2>Registro de ventas</h2>
-
-<p>Aquí se anotarán las ventas diarias.</p>
-
-</div>
-
-`;
-
-}
-
-
-/* DIARIO */
-
-function abrirDiario(){
-
-document.body.innerHTML = `
-
-<div class="header">
-<span onclick="location.reload()">⬅ Volver</span>
-<div>DIARIO DEL BAR</div>
-<span>❓ Ayuda</span>
-</div>
-
-<div style="padding:20px">
-
-<h2>Calendario y anotaciones</h2>
-
-<p>Aquí se registrarán eventos y avisos.</p>
-
-</div>
-
-`;
-
-}
+function abrirDiario(){alert("Módulo diario");}
 
 </script>
+
+</body>
 </html>
