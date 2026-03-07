@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Monolito GPT Pro</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 
@@ -17,16 +22,11 @@ text-align:center;
 .header{
 background:#222;
 color:white;
-padding:15px;
-font-size:22px;
+padding:14px;
 font-weight:bold;
 display:flex;
 justify-content:space-between;
 align-items:center;
-}
-
-.header span{
-cursor:pointer;
 }
 
 .container{
@@ -42,7 +42,7 @@ margin:auto;
 border-radius:14px;
 color:white;
 font-weight:bold;
-padding:28px;
+padding:30px;
 cursor:pointer;
 display:flex;
 flex-direction:column;
@@ -52,9 +52,13 @@ transition:0.15s;
 font-size:18px;
 }
 
+.boton i{
+font-size:28px;
+margin-bottom:8px;
+}
+
 .boton:active{
 transform:scale(0.95);
-filter:brightness(0.9);
 }
 
 .azul{background:#3c7ec4;}
@@ -68,71 +72,75 @@ color:#777;
 font-size:14px;
 }
 
-.indicadores{
-margin:10px;
-font-size:14px;
-}
-
 </style>
+
 </head>
 
 <body>
 
 <div class="header">
 <span>⬅ Volver</span>
-<div>MONOLITO GPT PRO</div>
-<div id="hora"></div>
+<div>MONOLITO GPT Pro</div>
 <span>❓ Ayuda</span>
-</div>
-
-<div class="indicadores">
-🔴 Incidencias (0) &nbsp;&nbsp; 🟡 Comunicaciones (0)
 </div>
 
 <div class="container">
 
-<div class="boton azul">PROVEEDORES</div>
+<div class="boton azul">
+<i class="fa-solid fa-truck"></i>
+PROVEEDORES
+</div>
 
-<div class="boton gris">ARTÍCULOS</div>
+<div class="boton gris">
+<i class="fa-solid fa-box"></i>
+ARTÍCULOS
+</div>
 
-<div class="boton gris">COMPARADOR</div>
+<div class="boton naranja">
+<i class="fa-solid fa-scale-balanced"></i>
+COMPARADOR
+</div>
 
-<div class="boton azul">PEDIDOS</div>
+<div class="boton azul">
+<i class="fa-solid fa-cart-shopping"></i>
+PEDIDOS
+</div>
 
-<div class="boton naranja">A TENER EN CUENTA</div>
+<div class="boton azul">
+<i class="fa-solid fa-money-bill-wave"></i>
+PAGOS
+</div>
 
-<div class="boton gris">CONFIGURACIÓN</div>
+<div class="boton gris">
+<i class="fa-solid fa-gear"></i>
+CONFIGURACIÓN
+</div>
 
-<div class="boton verde">HISTÓRICO</div>
+<div class="boton verde">
+<i class="fa-solid fa-clock-rotate-left"></i>
+HISTÓRICO
+</div>
 
-<div class="boton azul">VENTAS</div>
+<div class="boton azul">
+<i class="fa-solid fa-calendar-days"></i>
+CALENDARIO
+</div>
 
-<div class="boton azul">PAGOS PROVEEDORES</div>
+<div class="boton naranja">
+<i class="fa-solid fa-triangle-exclamation"></i>
+INCIDENCIAS
+</div>
 
-<div class="boton gris">CALENDARIO</div>
-
-<div class="boton gris">COMPROBACIONES</div>
+<div class="boton naranja">
+<i class="fa-solid fa-bell"></i>
+AVISOS
+</div>
 
 </div>
 
 <div class="footer">
-Monolito GPT Pro<br>
-por Javier Gion – IA ChatGPT
+Monolito GPT Pro — Javier Gión & IA ChatGPT
 </div>
-
-<script>
-
-function actualizarHora(){
-const ahora=new Date();
-let h=ahora.getHours().toString().padStart(2,"0");
-let m=ahora.getMinutes().toString().padStart(2,"0");
-document.getElementById("hora").innerHTML=h+":"+m;
-}
-
-setInterval(actualizarHora,1000);
-actualizarHora();
-
-</script>
 
 </body>
 </html>
