@@ -99,5 +99,220 @@ font-size:14px;
 Sistema MONOLITO GPT Pro – Javier Gión + IA
 </div>
 
-</body>
+</body><script>
+
+/* PROVEEDORES */
+
+function abrirProveedores(){
+
+document.body.innerHTML = `
+
+<div class="header">
+<span onclick="location.reload()">⬅ Volver</span>
+<div>PROVEEDORES</div>
+<span>❓ Ayuda</span>
+</div>
+
+<div style="padding:20px;max-width:600px;margin:auto">
+
+<h2>Nuevo proveedor</h2>
+
+<input placeholder="Nombre proveedor" style="width:100%;padding:10px;margin:5px">
+<input placeholder="Teléfono" style="width:100%;padding:10px;margin:5px">
+<input placeholder="Día de pedido" style="width:100%;padding:10px;margin:5px">
+<input placeholder="Día de reparto" style="width:100%;padding:10px;margin:5px">
+
+<select style="width:100%;padding:10px;margin:5px">
+<option>Forma de pago</option>
+<option>Reposición</option>
+<option>Contado</option>
+<option>Banco</option>
+<option>Entregas a cuenta</option>
+</select>
+
+<button style="width:100%;padding:15px;margin-top:10px;background:#3c7ec4;color:white;border:none;border-radius:8px">
+Guardar proveedor
+</button>
+
+</div>
+`;
+
+}
+
+
+/* ARTICULOS */
+
+function abrirArticulos(){
+
+document.body.innerHTML = `
+
+<div class="header">
+<span onclick="location.reload()">⬅ Volver</span>
+<div>ARTÍCULOS</div>
+<span>❓ Ayuda</span>
+</div>
+
+<div style="padding:20px">
+
+<h2>Artículos</h2>
+
+<p>Aquí irá la base de datos de artículos.</p>
+
+</div>
+
+`;
+
+}
+
+
+/* PEDIDOS */
+
+function abrirPedidos(){
+
+document.body.innerHTML = `
+
+<div class="header">
+<span onclick="location.reload()">⬅ Volver</span>
+<div>PEDIDOS</div>
+<span>❓ Ayuda</span>
+</div>
+
+<div style="padding:20px">
+
+<h2>Pedido semanal</h2>
+
+<p>Aquí se realizará el pedido al proveedor.</p>
+
+</div>
+
+`;
+
+}
+
+
+/* HISTORICO */
+
+function abrirHistorico(){
+
+document.body.innerHTML = `
+
+<div class="header">
+<span onclick="location.reload()">⬅ Volver</span>
+<div>HISTÓRICO PEDIDOS</div>
+<span>❓ Ayuda</span>
+</div>
+
+<div style="padding:20px">
+
+<h2>Histórico</h2>
+
+<p>Aquí podrás revisar pedidos anteriores.</p>
+
+</div>
+
+`;
+
+}
+
+
+/* COMPARADOR */
+
+function abrirComparador(){
+
+document.body.innerHTML = `
+
+<div class="header">
+<span onclick="location.reload()">⬅ Volver</span>
+<div>COMPARADOR DE PRECIOS</div>
+<span>❓ Ayuda</span>
+</div>
+
+<div style="padding:20px">
+
+<h2>Comparador</h2>
+
+<p>Aquí se compararán ofertas de proveedores.</p>
+
+</div>
+
+`;
+
+}
+
+
+/* CONFIGURACION */
+
+function abrirConfiguracion(){
+
+document.body.innerHTML = `
+
+<div class="header">
+<span onclick="location.reload()">⬅ Volver</span>
+<div>CONFIGURACIÓN</div>
+<span>❓ Ayuda</span>
+</div>
+
+<div style="padding:20px">
+
+<h2>Configuración del sistema</h2>
+
+<p>Zona reservada para Javier y Silvia.</p>
+
+</div>
+
+`;
+
+}
+
+
+/* VENTAS */
+
+function abrirVentas(){
+
+document.body.innerHTML = `
+
+<div class="header">
+<span onclick="location.reload()">⬅ Volver</span>
+<div>VENTAS</div>
+<span>❓ Ayuda</span>
+</div>
+
+<div style="padding:20px">
+
+<h2>Registro de ventas</h2>
+
+<p>Aquí se anotarán las ventas diarias.</p>
+
+</div>
+
+`;
+
+}
+
+
+/* DIARIO */
+
+function abrirDiario(){
+
+document.body.innerHTML = `
+
+<div class="header">
+<span onclick="location.reload()">⬅ Volver</span>
+<div>DIARIO DEL BAR</div>
+<span>❓ Ayuda</span>
+</div>
+
+<div style="padding:20px">
+
+<h2>Calendario y anotaciones</h2>
+
+<p>Aquí se registrarán eventos y avisos.</p>
+
+</div>
+
+`;
+
+}
+
+</script>
 </html>
