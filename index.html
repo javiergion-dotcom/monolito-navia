@@ -1,172 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>MONOLITO</title>
 
 <style>
 
 body{
-font-family: Arial, Helvetica, sans-serif;
-background:#f2f2f2;
-margin:0;
+font-family: Arial, sans-serif;
+background:#f4f4f4;
 text-align:center;
-}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-padding:10px 20px;
-font-size:20px;
-}
-
-.topbar span{
-cursor:pointer;
+margin:0;
+padding:0;
 }
 
 h1{
-margin:5px 0 10px 0;
-font-size:32px;
+background:#222;
+color:white;
+padding:20px;
+margin:0;
+}
+
+h2{
+margin-top:30px;
+color:#333;
 }
 
 .panel{
-display:grid;
-grid-template-columns: repeat(3, 1fr);
-gap:12px;
-width:92%;
-max-width:900px;
-margin:auto;
+margin:20px;
 }
 
-.boton{
-background:#4CAF50;
+button{
+padding:15px 25px;
+margin:10px;
+font-size:16px;
+border:none;
+border-radius:8px;
+background:#2e7d32;
 color:white;
-padding:20px;
-font-size:18px;
-border-radius:12px;
 cursor:pointer;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-box-shadow:0 4px 6px rgba(0,0,0,0.2);
 }
 
-.icono{
-font-size:32px;
-margin-bottom:5px;
-}
-
-.pagos{
-grid-column:2;
-background:#333;
-}
-
-.avisos{
-background:white;
-margin:15px auto;
-padding:15px;
-border-radius:10px;
-width:92%;
-max-width:900px;
-text-align:left;
-}
-
-.bottombar{
-display:flex;
-justify-content:space-around;
-margin-top:10px;
-font-size:20px;
+button:hover{
+background:#1b5e20;
 }
 
 </style>
-
 </head>
-
 
 <body>
 
-<div class="topbar">
-<span>← Volver</span>
-<span>❓ Ayuda</span>
-</div>
-
 <h1>MONOLITO</h1>
-
 
 <div class="panel">
 
-<div class="boton">
-<div class="icono">🏢</div>
-PROVEEDORES
-</div>
+<h2>OPERATIVA</h2>
 
-<div class="boton">
-<div class="icono">📦</div>
-ARTÍCULOS
-</div>
+<button onclick="location.href='proveedores.html'">Proveedores</button>
+<button onclick="location.href='articulos.html'">Artículos</button>
+<button onclick="location.href='pedidos.html'">Pedidos</button>
 
-<div class="boton">
-<div class="icono">📊</div>
-COMPARADOR
-</div>
+<h2>CONTROL</h2>
 
-<div class="boton">
-<div class="icono">📝</div>
-PEDIDOS
-</div>
+<button onclick="location.href='caja.html'">Caja</button>
+<button onclick="location.href='diario.html'">Diario</button>
+<button onclick="location.href='pagos.html'">Pagos</button>
 
-<div class="boton">
-<div class="icono">⚠</div>
-A TENER EN CUENTA
-</div>
+<h2>ANÁLISIS</h2>
 
-<div class="boton">
-<div class="icono">⚙</div>
-CONFIGURACIÓN
-</div>
+<button onclick="location.href='comparador.html'">Comparador</button>
+<button onclick="location.href='historico.html'">Histórico</button>
 
-<div class="boton">
-<div class="icono">📚</div>
-HISTÓRICO
-</div>
+<h2>SISTEMA</h2>
 
-<div class="boton">
-<div class="icono">💰</div>
-CAJA
-</div>
-
-<div class="boton">
-<div class="icono">📖</div>
-DIARIO
-</div>
-
-<div class="boton pagos">
-<div class="icono">💳</div>
-PAGOS
-</div>
+<button onclick="location.href='configuracion.html'">Configuración</button>
 
 </div>
-
-
-<div class="avisos">
-
-<h3>AVISOS DEL BAR</h3>
-
-<p>• Oferta Rioja Meles León pendiente revisar</p>
-<p>• Incidencia proveedor Turado pendiente</p>
-
-</div>
-
-
-<div class="bottombar">
-<span>⚠ Incidencias</span>
-<span>💬 Comunicaciones</span>
-</div>
-
 
 </body>
 </html>
