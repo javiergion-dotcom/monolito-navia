@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MONOLITO</title>
 
 <style>
@@ -12,129 +10,177 @@
 body{
 margin:0;
 font-family:Arial, Helvetica, sans-serif;
-background:#e4e4e4;
+background:#e5e5e5;
 }
 
 /* CABECERA */
 
 header{
-background:#1f1f1f;
+background:#2b2b2b;
 color:white;
-padding:20px;
-font-size:28px;
-text-align:center;
-letter-spacing:2px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 20px;
+font-size:18px;
 }
 
-/* PANEL */
+header .titulo{
+font-weight:bold;
+}
+
+header .derecha{
+display:flex;
+gap:15px;
+align-items:center;
+font-size:16px;
+}
+
+/* GRID */
 
 .panel{
 max-width:900px;
 margin:auto;
-padding:40px;
+padding:30px;
 display:grid;
 grid-template-columns:repeat(3,1fr);
-gap:25px;
+gap:20px;
 }
 
-/* BOTONES */
+/* TARJETAS */
 
 .boton{
-height:95px;
+height:140px;
+border-radius:8px;
+color:white;
 display:flex;
+flex-direction:column;
 align-items:center;
 justify-content:center;
-
-border-radius:12px;
-font-size:18px;
 font-weight:bold;
-color:white;
-
+text-align:center;
+box-shadow:0 6px 10px rgba(0,0,0,0.25);
 cursor:pointer;
-
-box-shadow:
-0 6px 12px rgba(0,0,0,0.25),
-inset 0 1px 0 rgba(255,255,255,0.15);
-
 transition:0.2s;
 }
 
 .boton:hover{
-transform:translateY(-4px);
+transform:translateY(-3px);
+}
+
+/* ICONO */
+
+.icono{
+font-size:42px;
+margin-bottom:10px;
 }
 
 /* COLORES */
 
-.proveedores{background:#3a6ea5;}
-.articulos{background:#5a5a5a;}
-.comparador{background:#666666;}
+.azul{background:#3f6ea5;}
+.gris{background:#555;}
+.gris2{background:#5f5f5f;}
+.naranja{background:#f39c12;}
+.verde{background:#4CAF50;}
+.negro{background:#444;}
+.negro2{background:#505050;}
 
-.pedidos{background:#4a7bd0;}
-.alerta{background:#f39c12;}
+/* AVISOS */
 
-.config{background:#707070;}
-
-.historico{background:#4CAF50;}
-
-.caja{background:#4b4b4b;}
-.diario{background:#5a5a5a;}
-.pagos{background:#444444;}
+.avisos{
+background:#2f2f2f;
+color:white;
+padding:12px 20px;
+font-weight:bold;
+display:flex;
+justify-content:flex-end;
+}
 
 </style>
-
 </head>
-
 
 <body>
 
 <header>
-MONOLITO
+
+<div class="titulo">
+MONOLITO – Sistema del Bar
+</div>
+
+<div class="derecha">
+<span id="fecha"></span>
+</div>
+
 </header>
 
 
 <div class="panel">
 
-<div class="boton proveedores" onclick="location.href='proveedores.html'">
+<div class="boton azul">
+<div class="icono">🚚</div>
 PROVEEDORES
 </div>
 
-<div class="boton articulos" onclick="location.href='articulos.html'">
+<div class="boton gris">
+<div class="icono">📋</div>
 ARTÍCULOS
 </div>
 
-<div class="boton comparador">
+<div class="boton gris2">
+<div class="icono">📊</div>
 COMPARADOR
 </div>
 
-<div class="boton pedidos">
+<div class="boton azul">
+<div class="icono">📝</div>
 PEDIDOS
 </div>
 
-<div class="boton alerta">
+<div class="boton naranja">
+<div class="icono">⚠️</div>
 A TENER EN CUENTA
 </div>
 
-<div class="boton config">
+<div class="boton gris">
+<div class="icono">⚙️</div>
 CONFIGURACIÓN
 </div>
 
-<div class="boton historico">
-HISTÓRICO
+<div class="boton verde">
+<div class="icono">🗂️</div>
+HISTÓRICO PEDIDOS
 </div>
 
-<div class="boton caja">
+<div class="boton negro">
+<div class="icono">💰</div>
 CAJA
 </div>
 
-<div class="boton diario">
-DIARIO
+<div class="boton negro2">
+<div class="icono">📖</div>
+DIARIO DEL BAR
 </div>
 
-<div class="boton pagos">
+<div class="boton negro">
+<div class="icono">💳</div>
 PAGOS
 </div>
 
 </div>
+
+
+<div class="avisos">
+📩 AVISOS DEL BAR
+</div>
+
+
+<script>
+const hoy = new Date();
+document.getElementById("fecha").innerText =
+hoy.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}) +
+" • " +
+hoy.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+</script>
 
 </body>
 </html>
