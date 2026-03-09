@@ -1,69 +1,98 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>MONOLITO</title>
 
 <style>
 
 body{
-font-family:Arial;
-background:#e5e5e5;
 margin:0;
-text-align:center;
+font-family:Arial, Helvetica, sans-serif;
+background:#e4e4e4;
 }
 
+/* CABECERA */
+
 header{
-background:#222;
+background:#1f1f1f;
 color:white;
 padding:20px;
 font-size:28px;
+text-align:center;
+letter-spacing:2px;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:20px;
-padding:30px;
+/* PANEL */
+
+.panel{
 max-width:900px;
 margin:auto;
+padding:40px;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:25px;
 }
+
+/* BOTONES */
 
 .boton{
-padding:30px;
-border-radius:10px;
-color:white;
+height:95px;
+display:flex;
+align-items:center;
+justify-content:center;
+
+border-radius:12px;
 font-size:18px;
+font-weight:bold;
+color:white;
+
 cursor:pointer;
-box-shadow:0 4px 8px rgba(0,0,0,0.2);
+
+box-shadow:
+0 6px 12px rgba(0,0,0,0.25),
+inset 0 1px 0 rgba(255,255,255,0.15);
+
+transition:0.2s;
 }
-
-.proveedores{background:#2e6da4;}
-.articulos{background:#555;}
-.comparador{background:#666;}
-
-.pedidos{background:#3a7bd5;}
-.alerta{background:#f39c12;}
-.config{background:#777;}
-
-.historico{background:#4caf50;}
-.caja{background:#444;}
-.diario{background:#555;}
-
-.pagos{background:#444;}
 
 .boton:hover{
-transform:scale(1.05);
+transform:translateY(-4px);
 }
 
+/* COLORES */
+
+.proveedores{background:#3a6ea5;}
+.articulos{background:#5a5a5a;}
+.comparador{background:#666666;}
+
+.pedidos{background:#4a7bd0;}
+.alerta{background:#f39c12;}
+
+.config{background:#707070;}
+
+.historico{background:#4CAF50;}
+
+.caja{background:#4b4b4b;}
+.diario{background:#5a5a5a;}
+.pagos{background:#444444;}
+
 </style>
+
 </head>
+
 
 <body>
 
-<header>MONOLITO</header>
+<header>
+MONOLITO
+</header>
 
-<div class="grid">
+
+<div class="panel">
 
 <div class="boton proveedores" onclick="location.href='proveedores.html'">
 PROVEEDORES
