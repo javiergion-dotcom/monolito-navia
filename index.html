@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>MONOLITO</title>
 
 <style>
@@ -25,15 +27,15 @@ padding:12px 20px;
 font-size:18px;
 }
 
-header .titulo{
+.titulo{
 font-weight:bold;
 }
 
-header .derecha{
+.top-icons{
 display:flex;
 gap:15px;
 align-items:center;
-font-size:16px;
+font-size:18px;
 }
 
 /* GRID */
@@ -51,7 +53,7 @@ gap:20px;
 
 .boton{
 height:140px;
-border-radius:8px;
+border-radius:10px;
 color:white;
 display:flex;
 flex-direction:column;
@@ -68,10 +70,18 @@ transition:0.2s;
 transform:translateY(-3px);
 }
 
-/* ICONO */
+/* ICONO CIRCULAR */
 
-.icono{
-font-size:42px;
+.circulo{
+width:60px;
+height:60px;
+border-radius:50%;
+background:white;
+color:#333;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:28px;
 margin-bottom:10px;
 }
 
@@ -88,6 +98,9 @@ margin-bottom:10px;
 /* AVISOS */
 
 .avisos{
+position:fixed;
+bottom:0;
+width:100%;
 background:#2f2f2f;
 color:white;
 padding:12px 20px;
@@ -96,7 +109,18 @@ display:flex;
 justify-content:flex-end;
 }
 
+.indicador-rojo{
+color:red;
+font-size:18px;
+}
+
+.indicador-amarillo{
+color:gold;
+font-size:18px;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -107,8 +131,17 @@ justify-content:flex-end;
 MONOLITO – Sistema del Bar
 </div>
 
-<div class="derecha">
+<div class="top-icons">
+
+<span class="indicador-rojo">●</span>
+<span class="indicador-amarillo">●</span>
+
+<span>📅</span>
+<span>⬅</span>
+<span>❓</span>
+
 <span id="fecha"></span>
+
 </div>
 
 </header>
@@ -117,52 +150,52 @@ MONOLITO – Sistema del Bar
 <div class="panel">
 
 <div class="boton azul">
-<div class="icono">🚚</div>
+<div class="circulo">🚚</div>
 PROVEEDORES
 </div>
 
 <div class="boton gris">
-<div class="icono">📋</div>
+<div class="circulo">📋</div>
 ARTÍCULOS
 </div>
 
 <div class="boton gris2">
-<div class="icono">📊</div>
+<div class="circulo">📊</div>
 COMPARADOR
 </div>
 
 <div class="boton azul">
-<div class="icono">📝</div>
+<div class="circulo">📝</div>
 PEDIDOS
 </div>
 
 <div class="boton naranja">
-<div class="icono">⚠️</div>
+<div class="circulo">⚠️</div>
 A TENER EN CUENTA
 </div>
 
 <div class="boton gris">
-<div class="icono">⚙️</div>
+<div class="circulo">⚙️</div>
 CONFIGURACIÓN
 </div>
 
 <div class="boton verde">
-<div class="icono">🗂️</div>
+<div class="circulo">🗂️</div>
 HISTÓRICO PEDIDOS
 </div>
 
 <div class="boton negro">
-<div class="icono">💰</div>
-CAJA
+<div class="circulo">💰</div>
+VENTAS
 </div>
 
 <div class="boton negro2">
-<div class="icono">📖</div>
+<div class="circulo">📖</div>
 DIARIO DEL BAR
 </div>
 
 <div class="boton negro">
-<div class="icono">💳</div>
+<div class="circulo">💳</div>
 PAGOS
 </div>
 
@@ -170,17 +203,21 @@ PAGOS
 
 
 <div class="avisos">
-📩 AVISOS DEL BAR
+✉ AVISOS DEL BAR
 </div>
 
 
 <script>
+
 const hoy = new Date();
+
 document.getElementById("fecha").innerText =
 hoy.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}) +
 " • " +
 hoy.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+
 </script>
+
 
 </body>
 </html>
