@@ -33,6 +33,7 @@ border:20px solid #111;
 border-radius:40px;
 box-shadow:0 20px 50px rgba(0,0,0,.3);
 overflow:hidden;
+position:relative;
 }
 
 header{
@@ -49,7 +50,7 @@ font-weight:bold;
 .header-right{
 display:flex;
 gap:20px;
-font-size:16px;
+font-size:15px;
 }
 
 .grid-container{
@@ -86,9 +87,12 @@ transform:scale(.94);
 }
 
 .counter{
-font-size:10px;
-margin-top:-6px;
-opacity:0.6;
+position:absolute;
+top:8px;
+right:14px;
+font-size:14px;
+color:white;
+font-weight:bold;
 }
 
 .blue{background:var(--btn-blue);}
@@ -108,16 +112,11 @@ border-radius:4px;
 font-size:12px;
 }
 
-/* PANTALLAS */
-
 .screen{
 display:none;
 padding:40px;
 text-align:center;
-}
-
-.screen h2{
-margin-top:0;
+font-size:22px;
 }
 
 </style>
@@ -201,19 +200,17 @@ PAGOS
 
 </div>
 
-<!-- PANTALLAS SIMPLES -->
-
-<div id="proveedores" class="screen"><h2>PROVEEDORES</h2></div>
-<div id="articulos" class="screen"><h2>ARTÍCULOS</h2></div>
-<div id="comparador" class="screen"><h2>COMPARADOR</h2></div>
-<div id="pedidos" class="screen"><h2>PEDIDOS</h2></div>
-<div id="tenerencuenta" class="screen"><h2>A TENER EN CUENTA</h2></div>
-<div id="configuracion" class="screen"><h2>CONFIGURACIÓN</h2></div>
-<div id="historico" class="screen"><h2>HISTÓRICO</h2></div>
-<div id="ventas" class="screen"><h2>VENTAS</h2></div>
-<div id="calendario" class="screen"><h2>CALENDARIO</h2></div>
-<div id="mensajes" class="screen"><h2>COMUNICACIÓN INTERNA</h2></div>
-<div id="pagos" class="screen"><h2>PAGOS</h2></div>
+<div id="proveedores" class="screen">PROVEEDORES</div>
+<div id="articulos" class="screen">ARTÍCULOS</div>
+<div id="comparador" class="screen">COMPARADOR</div>
+<div id="pedidos" class="screen">PEDIDOS</div>
+<div id="tenerencuenta" class="screen">A TENER EN CUENTA</div>
+<div id="configuracion" class="screen">CONFIGURACIÓN</div>
+<div id="historico" class="screen">HISTÓRICO</div>
+<div id="ventas" class="screen">VENTAS</div>
+<div id="calendario" class="screen">CALENDARIO</div>
+<div id="mensajes" class="screen">COMUNICACIÓN INTERNA</div>
+<div id="pagos" class="screen">PAGOS</div>
 
 <script>
 
