@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
-<title>Monolito - Sistema del Bar</title>
+
+<title>MONOLITO - Sistema del Bar</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#1e2a33">
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="icon" href="icono-monolito.png">
+<link rel="apple-touch-icon" href="icono-monolito.png">
 
 <style>
 
-:root{
---bg-body:#e0e0e0;
---header-bg:#1a252f;
---btn-blue:linear-gradient(to bottom,#4a90e2,#357abd);
---btn-grey:linear-gradient(to bottom,#7f8c8d,#5d6d7e);
---btn-green:linear-gradient(to bottom,#76a04d,#558b2f);
---btn-orange:linear-gradient(to bottom,#f39c12,#d35400);
---btn-dark:linear-gradient(to bottom,#546e7a,#37474f);
-}
-
 body{
-font-family:'Segoe UI',Tahoma;
-background:var(--bg-body);
+font-family:Segoe UI,Arial;
+background:#d9d9d9;
 margin:0;
 display:flex;
 justify-content:center;
@@ -26,119 +32,112 @@ align-items:center;
 height:100vh;
 }
 
-.tablet-container{
-width:900px;
-background:#fff;
-border:20px solid #111;
+.tablet{
+width:950px;
+background:white;
+border:20px solid black;
 border-radius:40px;
-box-shadow:0 20px 50px rgba(0,0,0,.3);
 overflow:hidden;
-position:relative;
+box-shadow:0 20px 60px rgba(0,0,0,.4);
 }
 
 header{
-background:var(--header-bg);
+background:#1e2a33;
 color:white;
-padding:15px 30px;
+padding:18px 25px;
 display:flex;
 justify-content:space-between;
 align-items:center;
 font-size:18px;
-font-weight:bold;
 }
 
 .header-right{
 display:flex;
 gap:20px;
-font-size:15px;
+align-items:center;
 }
 
-.grid-container{
+.grid{
 display:grid;
 grid-template-columns:repeat(3,1fr);
-gap:18px;
+gap:22px;
 padding:30px;
-background:#f0f2f5;
+background:#f1f2f3;
 }
 
 .btn{
-height:135px;
-border-radius:10px;
+height:150px;
+border-radius:12px;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
 color:white;
 font-weight:bold;
-text-transform:uppercase;
-font-size:14px;
-box-shadow:0 8px 16px rgba(0,0,0,.35);
+font-size:15px;
+box-shadow:0 8px 16px rgba(0,0,0,.25);
 cursor:pointer;
 position:relative;
 }
 
 .btn span{
-font-size:34px;
-margin-bottom:8px;
+font-size:38px;
+margin-bottom:10px;
 }
 
-.btn:active{
-transform:scale(.94);
-}
+.blue{background:linear-gradient(#5b8cc0,#3e6fa3);}
+.grey{background:linear-gradient(#7f8c8d,#5d6d7e);}
+.green{background:linear-gradient(#6fb657,#4c8c36);}
+.orange{background:linear-gradient(#ffa726,#ef6c00);}
+.dark{background:linear-gradient(#546e7a,#37474f);}
 
 .counter{
 position:absolute;
 top:8px;
-right:14px;
-font-size:14px;
-color:white;
+right:12px;
+font-size:18px;
 font-weight:bold;
-}
-
-.blue{background:var(--btn-blue);}
-.grey{background:var(--btn-grey);}
-.orange{background:var(--btn-orange);}
-.green{background:var(--btn-green);}
-.dark{background:var(--btn-dark);}
-
-.footer-status{
-background:#2c3e50;
 color:white;
-padding:10px 20px;
-position:absolute;
-bottom:20px;
-right:20px;
-border-radius:4px;
-font-size:12px;
 }
 
 .screen{
 display:none;
 padding:40px;
-text-align:center;
 font-size:22px;
+text-align:center;
 }
 
 </style>
+
 </head>
+
 
 <body>
 
-<div class="tablet-container">
+<div class="tablet">
 
 <header>
+
 <div>MONOLITO – Sistema del Bar</div>
 
 <div class="header-right">
-⚠ INCIDENCIAS
-❓ AYUDA
-↩ VOLVER
+
+<div onclick="abrir('incidencias')" style="cursor:pointer">⚠ INCIDENCIAS</div>
+
+<div onclick="abrir('buscar')" style="cursor:pointer">🔍 BUSCAR</div>
+
+<div onclick="abrir('ayuda')" style="cursor:pointer">❓ AYUDA</div>
+
+<div onclick="volver()" style="cursor:pointer">↩ VOLVER</div>
+
 </div>
+
 </header>
+
 
 <div id="panel">
 
-<main class="grid-container">
+<div class="grid">
 
 <div class="btn blue" onclick="abrir('proveedores')">
 <span>🚚</span>
@@ -160,13 +159,13 @@ COMPARADOR
 PEDIDOS
 </div>
 
-<div class="btn orange" onclick="abrir('tenerencuenta')">
-<span>⚠️</span>
-A TENER EN CUENTA
+<div class="btn orange" onclick="abrir('revision')">
+<span>🔍</span>
+REVISIÓN
 </div>
 
 <div class="btn grey" onclick="abrir('configuracion')">
-<span>⚙️</span>
+<span>⚙</span>
 CONFIGURACIÓN
 </div>
 
@@ -186,9 +185,9 @@ CALENDARIO
 </div>
 
 <div class="btn orange" onclick="abrir('mensajes')">
-<span>✉️</span>
+<span>✉</span>
 <div class="counter">3</div>
-COMUNICACIÓN INTERNA
+COMUNICACIÓN
 </div>
 
 <div class="btn dark" onclick="abrir('pagos')">
@@ -196,32 +195,48 @@ COMUNICACIÓN INTERNA
 PAGOS
 </div>
 
-</main>
+</div>
 
 </div>
 
-<div id="proveedores" class="screen">PROVEEDORES</div>
-<div id="articulos" class="screen">ARTÍCULOS</div>
-<div id="comparador" class="screen">COMPARADOR</div>
-<div id="pedidos" class="screen">PEDIDOS</div>
-<div id="tenerencuenta" class="screen">A TENER EN CUENTA</div>
+
+<div id="proveedores" class="screen">PANTALLA PROVEEDORES</div>
+<div id="articulos" class="screen">PANTALLA ARTÍCULOS</div>
+<div id="comparador" class="screen">COMPARADOR DE PRECIOS</div>
+<div id="pedidos" class="screen">GESTIÓN DE PEDIDOS</div>
+<div id="revision" class="screen">REVISIÓN DE PEDIDOS</div>
 <div id="configuracion" class="screen">CONFIGURACIÓN</div>
 <div id="historico" class="screen">HISTÓRICO</div>
-<div id="ventas" class="screen">VENTAS</div>
-<div id="calendario" class="screen">CALENDARIO</div>
+<div id="ventas" class="screen">VENTAS DEL BAR</div>
+<div id="calendario" class="screen">CALENDARIO / DIARIO DEL BAR</div>
 <div id="mensajes" class="screen">COMUNICACIÓN INTERNA</div>
-<div id="pagos" class="screen">PAGOS</div>
+<div id="pagos" class="screen">PAGOS A PROVEEDORES</div>
+<div id="incidencias" class="screen">INCIDENCIAS ABIERTAS</div>
+<div id="buscar" class="screen">BUSCADOR DEL SISTEMA</div>
+<div id="ayuda" class="screen">AYUDA</div>
+
 
 <script>
 
-function abrir(pantalla){
+function abrir(p){
 
-document.getElementById("panel").style.display="none";
+document.getElementById("panel").style.display="none"
 
-let screens=document.querySelectorAll(".screen");
-screens.forEach(s=>s.style.display="none");
+document.querySelectorAll(".screen").forEach(e=>{
+e.style.display="none"
+})
 
-document.getElementById(pantalla).style.display="block";
+document.getElementById(p).style.display="block"
+
+}
+
+function volver(){
+
+document.querySelectorAll(".screen").forEach(e=>{
+e.style.display="none"
+})
+
+document.getElementById("panel").style.display="block"
 
 }
 
@@ -230,4 +245,5 @@ document.getElementById(pantalla).style.display="block";
 </div>
 
 </body>
+
 </html>
