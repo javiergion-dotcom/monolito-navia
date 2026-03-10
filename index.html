@@ -6,14 +6,14 @@
 
 <style>
 
-:root {
-    --bg-body:#e0e0e0;
-    --header-bg:#1a252f;
-    --btn-blue:linear-gradient(to bottom,#4a90e2,#357abd);
-    --btn-grey:linear-gradient(to bottom,#7f8c8d,#5d6d7e);
-    --btn-green:linear-gradient(to bottom,#76a04d,#558b2f);
-    --btn-orange:linear-gradient(to bottom,#f39c12,#d35400);
-    --btn-dark:linear-gradient(to bottom,#546e7a,#37474f);
+:root{
+--bg-body:#e0e0e0;
+--header-bg:#1a252f;
+--btn-blue:linear-gradient(to bottom,#4a90e2,#357abd);
+--btn-grey:linear-gradient(to bottom,#7f8c8d,#5d6d7e);
+--btn-green:linear-gradient(to bottom,#76a04d,#558b2f);
+--btn-orange:linear-gradient(to bottom,#f39c12,#d35400);
+--btn-dark:linear-gradient(to bottom,#546e7a,#37474f);
 }
 
 body{
@@ -26,8 +26,6 @@ align-items:center;
 height:100vh;
 }
 
-/* TABLET */
-
 .tablet-container{
 width:900px;
 background:#fff;
@@ -37,19 +35,22 @@ box-shadow:0 20px 50px rgba(0,0,0,.3);
 overflow:hidden;
 }
 
-/* HEADER */
-
 header{
 background:var(--header-bg);
 color:white;
 padding:15px 30px;
 display:flex;
 justify-content:space-between;
-font-size:20px;
+align-items:center;
+font-size:18px;
 font-weight:bold;
 }
 
-/* GRID BOTONES */
+.header-right{
+display:flex;
+gap:20px;
+font-size:16px;
+}
 
 .grid-container{
 display:grid;
@@ -58,8 +59,6 @@ gap:18px;
 padding:30px;
 background:#f0f2f5;
 }
-
-/* BOTONES */
 
 .btn{
 height:135px;
@@ -78,7 +77,7 @@ position:relative;
 }
 
 .btn span{
-font-size:36px;
+font-size:34px;
 margin-bottom:8px;
 }
 
@@ -86,28 +85,17 @@ margin-bottom:8px;
 transform:scale(.94);
 }
 
-/* CONTADOR */
-
-.badge{
-position:absolute;
-top:12px;
-right:18px;
-background:red;
-color:white;
-font-size:12px;
-border-radius:50%;
-padding:3px 7px;
+.counter{
+font-size:10px;
+margin-top:-6px;
+opacity:0.6;
 }
-
-/* COLORES */
 
 .blue{background:var(--btn-blue);}
 .grey{background:var(--btn-grey);}
 .orange{background:var(--btn-orange);}
 .green{background:var(--btn-green);}
 .dark{background:var(--btn-dark);}
-
-/* AVISOS */
 
 .footer-status{
 background:#2c3e50;
@@ -120,6 +108,18 @@ border-radius:4px;
 font-size:12px;
 }
 
+/* PANTALLAS */
+
+.screen{
+display:none;
+padding:40px;
+text-align:center;
+}
+
+.screen h2{
+margin-top:0;
+}
+
 </style>
 </head>
 
@@ -128,43 +128,107 @@ font-size:12px;
 <div class="tablet-container">
 
 <header>
-MONOLITO – Sistema del Bar
-<span>Martes • 12 marzo</span>
+<div>MONOLITO – Sistema del Bar</div>
+
+<div class="header-right">
+⚠ INCIDENCIAS
+❓ AYUDA
+↩ VOLVER
+</div>
 </header>
+
+<div id="panel">
 
 <main class="grid-container">
 
-<div class="btn blue"><span>🚚</span>PROVEEDORES</div>
+<div class="btn blue" onclick="abrir('proveedores')">
+<span>🚚</span>
+PROVEEDORES
+</div>
 
-<div class="btn grey"><span>📋</span>ARTÍCULOS</div>
+<div class="btn grey" onclick="abrir('articulos')">
+<span>📋</span>
+ARTÍCULOS
+</div>
 
-<div class="btn grey"><span>📊</span>COMPARADOR</div>
+<div class="btn grey" onclick="abrir('comparador')">
+<span>📊</span>
+COMPARADOR
+</div>
 
-<div class="btn blue"><span>📝</span>PEDIDOS</div>
+<div class="btn blue" onclick="abrir('pedidos')">
+<span>📝</span>
+PEDIDOS
+</div>
 
-<div class="btn orange"><span>⚠️</span>A TENER EN CUENTA</div>
+<div class="btn orange" onclick="abrir('tenerencuenta')">
+<span>⚠️</span>
+A TENER EN CUENTA
+</div>
 
-<div class="btn grey"><span>⚙️</span>CONFIGURACIÓN</div>
+<div class="btn grey" onclick="abrir('configuracion')">
+<span>⚙️</span>
+CONFIGURACIÓN
+</div>
 
-<div class="btn green"><span>📂</span>HISTÓRICO</div>
+<div class="btn green" onclick="abrir('historico')">
+<span>📂</span>
+HISTÓRICO
+</div>
 
-<div class="btn grey"><span>💰</span>CAJA</div>
+<div class="btn grey" onclick="abrir('ventas')">
+<span>💰</span>
+VENTAS
+</div>
 
-<div class="btn grey"><span>📅</span>CALENDARIO</div>
+<div class="btn grey" onclick="abrir('calendario')">
+<span>📅</span>
+CALENDARIO
+</div>
 
-<div class="btn orange">
+<div class="btn orange" onclick="abrir('mensajes')">
 <span>✉️</span>
-<span class="badge">3</span>
+<div class="counter">3</div>
 COMUNICACIÓN INTERNA
 </div>
 
-<div class="btn dark"><span>💳</span>PAGOS</div>
+<div class="btn dark" onclick="abrir('pagos')">
+<span>💳</span>
+PAGOS
+</div>
 
 </main>
 
-<div class="footer-status">
-📩 AVISOS DEL BAR
 </div>
+
+<!-- PANTALLAS SIMPLES -->
+
+<div id="proveedores" class="screen"><h2>PROVEEDORES</h2></div>
+<div id="articulos" class="screen"><h2>ARTÍCULOS</h2></div>
+<div id="comparador" class="screen"><h2>COMPARADOR</h2></div>
+<div id="pedidos" class="screen"><h2>PEDIDOS</h2></div>
+<div id="tenerencuenta" class="screen"><h2>A TENER EN CUENTA</h2></div>
+<div id="configuracion" class="screen"><h2>CONFIGURACIÓN</h2></div>
+<div id="historico" class="screen"><h2>HISTÓRICO</h2></div>
+<div id="ventas" class="screen"><h2>VENTAS</h2></div>
+<div id="calendario" class="screen"><h2>CALENDARIO</h2></div>
+<div id="mensajes" class="screen"><h2>COMUNICACIÓN INTERNA</h2></div>
+<div id="pagos" class="screen"><h2>PAGOS</h2></div>
+
+<script>
+
+function abrir(pantalla){
+
+document.getElementById("panel").style.display="none";
+
+let screens=document.querySelectorAll(".screen");
+screens.forEach(s=>s.style.display="none");
+
+document.getElementById(pantalla).style.display="block";
+
+}
+
+</script>
 
 </div>
 
