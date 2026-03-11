@@ -1,57 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>MONOLITO - Sistema del Bar</title>
+<title>MONOLITO</title>
 
 <style>
 
 body{
-font-family:Segoe UI,Arial;
-background:#d9d9d9;
 margin:0;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-}
-
-/* SPLASH */
-
-#splash{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:#1e2a33;
-color:white;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-z-index:9999;
-font-size:32px;
-}
-
-#splash p{
-font-size:18px;
-opacity:0.8;
-}
-
-/* TABLET */
-
-.tablet{
-width:950px;
-background:white;
-border:20px solid black;
-border-radius:40px;
-overflow:hidden;
-box-shadow:0 20px 60px rgba(0,0,0,.4);
+font-family:Segoe UI,Arial;
+background:#e9e9e9;
 }
 
 /* HEADER */
@@ -59,31 +20,56 @@ box-shadow:0 20px 60px rgba(0,0,0,.4);
 header{
 background:#1e2a33;
 color:white;
-padding:18px 25px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-font-size:18px;
+padding:14px 16px;
+font-size:20px;
 }
 
-.header-right{
+.header-icons{
 display:flex;
-gap:20px;
-align-items:center;
+gap:16px;
+font-size:22px;
+cursor:pointer;
 }
 
-/* GRID BOTONES */
+/* GRID */
 
 .grid{
 display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:22px;
-padding:30px;
-background:#f1f2f3;
+gap:16px;
+padding:16px;
 }
 
+/* móvil */
+
+@media (max-width:700px){
+
+.grid{
+grid-template-columns:1fr 1fr;
+}
+
+}
+
+/* tablet */
+
+@media (min-width:701px){
+
+.grid{
+grid-template-columns:1fr 1fr 1fr;
+max-width:900px;
+margin:auto;
+}
+
+}
+
+/* BOTONES */
+
 .btn{
-height:150px;
+
+background:#6f7c86;
+height:130px;
 border-radius:12px;
 display:flex;
 flex-direction:column;
@@ -91,216 +77,130 @@ justify-content:center;
 align-items:center;
 color:white;
 font-weight:bold;
-font-size:15px;
-box-shadow:0 8px 16px rgba(0,0,0,.25);
-cursor:pointer;
+box-shadow:0 6px 12px rgba(0,0,0,.2);
 position:relative;
+cursor:pointer;
+
 }
 
 .btn span{
-font-size:38px;
-margin-bottom:10px;
+
+font-size:34px;
+margin-bottom:8px;
+
 }
 
-.blue{background:linear-gradient(#5b8cc0,#3e6fa3);}
-.grey{background:linear-gradient(#7f8c8d,#5d6d7e);}
-.green{background:linear-gradient(#6fb657,#4c8c36);}
-.orange{background:linear-gradient(#ffa726,#ef6c00);}
-.dark{background:linear-gradient(#546e7a,#37474f);}
+/* COLORES */
 
-/* CONTADOR */
+.blue{background:#5a88b5;}
+.orange{background:#f18700;}
+.green{background:#5da649;}
+.dark{background:#4f5f68;}
 
-.counter{
+/* contador comunicaciones */
+
+.badge{
+
 position:absolute;
 top:8px;
-right:12px;
-font-size:18px;
+right:10px;
+background:white;
+color:#f18700;
 font-weight:bold;
-color:white;
-}
+border-radius:50%;
+width:26px;
+height:26px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:14px;
 
-/* PANTALLAS */
-
-.screen{
-display:none;
-padding:40px;
-font-size:22px;
-text-align:center;
 }
 
 </style>
 
 </head>
 
-
 <body>
-
-
-<!-- SPLASH -->
-
-<div id="splash">
-<h1>MONOLITO</h1>
-<p>Sistema del Bar · Navia</p>
-</div>
-
-
-<div class="tablet">
 
 <header>
 
-<div>MONOLITO – Sistema del Bar</div>
+<div>MONOLITO</div>
 
-<div class="header-right">
+<div class="header-icons">
 
-<div onclick="abrir('incidencias')" style="cursor:pointer">⚠ INCIDENCIAS</div>
-
-<div onclick="abrir('buscar')" style="cursor:pointer">🔍 BUSCAR</div>
-
-<div onclick="abrir('ayuda')" style="cursor:pointer">❓ AYUDA</div>
-
-<div onclick="volver()" style="cursor:pointer">↩ VOLVER</div>
+<div>⚠</div>
+<div>🔍</div>
+<div>❓</div>
+<div>↩</div>
 
 </div>
 
 </header>
 
 
-<!-- PANEL PRINCIPAL -->
-
-<div id="panel">
-
 <div class="grid">
 
-<div class="btn blue" onclick="abrir('proveedores')">
+<div class="btn blue">
 <span>🚚</span>
 PROVEEDORES
 </div>
 
-<div class="btn grey" onclick="abrir('articulos')">
+<div class="btn">
 <span>📋</span>
 ARTÍCULOS
 </div>
 
-<div class="btn grey" onclick="abrir('comparador')">
+<div class="btn">
 <span>📊</span>
 COMPARADOR
 </div>
 
-<div class="btn blue" onclick="abrir('pedidos')">
+<div class="btn blue">
 <span>📝</span>
 PEDIDOS
 </div>
 
-<div class="btn orange" onclick="abrir('revision')">
+<div class="btn orange">
 <span>🔍</span>
 REVISIÓN
 </div>
 
-<div class="btn grey" onclick="abrir('configuracion')">
+<div class="btn">
 <span>⚙</span>
 CONFIGURACIÓN
 </div>
 
-<div class="btn green" onclick="abrir('historico')">
+<div class="btn green">
 <span>📂</span>
 HISTÓRICO
 </div>
 
-<div class="btn grey" onclick="abrir('ventas')">
+<div class="btn">
 <span>💰</span>
 VENTAS
 </div>
 
-<div class="btn grey" onclick="abrir('calendario')">
+<div class="btn">
 <span>📅</span>
 CALENDARIO
 </div>
 
-<div class="btn orange" onclick="abrir('mensajes')">
+<div class="btn orange">
+
+<div class="badge">3</div>
+
 <span>✉</span>
-<div class="counter">3</div>
 COMUNICACIÓN
+
 </div>
 
-<div class="btn dark" onclick="abrir('pagos')">
+<div class="btn dark">
 <span>💳</span>
 PAGOS
 </div>
 
 </div>
 
-</div>
-
-
-<!-- PANTALLAS -->
-
-<div id="proveedores" class="screen">PANTALLA PROVEEDORES</div>
-
-<div id="articulos" class="screen">PANTALLA ARTÍCULOS</div>
-
-<div id="comparador" class="screen">COMPARADOR DE PRECIOS</div>
-
-<div id="pedidos" class="screen">GESTIÓN DE PEDIDOS</div>
-
-<div id="revision" class="screen">REVISIÓN DE PEDIDOS</div>
-
-<div id="configuracion" class="screen">CONFIGURACIÓN</div>
-
-<div id="historico" class="screen">HISTÓRICO</div>
-
-<div id="ventas" class="screen">VENTAS DEL BAR</div>
-
-<div id="calendario" class="screen">CALENDARIO / DIARIO DEL BAR</div>
-
-<div id="mensajes" class="screen">COMUNICACIÓN INTERNA</div>
-
-<div id="pagos" class="screen">PAGOS A PROVEEDORES</div>
-
-<div id="incidencias" class="screen">INCIDENCIAS ABIERTAS</div>
-
-<div id="buscar" class="screen">BUSCADOR DEL SISTEMA</div>
-
-<div id="ayuda" class="screen">AYUDA</div>
-
-
-<script>
-
-/* NAVEGACIÓN */
-
-function abrir(p){
-
-document.getElementById("panel").style.display="none"
-
-document.querySelectorAll(".screen").forEach(e=>{
-e.style.display="none"
-})
-
-document.getElementById(p).style.display="block"
-
-}
-
-function volver(){
-
-document.querySelectorAll(".screen").forEach(e=>{
-e.style.display="none"
-})
-
-document.getElementById("panel").style.display="block"
-
-}
-
-
-/* SPLASH */
-
-window.onload=function(){
-setTimeout(function(){
-document.getElementById("splash").style.display="none"
-},2000)
-}
-
-</script>
-
-
 </body>
-
 </html>
