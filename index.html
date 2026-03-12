@@ -1,181 +1,175 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>MONOLITO</title>
+<title>MONOLITO GPT PRO</title>
 
 <style>
 
 body{
 margin:0;
-background:#e6e6e6;
-font-family:Segoe UI;
+font-family:Segoe UI,Arial;
+background:#d9d9d9;
+height:100vh;
+display:flex;
+flex-direction:column;
 }
 
-/* CABECERA */
-
 .top{
-background:#1f2c34;
+background:#1c2730;
 color:white;
-padding:18px;
-font-size:26px;
+padding:16px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-box-shadow:0 4px 10px rgba(0,0,0,0.4);
+box-shadow:0 6px 14px rgba(0,0,0,0.4);
 }
 
-.icons{
+.logo{
 font-size:22px;
-letter-spacing:8px;
+font-weight:600;
 }
 
-/* GRID */
+.sub{
+font-size:11px;
+opacity:0.7;
+}
+
+.icons span{
+margin-left:14px;
+cursor:pointer;
+font-size:20px;
+}
 
 .panel{
-padding:20px;
+flex:1;
 display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:20px;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:18px;
+padding:18px;
 }
 
-/* BOTONES */
-
 .btn{
-height:120px;
-border-radius:20px;
+background:linear-gradient(#6f8fa4,#4a6b80);
+border-radius:22px;
+color:white;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-font-size:18px;
-color:white;
-cursor:pointer;
-transition:0.25s;
+height:120px;
 box-shadow:
-0 8px 18px rgba(0,0,0,0.25),
-inset 0 1px 0 rgba(255,255,255,0.3);
+0 12px 22px rgba(0,0,0,0.25),
+inset 0 2px 2px rgba(255,255,255,0.25);
+transition:0.2s;
+cursor:pointer;
+text-align:center;
+font-size:15px;
 }
 
 .btn:active{
-transform:scale(0.97);
-box-shadow:0 3px 8px rgba(0,0,0,0.3);
+transform:scale(0.96);
 }
 
-.azul{background:linear-gradient(#5f8fb8,#3d6f9a);}
-.gris{background:linear-gradient(#7c8b92,#5f6d73);}
-.naranja{background:linear-gradient(#f5a623,#d97d00);}
-.verde{background:linear-gradient(#6ab04c,#4b8b32);}
-.oscuro{background:linear-gradient(#556b75,#394b52);}
-
-.icono{
+.btn span{
 font-size:32px;
-margin-bottom:8px;
+margin-bottom:6px;
 }
 
-/* CONTADOR */
+.help{
+background:linear-gradient(#f5a623,#d67b00);
+height:130px;
+font-weight:600;
+}
 
 .badge{
 position:absolute;
-margin-top:-85px;
-margin-left:80px;
-background:white;
-color:#d97d00;
-width:28px;
-height:28px;
+background:#ff3b3b;
+color:white;
+width:24px;
+height:24px;
 border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:14px;
-font-weight:bold;
+font-size:13px;
+margin-left:70px;
+margin-top:-80px;
 }
 
-/* RESPONSIVE */
-
-@media(max-width:900px){
-.panel{
-grid-template-columns:repeat(2,1fr);
+.screen{
+display:none;
+padding:20px;
 }
+
+.active{
+display:block;
 }
 
 </style>
-
 </head>
 
 <body>
 
 <div class="top">
-MONOLITO
+<div>
+<div class="logo">MONOLITO GPT PRO</div>
+<div class="sub">Javier Gion & IA ChatGPT</div>
+</div>
+
 <div class="icons">
-⚠️ 🔎 ❓ ↩️
+<span onclick="show('incidencias')">⚠️</span>
+<span onclick="show('buscar')">🔎</span>
+<span onclick="openIA()">❓</span>
+<span onclick="show('panel')">↩</span>
 </div>
 </div>
 
-<div class="panel">
+<div id="panel" class="panel active">
 
-<div class="btn azul">
-<div class="icono">🚚</div>
-PROVEEDORES
-</div>
-
-<div class="btn gris">
-<div class="icono">📋</div>
-ARTÍCULOS
-</div>
-
-<div class="btn gris">
-<div class="icono">📊</div>
-COMPARADOR
-</div>
-
-<div class="btn azul">
-<div class="icono">📝</div>
-PEDIDOS
-</div>
-
-<div class="btn naranja">
-<div class="icono">🔎</div>
-REVISIÓN
-</div>
-
-<div class="btn gris">
-<div class="icono">⚙️</div>
-CONFIGURACIÓN
-</div>
-
-<div class="btn verde">
-<div class="icono">📁</div>
-HISTÓRICO
-</div>
-
-<div class="btn gris">
-<div class="icono">💰</div>
-VENTAS
-</div>
-
-<div class="btn gris">
-<div class="icono">📅</div>
-CALENDARIO
-</div>
+<div class="btn" onclick="show('proveedores')"><span>🚚</span>PROVEEDORES</div>
+<div class="btn" onclick="show('articulos')"><span>📦</span>ARTÍCULOS</div>
+<div class="btn" onclick="show('comparador')"><span>📊</span>COMPARADOR</div>
+<div class="btn" onclick="show('pedidos')"><span>📝</span>PEDIDOS</div>
+<div class="btn" onclick="show('pagos')"><span>💳</span>PAGOS</div>
+<div class="btn" onclick="show('revision')"><span>🔍</span>REVISIÓN</div>
+<div class="btn" onclick="show('calendario')"><span>📅</span>CALENDARIO</div>
+<div class="btn" onclick="show('historico')"><span>📂</span>HISTÓRICO</div>
 
 <div style="position:relative">
-<div class="btn naranja">
-<div class="icono">✉️</div>
-COMUNICACIÓN
-</div>
-<div class="badge">3</div>
+<div class="btn" onclick="show('comunicacion')"><span>✉</span>COMUNICACIÓN</div>
+<div class="badge">2</div>
 </div>
 
-<div class="btn oscuro">
-<div class="icono">💳</div>
-PAGOS
-</div>
+<div class="btn help" onclick="openIA()"><span>🤖</span>AYUDA IA</div>
 
 </div>
+
+<div id="proveedores" class="screen">Módulo proveedores</div>
+<div id="articulos" class="screen">Módulo artículos</div>
+<div id="comparador" class="screen">Comparador guiado IA</div>
+<div id="pedidos" class="screen">Hoja pedido estilo factura</div>
+<div id="pagos" class="screen">Control pagos semanal</div>
+<div id="revision" class="screen">Revisión las que hay</div>
+<div id="calendario" class="screen">Calendario / diario bar</div>
+<div id="historico" class="screen">Histórico</div>
+<div id="comunicacion" class="screen">Chat interno</div>
+<div id="incidencias" class="screen">Incidencias abiertas</div>
+<div id="buscar" class="screen">Buscador global</div>
+
+<script>
+
+function show(id){
+document.querySelectorAll('.screen,.panel').forEach(e=>e.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+}
+
+function openIA(){
+window.open("https://chat.openai.com","_blank");
+}
+
+</script>
 
 </body>
 </html>
