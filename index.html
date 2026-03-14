@@ -3,57 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>MONOLITO</title>
-
-<link rel="manifest" href="manifest.json">
+<title>MONOLITO GPT PRO</title>
 
 <style>
 
 body{
 margin:0;
 font-family:Arial, Helvetica, sans-serif;
-background:#e9ecef;
+background:#e6e6e6;
 }
+
+/* BARRA SUPERIOR */
 
 .header{
 background:#111;
 color:white;
-padding:16px;
+padding:20px;
 text-align:center;
-font-size:22px;
+font-size:26px;
 font-weight:bold;
+letter-spacing:1px;
 }
+
+/* GRID */
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-gap:18px;
-padding:18px;
+grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+gap:22px;
+padding:22px;
 }
 
+/* BOTONES */
+
 .boton{
-background:linear-gradient(#4a90e2,#2f6fb5);
-border-radius:18px;
+border-radius:22px;
 color:white;
-font-size:18px;
+font-size:20px;
 font-weight:bold;
 text-align:center;
-padding:28px 10px;
-box-shadow:0 6px 0 #1d4e82;
-transition:0.1s;
+padding:45px 12px;
+box-shadow:0 8px 0 rgba(0,0,0,0.35);
+transition:0.12s;
+user-select:none;
 }
 
 .boton:active{
-transform:translateY(4px);
-box-shadow:0 2px 0 #1d4e82;
+transform:translateY(6px);
+box-shadow:0 2px 0 rgba(0,0,0,0.35);
 }
 
 .icono{
-font-size:34px;
+font-size:70px;
 display:block;
-margin-bottom:8px;
+margin-bottom:12px;
 }
+
+/* COLORES */
+
+.azul{background:linear-gradient(#4a90e2,#2f6fb5);}
+.gris{background:linear-gradient(#7a7a7a,#505050);}
+.verde{background:linear-gradient(#69b34c,#3e8e2f);}
+.naranja{background:linear-gradient(#f29c1f,#d97800);}
 
 </style>
 </head>
@@ -66,17 +77,17 @@ MONOLITO GPT PRO
 
 <div class="grid">
 
-<div class="boton"><span class="icono">📦</span>PROVEEDORES</div>
-<div class="boton"><span class="icono">🍺</span>ARTÍCULOS</div>
-<div class="boton"><span class="icono">📝</span>PEDIDOS</div>
+<div class="boton azul"><span class="icono">📦</span>PROVEEDORES</div>
+<div class="boton gris"><span class="icono">🍺</span>ARTÍCULOS</div>
+<div class="boton naranja"><span class="icono">📝</span>PEDIDOS</div>
 
-<div class="boton"><span class="icono">💳</span>PAGOS</div>
-<div class="boton"><span class="icono">⚠</span>INCIDENCIAS</div>
-<div class="boton"><span class="icono">📊</span>COMPARADOR</div>
+<div class="boton verde"><span class="icono">💳</span>PAGOS</div>
+<div class="boton azul"><span class="icono">⚠️</span>INCIDENCIAS</div>
+<div class="boton gris"><span class="icono">📊</span>COMPARADOR</div>
 
-<div class="boton"><span class="icono">📅</span>CALENDARIO</div>
-<div class="boton"><span class="icono">🔔</span>AVISOS</div>
-<div class="boton"><span class="icono">⚙</span>CONFIG</div>
+<div class="boton naranja"><span class="icono">📅</span>CALENDARIO</div>
+<div class="boton verde"><span class="icono">✉️</span>MENSAJES</div>
+<div class="boton azul"><span class="icono">⚙️</span>CONFIGURACIÓN</div>
 
 </div>
 
