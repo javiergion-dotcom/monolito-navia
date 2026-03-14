@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO GPT PRO</title>
+<title>MONOLITO</title>
 
 <style>
 
@@ -13,28 +13,29 @@ font-family:Arial, Helvetica, sans-serif;
 background:#e6e6e6;
 }
 
-/* BARRA SUPERIOR */
-
 .header{
 background:#111;
 color:white;
-padding:20px;
+padding:18px;
 text-align:center;
-font-size:26px;
+font-size:24px;
 font-weight:bold;
-letter-spacing:1px;
 }
 
-/* GRID */
-
+/* 📱 MOVIL */
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-gap:22px;
-padding:22px;
+grid-template-columns:1fr;
+gap:18px;
+padding:18px;
 }
 
-/* BOTONES */
+/* 📲 TABLET */
+@media (min-width:700px){
+.grid{
+grid-template-columns:repeat(3,1fr);
+}
+}
 
 .boton{
 border-radius:22px;
@@ -42,10 +43,9 @@ color:white;
 font-size:20px;
 font-weight:bold;
 text-align:center;
-padding:45px 12px;
+padding:40px 10px;
 box-shadow:0 8px 0 rgba(0,0,0,0.35);
 transition:0.12s;
-user-select:none;
 }
 
 .boton:active{
@@ -56,10 +56,8 @@ box-shadow:0 2px 0 rgba(0,0,0,0.35);
 .icono{
 font-size:70px;
 display:block;
-margin-bottom:12px;
+margin-bottom:10px;
 }
-
-/* COLORES */
 
 .azul{background:linear-gradient(#4a90e2,#2f6fb5);}
 .gris{background:linear-gradient(#7a7a7a,#505050);}
@@ -87,7 +85,7 @@ MONOLITO GPT PRO
 
 <div class="boton naranja"><span class="icono">📅</span>CALENDARIO</div>
 <div class="boton verde"><span class="icono">✉️</span>MENSAJES</div>
-<div class="boton azul"><span class="icono">⚙️</span>CONFIGURACIÓN</div>
+<div class="boton azul"><span class="icono">⚙️</span>CONFIG</div>
 
 </div>
 
