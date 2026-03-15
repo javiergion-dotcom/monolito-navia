@@ -1,16 +1,10 @@
-{
-  "name": "MONOLITO",
-  "short_name": "MONOLITO",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#0f1720",
-  "theme_color": "#0f1720",
-  "orientation": "landscape",
-  "icons": [
-    {
-      "src": "icono.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#111111">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Monolito">
+
+<link rel="icon" href="icono.png">
+<link rel="apple-touch-icon" href="icono.png">
