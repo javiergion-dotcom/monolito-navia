@@ -1,154 +1,122 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 <meta charset="UTF-8">
-<title>MONOLITO – Sistema del Bar</title>
-
+<title>EL MONOLITO · Navia</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#111111">
-<link rel="icon" href="icono.png">
-<link rel="apple-touch-icon" href="icono.png">
 
 <style>
 
 body{
-font-family:Arial;
-background:#f2f2f2;
 margin:0;
-}
-
-.header{
+font-family:Arial,Helvetica,sans-serif;
 background:#111;
 color:white;
-padding:14px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-font-size:20px;
-font-weight:bold;
 }
 
-.btnTop{
-background:#444;
-color:white;
-padding:10px 14px;
-border-radius:10px;
-text-decoration:none;
-}
-
-.grid{
-padding:18px;
-display:grid;
-grid-template-columns:1fr;
-gap:18px;
-}
-
-@media (min-width:900px){
-.grid{
-grid-template-columns:1fr 1fr 1fr;
-}
-}
-
-.boton{
-height:140px;
-border-radius:24px;
+.hero{
+height:100vh;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-font-size:22px;
-font-weight:bold;
-color:white;
-box-shadow:0 12px 0 rgba(0,0,0,0.25);
-transition:0.1s;
-text-decoration:none;
+text-align:center;
+padding:20px;
+background:
+linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.7)),
+radial-gradient(circle at center,#2a2a2a,#000);
 }
 
-.boton:active{
-transform:translateY(6px);
-box-shadow:0 6px 0 rgba(0,0,0,0.25);
+h1{
+font-size:54px;
+letter-spacing:4px;
+margin:0;
 }
 
-.icono{
-font-size:52px;
-margin-bottom:6px;
+h2{
+font-weight:normal;
+margin-top:10px;
+color:#e8892b;
 }
 
-.azul{background:#4a86c5;}
-.gris{background:#6b6f73;}
-.verde{background:#5cab4b;}
-.naranja{background:#e38b2c;}
+.desc{
+margin-top:40px;
+max-width:700px;
+line-height:1.6;
+font-size:20px;
+color:#ddd;
+}
+
+.grid{
+margin-top:60px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:25px;
+width:100%;
+max-width:900px;
+}
+
+.card{
+background:#1d1d1d;
+padding:30px;
+border-radius:14px;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+.icon{
+font-size:42px;
+margin-bottom:12px;
+}
+
+.footer{
+position:absolute;
+bottom:20px;
+font-size:14px;
+color:#777;
+}
 
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<a class="btnTop" href="#">← Volver</a>
-<div>MONOLITO</div>
-<a class="btnTop" href="#">Ayuda</a>
+<div class="hero">
+
+<h1>EL MONOLITO</h1>
+<h2>NAVIA</h2>
+
+<div class="desc">
+Café ecológico Candelas · Mahou 5 Estrellas ·  
+Ambiente tranquilo y público joven.  
+Especialistas en cafés y punto de encuentro diario.
 </div>
 
 <div class="grid">
 
-<a class="boton azul" href="proveedores.html" onclick="vibra()">
-<div class="icono">📦</div>
-PROVEEDORES
-</a>
+<div class="card">
+<div class="icon">☕</div>
+Cafés especiales ecológicos
+</div>
 
-<a class="boton gris" href="articulos.html" onclick="vibra()">
-<div class="icono">🍺</div>
-ARTÍCULOS
-</a>
+<div class="card">
+<div class="icon">🍺</div>
+Mahou 5 Estrellas  
+y próxima novedad Mahou Bodega
+</div>
 
-<a class="boton naranja" href="pedidos.html" onclick="vibra()">
-<div class="icono">📝</div>
-PEDIDOS
-</a>
-
-<a class="boton verde" href="pagos.html" onclick="vibra()">
-<div class="icono">💳</div>
-PAGOS
-</a>
-
-<a class="boton gris" href="incidencias.html" onclick="vibra()">
-<div class="icono">⚠️</div>
-INCIDENCIAS
-</a>
-
-<a class="boton azul" href="comparador.html" onclick="vibra()">
-<div class="icono">📊</div>
-COMPARADOR
-</a>
-
-<a class="boton naranja" href="calendario.html" onclick="vibra()">
-<div class="icono">📅</div>
-CALENDARIO
-</a>
-
-<a class="boton verde" href="mensajes.html" onclick="vibra()">
-<div class="icono">✉️</div>
-MENSAJES
-</a>
-
-<a class="boton gris" href="configuracion.html" onclick="vibra()">
-<div class="icono">⚙️</div>
-CONFIGURACIÓN
-</a>
+<div class="card">
+<div class="icon">✨</div>
+Ambiente relajado  
+y muy bien valorado
+</div>
 
 </div>
 
-<script>
-function vibra(){
-if(navigator.vibrate){
-navigator.vibrate(60);
-}
-}
-</script>
+<div class="footer">
+EL MONOLITO · Navia
+</div>
+
+</div>
 
 </body>
 </html>
