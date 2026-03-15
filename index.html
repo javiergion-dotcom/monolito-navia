@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>MONOLITO – Sistema del Bar</title>
+<title>MONOLITO</title>
 
 <style>
 
 body{
-font-family:Arial, Helvetica, sans-serif;
-background:#f2f2f2;
 margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#dcdcdc;
 }
 
-/* BARRA */
+/* CABECERA */
 
 .header{
 background:#111;
@@ -23,32 +23,48 @@ padding:14px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-font-weight:bold;
-font-size:20px;
+font-size:22px;
 }
 
-.topbtn{
+.header button{
 background:#444;
-padding:8px 14px;
-border-radius:10px;
 color:white;
-text-decoration:none;
+border:none;
+padding:8px 14px;
+border-radius:8px;
+font-size:16px;
+}
+
+/* BARRA ESTADO */
+
+.status{
+background:#eeeeee;
+text-align:center;
+padding:6px;
+font-size:14px;
+color:#333;
 }
 
 /* GRID */
 
-.container{
+.grid{
 display:grid;
-grid-template-columns:1fr;
 gap:22px;
-padding:20px;
-max-width:1200px;
-margin:auto;
+padding:22px;
 }
 
-/* tablet */
-@media (min-width:900px){
-.container{
+/* MOVIL */
+
+@media (max-width:700px){
+.grid{
+grid-template-columns:1fr;
+}
+}
+
+/* TABLET HORIZONTAL */
+
+@media (min-width:701px){
+.grid{
 grid-template-columns:repeat(3,1fr);
 }
 }
@@ -56,129 +72,147 @@ grid-template-columns:repeat(3,1fr);
 /* BOTONES */
 
 .boton{
-height:160px;
-border-radius:30px;
+border-radius:26px;
+padding:34px;
+text-align:center;
+font-size:26px;
 color:white;
 font-weight:bold;
-font-size:22px;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-text-decoration:none;
-box-shadow:
-0 14px 0 rgba(0,0,0,0.25),
-0 18px 30px rgba(0,0,0,0.25);
-transition:0.1s;
+box-shadow:0 12px 0 rgba(0,0,0,0.25);
+transition:0.15s;
+user-select:none;
 }
-
-/* efecto hundir */
 
 .boton:active{
-transform:translateY(10px);
-box-shadow:
-0 4px 0 rgba(0,0,0,0.25),
-0 6px 10px rgba(0,0,0,0.25);
+transform:translateY(6px);
+box-shadow:0 6px 0 rgba(0,0,0,0.25);
 }
 
-/* colores */
+/* COLORES */
 
-.azul{background:#3c7ec4;}
-.gris{background:#5f676e;}
-.verde{background:#5cab4b;}
-.naranja{background:#e8892b;}
+.azul{background:linear-gradient(#4e86c9,#3c6fa8);}
+.gris{background:linear-gradient(#70777d,#575e63);}
+.verde{background:linear-gradient(#6cc05c,#4f9e41);}
+.naranja{background:linear-gradient(#f09a3a,#d87e1f);}
 
-/* iconos */
+/* ICONO */
 
 .icono{
-font-size:54px;
-margin-bottom:10px;
+font-size:64px;
+margin-bottom:12px;
 }
-
-/* pie */
 
 .footer{
 text-align:center;
-color:#777;
-margin:25px;
+color:#666;
+padding:18px;
+font-size:14px;
 }
 
 </style>
-
-<script>
-
-/* vibración */
-
-function vibrar(){
-if(navigator.vibrate){
-navigator.vibrate(40);
-}
-}
-
-</script>
-
 </head>
 
 <body>
 
 <div class="header">
-<a href="#" class="topbtn">← Volver</a>
+<button onclick="history.back()">← Volver</button>
 <div>MONOLITO</div>
-<a href="#" class="topbtn">Ayuda</a>
+<button onclick="alert('Ayuda en desarrollo')">Ayuda</button>
 </div>
 
-<div class="container">
+<div class="status">
+<span id="fecha"></span> ·
+<span id="hora"></span> ·
+Operador: Javier
+</div>
 
-<a onclick="vibrar()" href="proveedores.html" class="boton azul">
+<div class="grid">
+
+<div class="boton azul" onclick="abrir('proveedores.html')">
 <div class="icono">📦</div>
 PROVEEDORES
-</a>
+</div>
 
-<a onclick="vibrar()" href="articulos.html" class="boton gris">
+<div class="boton gris" onclick="abrir('articulos.html')">
 <div class="icono">🍺</div>
 ARTÍCULOS
-</a>
+</div>
 
-<a onclick="vibrar()" href="pedidos.html" class="boton naranja">
+<div class="boton naranja" onclick="abrir('pedidos.html')">
 <div class="icono">📝</div>
 PEDIDOS
-</a>
+</div>
 
-<a onclick="vibrar()" href="pagos.html" class="boton verde">
+<div class="boton verde" onclick="abrir('pagos.html')">
 <div class="icono">💳</div>
 PAGOS
-</a>
+</div>
 
-<a onclick="vibrar()" href="incidencias.html" class="boton gris">
+<div class="boton gris" onclick="abrir('incidencias.html')">
 <div class="icono">⚠️</div>
 INCIDENCIAS
-</a>
+</div>
 
-<a onclick="vibrar()" href="comparador.html" class="boton azul">
+<div class="boton azul" onclick="abrir('comparador.html')">
 <div class="icono">📊</div>
 COMPARADOR
-</a>
+</div>
 
-<a onclick="vibrar()" href="calendario.html" class="boton naranja">
+<div class="boton naranja" onclick="abrir('calendario.html')">
 <div class="icono">📅</div>
 CALENDARIO
-</a>
+</div>
 
-<a onclick="vibrar()" href="avisos.html" class="boton gris">
+<div class="boton verde" onclick="abrir('avisos.html')">
 <div class="icono">✉️</div>
 MENSAJES
-</a>
+</div>
 
-<a onclick="vibrar()" href="configuracion.html" class="boton gris">
+<div class="boton gris" onclick="abrir('configuracion.html')">
 <div class="icono">⚙️</div>
 CONFIGURACIÓN
-</a>
+</div>
 
 </div>
 
 <div class="footer">
-Monolito GPT Pro – Control real del bar
+Monolito GPT Pro — Control real del bar
 </div>
+
+<script>
+
+function abrir(p){
+vibrar()
+setTimeout(()=>{
+window.location=p
+},120)
+}
+
+function vibrar(){
+if(navigator.vibrate){
+navigator.vibrate(60)
+}
+}
+
+function reloj(){
+
+const ahora = new Date()
+
+const dias = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"]
+const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
+
+document.getElementById("fecha").innerHTML =
+dias[ahora.getDay()]+" "+ahora.getDate()+" "+meses[ahora.getMonth()]
+
+document.getElementById("hora").innerHTML =
+ahora.toLocaleTimeString()
+
+}
+
+setInterval(reloj,1000)
+reloj()
+
+</script>
 
 </body>
 </html>
