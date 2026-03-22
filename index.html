@@ -9,92 +9,97 @@
 
 body{
 margin:0;
-font-family:Segoe UI,Arial;
-background:#0f1720;
-color:white;
+font-family:Arial, Helvetica, sans-serif;
+background:#e9eef2;
 }
+
+/* BARRA SUPERIOR */
 
 .topbar{
-height:70px;
-background:#121c26;
+background:#16232d;
+color:white;
+padding:14px;
 display:flex;
-align-items:center;
 justify-content:space-between;
-padding:0 20px;
-box-shadow:0 2px 6px rgba(0,0,0,0.6);
+align-items:center;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
 }
 
-.logo{
+.title{
 font-size:22px;
 font-weight:700;
 }
 
-.sub{
+.subtitle{
 font-size:12px;
-opacity:.7;
+opacity:0.7;
 }
 
-.right{
+.icons{
+font-size:20px;
 display:flex;
-align-items:center;
 gap:18px;
-font-size:14px;
 }
 
-.grid{
+/* GRID */
+
+.panel{
+padding:18px;
 display:grid;
-grid-template-columns:repeat(3,1fr);
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 gap:18px;
-padding:20px;
-height:calc(100vh - 70px);
-box-sizing:border-box;
 }
+
+/* BOTONES */
 
 .btn{
-background:linear-gradient(180deg,#3b82f6,#1e3a8a);
-border-radius:16px;
+background:linear-gradient(180deg,#6f8fa6,#4e6e85);
+color:white;
+border-radius:22px;
+height:110px;
 display:flex;
 flex-direction:column;
-align-items:center;
 justify-content:center;
+align-items:center;
 font-size:18px;
-font-weight:600;
+font-weight:700;
 box-shadow:
-0 8px 0 rgba(0,0,0,.6),
-0 12px 20px rgba(0,0,0,.8);
-transition:.08s;
+inset 0 1px 0 rgba(255,255,255,0.4),
+0 10px 18px rgba(0,0,0,0.25);
+transition:0.15s;
+cursor:pointer;
+user-select:none;
+}
+
+.btn span{
+font-size:36px;
+margin-bottom:6px;
 }
 
 .btn:active{
 transform:translateY(6px);
 box-shadow:
-0 2px 0 rgba(0,0,0,.6),
-0 4px 8px rgba(0,0,0,.8);
+inset 0 6px 12px rgba(0,0,0,0.5);
 }
 
-.orange{
-background:linear-gradient(180deg,#fb923c,#c2410c);
-}
+/* COLORES */
 
-.green{
-background:linear-gradient(180deg,#4ade80,#166534);
-}
+.green{background:linear-gradient(180deg,#6fbf55,#3d8c2f);}
+.orange{background:linear-gradient(180deg,#f5a623,#d87c00);}
+.dark{background:linear-gradient(180deg,#5f6f7a,#3f4f59);}
 
-.grey{
-background:linear-gradient(180deg,#6b7280,#374151);
-}
-
-.icon{
-font-size:34px;
-margin-bottom:8px;
-}
-
-.counter{
+.badge{
 position:absolute;
-margin-left:90px;
-margin-top:-60px;
+right:12px;
+top:8px;
 font-size:14px;
-opacity:.9;
+background:transparent;
+color:white;
+font-weight:bold;
+}
+
+.box{
+position:relative;
 }
 
 </style>
@@ -104,37 +109,58 @@ opacity:.9;
 
 <div class="topbar">
 <div>
-<div class="logo">MONOLITO GPT PRO</div>
-<div class="sub">Javier Gion & IA ChatGPT</div>
+<div class="title">MONOLITO GPT PRO</div>
+<div class="subtitle">Javier Gion & IA ChatGPT</div>
 </div>
 
-<div class="right">
-<div>📶</div>
-<div>👤 Carlos</div>
-<div>🕒 10:42</div>
-<div>📅 Hoy</div>
+<div class="icons">
+⚠️ 🔎 ❓ ↩️
 </div>
 </div>
 
-<div class="grid">
+<div class="panel">
 
-<div class="btn"><div class="icon">🚚</div>Proveedores</div>
-<div class="btn grey"><div class="icon">📦</div>Artículos</div>
-<div class="btn"><div class="icon">📊</div>Comparador</div>
+<div class="btn"><span>🚚</span>PROVEEDORES</div>
 
-<div class="btn"><div class="icon">📝</div>Pedidos</div>
-<div class="btn orange"><div class="icon">⚠️</div>A tener en cuenta</div>
-<div class="btn grey"><div class="icon">⚙️</div>Configuración</div>
+<div class="btn dark"><span>📦</span>ARTÍCULOS</div>
 
-<div class="btn green"><div class="icon">📂</div>Histórico</div>
-<div class="btn green"><div class="icon">💰</div>Ventas</div>
-<div class="btn green"><div class="icon">💳</div>Pagos</div>
+<div class="btn"><span>📊</span>COMPARADOR</div>
 
-<div class="btn grey"><div class="icon">📅</div>Calendario</div>
-<div class="btn"><div class="icon">✉️</div>Comunicación</div>
-<div class="btn"><div class="icon">🤖</div>Ayuda IA</div>
+<div class="btn"><span>📝</span>PEDIDOS</div>
+
+<div class="btn dark"><span>💳</span>PAGOS</div>
+
+<div class="btn orange"><span>🔎</span>REVISIÓN</div>
+
+<div class="btn green"><span>📁</span>HISTÓRICO</div>
+
+<div class="btn dark"><span>💰</span>VENTAS</div>
+
+<div class="btn dark"><span>📅</span>CALENDARIO</div>
+
+<div class="btn orange box">
+<div class="badge">3</div>
+<span>✉️</span>COMUNICACIÓN
+</div>
+
+<div class="btn orange"><span>🤖</span>AYUDA IA</div>
+
+<div class="btn dark"><span>⚙️</span>CONFIGURACIÓN</div>
 
 </div>
+
+<script>
+
+/* vibración al tocar */
+
+document.querySelectorAll(".btn").forEach(b=>{
+b.onclick=()=>{
+if(navigator.vibrate) navigator.vibrate(40)
+alert("Pantalla en construcción")
+}
+})
+
+</script>
 
 </body>
 </html>
