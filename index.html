@@ -9,71 +9,72 @@
 
 body{
 margin:0;
-font-family:Arial, Helvetica, sans-serif;
-background:#e9eef2;
+font-family:Segoe UI,Arial;
+background:#e6ecf0;
+overflow:hidden;
 }
 
-/* BARRA SUPERIOR */
+/* ===== BARRA SUPERIOR ===== */
 
-.topbar{
-background:#16232d;
+.header{
+height:70px;
+background:#16242f;
 color:white;
-padding:14px;
 display:flex;
-justify-content:space-between;
 align-items:center;
-box-shadow:0 4px 10px rgba(0,0,0,0.3);
+justify-content:space-between;
+padding:0 25px;
+box-shadow:0 4px 12px rgba(0,0,0,0.35);
 }
 
 .title{
-font-size:22px;
+font-size:24px;
 font-weight:700;
 }
 
-.subtitle{
-font-size:12px;
-opacity:0.7;
+.operator{
+font-size:14px;
+opacity:0.8;
 }
 
-.icons{
-font-size:20px;
-display:flex;
-gap:18px;
+.clock{
+font-size:18px;
+font-weight:600;
 }
 
-/* GRID */
+/* ===== PANEL ===== */
 
 .panel{
-padding:18px;
+height:calc(100vh - 70px);
+padding:20px;
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:18px;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
 }
 
-/* BOTONES */
+/* ===== BOTONES ===== */
 
 .btn{
-background:linear-gradient(180deg,#6f8fa6,#4e6e85);
+position:relative;
+border-radius:26px;
+background:linear-gradient(180deg,#5e87a6,#3d5f7a);
 color:white;
-border-radius:22px;
-height:110px;
 display:flex;
 flex-direction:column;
-justify-content:center;
 align-items:center;
-font-size:18px;
+justify-content:center;
+font-size:20px;
 font-weight:700;
 box-shadow:
-inset 0 1px 0 rgba(255,255,255,0.4),
-0 10px 18px rgba(0,0,0,0.25);
-transition:0.15s;
+inset 0 2px 0 rgba(255,255,255,0.4),
+0 12px 18px rgba(0,0,0,0.25);
 cursor:pointer;
-user-select:none;
+transition:0.12s;
 }
 
 .btn span{
-font-size:36px;
-margin-bottom:6px;
+font-size:42px;
+margin-bottom:8px;
 }
 
 .btn:active{
@@ -84,22 +85,19 @@ inset 0 6px 12px rgba(0,0,0,0.5);
 
 /* COLORES */
 
-.green{background:linear-gradient(180deg,#6fbf55,#3d8c2f);}
-.orange{background:linear-gradient(180deg,#f5a623,#d87c00);}
-.dark{background:linear-gradient(180deg,#5f6f7a,#3f4f59);}
+.green{background:linear-gradient(180deg,#6ec45b,#3e8f33);}
+.orange{background:linear-gradient(180deg,#f4a12c,#d17800);}
+.dark{background:linear-gradient(180deg,#5f6f79,#3e4d57);}
+
+/* CONTADOR */
 
 .badge{
 position:absolute;
-right:12px;
-top:8px;
+top:10px;
+right:14px;
 font-size:14px;
-background:transparent;
-color:white;
-font-weight:bold;
-}
-
-.box{
-position:relative;
+font-weight:700;
+opacity:0.9;
 }
 
 </style>
@@ -107,30 +105,28 @@ position:relative;
 
 <body>
 
-<div class="topbar">
+<div class="header">
 <div>
 <div class="title">MONOLITO GPT PRO</div>
-<div class="subtitle">Javier Gion & IA ChatGPT</div>
+<div class="operator">Operador 03</div>
 </div>
 
-<div class="icons">
-⚠️ 🔎 ❓ ↩️
-</div>
+<div class="clock" id="clock"></div>
 </div>
 
 <div class="panel">
 
-<div class="btn"><span>🚚</span>PROVEEDORES</div>
+<div class="btn"><div class="badge">1</div><span>🚚</span>PROVEEDORES</div>
 
 <div class="btn dark"><span>📦</span>ARTÍCULOS</div>
 
 <div class="btn"><span>📊</span>COMPARADOR</div>
 
-<div class="btn"><span>📝</span>PEDIDOS</div>
+<div class="btn"><div class="badge">2</div><span>📝</span>PEDIDOS</div>
 
 <div class="btn dark"><span>💳</span>PAGOS</div>
 
-<div class="btn orange"><span>🔎</span>REVISIÓN</div>
+<div class="btn orange"><div class="badge">1</div><span>🔎</span>REVISIÓN</div>
 
 <div class="btn green"><span>📁</span>HISTÓRICO</div>
 
@@ -138,12 +134,9 @@ position:relative;
 
 <div class="btn dark"><span>📅</span>CALENDARIO</div>
 
-<div class="btn orange box">
-<div class="badge">3</div>
-<span>✉️</span>COMUNICACIÓN
-</div>
+<div class="btn orange"><div class="badge">3</div><span>✉️</span>COMUNICACIÓN</div>
 
-<div class="btn orange"><span>🤖</span>AYUDA IA</div>
+<div class="btn orange"><span>🤖</span>AYUDA</div>
 
 <div class="btn dark"><span>⚙️</span>CONFIGURACIÓN</div>
 
@@ -151,12 +144,21 @@ position:relative;
 
 <script>
 
-/* vibración al tocar */
+/* reloj */
+
+function clock(){
+let d=new Date()
+document.getElementById("clock").innerHTML=
+d.toLocaleDateString()+" · "+d.toLocaleTimeString().slice(0,5)
+}
+setInterval(clock,1000)
+clock()
+
+/* vibración */
 
 document.querySelectorAll(".btn").forEach(b=>{
 b.onclick=()=>{
 if(navigator.vibrate) navigator.vibrate(40)
-alert("Pantalla en construcción")
 }
 })
 
