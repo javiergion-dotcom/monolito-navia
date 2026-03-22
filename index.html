@@ -2,80 +2,99 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>EL MONOLITO · Navia</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MONOLITO GPT PRO</title>
 
 <style>
 
 body{
 margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#111;
+font-family:Segoe UI,Arial;
+background:#0f1720;
 color:white;
-text-align:center;
 }
 
-section{
-padding:60px 20px;
+.topbar{
+height:70px;
+background:#121c26;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 20px;
+box-shadow:0 2px 6px rgba(0,0,0,0.6);
 }
 
-.hero{
-height:100vh;
-background:url("navia.jpg") center/cover no-repeat;
+.logo{
+font-size:22px;
+font-weight:700;
+}
+
+.sub{
+font-size:12px;
+opacity:.7;
+}
+
+.right{
+display:flex;
+align-items:center;
+gap:18px;
+font-size:14px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:18px;
+padding:20px;
+height:calc(100vh - 70px);
+box-sizing:border-box;
+}
+
+.btn{
+background:linear-gradient(180deg,#3b82f6,#1e3a8a);
+border-radius:16px;
 display:flex;
 flex-direction:column;
-justify-content:center;
 align-items:center;
-background-blend-mode:overlay;
-background-color:#0008;
+justify-content:center;
+font-size:18px;
+font-weight:600;
+box-shadow:
+0 8px 0 rgba(0,0,0,.6),
+0 12px 20px rgba(0,0,0,.8);
+transition:.08s;
 }
 
-h1{
-font-size:48px;
-letter-spacing:4px;
-margin:0;
+.btn:active{
+transform:translateY(6px);
+box-shadow:
+0 2px 0 rgba(0,0,0,.6),
+0 4px 8px rgba(0,0,0,.8);
 }
 
-h2{
-color:#ff9d2f;
-font-weight:300;
-margin-top:10px;
+.orange{
+background:linear-gradient(180deg,#fb923c,#c2410c);
 }
 
-.card{
-background:#1c1c1c;
-margin:30px auto;
-padding:30px;
-border-radius:20px;
-max-width:500px;
-box-shadow:0 10px 30px #000;
+.green{
+background:linear-gradient(180deg,#4ade80,#166534);
 }
 
-.card img{
-width:100%;
-border-radius:15px;
-margin-bottom:20px;
+.grey{
+background:linear-gradient(180deg,#6b7280,#374151);
 }
 
-.mahou{
-background:#000;
-padding:80px 20px;
-}
-
-.mahou h3{
+.icon{
 font-size:34px;
-color:#ff3c3c;
-letter-spacing:3px;
+margin-bottom:8px;
 }
 
-.historia{
-background:#181818;
-}
-
-footer{
-padding:40px;
+.counter{
+position:absolute;
+margin-left:90px;
+margin-top:-60px;
 font-size:14px;
-opacity:0.6;
+opacity:.9;
 }
 
 </style>
@@ -83,54 +102,39 @@ opacity:0.6;
 
 <body>
 
-<section class="hero">
-<h1>EL MONOLITO</h1>
-<h2>NAVIA</h2>
-<p>Café ecológico · Mahou 5 Estrellas · Ambiente joven</p>
-</section>
-
-<section>
-<div class="card">
-<img src="cafe1.jpg">
-<h3>Cafés especiales ecológicos</h3>
-<p>Especialistas en café y punto de encuentro diario.</p>
+<div class="topbar">
+<div>
+<div class="logo">MONOLITO GPT PRO</div>
+<div class="sub">Javier Gion & IA ChatGPT</div>
 </div>
-</section>
 
-<section>
-<div class="card">
-<img src="matcha.jpg">
-<h3>Matcha Latte Candelas</h3>
-<p>Producto ecológico seleccionado.</p>
+<div class="right">
+<div>📶</div>
+<div>👤 Carlos</div>
+<div>🕒 10:42</div>
+<div>📅 Hoy</div>
 </div>
-</section>
-
-<section class="mahou">
-<h3>GRAN NOVEDAD</h3>
-<p>Llega Mahou Bodega a EL MONOLITO</p>
-<img src="mahou.jpg" style="max-width:600px;width:90%;border-radius:20px;">
-<p>Una nueva experiencia cervecera en Navia.</p>
-</section>
-
-<section class="historia">
-<div class="card">
-<img src="fachada.jpg">
-<h3>Nuestra historia</h3>
-<p>Nacimos con la idea de crear un espacio referente en la hostelería de Navia.</p>
 </div>
-</section>
 
-<section>
-<div class="card">
-<img src="interior.jpg">
-<h3>Ambiente tranquilo</h3>
-<p>Un lugar para disfrutar con calma.</p>
+<div class="grid">
+
+<div class="btn"><div class="icon">🚚</div>Proveedores</div>
+<div class="btn grey"><div class="icon">📦</div>Artículos</div>
+<div class="btn"><div class="icon">📊</div>Comparador</div>
+
+<div class="btn"><div class="icon">📝</div>Pedidos</div>
+<div class="btn orange"><div class="icon">⚠️</div>A tener en cuenta</div>
+<div class="btn grey"><div class="icon">⚙️</div>Configuración</div>
+
+<div class="btn green"><div class="icon">📂</div>Histórico</div>
+<div class="btn green"><div class="icon">💰</div>Ventas</div>
+<div class="btn green"><div class="icon">💳</div>Pagos</div>
+
+<div class="btn grey"><div class="icon">📅</div>Calendario</div>
+<div class="btn"><div class="icon">✉️</div>Comunicación</div>
+<div class="btn"><div class="icon">🤖</div>Ayuda IA</div>
+
 </div>
-</section>
-
-<footer>
-EL MONOLITO · Navia
-</footer>
 
 </body>
 </html>
