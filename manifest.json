@@ -1,10 +1,11 @@
 {
   "name": "MONOLITO GPT PRO",
   "short_name": "MONOLITO",
-  "start_url": ".",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#111111",
+  "background_color": "#14232c",
+  "theme_color": "#14232c",
+  "orientation": "any",
   "icons": [
     {
       "src": "logotipo-monolito.png",
