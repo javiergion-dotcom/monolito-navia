@@ -6,53 +6,132 @@
 <title>MONOLITO GPT PRO</title>
 
 <style>
-
 *{box-sizing:border-box;}
 
 body{
 margin:0;
-font-family:Segoe UI,Arial;
+font-family:Segoe UI, Arial;
 background:#dfe6ec;
-height:100vh;
-overflow:auto;
 }
 
-/* ===== BARRA TPV ===== */
-
 .topbar{
-height:60px;
-background:#132028;
+height:75px;
+background:#14232c;
 color:white;
 display:flex;
 align-items:center;
 justify-content:space-between;
-padding:0 18px;
-box-shadow:0 4px 10px rgba(0,0,0,0.4);
+padding:0 30px;
+box-shadow:0 5px 15px rgba(0,0,0,0.4);
+position:sticky;
+top:0;
+z-index:10;
 }
 
-.left-icons span{
-font-size:22px;
-margin-right:14px;
-cursor:pointer;
-opacity:0.9;
-}
-
-.title{
-font-size:20px;
-font-weight:700;
-}
-
-.operator{
-font-size:12px;
-opacity:0.7;
-}
-
-.datetime{
-font-size:16px;
-font-weight:600;
-}
-
-/* ===== PANEL ===== */
+.title{font-size:26px;font-weight:700;}
+.operator{font-size:14px;opacity:0.8;}
+.datetime{font-size:18px;font-weight:600;}
 
 .panel{
-padding
+padding:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+}
+
+.btn{
+background:linear-gradient(180deg,#6f8fa6,#4c6576);
+border-radius:28px;
+color:white;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+font-size:22px;
+font-weight:700;
+cursor:pointer;
+position:relative;
+height:150px;
+
+box-shadow:
+inset 0 3px 4px rgba(255,255,255,0.35),
+0 15px 25px rgba(0,0,0,0.35);
+
+transition:0.12s;
+}
+
+.btn:active{
+transform:translateY(8px);
+box-shadow:
+inset 0 6px 10px rgba(0,0,0,0.6),
+0 5px 10px rgba(0,0,0,0.5);
+}
+
+.icon{font-size:48px;margin-bottom:10px;}
+
+.green{background:linear-gradient(180deg,#71bf55,#3d8f2b);}
+.orange{background:linear-gradient(180deg,#f6a623,#d57900);}
+
+.counter{
+position:absolute;
+top:12px;
+right:18px;
+font-size:15px;
+opacity:0.9;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+<div>
+<div class="title">MONOLITO GPT PRO</div>
+<div class="operator">Operador activo</div>
+</div>
+<div class="datetime" id="reloj"></div>
+</div>
+
+<div class="panel">
+<div class="grid">
+
+<div class="btn"><div class="counter">1</div><div class="icon">🚚</div>PROVEEDORES</div>
+<div class="btn"><div class="icon">📦</div>ARTÍCULOS</div>
+<div class="btn"><div class="icon">📊</div>COMPARADOR</div>
+
+<div class="btn"><div class="counter">2</div><div class="icon">📝</div>PEDIDOS</div>
+<div class="btn"><div class="icon">💳</div>PAGOS</div>
+<div class="btn orange"><div class="counter">1</div><div class="icon">🔎</div>REVISIÓN</div>
+
+<div class="btn green"><div class="icon">📁</div>HISTÓRICO</div>
+<div class="btn"><div class="icon">💰</div>VENTAS</div>
+<div class="btn"><div class="icon">📅</div>CALENDARIO</div>
+
+<div class="btn orange"><div class="counter">3</div><div class="icon">✉️</div>COMUNICACIÓN</div>
+<div class="btn orange"><div class="icon">🤖</div>AYUDA</div>
+<div class="btn"><div class="icon">⚙️</div>CONFIGURACIÓN</div>
+
+</div>
+</div>
+
+<script>
+function reloj(){
+let d=new Date()
+document.getElementById("reloj").innerHTML=
+d.toLocaleDateString()+" · "+d.toLocaleTimeString().slice(0,5)
+}
+setInterval(reloj,1000)
+reloj()
+
+document.querySelectorAll(".btn").forEach(b=>{
+b.onclick=()=>{
+if(navigator.vibrate) navigator.vibrate(40)
+}
+})
+</script>
+
+</body>
+</html>
