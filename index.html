@@ -1,304 +1,213 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO GPT PRO</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MONOLITO PRO</title>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --panel-bg: #1e1e1e;
+            --accent-blue: #3a5a78;
+            --accent-orange: #d35400;
+            --accent-green: #27ae60;
+            --accent-red: #c0392b;
+            --text-white: #ffffff;
+        }
 
-<style>
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-*{box-sizing:border-box}
+        /* BARRA SUPERIOR DE MANDO */
+        .header {
+            background: #1a1a1a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 2px solid #333;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-body{
-margin:0;
-font-family:Segoe UI, Arial;
-background:#0f1a21;
-overflow:hidden;
-}
+        .nav-left { display: flex; gap: 20px; align-items: center; }
+        .nav-right { display: flex; gap: 15px; align-items: center; font-size: 0.9em; }
 
-/* ===== LOGIN ===== */
+        .btn-header {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
 
-.login{
-position:fixed;
-inset:0;
-background:#0f1a21;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-color:white;
-z-index:10;
-}
+        .title { font-size: 1.5em; font-weight: bold; letter-spacing: 2px; }
+        .operator-tag { background: #333; padding: 5px 10px; border-radius: 4px; border: 1px solid #555; }
 
-.logo{
-font-size:42px;
-font-weight:700;
-margin-bottom:10px;
-}
+        /* REJILLA DE 12 BOTONES (EL MONOLITO) */
+        .dashboard {
+            display: grid;
+            gap: 15px;
+            padding: 15px;
+            margin-top: 5px;
+        }
 
-.sub{
-opacity:0.7;
-margin-bottom:40px;
-}
+        /* Móvil (2 Columnas) */
+        @media (max-width: 767px) {
+            .dashboard { grid-template-columns: repeat(2, 1fr); }
+        }
 
-.pin{
-font-size:36px;
-letter-spacing:10px;
-margin-bottom:25px;
-height:40px;
-}
+        /* Tablet Redmi Pad / PC (3 Columnas) */
+        @media (min-width: 768px) {
+            .dashboard { grid-template-columns: repeat(3, 1fr); }
+        }
 
-.keypad{
-display:grid;
-grid-template-columns:repeat(3,90px);
-gap:18px;
-}
+        .btn-tpv {
+            aspect-ratio: 1.5 / 1;
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border: 1px solid #333;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 6px 6px 12px #000000, -2px -2px 8px rgba(255,255,255,0.05);
+            transition: all 0.1s ease;
+            position: relative;
+        }
 
-.key{
-height:90px;
-border-radius:20px;
-background:linear-gradient(#6f8fa6,#4c6576);
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:28px;
-cursor:pointer;
-box-shadow:
-0 12px 20px rgba(0,0,0,0.5),
-inset 0 3px 4px rgba(255,255,255,0.3);
-}
+        /* Efecto de Hundimiento Táctil */
+        .btn-tpv:active {
+            box-shadow: inset 4px 4px 8px #000000, inset -2px -2px 8px rgba(255,255,255,0.05);
+            transform: scale(0.97);
+        }
 
-.key:active{
-transform:translateY(6px);
-box-shadow:
-0 4px 10px rgba(0,0,0,0.6),
-inset 0 6px 10px rgba(0,0,0,0.6);
-}
+        .icon { font-size: 2.5em; margin-bottom: 10px; }
+        
+        /* Notificaciones (Numeritos) */
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent-orange);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7em;
+        }
 
-/* ===== PANEL ===== */
+        /* Estados Especiales */
+        .btn-incidencia { border: 2px solid var(--accent-red); }
+        .btn-incidencia .icon { color: var(--accent-red); animation: pulse 2s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
 
-.topbar{
-height:70px;
-background:#14232c;
-color:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 25px;
-box-shadow:0 5px 15px rgba(0,0,0,0.4);
-}
-
-.title{font-size:24px;font-weight:700}
-
-.operator{font-size:13px;opacity:0.8}
-
-.datetime{font-size:18px}
-
-.panel{
-height:calc(100vh - 70px);
-padding:20px;
-background:#dfe6ec;
-}
-
-.grid{
-height:100%;
-display:grid;
-grid-template-columns:repeat(3,1fr);
-grid-template-rows:repeat(4,1fr);
-gap:20px;
-}
-
-.btn{
-background:linear-gradient(180deg,#6f8fa6,#4c6576);
-border-radius:28px;
-color:white;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-font-size:22px;
-font-weight:700;
-cursor:pointer;
-position:relative;
-box-shadow:
-inset 0 3px 4px rgba(255,255,255,0.35),
-0 15px 25px rgba(0,0,0,0.35);
-transition:.12s;
-}
-
-.btn:active{
-transform:translateY(8px);
-box-shadow:
-inset 0 6px 10px rgba(0,0,0,0.6),
-0 5px 10px rgba(0,0,0,0.5);
-}
-
-.icon{font-size:48px;margin-bottom:10px}
-
-.orange{background:linear-gradient(180deg,#f6a623,#d57900)}
-.green{background:linear-gradient(180deg,#71bf55,#3d8f2b)}
-
-.counter{
-position:absolute;
-top:12px;
-right:18px;
-font-size:14px;
-opacity:0.9;
-}
-
-</style>
+    </style>
 </head>
-
 <body>
 
-<div class="login" id="login">
-
-<div class="logo">MONOLITO GPT PRO</div>
-<div class="sub">Introduce tu PIN</div>
-
-<div class="pin" id="pin"></div>
-
-<div class="keypad">
-<div class="key" onclick="num(1)">1</div>
-<div class="key" onclick="num(2)">2</div>
-<div class="key" onclick="num(3)">3</div>
-<div class="key" onclick="num(4)">4</div>
-<div class="key" onclick="num(5)">5</div>
-<div class="key" onclick="num(6)">6</div>
-<div class="key" onclick="num(7)">7</div>
-<div class="key" onclick="num(8)">8</div>
-<div class="key" onclick="num(9)">9</div>
-<div class="key" onclick="borrar()">←</div>
-<div class="key" onclick="num(0)">0</div>
-<div class="key" onclick="borrarTodo()">C</div>
+<div class="header">
+    <div class="nav-left">
+        <button class="btn-header" onclick="vibrar()"> < </button>
+        <button class="btn-header" onclick="vibrar()" style="font-size: 22px;"> 🔍 </button>
+    </div>
+    <div class="title">MONOLITO</div>
+    <div class="nav-right">
+        <div class="operator-tag">G-3F-PAID</div>
+        <div id="reloj">16:45</div>
+    </div>
 </div>
 
-</div>
-
-<div id="app" style="display:none">
-
-<div class="topbar">
-<div>
-<div class="title">MONOLITO GPT PRO</div>
-<div class="operator" id="operador"></div>
-</div>
-<div class="datetime" id="reloj"></div>
-</div>
-
-<div class="panel">
-<div class="grid">
-
-<div class="btn" onclick="abrir('proveedores')">
-<div class="counter">1</div>
-<div class="icon">🚚</div>PROVEEDORES
-</div>
-
-<div class="btn" onclick="abrir('articulos')">
-<div class="icon">📦</div>ARTÍCULOS
-</div>
-
-<div class="btn" onclick="abrir('comparador')">
-<div class="icon">📊</div>COMPARADOR
-</div>
-
-<div class="btn" onclick="abrir('pedidos')">
-<div class="counter">2</div>
-<div class="icon">📝</div>PEDIDOS
-</div>
-
-<div class="btn" onclick="abrir('pagos')">
-<div class="icon">💳</div>PAGOS
-</div>
-
-<div class="btn orange" onclick="abrir('revision')">
-<div class="counter">1</div>
-<div class="icon">🔎</div>REVISIÓN
-</div>
-
-<div class="btn green" onclick="abrir('historico')">
-<div class="icon">📁</div>HISTÓRICO
-</div>
-
-<div class="btn" onclick="abrir('ventas')">
-<div class="icon">💰</div>VENTAS
-</div>
-
-<div class="btn" onclick="abrir('calendario')">
-<div class="icon">📅</div>CALENDARIO
-</div>
-
-<div class="btn orange" onclick="abrir('comunicacion')">
-<div class="counter">3</div>
-<div class="icon">✉️</div>COMUNICACIÓN
-</div>
-
-<div class="btn orange" onclick="abrir('ia')">
-<div class="icon">🤖</div>AYUDA
-</div>
-
-<div class="btn" onclick="abrir('config')">
-<div class="icon">⚙️</div>CONFIGURACIÓN
-</div>
-
-</div>
-</div>
-
+<div class="dashboard">
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">🚚</span>
+        <span>PROVEEDORES</span>
+        <div class="badge">1</div>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">📦</span>
+        <span>PEDIDOS</span>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">⚖️</span>
+        <span>COMPARADOR</span>
+    </div>
+    <div class="btn-tpv btn-incidencia" onclick="vibrar()">
+        <span class="icon">🚨</span>
+        <span>REVISIÓN</span>
+        <div class="badge" style="background: red;">3</div>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">💰</span>
+        <span>PAGOS</span>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">📓</span>
+        <span>DIARIO</span>
+        <div class="badge">2</div>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">📣</span>
+        <span>COMUNICACIÓN</span>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">💵</span>
+        <span>VENTAS</span>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">📅</span>
+        <span>CALENDARIO</span>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">📊</span>
+        <span>HISTÓRICO</span>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()" style="background: linear-gradient(145deg, #d3540022, #1a1a1a);">
+        <span class="icon">❓</span>
+        <span>AYUDA</span>
+    </div>
+    <div class="btn-tpv" onclick="vibrar()">
+        <span class="icon">⚙️</span>
+        <span>CONFIGURACIÓN</span>
+    </div>
 </div>
 
 <script>
+    // Función de vibración para el tacto real (solo en móviles/tablets compatibles)
+    function vibrar() {
+        if (navigator.vibrate) {
+            navigator.vibrate(40); // 40ms de vibración corta
+        }
+    }
 
-let base={
-"1111":"DARIO",
-"2222":"TOÑO",
-"3333":"ANDREINA",
-"0985":"JAVI",
-"4544":"SILVIA",
-"4444":"FELI"
-}
-
-let actual=""
-
-function num(n){
-if(navigator.vibrate) navigator.vibrate(30)
-actual+=n
-document.getElementById("pin").innerHTML="• ".repeat(actual.length)
-
-if(actual.length==4){
-if(base[actual]){
-document.getElementById("login").style.display="none"
-document.getElementById("app").style.display="block"
-document.getElementById("operador").innerHTML="Operador: "+base[actual]
-}else{
-actual=""
-document.getElementById("pin").innerHTML=""
-alert("PIN incorrecto")
-}
-}
-}
-
-function borrar(){
-actual=actual.slice(0,-1)
-document.getElementById("pin").innerHTML="• ".repeat(actual.length)
-}
-
-function borrarTodo(){
-actual=""
-document.getElementById("pin").innerHTML=""
-}
-
-function abrir(sec){
-if(navigator.vibrate) navigator.vibrate(50)
-alert("Abrir módulo: "+sec)
-}
-
-function reloj(){
-let d=new Date()
-document.getElementById("reloj").innerHTML=
-d.toLocaleDateString()+" · "+d.toLocaleTimeString().slice(0,5)
-}
-setInterval(reloj,1000)
-reloj()
-
+    // Reloj en tiempo real
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('reloj').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }, 1000);
 </script>
 
 </body>
