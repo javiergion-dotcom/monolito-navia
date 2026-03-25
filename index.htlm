@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MONOLITO PRO G3F</title>
+    <style>
+        :root { --bg: #0a0a0a; --accent: #27ae60; --panel: #1a1a1a; --text: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; overflow: hidden; height: 100vh; }
+        .header { background: #111; display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; border-bottom: 3px solid var(--accent); box-shadow: 0 4px 15px rgba(0,0,0,0.8); }
+        .tag { background: var(--accent); color: #000; padding: 5px 12px; border-radius: 6px; font-weight: 900; font-size: 14px; letter-spacing: 1px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 25px; height: calc(100vh - 100px); }
+        .btn { background: linear-gradient(145deg, #222, #111); border: 1px solid #333; border-radius: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 16px; font-weight: bold; transition: 0.1s; box-shadow: 8px 8px 16px #050505, -4px -4px 12px #1a1a1a; text-transform: uppercase; }
+        .btn:active { transform: scale(0.96); box-shadow: inset 4px 4px 10px #000; border-color: var(--accent); }
+        .icon { font-size: 45px; margin-bottom: 12px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        .footer { position: fixed; bottom: 10px; right: 15px; font-size: 10px; color: #444; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="font-size: 22px; font-weight: 900; letter-spacing: 2px;">MONOLITO PRO G3F</div>
+        <div class="tag">OPERADOR: G-3F-PAID</div>
+    </div>
+    <div class="grid">
+        <div class="btn" onclick="v(60)"><span class="icon">🚚</span>Proveedores</div>
+        <div class="btn" onclick="v(60)"><span class="icon">📦</span>Pedidos</div>
+        <div class="btn" onclick="v(60)"><span class="icon">⚖️</span>Comparador</div>
+        <div class="btn" onclick="v(60)"><span class="icon">💰</span>Pagos</div>
+        <div class="btn" onclick="v(60)"><span class="icon">💵</span>Ventas</div>
+        <div class="btn" onclick="v(60)"><span class="icon">⚙️</span>Ajustes</div>
+        <div class="btn" onclick="v(60)"><span class="icon">📅</span>Calendario</div>
+        <div class="btn" onclick="v(60)"><span class="icon">📓</span>Diario</div>
+        <div class="btn" onclick="v(60)"><span class="icon">🍷</span>Celler</div>
+        <div class="btn" onclick="v(60)"><span class="icon">🧒</span>Niños</div>
+        <div class="btn" onclick="v(60)"><span class="icon">🚀</span>Turbo</div>
+        <div class="btn" onclick="v(80)" style="border: 2px solid #c0392b; color: #e74c3c;"><span class="icon">🚨</span>REVISIÓN</div>
+    </div>
+    <div class="footer">25/03/2026 - G-3F-PAID - PROPIETARIO: JAVI</div>
+    <script>
+        function v(ms) { if(navigator.vibrate) navigator.vibrate(ms); }
+    </script>
+</body>
+</html>
