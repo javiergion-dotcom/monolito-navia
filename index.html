@@ -2,140 +2,44 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MONOLITO GPT PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
-body{
-margin:0;
-font-family:Segoe UI,Arial;
-background:#e6ecf0;
-}
-
-/* ===== HEADER ===== */
-
-.header{
-height:80px;
-background:#14212b;
-color:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 25px;
-box-shadow:0 5px 14px rgba(0,0,0,0.4);
-}
-
-.lefticons{
-font-size:26px;
-display:flex;
-gap:20px;
-}
-
-.title{
-font-size:26px;
-font-weight:700;
-}
-
-.clock{
-font-size:18px;
-}
-
-/* ===== PANEL ===== */
-
-.panel{
-height:calc(100vh - 80px);
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:22px;
-padding:22px;
-box-sizing:border-box;
-}
-
-/* ===== BOTONES ===== */
-
-.btn{
-border-radius:28px;
-background:linear-gradient(180deg,#5c86a5,#3d5f79);
-color:white;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-font-size:22px;
-font-weight:700;
-box-shadow:
-inset 0 2px 0 rgba(255,255,255,0.4),
-0 14px 22px rgba(0,0,0,0.25);
-transition:0.12s;
-}
-
-.btn span{
-font-size:48px;
-margin-bottom:10px;
-}
-
-.btn:active{
-transform:translateY(8px);
-box-shadow:
-inset 0 8px 14px rgba(0,0,0,0.5);
-}
-
-/* colores */
-
-.green{background:linear-gradient(180deg,#6fc65b,#3f8f33);}
-.orange{background:linear-gradient(180deg,#f5a32e,#d37900);}
-.dark{background:linear-gradient(180deg,#5f6f79,#3e4e58);}
-
-.badge{
-position:absolute;
-margin-top:-55px;
-margin-left:70px;
-font-size:14px;
-}
-
+body{font-family:Arial;background:#f2f2f2;margin:0;}
+header{background:#111;color:white;padding:20px;text-align:center;font-size:26px;}
+.container{padding:25px;}
+.boton{display:block;padding:18px;margin:12px 0;border-radius:10px;font-size:20px;color:white;text-align:center;cursor:pointer;}
+.proveedores{background:#007bff;}
+.articulos{background:#28a745;}
+.pagos{background:#ff9800;}
+.historial{background:#9c27b0;}
+.config{background:#607d8b;}
+.chat{background:#e91e63;}
 </style>
+
+<script>
+function abrir(p){
+window.location.href=p;
+}
+</script>
+
 </head>
 
 <body>
 
-<div class="header">
-<div class="lefticons">← 🔍 ⚠️ ❓</div>
+<header>MONOLITO GPT PRO</header>
 
-<div class="title">MONOLITO</div>
+<div class="container">
 
-<div class="clock" id="clock"></div>
-</div>
-
-<div class="panel">
-
-<div class="btn"><span>🚚</span>PROVEEDORES</div>
-<div class="btn dark"><span>📦</span>ARTÍCULOS</div>
-<div class="btn"><span>📊</span>COMPARADOR</div>
-
-<div class="btn"><span>📝</span>PEDIDOS</div>
-<div class="btn dark"><span>💳</span>PAGOS</div>
-<div class="btn orange"><span>🔎</span>REVISIÓN</div>
-
-<div class="btn green"><span>📁</span>HISTÓRICO</div>
-<div class="btn dark"><span>💰</span>VENTAS</div>
-<div class="btn dark"><span>📅</span>CALENDARIO</div>
-
-<div class="btn orange"><span>✉️</span>COMUNICACIÓN</div>
-<div class="btn orange"><span>🤖</span>AYUDA</div>
-<div class="btn dark"><span>⚙️</span>CONFIGURACIÓN</div>
+<div class="boton proveedores" onclick="abrir('proveedores.html')">Proveedores</div>
+<div class="boton articulos" onclick="abrir('articulos.html')">Artículos</div>
+<div class="boton pagos" onclick="abrir('pagos.html')">Pagos</div>
+<div class="boton historial" onclick="abrir('historial.html')">Histórico</div>
+<div class="boton config" onclick="abrir('configuracion.html')">Configuración</div>
+<div class="boton chat" onclick="abrir('chat.html')">ChatGPT</div>
 
 </div>
-
-<script>
-function clock(){
-let d=new Date()
-document.getElementById("clock").innerHTML =
-d.toLocaleDateString()+" "+d.toLocaleTimeString().slice(0,5)
-}
-setInterval(clock,1000)
-clock()
-</script>
 
 </body>
 </html>
