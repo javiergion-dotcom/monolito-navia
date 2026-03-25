@@ -1,20 +1,19 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO GPT PRO</title>
-
-<style>
+<title>MONOLITO GPT PRO</title><style>
 
 body{
 margin:0;
-font-family:Arial, Helvetica, sans-serif;
+font-family:Arial,Helvetica,sans-serif;
 background:#e9eef2;
-overflow-y:auto;
+overflow:hidden;
 }
 
-.topbar{
+/* BARRA SUPERIOR */
+
+.top{
 background:#0f2029;
 color:white;
 padding:14px;
@@ -24,156 +23,104 @@ align-items:center;
 font-size:18px;
 }
 
+/* GRID BOTONES */
+
 .grid{
 display:grid;
-grid-template-columns:repeat(3, 1fr);
+grid-template-columns:repeat(3,1fr);
 gap:22px;
 padding:22px;
+height:calc(100vh - 60px);
+box-sizing:border-box;
 }
 
+/* BOTONES */
+
 .btn{
-height:150px;
-border-radius:22px;
+border-radius:26px;
+color:white;
+font-size:22px;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-color:white;
-font-size:20px;
-font-weight:bold;
-box-shadow:0 10px 18px rgba(0,0,0,0.25);
-transition:0.15s;
+box-shadow:0 10px 20px rgba(0,0,0,0.25);
+transition:.12s;
 cursor:pointer;
 user-select:none;
 }
 
 .btn:active{
-transform:scale(0.94);
-box-shadow:0 4px 6px rgba(0,0,0,0.4);
+transform:scale(.96);
+box-shadow:0 4px 8px rgba(0,0,0,0.35);
 }
 
-.prov{background:linear-gradient(#6f93ad,#4e6f86);}
-.art{background:linear-gradient(#666,#444);}
-.comp{background:linear-gradient(#6f93ad,#4e6f86);}
-.ped{background:linear-gradient(#6f93ad,#4e6f86);}
-.pag{background:linear-gradient(#666,#444);}
-.rev{background:linear-gradient(#f5a623,#d97c00);}
-.his{background:linear-gradient(#5db04f,#3f8f34);}
-.ven{background:linear-gradient(#666,#444);}
-.cal{background:linear-gradient(#666,#444);}
-.com{background:linear-gradient(#f5a623,#d97c00);}
-.ia{background:linear-gradient(#f5a623,#d97c00);}
-.conf{background:linear-gradient(#666,#444);}
+/* COLORES */
+
+.azul{background:linear-gradient(#6f8fa6,#3f5f75);}
+.gris{background:linear-gradient(#7d8b94,#4e5b63);}
+.naranja{background:linear-gradient(#f2a93b,#d88300);}
+.verde{background:linear-gradient(#69c15a,#3e9c32);}
 
 .icon{
-font-size:42px;
+font-size:46px;
 margin-bottom:8px;
 }
 
-.badge{
-position:absolute;
-right:18px;
-top:14px;
-font-size:16px;
-}
-
-.btnwrap{
-position:relative;
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="topbar">
+</style></head><body><div class="top">
 <div>MONOLITO GPT PRO</div>
-<div id="fecha"></div>
-</div>
-
-<div class="grid">
-
-<div class="btnwrap">
-<div class="badge">1</div>
-<div class="btn prov" onclick="abrir('proveedores')">
+<div id="hora"></div>
+</div><div class="grid"><div class="btn azul" onclick="abrir('proveedores')">
 <div class="icon">🚚</div>
 PROVEEDORES
-</div>
-</div>
-
-<div class="btn art" onclick="abrir('articulos')">
+</div><div class="btn gris" onclick="abrir('articulos')">
 <div class="icon">📦</div>
 ARTÍCULOS
-</div>
-
-<div class="btn comp" onclick="abrir('comparador')">
+</div><div class="btn azul" onclick="abrir('comparador')">
 <div class="icon">📊</div>
 COMPARADOR
-</div>
-
-<div class="btn ped" onclick="abrir('pedidos')">
+</div><div class="btn azul" onclick="abrir('pedidos')">
 <div class="icon">📝</div>
 PEDIDOS
-</div>
-
-<div class="btn pag" onclick="abrir('pagos')">
+</div><div class="btn gris" onclick="abrir('pagos')">
 <div class="icon">💳</div>
 PAGOS
-</div>
-
-<div class="btn rev" onclick="abrir('revision')">
+</div><div class="btn naranja" onclick="abrir('revision')">
 <div class="icon">🔎</div>
 REVISIÓN
-</div>
-
-<div class="btn his" onclick="abrir('historico')">
-<div class="icon">📁</div>
+</div><div class="btn verde" onclick="abrir('historico')">
+<div class="icon">📂</div>
 HISTÓRICO
-</div>
-
-<div class="btn ven" onclick="abrir('ventas')">
+</div><div class="btn gris" onclick="abrir('ventas')">
 <div class="icon">💰</div>
 VENTAS
-</div>
-
-<div class="btn cal" onclick="abrir('calendario')">
+</div><div class="btn gris" onclick="abrir('calendario')">
 <div class="icon">📅</div>
 CALENDARIO
-</div>
-
-<div class="btn com" onclick="abrir('comunicacion')">
+</div><div class="btn naranja" onclick="abrir('comunicacion')">
 <div class="icon">✉️</div>
 COMUNICACIÓN
-</div>
-
-<div class="btn ia" onclick="abrir('ia')">
+</div><div class="btn naranja" onclick="abrir('ia')">
 <div class="icon">🤖</div>
 AYUDA IA
-</div>
-
-<div class="btn conf" onclick="abrir('config')">
+</div><div class="btn gris" onclick="abrir('config')">
 <div class="icon">⚙️</div>
 CONFIGURACIÓN
-</div>
-
-</div>
-
-<script>
+</div></div><script>
 
 function abrir(p){
-navigator.vibrate(60);
-alert("Entrar en: "+p);
+navigator.vibrate(40);
+alert("Abrir módulo: " + p);
 }
 
 function reloj(){
 let f=new Date();
-document.getElementById("fecha").innerHTML=
-f.toLocaleDateString()+" "+f.toLocaleTimeString().substring(0,5);
+document.getElementById("hora").innerHTML=
+f.toLocaleDateString()+" · "+f.toLocaleTimeString();
 }
+
 setInterval(reloj,1000);
 reloj();
 
-</script>
-
-</body>
+</script></body>
 </html>
