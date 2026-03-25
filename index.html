@@ -11,13 +11,13 @@
 
 body{
 margin:0;
-font-family:Segoe UI,Arial;
+font-family:Segoe UI, Arial, sans-serif;
 background:#dfe6ec;
-height:100vh;
-overflow:hidden;
+min-height:100vh;
+overflow:auto;
 }
 
-/* CABECERA */
+/* ===== CABECERA ===== */
 
 .topbar{
 height:80px;
@@ -27,11 +27,14 @@ display:flex;
 align-items:center;
 justify-content:space-between;
 padding:0 30px;
-box-shadow:0 6px 20px rgba(0,0,0,0.4);
+box-shadow:0 5px 15px rgba(0,0,0,0.4);
+position:sticky;
+top:0;
+z-index:10;
 }
 
 .title{
-font-size:28px;
+font-size:26px;
 font-weight:700;
 }
 
@@ -41,59 +44,57 @@ opacity:0.8;
 }
 
 .datetime{
-font-size:20px;
+font-size:18px;
 font-weight:600;
 }
 
-/* PANEL */
+/* ===== PANEL ===== */
 
 .panel{
-height:calc(100vh - 80px);
 padding:20px;
 }
 
-/* GRID */
+/* ===== GRID ===== */
 
 .grid{
-height:100%;
 display:grid;
 grid-template-columns:repeat(3,1fr);
-grid-template-rows:repeat(4,1fr);
-gap:20px;
+gap:22px;
 }
 
-/* BOTONES TPV */
+/* ===== BOTONES TPV ===== */
 
 .btn{
+height:150px;
 background:linear-gradient(180deg,#6f8fa6,#4c6576);
-border-radius:30px;
+border-radius:28px;
 color:white;
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
-font-size:22px;
+font-size:20px;
 font-weight:700;
 cursor:pointer;
 position:relative;
 
 box-shadow:
 inset 0 3px 4px rgba(255,255,255,0.35),
-0 18px 30px rgba(0,0,0,0.35);
+0 15px 25px rgba(0,0,0,0.35);
 
 transition:0.12s;
 }
 
 .btn:active{
-transform:translateY(10px);
+transform:translateY(8px);
 box-shadow:
-inset 0 8px 14px rgba(0,0,0,0.6),
-0 6px 12px rgba(0,0,0,0.5);
+inset 0 6px 10px rgba(0,0,0,0.6),
+0 5px 10px rgba(0,0,0,0.5);
 }
 
 .icon{
-font-size:52px;
-margin-bottom:10px;
+font-size:46px;
+margin-bottom:8px;
 }
 
 .green{
@@ -106,29 +107,25 @@ background:linear-gradient(180deg,#f6a623,#d57900);
 
 .counter{
 position:absolute;
-top:14px;
-right:20px;
-font-size:16px;
+top:10px;
+right:16px;
+font-size:14px;
 opacity:0.9;
 }
 
-/* RESPONSIVE MOVIL */
+/* ===== RESPONSIVE MÓVIL ===== */
 
-@media (max-width:900px){
-
+@media(max-width:700px){
 .grid{
 grid-template-columns:repeat(2,1fr);
-grid-template-rows:auto;
 }
-
-.topbar{
-height:70px;
+.btn{
+height:130px;
+font-size:18px;
 }
-
-.panel{
-height:calc(100vh - 70px);
+.icon{
+font-size:38px;
 }
-
 }
 
 </style>
@@ -207,7 +204,7 @@ COMUNICACIÓN
 AYUDA
 </div>
 
-<div class="btn" onclick="abrir('config')">
+<div class="btn" onclick="abrir('configuracion')">
 <div class="icon">⚙️</div>
 CONFIGURACIÓN
 </div>
@@ -217,19 +214,21 @@ CONFIGURACIÓN
 
 <script>
 
-function abrir(sec){
-if(navigator.vibrate) navigator.vibrate(60)
-alert("Abrir módulo: "+sec)
+function abrir(seccion){
+try{
+navigator.vibrate(40);
+}catch(e){}
+alert("Abrir módulo: "+seccion);
 }
 
 function reloj(){
-let d=new Date()
-document.getElementById("reloj").innerHTML =
-d.toLocaleDateString()+" · "+d.toLocaleTimeString().slice(0,5)
+let d=new Date();
+document.getElementById("reloj").innerHTML=
+d.toLocaleDateString()+" · "+d.toLocaleTimeString().slice(0,5);
 }
 
-setInterval(reloj,1000)
-reloj()
+setInterval(reloj,1000);
+reloj();
 
 </script>
 
