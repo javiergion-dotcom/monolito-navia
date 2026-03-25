@@ -1,44 +1,80 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA MONOLITO | Gestión de Compras Profesional</title>
-    <style>
-        :root { --oro: #d4af37; --oscuro: #121212; --gris: #e0e0e0; }
-        body { background: var(--oscuro); color: var(--gris); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        .header { border-bottom: 2px solid var(--oro); padding: 20px; text-align: center; background: #1a1a1a; }
-        .cajita-central { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-        .card { background: #1e1e1e; border: 1px solid var(--oro); padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 600px; width: 100%; }
-        h1 { color: var(--oro); margin: 0; font-size: 1.8rem; letter-spacing: 2px; }
-        .status { margin-top: 20px; padding: 10px; border-radius: 5px; background: rgba(212, 175, 55, 0.1); color: var(--oro); font-weight: bold; }
-        footer { padding: 15px; font-size: 0.8rem; color: #666; text-align: center; border-top: 1px solid #333; }
-    </style>
+<meta charset="UTF-8">
+<title>MONOLITO</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#f2f2f2;
+}
+
+header{
+background:#111;
+color:white;
+padding:20px;
+text-align:center;
+font-size:26px;
+}
+
+.panel{
+padding:20px;
+}
+
+.boton{
+display:block;
+width:100%;
+padding:22px;
+margin:12px 0;
+border-radius:12px;
+color:white;
+font-size:22px;
+text-align:center;
+cursor:pointer;
+user-select:none;
+transition:transform .1s;
+}
+
+.boton:active{
+transform:scale(0.96);
+}
+
+.proveedores{background:#007bff;}
+.articulos{background:#28a745;}
+.pagos{background:#ff9800;}
+.historial{background:#9c27b0;}
+.config{background:#607d8b;}
+.chat{background:#e91e63;}
+</style>
 </head>
+
 <body>
-    <div class="header">
-        <h1>MONOLITO: SISTEMA DE CONTROL TOTAL</h1>
-    </div>
 
-    <div class="cajita-central">
-        <div class="card">
-            <h2>Panel de Control Profesional</h2>
-            <p>Optimizando compras y eliminando mermas.</p>
-            <div class="status" id="estado">SINCRIZANDO CON INDEX.HTML...</div>
-            <p style="margin-top: 20px;">30 Años de Experiencia | Diseño Javi</p>
-        </div>
-    </div>
+<header>MONOLITO</header>
 
-    <footer>
-        2026-03-25 | 20:41 | Código Camarero: MONO-PRO-G3F | Gema Activa
-    </footer>
+<div class="panel">
 
-    <script>
-        function checkSystem() {
-            document.getElementById('estado').innerHTML = "SISTEMA ONLINE - " + new Date().toLocaleTimeString();
-            console.log("Monolito cargado. Identidad: index.html");
-        }
-        setInterval(checkSystem, 1000);
-    </script>
+<div class="boton proveedores" onclick="abrir('proveedores')">Proveedores</div>
+<div class="boton articulos" onclick="abrir('articulos')">Artículos</div>
+<div class="boton pagos" onclick="abrir('pagos')">Pagos</div>
+<div class="boton historial" onclick="abrir('historial')">Histórico</div>
+<div class="boton config" onclick="abrir('config')">Configuración</div>
+<div class="boton chat" onclick="abrir('chat')">ChatGPT</div>
+
+</div>
+
+<script>
+
+function abrir(p){
+console.log("Abrir hoja:",p)
+alert("Abrir hoja: "+p)
+}
+
+</script>
+
 </body>
 </html>
