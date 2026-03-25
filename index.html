@@ -7,91 +7,143 @@
 
 <style>
 
-*{box-sizing:border-box;}
+*{box-sizing:border-box}
 
-html,body{
+body{
 margin:0;
 font-family:Segoe UI, Arial;
-background:#e6ecf0;
-min-height:100vh;
-overflow:auto;
--webkit-overflow-scrolling:touch;
+background:#0f1a21;
+overflow:hidden;
 }
 
-/* ===== BARRA APP ===== */
+/* ===== LOGIN ===== */
 
-.topbar{
-position:sticky;
-top:0;
-z-index:1000;
-height:70px;
-background:#0f2027;
-color:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 20px;
-box-shadow:0 4px 12px rgba(0,0,0,0.3);
-}
-
-.top-left{
-display:flex;
-flex-direction:column;
-}
-
-.title{
-font-size:22px;
-font-weight:600;
-}
-
-.operador{
-font-size:13px;
-opacity:.8;
-}
-
-.top-right{
-display:flex;
-align-items:center;
-gap:15px;
-font-size:18px;
-}
-
-/* ===== PANEL ===== */
-
-.panel{
-padding:20px;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-gap:20px;
-}
-
-.boton{
-height:120px;
-border-radius:18px;
+.login{
+position:fixed;
+inset:0;
+background:#0f1a21;
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
-font-size:20px;
-font-weight:600;
 color:white;
-box-shadow:0 10px 20px rgba(0,0,0,.25);
-transition:.15s;
-user-select:none;
+z-index:10;
 }
 
-.boton:active{
-transform:scale(.95);
-box-shadow:0 5px 10px rgba(0,0,0,.3);
+.logo{
+font-size:42px;
+font-weight:700;
+margin-bottom:10px;
 }
 
-.azul{background:linear-gradient(145deg,#5f7c8a,#3e5663);}
-.verde{background:linear-gradient(145deg,#5bbd4a,#3f8e33);}
-.naranja{background:linear-gradient(145deg,#f3a531,#c97d07);}
+.sub{
+opacity:0.7;
+margin-bottom:40px;
+}
 
-.icono{
-font-size:34px;
-margin-bottom:8px;
+.pin{
+font-size:36px;
+letter-spacing:10px;
+margin-bottom:25px;
+height:40px;
+}
+
+.keypad{
+display:grid;
+grid-template-columns:repeat(3,90px);
+gap:18px;
+}
+
+.key{
+height:90px;
+border-radius:20px;
+background:linear-gradient(#6f8fa6,#4c6576);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:28px;
+cursor:pointer;
+box-shadow:
+0 12px 20px rgba(0,0,0,0.5),
+inset 0 3px 4px rgba(255,255,255,0.3);
+}
+
+.key:active{
+transform:translateY(6px);
+box-shadow:
+0 4px 10px rgba(0,0,0,0.6),
+inset 0 6px 10px rgba(0,0,0,0.6);
+}
+
+/* ===== PANEL ===== */
+
+.topbar{
+height:70px;
+background:#14232c;
+color:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 25px;
+box-shadow:0 5px 15px rgba(0,0,0,0.4);
+}
+
+.title{font-size:24px;font-weight:700}
+
+.operator{font-size:13px;opacity:0.8}
+
+.datetime{font-size:18px}
+
+.panel{
+height:calc(100vh - 70px);
+padding:20px;
+background:#dfe6ec;
+}
+
+.grid{
+height:100%;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+grid-template-rows:repeat(4,1fr);
+gap:20px;
+}
+
+.btn{
+background:linear-gradient(180deg,#6f8fa6,#4c6576);
+border-radius:28px;
+color:white;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+font-size:22px;
+font-weight:700;
+cursor:pointer;
+position:relative;
+box-shadow:
+inset 0 3px 4px rgba(255,255,255,0.35),
+0 15px 25px rgba(0,0,0,0.35);
+transition:.12s;
+}
+
+.btn:active{
+transform:translateY(8px);
+box-shadow:
+inset 0 6px 10px rgba(0,0,0,0.6),
+0 5px 10px rgba(0,0,0,0.5);
+}
+
+.icon{font-size:48px;margin-bottom:10px}
+
+.orange{background:linear-gradient(180deg,#f6a623,#d57900)}
+.green{background:linear-gradient(180deg,#71bf55,#3d8f2b)}
+
+.counter{
+position:absolute;
+top:12px;
+right:18px;
+font-size:14px;
+opacity:0.9;
 }
 
 </style>
@@ -99,139 +151,153 @@ margin-bottom:8px;
 
 <body>
 
-<div class="topbar">
-  <div class="top-left">
-    <div class="title">MONOLITO GPT PRO</div>
-    <div class="operador" id="operador">Operador: ---</div>
-  </div>
+<div class="login" id="login">
 
-  <div class="top-right">
-    🔍
-    🔙
-    <div id="hora"></div>
-  </div>
+<div class="logo">MONOLITO GPT PRO</div>
+<div class="sub">Introduce tu PIN</div>
+
+<div class="pin" id="pin"></div>
+
+<div class="keypad">
+<div class="key" onclick="num(1)">1</div>
+<div class="key" onclick="num(2)">2</div>
+<div class="key" onclick="num(3)">3</div>
+<div class="key" onclick="num(4)">4</div>
+<div class="key" onclick="num(5)">5</div>
+<div class="key" onclick="num(6)">6</div>
+<div class="key" onclick="num(7)">7</div>
+<div class="key" onclick="num(8)">8</div>
+<div class="key" onclick="num(9)">9</div>
+<div class="key" onclick="borrar()">←</div>
+<div class="key" onclick="num(0)">0</div>
+<div class="key" onclick="borrarTodo()">C</div>
+</div>
+
+</div>
+
+<div id="app" style="display:none">
+
+<div class="topbar">
+<div>
+<div class="title">MONOLITO GPT PRO</div>
+<div class="operator" id="operador"></div>
+</div>
+<div class="datetime" id="reloj"></div>
 </div>
 
 <div class="panel">
+<div class="grid">
 
-<div class="boton azul" onclick="abrir('proveedores')">
-<div class="icono">🚚</div>
-PROVEEDORES
+<div class="btn" onclick="abrir('proveedores')">
+<div class="counter">1</div>
+<div class="icon">🚚</div>PROVEEDORES
 </div>
 
-<div class="boton azul" onclick="abrir('articulos')">
-<div class="icono">📦</div>
-ARTÍCULOS
+<div class="btn" onclick="abrir('articulos')">
+<div class="icon">📦</div>ARTÍCULOS
 </div>
 
-<div class="boton azul" onclick="abrir('comparador')">
-<div class="icono">📊</div>
-COMPARADOR
+<div class="btn" onclick="abrir('comparador')">
+<div class="icon">📊</div>COMPARADOR
 </div>
 
-<div class="boton azul" onclick="abrir('pedidos')">
-<div class="icono">📝</div>
-PEDIDOS
+<div class="btn" onclick="abrir('pedidos')">
+<div class="counter">2</div>
+<div class="icon">📝</div>PEDIDOS
 </div>
 
-<div class="boton azul" onclick="abrir('pagos')">
-<div class="icono">💳</div>
-PAGOS
+<div class="btn" onclick="abrir('pagos')">
+<div class="icon">💳</div>PAGOS
 </div>
 
-<div class="boton naranja" onclick="abrir('revision')">
-<div class="icono">🔎</div>
-REVISIÓN
+<div class="btn orange" onclick="abrir('revision')">
+<div class="counter">1</div>
+<div class="icon">🔎</div>REVISIÓN
 </div>
 
-<div class="boton verde" onclick="abrir('historico')">
-<div class="icono">📁</div>
-HISTÓRICO
+<div class="btn green" onclick="abrir('historico')">
+<div class="icon">📁</div>HISTÓRICO
 </div>
 
-<div class="boton azul" onclick="abrir('ventas')">
-<div class="icono">💰</div>
-VENTAS
+<div class="btn" onclick="abrir('ventas')">
+<div class="icon">💰</div>VENTAS
 </div>
 
-<div class="boton azul" onclick="abrir('calendario')">
-<div class="icono">📅</div>
-CALENDARIO
+<div class="btn" onclick="abrir('calendario')">
+<div class="icon">📅</div>CALENDARIO
 </div>
 
-<div class="boton naranja" onclick="abrir('comunicacion')">
-<div class="icono">✉️</div>
-COMUNICACIÓN
+<div class="btn orange" onclick="abrir('comunicacion')">
+<div class="counter">3</div>
+<div class="icon">✉️</div>COMUNICACIÓN
 </div>
 
-<div class="boton naranja" onclick="abrir('ayuda')">
-<div class="icono">🤖</div>
-AYUDA
+<div class="btn orange" onclick="abrir('ia')">
+<div class="icon">🤖</div>AYUDA
 </div>
 
-<div class="boton azul" onclick="abrir('configuracion')">
-<div class="icono">⚙️</div>
-CONFIGURACIÓN
+<div class="btn" onclick="abrir('config')">
+<div class="icon">⚙️</div>CONFIGURACIÓN
+</div>
+
+</div>
 </div>
 
 </div>
 
 <script>
 
-/* ===== OPERARIOS ===== */
-
-let operarios={
-"DARIO":"1111",
-"TOÑO":"2222",
-"ANDREINA":"3333",
-"JAVI":"0985",
-"SILVIA":"4544",
-"FELI":"4444"
+let base={
+"1111":"DARIO",
+"2222":"TOÑO",
+"3333":"ANDREINA",
+"0985":"JAVI",
+"4544":"SILVIA",
+"4444":"FELI"
 }
 
-let activo=null
+let actual=""
 
-function login(){
+function num(n){
+if(navigator.vibrate) navigator.vibrate(30)
+actual+=n
+document.getElementById("pin").innerHTML="• ".repeat(actual.length)
 
-let pin=prompt("PIN OPERARIO")
-
-for(let nombre in operarios){
-
-if(operarios[nombre]===pin){
-activo=nombre
-document.getElementById("operador").innerText="Operador: "+nombre
-return
-}
-
-}
-
+if(actual.length==4){
+if(base[actual]){
+document.getElementById("login").style.display="none"
+document.getElementById("app").style.display="block"
+document.getElementById("operador").innerHTML="Operador: "+base[actual]
+}else{
+actual=""
+document.getElementById("pin").innerHTML=""
 alert("PIN incorrecto")
-login()
-
+}
+}
 }
 
-login()
+function borrar(){
+actual=actual.slice(0,-1)
+document.getElementById("pin").innerHTML="• ".repeat(actual.length)
+}
 
-/* ===== HORA ===== */
+function borrarTodo(){
+actual=""
+document.getElementById("pin").innerHTML=""
+}
+
+function abrir(sec){
+if(navigator.vibrate) navigator.vibrate(50)
+alert("Abrir módulo: "+sec)
+}
 
 function reloj(){
-let ahora=new Date()
-document.getElementById("hora").innerText=
-ahora.toLocaleDateString()+" · "+ahora.toLocaleTimeString().slice(0,5)
+let d=new Date()
+document.getElementById("reloj").innerHTML=
+d.toLocaleDateString()+" · "+d.toLocaleTimeString().slice(0,5)
 }
-
 setInterval(reloj,1000)
 reloj()
-
-/* ===== ABRIR MODULOS ===== */
-
-function abrir(modulo){
-
-navigator.vibrate?.(30)
-
-location.href=modulo+".html"
-
-}
 
 </script>
 
