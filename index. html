@@ -2,83 +2,99 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MONOLITO</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
+
 body{
-background:#1b1b1b;
+margin:0;
+background:#111;
 color:white;
 font-family:Arial,Helvetica,sans-serif;
-margin:0;
-padding:0;
-text-align:center;
 }
 
 header{
-background:#111;
+background:#8c6a4a;
 padding:20px;
-font-size:28px;
+text-align:center;
+font-size:26px;
 font-weight:bold;
-letter-spacing:2px;
+}
+
+.sub{
+font-size:14px;
+opacity:0.8;
+margin-top:5px;
 }
 
 .panel{
 display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:15px;
+grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+gap:18px;
 padding:20px;
 }
 
-button{
-height:80px;
+.boton{
+background:#d9d2c8;
+color:#222;
+padding:30px 10px;
+border-radius:16px;
+text-align:center;
 font-size:18px;
-border-radius:12px;
-border:none;
-background:#2e2e2e;
-color:white;
-box-shadow:0 4px 10px rgba(0,0,0,0.6);
+box-shadow:0 6px 0 #aaa;
+transition:0.15s;
+user-select:none;
 }
 
-button:active{
-transform:scale(0.95);
-background:#444;
+.boton:active{
+transform:translateY(4px);
+box-shadow:0 2px 0 #888;
 }
 
-.radar{
-background:#7a0000;
+footer{
+text-align:center;
+padding:15px;
+font-size:12px;
+opacity:0.6;
 }
 
-.aviso{
-background:#c58b00;
-}
 </style>
-
 </head>
 
 <body>
 
-<header>MONOLITO</header>
+<header>
+MONOLITO G3F  
+<div class="sub">Sistema de control profesional</div>
+</header>
 
 <div class="panel">
 
-<button>PROVEEDORES</button>
-<button>PEDIDOS</button>
-
-<button>PAGOS</button>
-<button>ARTÍCULOS</button>
-
-<button>COMPARADOR</button>
-<button>DIARIO</button>
-
-<button class="radar">RADAR</button>
-<button>HISTÓRICO</button>
-
-<button>CONFIGURACIÓN</button>
-<button class="aviso">A TENER EN CUENTA</button>
+<div class="boton" onclick="abrir('proveedores')">Proveedores</div>
+<div class="boton" onclick="abrir('pedidos')">Pedidos</div>
+<div class="boton" onclick="abrir('pagos')">Pagos</div>
+<div class="boton" onclick="abrir('articulos')">Artículos</div>
+<div class="boton" onclick="abrir('comparador')">Comparador</div>
+<div class="boton" onclick="abrir('diario')">Diario</div>
+<div class="boton" onclick="abrir('radar')">Radar</div>
+<div class="boton" onclick="abrir('historico')">Histórico</div>
+<div class="boton" onclick="abrir('config')">Configuración</div>
+<div class="boton" onclick="abrir('ventas')">Ventas</div>
+<div class="boton" onclick="abrir('calendario')">Calendario</div>
+<div class="boton" onclick="abrir('observaciones')">Observaciones</div>
 
 </div>
+
+<footer>
+Operador G-3F-PAID
+</footer>
+
+<script>
+function abrir(modulo){
+alert("Abrir módulo: " + modulo);
+}
+</script>
 
 </body>
 </html>
