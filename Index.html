@@ -7,34 +7,36 @@
 
 <style>
 body{
-  background:#0f1419;
-  font-family:Arial,Helvetica,sans-serif;
-  color:white;
   margin:0;
-  padding:20px;
+  background:#0f1419;
+  color:white;
+  font-family:Arial,Helvetica,sans-serif;
 }
 
 h1{
-  margin-bottom:30px;
+  padding:20px;
+  margin:0;
 }
 
 .panel{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:15px;
+  padding:20px;
 }
 
 .boton{
   background:#1f2a33;
-  padding:20px;
+  padding:25px;
   border-radius:12px;
   text-align:center;
   cursor:pointer;
   transition:0.2s;
 }
 
-.boton:hover{
-  background:#2c3e50;
+.boton:active{
+  transform:scale(0.95);
+  background:#162027;
 }
 </style>
 </head>
