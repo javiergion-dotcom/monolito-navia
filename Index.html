@@ -2,94 +2,57 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<title>MONOLITO NAVIA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO</title>
 
 <style>
 body{
-  margin:0;
-  font-family:Segoe UI, Arial;
   background:#0f1419;
+  font-family:Arial,Helvetica,sans-serif;
   color:white;
+  margin:0;
+  padding:20px;
 }
 
-/* HEADER */
-.header{
-  background:#000;
-  padding:15px;
-  text-align:center;
-  font-size:20px;
-  font-weight:bold;
+h1{
+  margin-bottom:30px;
 }
 
-/* GRID */
-.grid{
+.panel{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  padding:16px;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
 }
 
 .boton{
+  background:#1f2a33;
+  padding:20px;
   border-radius:12px;
-  padding:22px;
   text-align:center;
-  font-weight:bold;
-  font-size:15px;
   cursor:pointer;
+  transition:0.2s;
 }
 
-/* COLORES */
-.azul{background:#3c7ec4;}
-.gris{background:#444;}
-.verde{background:#4caf50;}
-.naranja{background:#e8892b;}
-.rojo{background:#c0392b;}
-.amarillo{background:#c8a600;}
-
-/* FOOTER */
-.footer{
-  text-align:center;
-  padding:10px;
-  font-size:12px;
-  color:#888;
+.boton:hover{
+  background:#2c3e50;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-MONOLITO – Sistema del Bar
-</div>
+<h1>MONOLITO NAVIA</h1>
 
-<div class="grid">
+<div class="panel">
 
-<div class="boton azul">PROVEEDORES</div>
-<div class="boton gris">ARTÍCULOS</div>
-<div class="boton azul">PEDIDOS</div>
+<div class="boton" onclick="location.href='articulos.html'">Artículos</div>
+<div class="boton" onclick="location.href='proveedores.html'">Proveedores</div>
+<div class="boton" onclick="location.href='pedidos.html'">Pedidos</div>
+<div class="boton" onclick="location.href='pagos.html'">Pagos</div>
+<div class="boton" onclick="location.href='incidencias.html'">Incidencias</div>
+<div class="boton" onclick="location.href='calendario.html'">Calendario</div>
 
-<div class="boton verde">HISTÓRICO</div>
-<div class="boton azul">PAGOS</div>
-<div class="boton gris">COMPARADOR</div>
-
-<div class="boton azul">VENTAS</div>
-<div class="boton gris">CAJA</div>
-<div class="boton azul">DIARIO</div>
-
-<div class="boton naranja">PENDIENTES</div>
-<div class="boton gris">CALENDARIO</div>
-<div class="boton amarillo">AVISOS</div>
-
-<div class="boton gris">CONFIGURACIÓN</div>
-<div class="boton gris">AYUDA</div>
-<div class="boton rojo">SALIR</div>
-
-</div>
-
-<div class="footer">
-Monolito GPT Pro
 </div>
 
 </body>
-</html> 
+</html>
