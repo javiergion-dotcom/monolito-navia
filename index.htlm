@@ -1,118 +1,187 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA MONOLITO | Gestión de Compras Profesional</title>
-    <style>
-        :root { --oro: #d4af37; --oscuro: #121212; --gris: #e0e0e0; }
-        body { background: var(--oscuro); color: var(--gris); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        .header { border-bottom: 2px solid var(--oro); padding: 20px; text-align: center; background: #1a1a1a; }
-        .cajita-central { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-        .card { background: #1e1e1e; border: 1px solid var(--oro); padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 600px; width: 100%; }
-        h1 { color: var(--oro); margin: 0; font-size: 1.8rem; letter-spacing: 2px; }
-        .status { margin-top: 20px; padding: 10px; border-radius: 5px; background: rgba(212, 175, 55, 0.1); color: var(--oro); font-weight: bold; }
-        footer { padding: 15px; font-size: 0.8rem; color: #666; text-align: center; border-top: 1px solid #333; }
-    </style>
 <meta charset="UTF-8">
-<title>MONOLITO</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MONOLITO PRO G3F</title>
 
 <style>
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
 body{
-margin:0;
+background:#0e1a22;
 font-family:Arial, Helvetica, sans-serif;
-background:#f2f2f2;
-}
-
-header{
-background:#111;
 color:white;
-padding:20px;
-text-align:center;
-font-size:26px;
+overflow:hidden;
 }
 
-.panel{
-padding:20px;
+/* CABECERA */
+.header{
+background:#0c1a21;
+padding:15px 20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 4px 10px rgba(0,0,0,.6);
 }
 
-.boton{
-display:block;
-width:100%;
-padding:22px;
-margin:12px 0;
-border-radius:12px;
-color:white;
+.title{
 font-size:22px;
-text-align:center;
+font-weight:bold;
+}
+
+.info{
+font-size:14px;
+opacity:.8;
+}
+
+/* GRID */
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:18px;
+padding:20px;
+height:calc(100vh - 80px);
+}
+
+/* BOTONES */
+.btn{
+background:linear-gradient(145deg,#3e5564,#2f4654);
+border-radius:20px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+font-weight:bold;
+font-size:15px;
 cursor:pointer;
-user-select:none;
-transition:transform .1s;
+box-shadow:6px 6px 12px rgba(0,0,0,.6), -2px -2px 8px rgba(255,255,255,.05);
+transition:.1s;
+position:relative;
 }
 
-.boton:active{
-transform:scale(0.96);
+.btn:active{
+transform:scale(.96);
+box-shadow:inset 4px 4px 10px #000;
 }
 
-.proveedores{background:#007bff;}
-.articulos{background:#28a745;}
-.pagos{background:#ff9800;}
-.historial{background:#9c27b0;}
-.config{background:#607d8b;}
-.chat{background:#e91e63;}
+.icon{
+font-size:38px;
+margin-bottom:10px;
+}
+
+.badge{
+position:absolute;
+top:8px;
+right:12px;
+font-size:12px;
+}
+
+/* COLORES ESPECIALES */
+.orange{ background:linear-gradient(145deg,#ff9f1a,#e67e00); }
+.green{ background:linear-gradient(145deg,#5bbd4a,#3f9e34); }
+.red{ background:linear-gradient(145deg,#ff7b5a,#d35400); }
+
 </style>
 </head>
 
 <body>
-    <div class="header">
-        <h1>MONOLITO: SISTEMA DE CONTROL TOTAL</h1>
-    </div>
 
-    <div class="cajita-central">
-        <div class="card">
-            <h2>Panel de Control Profesional</h2>
-            <p>Optimizando compras y eliminando mermas.</p>
-            <div class="status" id="estado">SINCRIZANDO CON INDEX.HTML...</div>
-            <p style="margin-top: 20px;">30 Años de Experiencia | Diseño Javi</p>
-        </div>
-    </div>
+<div class="header">
+<div class="title">MONOLITO GPT PRO</div>
+<div class="info" id="hora"></div>
+</div>
 
-    <footer>
-        2026-03-25 | 20:41 | Código Camarero: MONO-PRO-G3F | Gema Activa
-    </footer>
+<div class="grid">
 
-    <script>
-        function checkSystem() {
-            document.getElementById('estado').innerHTML = "SISTEMA ONLINE - " + new Date().toLocaleTimeString();
-            console.log("Monolito cargado. Identidad: index.html");
-        }
-        setInterval(checkSystem, 1000);
-    </script>
+<div class="btn" onclick="go('proveedores.html')">
+<span class="icon">🚚</span>
+PROVEEDORES
+<div class="badge">1</div>
+</div>
 
-<header>MONOLITO</header>
+<div class="btn" onclick="go('articulos.html')">
+<span class="icon">📦</span>
+ARTÍCULOS
+</div>
 
-<div class="panel">
+<div class="btn" onclick="v()">
+<span class="icon">📊</span>
+COMPARADOR
+</div>
 
-<div class="boton proveedores" onclick="abrir('proveedores')">Proveedores</div>
-<div class="boton articulos" onclick="abrir('articulos')">Artículos</div>
-<div class="boton pagos" onclick="abrir('pagos')">Pagos</div>
-<div class="boton historial" onclick="abrir('historial')">Histórico</div>
-<div class="boton config" onclick="abrir('config')">Configuración</div>
-<div class="boton chat" onclick="abrir('chat')">ChatGPT</div>
+<div class="btn" onclick="go('pedidos.html')">
+<span class="icon">📝</span>
+PEDIDOS
+<div class="badge">2</div>
+</div>
+
+<div class="btn" onclick="v()">
+<span class="icon">💳</span>
+PAGOS
+</div>
+
+<div class="btn orange" onclick="v()">
+<span class="icon">🔎</span>
+REVISIÓN
+<div class="badge">1</div>
+</div>
+
+<div class="btn green" onclick="v()">
+<span class="icon">📁</span>
+HISTÓRICO
+</div>
+
+<div class="btn" onclick="v()">
+<span class="icon">💰</span>
+VENTAS
+</div>
+
+<div class="btn" onclick="v()">
+<span class="icon">📅</span>
+CALENDARIO
+</div>
+
+<div class="btn orange" onclick="v()">
+<span class="icon">✉️</span>
+COMUNICACIÓN
+<div class="badge">3</div>
+</div>
+
+<div class="btn orange" onclick="v()">
+<span class="icon">🤖</span>
+AYUDA
+</div>
+
+<div class="btn" onclick="v()">
+<span class="icon">⚙️</span>
+CONFIGURACIÓN
+</div>
 
 </div>
 
 <script>
 
-function abrir(p){
-console.log("Abrir hoja:",p)
-alert("Abrir hoja: "+p)
+/* NAVEGACIÓN */
+function go(pagina){
+if(navigator.vibrate) navigator.vibrate(40);
+window.location.href = pagina;
 }
+
+/* VIBRACIÓN SIMPLE */
+function v(){
+if(navigator.vibrate) navigator.vibrate(40);
+}
+
+/* RELOJ */
+setInterval(()=>{
+const now = new Date();
+document.getElementById("hora").innerText =
+now.toLocaleDateString()+" - "+now.toLocaleTimeString().slice(0,5);
+},1000);
 
 </script>
 
 </body>
 </html>
-?v=2
