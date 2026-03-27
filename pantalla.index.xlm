@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MONOLITO</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Segoe UI, Arial;
+  background:#0f1419;
+  color:white;
+}
+
+/* HEADER */
+.header{
+  background:#000;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  padding:16px;
+}
+
+.boton{
+  border-radius:12px;
+  padding:22px;
+  text-align:center;
+  font-weight:bold;
+  font-size:15px;
+  cursor:pointer;
+}
+
+/* COLORES */
+.azul{background:#3c7ec4;}
+.gris{background:#444;}
+.verde{background:#4caf50;}
+.naranja{background:#e8892b;}
+.rojo{background:#c0392b;}
+.amarillo{background:#c8a600;}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  padding:10px;
+  font-size:12px;
+  color:#888;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+MONOLITO – Sistema del Bar
+</div>
+
+<div class="grid">
+
+<div class="boton azul">PROVEEDORES</div>
+<div class="boton gris">ARTÍCULOS</div>
+<div class="boton azul">PEDIDOS</div>
+
+<div class="boton verde">HISTÓRICO</div>
+<div class="boton azul">PAGOS</div>
+<div class="boton gris">COMPARADOR</div>
+
+<div class="boton azul">VENTAS</div>
+<div class="boton gris">CAJA</div>
+<div class="boton azul">DIARIO</div>
+
+<div class="boton naranja">PENDIENTES</div>
+<div class="boton gris">CALENDARIO</div>
+<div class="boton amarillo">AVISOS</div>
+
+<div class="boton gris">CONFIGURACIÓN</div>
+<div class="boton gris">AYUDA</div>
+<div class="boton rojo">SALIR</div>
+
+</div>
+
+<div class="footer">
+Monolito GPT Pro
+</div>
+
+</body>
+</html>
