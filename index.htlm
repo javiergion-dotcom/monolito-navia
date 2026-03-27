@@ -7,58 +7,58 @@
 
 <style>
 body{
-  margin:0;
-  background:#0f1419;
-  color:white;
-  font-family:Arial,Helvetica,sans-serif;
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#0f1419;
+color:white;
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 
 header{
-  background:linear-gradient(90deg,#0f2027,#203a43,#2c5364);
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:0 4px 12px rgba(0,0,0,.4);
+background:linear-gradient(90deg,#0f2027,#203a43,#2c5364);
+padding:18px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 4px 12px rgba(0,0,0,.4);
 }
 
 .logo{
-  font-size:18px;
-  font-weight:bold;
+font-size:20px;
+font-weight:bold;
 }
 
 .hora{
-  font-size:14px;
-  opacity:.8;
+font-size:14px;
+opacity:.8;
 }
 
-/* ===== PANEL ===== */
+/* PANEL */
 
 .panel{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:15px;
-  padding:20px;
+padding:18px;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:16px;
 }
 
 .boton{
-  background:#1f2a33;
-  padding:25px;
-  border-radius:12px;
-  text-align:center;
-  cursor:pointer;
-  transition:0.2s;
+background:#1f2a33;
+padding:25px;
+border-radius:12px;
+text-align:center;
+cursor:pointer;
+transition:.2s;
 }
 
 .boton:hover{
-  background:#2c3e50;
+background:#2c3e50;
 }
 
 .boton:active{
-  transform:scale(0.95);
-  background:#162027;
+transform:scale(.95);
+background:#162027;
 }
 </style>
 </head>
@@ -66,32 +66,27 @@ header{
 <body>
 
 <header>
-  <div class="logo">MONOLITO NAVIA</div>
-  <div class="hora" id="hora"></div>
+<div class="logo">MONOLITO NAVIA</div>
+<div class="hora" id="hora"></div>
 </header>
 
 <div class="panel">
 
-<div class="boton" onclick="location.href='articulos.html'">Artículos</div>
-<div class="boton" onclick="location.href='proveedores.html'">Proveedores</div>
-<div class="boton" onclick="location.href='pedidos.html'">Pedidos</div>
-<div class="boton" onclick="location.href='pagos.html'">Pagos</div>
-<div class="boton" onclick="location.href='incidencias.html'">Incidencias</div>
-<div class="boton" onclick="location.href='calendario.html'">Calendario</div>
+<div class="boton">Artículos</div>
+<div class="boton">Proveedores</div>
+<div class="boton">Pedidos</div>
+<div class="boton">Pagos</div>
 
 </div>
 
 <script>
 function actualizarHora(){
-  const ahora = new Date();
-  document.getElementById("hora").innerText =
-    ahora.toLocaleTimeString();
+const ahora=new Date();
+document.getElementById("hora").innerText=ahora.toLocaleTimeString();
 }
-
 setInterval(actualizarHora,1000);
 actualizarHora();
 </script>
 
 </body>
 </html>
-
