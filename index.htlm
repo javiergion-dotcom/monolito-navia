@@ -17,7 +17,7 @@ color:white;
 
 header{
 background:linear-gradient(90deg,#0f2027,#203a43,#2c5364);
-padding:18px;
+padding:15px;
 display:flex;
 justify-content:space-between;
 align-items:center;
@@ -25,22 +25,22 @@ box-shadow:0 4px 12px rgba(0,0,0,.4);
 }
 
 .logo{
-font-size:20px;
+font-size:18px;
 font-weight:bold;
 }
 
 .hora{
-font-size:14px;
+font-size:13px;
 opacity:.8;
 }
 
 /* PANEL */
 
 .panel{
-padding:18px;
+padding:15px;
 display:grid;
 grid-template-columns:repeat(2,1fr);
-gap:16px;
+gap:12px;
 }
 
 .boton{
@@ -50,6 +50,7 @@ border-radius:12px;
 text-align:center;
 cursor:pointer;
 transition:.2s;
+box-shadow:0 4px 10px rgba(0,0,0,.3);
 }
 
 .boton:hover{
@@ -60,6 +61,14 @@ background:#2c3e50;
 transform:scale(.95);
 background:#162027;
 }
+
+/* COLORES */
+
+.verde{background:#2e7d32;}
+.naranja{background:#ef6c00;}
+.azul{background:#1565c0;}
+.gris{background:#37474f;}
+
 </style>
 </head>
 
@@ -72,17 +81,25 @@ background:#162027;
 
 <div class="panel">
 
-<div class="boton">Artículos</div>
-<div class="boton">Proveedores</div>
-<div class="boton">Pedidos</div>
-<div class="boton">Pagos</div>
+<div class="boton azul">PROVEEDORES</div>
+<div class="boton gris">ARTÍCULOS</div>
+
+<div class="boton gris">PEDIDOS</div>
+<div class="boton naranja">REVISIÓN</div>
+
+<div class="boton verde">HISTÓRICO</div>
+<div class="boton gris">VENTAS</div>
+
+<div class="boton naranja">COMUNICACIÓN</div>
+<div class="boton gris">CONFIGURACIÓN</div>
 
 </div>
 
 <script>
 function actualizarHora(){
 const ahora=new Date();
-document.getElementById("hora").innerText=ahora.toLocaleTimeString();
+document.getElementById("hora").innerText=
+ahora.toLocaleDateString()+" - "+ahora.toLocaleTimeString();
 }
 setInterval(actualizarHora,1000);
 actualizarHora();
