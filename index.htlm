@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>MONOLITO NAVIA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#0f1419;
+color:white;
+}
+
+/* HEADER */
+
+header{
+background:linear-gradient(90deg,#0f2027,#203a43,#2c5364);
+padding:18px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 4px 12px rgba(0,0,0,.4);
+}
+
+.logo{
+font-size:20px;
+font-weight:bold;
+}
+
+.hora{
+font-size:14px;
+opacity:.8;
+}
+
+/* PANEL */
+
+.panel{
+padding:18px;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:16px;
+}
+
+.boton{
+background:#1f2a33;
+padding:25px;
+border-radius:12px;
+text-align:center;
+cursor:pointer;
+transition:.2s;
+}
+
+.boton:hover{
+background:#2c3e50;
+}
+
+.boton:active{
+transform:scale(.95);
+background:#162027;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">MONOLITO NAVIA</div>
+<div class="hora" id="hora"></div>
+</header>
+
+<div class="panel">
+
+<div class="boton">Artículos</div>
+<div class="boton">Proveedores</div>
+<div class="boton">Pedidos</div>
+<div class="boton">Pagos</div>
+
+</div>
+
+<script>
+function actualizarHora(){
+const ahora=new Date();
+document.getElementById("hora").innerText=ahora.toLocaleTimeString();
+}
+setInterval(actualizarHora,1000);
+actualizarHora();
+</script>
+
+</body>
+</html>
