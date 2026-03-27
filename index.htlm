@@ -1,108 +1,163 @@
-<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>MONOLITO NAVIA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MONOLITO GPT PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+body{font-family:Arial;background:#f2f2f2;margin:0;}
+header{background:#111;color:white;padding:20px;text-align:center;font-size:26px;}
+.container{padding:25px;}
+.boton{display:block;padding:18px;margin:12px 0;border-radius:10px;font-size:20px;color:white;text-align:center;cursor:pointer;}
+.proveedores{background:#007bff;}
+.articulos{background:#28a745;}
+.pagos{background:#ff9800;}
+.historial{background:#9c27b0;}
+.config{background:#607d8b;}
+.chat{background:#e91e63;}
+</style>
+
 body{
 margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#0f1419;
+font-family:Segoe UI,Arial;
+background:#e6ecf0;
+}
+
+/* ===== HEADER ===== */
+
+.header{
+height:80px;
+background:#14212b;
 color:white;
-}
-
-/* HEADER */
-
-header{
-background:linear-gradient(90deg,#0f2027,#203a43,#2c5364);
-padding:15px;
 display:flex;
-justify-content:space-between;
 align-items:center;
-box-shadow:0 4px 12px rgba(0,0,0,.4);
+justify-content:space-between;
+padding:0 25px;
+box-shadow:0 5px 14px rgba(0,0,0,0.4);
 }
 
-.logo{
+.lefticons{
+font-size:26px;
+display:flex;
+gap:20px;
+}
+
+.title{
+font-size:26px;
+font-weight:700;
+}
+
+.clock{
 font-size:18px;
-font-weight:bold;
 }
 
-.hora{
-font-size:13px;
-opacity:.8;
-}
-
-/* PANEL */
+/* ===== PANEL ===== */
 
 .panel{
-padding:15px;
+height:calc(100vh - 80px);
 display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:12px;
+grid-template-columns:repeat(3,1fr);
+gap:22px;
+padding:22px;
+box-sizing:border-box;
 }
 
-.boton{
-background:#1f2a33;
-padding:25px;
-border-radius:12px;
-text-align:center;
-cursor:pointer;
-transition:.2s;
-box-shadow:0 4px 10px rgba(0,0,0,.3);
+/* ===== BOTONES ===== */
+
+.btn{
+border-radius:28px;
+background:linear-gradient(180deg,#5c86a5,#3d5f79);
+color:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+font-size:22px;
+font-weight:700;
+box-shadow:
+inset 0 2px 0 rgba(255,255,255,0.4),
+0 14px 22px rgba(0,0,0,0.25);
+transition:0.12s;
 }
 
-.boton:hover{
-background:#2c3e50;
+.btn span{
+font-size:48px;
+margin-bottom:10px;
 }
 
-.boton:active{
-transform:scale(.95);
-background:#162027;
+.btn:active{
+transform:translateY(8px);
+box-shadow:
+inset 0 8px 14px rgba(0,0,0,0.5);
 }
 
-/* COLORES */
+/* colores */
 
-.verde{background:#2e7d32;}
-.naranja{background:#ef6c00;}
-.azul{background:#1565c0;}
-.gris{background:#37474f;}
+.green{background:linear-gradient(180deg,#6fc65b,#3f8f33);}
+.orange{background:linear-gradient(180deg,#f5a32e,#d37900);}
+.dark{background:linear-gradient(180deg,#5f6f79,#3e4e58);}
+
+.badge{
+position:absolute;
+margin-top:-55px;
+margin-left:70px;
+font-size:14px;
+<script>
+function abrir(p){
+window.location.href=p;
+}
+</script>
 
 </style>
 </head>
 
 <body>
 
-<header>
-<div class="logo">MONOLITO NAVIA</div>
-<div class="hora" id="hora"></div>
-</header>
+<div class="header">
+<div class="lefticons">← 🔍 ⚠️ ❓</div>
+<header>MONOLITO GPT PRO</header>
+
+<div class="title">MONOLITO</div>
+<div class="container">
+
+<div class="clock" id="clock"></div>
+</div>
 
 <div class="panel">
 
-<div class="boton azul">PROVEEDORES</div>
-<div class="boton gris">ARTÍCULOS</div>
+<div class="btn"><span>🚚</span>PROVEEDORES</div>
+<div class="btn dark"><span>📦</span>ARTÍCULOS</div>
+<div class="btn"><span>📊</span>COMPARADOR</div>
 
-<div class="boton gris">PEDIDOS</div>
-<div class="boton naranja">REVISIÓN</div>
+<div class="btn"><span>📝</span>PEDIDOS</div>
+<div class="btn dark"><span>💳</span>PAGOS</div>
+<div class="btn orange"><span>🔎</span>REVISIÓN</div>
 
-<div class="boton verde">HISTÓRICO</div>
-<div class="boton gris">VENTAS</div>
+<div class="btn green"><span>📁</span>HISTÓRICO</div>
+<div class="btn dark"><span>💰</span>VENTAS</div>
+<div class="btn dark"><span>📅</span>CALENDARIO</div>
 
-<div class="boton naranja">COMUNICACIÓN</div>
-<div class="boton gris">CONFIGURACIÓN</div>
+<div class="btn orange"><span>✉️</span>COMUNICACIÓN</div>
+<div class="btn orange"><span>🤖</span>AYUDA</div>
+<div class="btn dark"><span>⚙️</span>CONFIGURACIÓN</div>
+<div class="boton proveedores" onclick="abrir('proveedores.html')">Proveedores</div>
+<div class="boton articulos" onclick="abrir('articulos.html')">Artículos</div>
+<div class="boton pagos" onclick="abrir('pagos.html')">Pagos</div>
+<div class="boton historial" onclick="abrir('historial.html')">Histórico</div>
+<div class="boton config" onclick="abrir('configuracion.html')">Configuración</div>
+<div class="boton chat" onclick="abrir('chat.html')">ChatGPT</div>
 
 </div>
 
 <script>
-function actualizarHora(){
-const ahora=new Date();
-document.getElementById("hora").innerText=
-ahora.toLocaleDateString()+" - "+ahora.toLocaleTimeString();
+function clock(){
+let d=new Date()
+document.getElementById("clock").innerHTML =
+d.toLocaleDateString()+" "+d.toLocaleTimeString().slice(0,5)
 }
-setInterval(actualizarHora,1000);
-actualizarHora();
+setInterval(clock,1000)
+clock()
 </script>
 
 </body>
