@@ -13,10 +13,28 @@ body{
   font-family:Arial,Helvetica,sans-serif;
 }
 
-h1{
-  padding:20px;
-  margin:0;
+/* ===== HEADER ===== */
+
+header{
+  background:linear-gradient(90deg,#0f2027,#203a43,#2c5364);
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
 }
+
+.logo{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.hora{
+  font-size:14px;
+  opacity:.8;
+}
+
+/* ===== PANEL ===== */
 
 .panel{
   display:grid;
@@ -34,6 +52,10 @@ h1{
   transition:0.2s;
 }
 
+.boton:hover{
+  background:#2c3e50;
+}
+
 .boton:active{
   transform:scale(0.95);
   background:#162027;
@@ -43,8 +65,32 @@ h1{
 
 <body>
 
-<h1>MONOLITO NAVIA</h1>
+<header>
+  <div class="logo">MONOLITO NAVIA</div>
+  <div class="hora" id="hora"></div>
+</header>
 
 <div class="panel">
 
-<div class="boton" onclick
+<div class="boton" onclick="location.href='articulos.html'">Artículos</div>
+<div class="boton" onclick="location.href='proveedores.html'">Proveedores</div>
+<div class="boton" onclick="location.href='pedidos.html'">Pedidos</div>
+<div class="boton" onclick="location.href='pagos.html'">Pagos</div>
+<div class="boton" onclick="location.href='incidencias.html'">Incidencias</div>
+<div class="boton" onclick="location.href='calendario.html'">Calendario</div>
+
+</div>
+
+<script>
+function actualizarHora(){
+  const ahora = new Date();
+  document.getElementById("hora").innerText =
+    ahora.toLocaleTimeString();
+}
+
+setInterval(actualizarHora,1000);
+actualizarHora();
+</script>
+
+</body>
+</html>
