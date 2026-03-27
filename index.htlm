@@ -1,15 +1,61 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA MONOLITO | Gestión de Compras Profesional</title>
+    <style>
+        :root { --oro: #d4af37; --oscuro: #121212; --gris: #e0e0e0; }
+        body { background: var(--oscuro); color: var(--gris); font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        .header { border-bottom: 2px solid var(--oro); padding: 20px; text-align: center; background: #1a1a1a; }
+        .cajita-central { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        .card { background: #1e1e1e; border: 1px solid var(--oro); padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 600px; width: 100%; }
+        h1 { color: var(--oro); margin: 0; font-size: 1.8rem; letter-spacing: 2px; }
+        .status { margin-top: 20px; padding: 10px; border-radius: 5px; background: rgba(212, 175, 55, 0.1); color: var(--oro); font-weight: bold; }
+        footer { padding: 15px; font-size: 0.8rem; color: #666; text-align: center; border-top: 1px solid #333; }
+    </style>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO GPT PRO</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MONOLITO</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{font-family:Arial;background:#f2f2f2;margin:0;}
-header{background:#111;color:white;padding:20px;text-align:center;font-size:26px;}
-.container{padding:25px;}
-.boton{display:block;padding:18px;margin:12px 0;border-radius:10px;font-size:20px;color:white;text-align:center;cursor:pointer;}
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#f2f2f2;
+}
+
+header{
+background:#111;
+color:white;
+padding:20px;
+text-align:center;
+font-size:26px;
+}
+
+.panel{
+padding:20px;
+}
+
+.boton{
+display:block;
+width:100%;
+padding:22px;
+margin:12px 0;
+border-radius:12px;
+color:white;
+font-size:22px;
+text-align:center;
+cursor:pointer;
+user-select:none;
+transition:transform .1s;
+}
+
+.boton:active{
+transform:scale(0.96);
+}
+
 .proveedores{background:#007bff;}
 .articulos{background:#28a745;}
 .pagos{background:#ff9800;}
@@ -17,147 +63,54 @@ header{background:#111;color:white;padding:20px;text-align:center;font-size:26px
 .config{background:#607d8b;}
 .chat{background:#e91e63;}
 </style>
-
-body{
-margin:0;
-font-family:Segoe UI,Arial;
-background:#e6ecf0;
-}
-
-/* ===== HEADER ===== */
-
-.header{
-height:80px;
-background:#14212b;
-color:white;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 25px;
-box-shadow:0 5px 14px rgba(0,0,0,0.4);
-}
-
-.lefticons{
-font-size:26px;
-display:flex;
-gap:20px;
-}
-
-.title{
-font-size:26px;
-font-weight:700;
-}
-
-.clock{
-font-size:18px;
-}
-
-/* ===== PANEL ===== */
-
-.panel{
-height:calc(100vh - 80px);
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:22px;
-padding:22px;
-box-sizing:border-box;
-}
-
-/* ===== BOTONES ===== */
-
-.btn{
-border-radius:28px;
-background:linear-gradient(180deg,#5c86a5,#3d5f79);
-color:white;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-font-size:22px;
-font-weight:700;
-box-shadow:
-inset 0 2px 0 rgba(255,255,255,0.4),
-0 14px 22px rgba(0,0,0,0.25);
-transition:0.12s;
-}
-
-.btn span{
-font-size:48px;
-margin-bottom:10px;
-}
-
-.btn:active{
-transform:translateY(8px);
-box-shadow:
-inset 0 8px 14px rgba(0,0,0,0.5);
-}
-
-/* colores */
-
-.green{background:linear-gradient(180deg,#6fc65b,#3f8f33);}
-.orange{background:linear-gradient(180deg,#f5a32e,#d37900);}
-.dark{background:linear-gradient(180deg,#5f6f79,#3e4e58);}
-
-.badge{
-position:absolute;
-margin-top:-55px;
-margin-left:70px;
-font-size:14px;
-<script>
-function abrir(p){
-window.location.href=p;
-}
-</script>
-
-</style>
 </head>
 
 <body>
+    <div class="header">
+        <h1>MONOLITO: SISTEMA DE CONTROL TOTAL</h1>
+    </div>
 
-<div class="header">
-<div class="lefticons">← 🔍 ⚠️ ❓</div>
-<header>MONOLITO GPT PRO</header>
+    <div class="cajita-central">
+        <div class="card">
+            <h2>Panel de Control Profesional</h2>
+            <p>Optimizando compras y eliminando mermas.</p>
+            <div class="status" id="estado">SINCRIZANDO CON INDEX.HTML...</div>
+            <p style="margin-top: 20px;">30 Años de Experiencia | Diseño Javi</p>
+        </div>
+    </div>
 
-<div class="title">MONOLITO</div>
-<div class="container">
+    <footer>
+        2026-03-25 | 20:41 | Código Camarero: MONO-PRO-G3F | Gema Activa
+    </footer>
 
-<div class="clock" id="clock"></div>
-</div>
+    <script>
+        function checkSystem() {
+            document.getElementById('estado').innerHTML = "SISTEMA ONLINE - " + new Date().toLocaleTimeString();
+            console.log("Monolito cargado. Identidad: index.html");
+        }
+        setInterval(checkSystem, 1000);
+    </script>
+
+<header>MONOLITO</header>
 
 <div class="panel">
 
-<div class="btn"><span>🚚</span>PROVEEDORES</div>
-<div class="btn dark"><span>📦</span>ARTÍCULOS</div>
-<div class="btn"><span>📊</span>COMPARADOR</div>
-
-<div class="btn"><span>📝</span>PEDIDOS</div>
-<div class="btn dark"><span>💳</span>PAGOS</div>
-<div class="btn orange"><span>🔎</span>REVISIÓN</div>
-
-<div class="btn green"><span>📁</span>HISTÓRICO</div>
-<div class="btn dark"><span>💰</span>VENTAS</div>
-<div class="btn dark"><span>📅</span>CALENDARIO</div>
-
-<div class="btn orange"><span>✉️</span>COMUNICACIÓN</div>
-<div class="btn orange"><span>🤖</span>AYUDA</div>
-<div class="btn dark"><span>⚙️</span>CONFIGURACIÓN</div>
-<div class="boton proveedores" onclick="abrir('proveedores.html')">Proveedores</div>
-<div class="boton articulos" onclick="abrir('articulos.html')">Artículos</div>
-<div class="boton pagos" onclick="abrir('pagos.html')">Pagos</div>
-<div class="boton historial" onclick="abrir('historial.html')">Histórico</div>
-<div class="boton config" onclick="abrir('configuracion.html')">Configuración</div>
-<div class="boton chat" onclick="abrir('chat.html')">ChatGPT</div>
+<div class="boton proveedores" onclick="abrir('proveedores')">Proveedores</div>
+<div class="boton articulos" onclick="abrir('articulos')">Artículos</div>
+<div class="boton pagos" onclick="abrir('pagos')">Pagos</div>
+<div class="boton historial" onclick="abrir('historial')">Histórico</div>
+<div class="boton config" onclick="abrir('config')">Configuración</div>
+<div class="boton chat" onclick="abrir('chat')">ChatGPT</div>
 
 </div>
 
 <script>
-function clock(){
-let d=new Date()
-document.getElementById("clock").innerHTML =
-d.toLocaleDateString()+" "+d.toLocaleTimeString().slice(0,5)
+
+function abrir(p){
+console.log("Abrir hoja:",p)
+alert("Abrir hoja: "+p)
 }
-setInterval(clock,1000)
-clock()
+
 </script>
 
 </body>
