@@ -3,183 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO PRO G3F</title>
+<title>MONOLITO</title>
 
 <style>
-
-*{ box-sizing:border-box; margin:0; padding:0; }
-
 body{
-background:#0e1a22;
-font-family:Arial, Helvetica, sans-serif;
+margin:0;
+background:black;
 color:white;
-overflow:hidden;
-}
-
-/* CABECERA */
-.header{
-background:#0c1a21;
-padding:15px 20px;
+font-family:Arial, sans-serif;
 display:flex;
-justify-content:space-between;
-align-items:center;
-box-shadow:0 4px 10px rgba(0,0,0,.6);
-}
-
-.title{
-font-size:22px;
-font-weight:bold;
-}
-
-.info{
-font-size:14px;
-opacity:.8;
-}
-
-/* GRID */
-.grid{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:18px;
-padding:20px;
-height:calc(100vh - 80px);
-}
-
-/* BOTONES */
-.btn{
-background:linear-gradient(145deg,#3e5564,#2f4654);
-border-radius:20px;
-display:flex;
-flex-direction:column;
 justify-content:center;
 align-items:center;
-font-weight:bold;
-font-size:15px;
-cursor:pointer;
-box-shadow:6px 6px 12px rgba(0,0,0,.6), -2px -2px 8px rgba(255,255,255,.05);
-transition:.1s;
-position:relative;
+height:100vh;
+flex-direction:column;
 }
 
-.btn:active{
-transform:scale(.96);
-box-shadow:inset 4px 4px 10px #000;
+/* LOGO */
+#logo{
+font-size:32px;
+letter-spacing:4px;
+opacity:0;
+transition:1.5s;
 }
 
-.icon{
-font-size:38px;
+/* LOGIN */
+#login{
+margin-top:30px;
+display:none;
+flex-direction:column;
+align-items:center;
+}
+
+input{
+padding:12px;
+font-size:18px;
+text-align:center;
+border:none;
+border-radius:8px;
 margin-bottom:10px;
 }
 
-.badge{
-position:absolute;
-top:8px;
-right:12px;
-font-size:12px;
+button{
+padding:12px 20px;
+font-size:16px;
+border:none;
+border-radius:8px;
+background:#27ae60;
+color:white;
 }
 
-/* COLORES ESPECIALES */
-.orange{ background:linear-gradient(145deg,#ff9f1a,#e67e00); }
-.green{ background:linear-gradient(145deg,#5bbd4a,#3f9e34); }
-.red{ background:linear-gradient(145deg,#ff7b5a,#d35400); }
-
+/* SALUDO */
+#saludo{
+margin-top:20px;
+font-size:18px;
+opacity:0;
+transition:1s;
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<div class="title">MONOLITO GPT PRO</div>
-<div class="info" id="hora"></div>
+<div id="logo">MONOLITO</div>
+
+<div id="login">
+<input type="text" id="codigo" placeholder="Código camarero">
+<button onclick="entrar()">ENTRAR</button>
 </div>
 
-<div class="grid">
-
-<div class="btn" onclick="go('proveedores.html')">
-<span class="icon">🚚</span>
-PROVEEDORES
-<div class="badge">1</div>
-</div>
-
-<div class="btn" onclick="go('articulos.html')">
-<span class="icon">📦</span>
-ARTÍCULOS
-</div>
-
-<div class="btn" onclick="v()">
-<span class="icon">📊</span>
-COMPARADOR
-</div>
-
-<div class="btn" onclick="go('pedidos.html')">
-<span class="icon">📝</span>
-PEDIDOS
-<div class="badge">2</div>
-</div>
-
-<div class="btn" onclick="v()">
-<span class="icon">💳</span>
-PAGOS
-</div>
-
-<div class="btn orange" onclick="v()">
-<span class="icon">🔎</span>
-REVISIÓN
-<div class="badge">1</div>
-</div>
-
-<div class="btn green" onclick="v()">
-<span class="icon">📁</span>
-HISTÓRICO
-</div>
-
-<div class="btn" onclick="v()">
-<span class="icon">💰</span>
-VENTAS
-</div>
-
-<div class="btn" onclick="v()">
-<span class="icon">📅</span>
-CALENDARIO
-</div>
-
-<div class="btn orange" onclick="v()">
-<span class="icon">✉️</span>
-COMUNICACIÓN
-<div class="badge">3</div>
-</div>
-
-<div class="btn orange" onclick="v()">
-<span class="icon">🤖</span>
-AYUDA
-</div>
-
-<div class="btn" onclick="v()">
-<span class="icon">⚙️</span>
-CONFIGURACIÓN
-</div>
-
-</div>
+<div id="saludo"></div>
 
 <script>
 
-/* NAVEGACIÓN */
-function go(pagina){
-if(navigator.vibrate) navigator.vibrate(40);
-window.location.href = pagina;
-}
+/* ARRANQUE */
+setTimeout(()=>{
+document.getElementById("logo").style.opacity = 1;
+},500);
 
-/* VIBRACIÓN SIMPLE */
-function v(){
-if(navigator.vibrate) navigator.vibrate(40);
-}
+setTimeout(()=>{
+document.getElementById("login").style.display = "flex";
+},2000);
 
-/* RELOJ */
-setInterval(()=>{
-const now = new Date();
-document.getElementById("hora").innerText =
-now.toLocaleDateString()+" - "+now.toLocaleTimeString().slice(0,5);
-},1000);
+/* ENTRADA */
+function entrar(){
+let cod = document.getElementById("codigo").value;
+
+if(cod === "") return;
+
+let hora = new Date().getHours();
+let saludo = "";
+
+if(hora < 14) saludo = "Buenos días";
+else if(hora < 21) saludo = "Buenas tardes";
+else saludo = "Buenas noches";
+
+let texto = saludo + " " + cod;
+
+let s = document.getElementById("saludo");
+s.innerText = texto;
+s.style.opacity = 1;
+
+/* ENTRADA AL PANEL */
+setTimeout(()=>{
+window.location.href = "panel.html";
+},1500);
+
+}
 
 </script>
 
