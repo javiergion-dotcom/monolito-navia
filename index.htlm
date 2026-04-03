@@ -1,4 +1,4 @@
-h1>PRUEBA MONOLITO 123</h1>!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -6,111 +6,104 @@ h1>PRUEBA MONOLITO 123</h1>!DOCTYPE html>
 <title>MONOLITO</title>
 
 <style>
+
 body{
-margin:0; 
-background:black;
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#f4efe8;
+}
+
+/* HEADER */
+
+header{
+background:#5a3825;
 color:white;
-font-family:Arial, sans-serif;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-flex-direction:column;
-}
-
-/* LOGO */
-#logo{
-font-size:32px;
-letter-spacing:4px;
-opacity:0;
-transition:1.5s;
-}
-
-/* LOGIN */
-#login{
-margin-top:30px;
-display:none;
-flex-direction:column;
-align-items:center;
-}
-
-input{
-padding:12px;
-font-size:18px;
+padding:15px;
 text-align:center;
-border:none;
-border-radius:8px;
-margin-bottom:10px;
+font-size:22px;
+font-weight:bold;
 }
 
-button{
-padding:12px 20px;
-font-size:16px;
-border:none;
-border-radius:8px;
-background:#27ae60;
+/* GRID */
+
+.panel{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+padding:15px;
+}
+
+/* BOTONES */
+
+.boton{
+position:relative;
+padding:25px;
+border-radius:15px;
 color:white;
+font-size:16px;
+font-weight:bold;
+text-align:center;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
 
-/* SALUDO */
-#saludo{
-margin-top:20px;
-font-size:18px;
-opacity:0;
-transition:1s;
+/* COLORES */
+
+.verde{background:#2e7d32;}
+.azul{background:#1565c0;}
+.naranja{background:#ef6c00;}
+.rojo{background:#c62828;}
+.morado{background:#6a1b9a;}
+.gris{background:#455a64;}
+
+/* CONTADOR */
+
+.contador{
+position:absolute;
+top:8px;
+right:10px;
+background:red;
+color:white;
+border-radius:50%;
+padding:5px 8px;
+font-size:12px;
 }
+
 </style>
 </head>
 
 <body>
 
-<div id="logo">MONOLITO</div>
+<header>MONOLITO</header>
 
-<div id="login">
-<input type="text" id="codigo" placeholder="Código camarero">
-<button onclick="entrar()">ENTRAR</button>
+<div class="panel">
+
+<div class="boton verde" onclick="alert('Ventas diarias')">
+Ventas diarias
 </div>
 
-<div id="saludo"></div>
+<div class="boton azul" onclick="alert('Diario del bar')">
+Diario del bar
+</div>
 
-<script>
+<div class="boton naranja" onclick="alert('Proveedores y pedidos')">
+Proveedores y pedidos
+<span class="contador">3</span>
+</div>
 
-/* ARRANQUE */
-setTimeout(()=>{
-document.getElementById("logo").style.opacity = 1;
-},500);
+<div class="boton rojo" onclick="alert('Pagos')">
+Pagos
+<span class="contador">1</span>
+</div>
 
-setTimeout(()=>{
-document.getElementById("login").style.display = "flex";
-},2000);
+<div class="boton morado" onclick="alert('Análisis')">
+Análisis
+</div>
 
-/* ENTRADA */
-function entrar(){
-let cod = document.getElementById("codigo").value;
+<div class="boton gris" onclick="alert('Configuración')">
+Configuración
+</div>
 
-if(cod === "") return;
-
-let hora = new Date().getHours();
-let saludo = "";
-
-if(hora < 14) saludo = "Buenos días";
-else if(hora < 21) saludo = "Buenas tardes";
-else saludo = "Buenas noches";
-
-let texto = saludo + " " + cod;
-
-let s = document.getElementById("saludo");
-s.innerText = texto;
-s.style.opacity = 1;
-
-/* ENTRADA AL PANEL */
-setTimeout(()=>{
-window.location.href = "panel.html";
-},1500);
-
-}
-
-</script>
+</div>
 
 </body>
 </html>
