@@ -1,10 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Monolito</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#0f1419;
+  color:white;
+}
+header{
+  position:relative;
+  min-height:70vh;
+  background:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:40px 20px;
+}
+.header-content{
+  max-width:700px;
+}
+h1{
+  font-size:42px;
+  margin:0 0 10px;
+  letter-spacing:2px;
+}
+.sub{
+  color:#cfcfcf;
+  font-size:20px;
+  margin-bottom:24px;
+}
+.intro{
+  color:#d7d7d7;
+  line-height:1.5;
+  max-width:700px;
+  margin:0 auto;
+}
+.botones{
+  margin-top:30px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:100%;
+  max-width:320px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.boton{
+  background:#c8a27a;
+  color:#111;
+  padding:16px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:bold;
+}
+section{
+  padding:40px 20px;
+  text-align:center;
+}
+h2{
+  margin-top:0;
+  font-size:30px;
+}
+p{
+  line-height:1.6;
+  max-width:800px;
+  margin:12px auto;
+}
+.foto{
+  width:100%;
+  max-width:900px;
+  margin:20px auto;
+  display:block;
+  border-radius:14px;
+}
+.footer{
+  padding:24px 20px;
+  background:#000;
+  color:#aaa;
+  text-align:center;
+  font-size:14px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <h1>EL MONOLITO</h1>
+    <div class="sub">Cafetería · Navia</div>
+    <p class="intro">
+      Café ecológico muy cuidado, gran variedad de cervezas y ginebras,
+      dos terrazas y ambiente junto al puerto.
+    </p>
+
+    <div class="botones">
+      <a class="boton" href="#">Facebook</a>
+      <a class="boton" href="#">Instagram</a>
+      <a class="boton" href="tel:985474534">Llamar · 985 47 45 34</a>
+    </div>
+  </div>
+</header>
+
 <section>
-  <h2>Contacto</h2>
-  <p>📍 Avenida de la Dársena, 19 · Navia</p>
-  <p>📞 <a href="tel:985474532" style="color:#c8a27a;">985 47 45 32</a></p>
+  <h2>El Monolito</h2>
+  <p>
+    Abrimos el 25 de enero de 2022 con una idea clara:
+    crear un sitio donde estar a gusto, disfrutar del café,
+    de la terraza y del ambiente en Navia.
+  </p>
+  <p>
+    Nos preocupamos mucho por el café, muy valorado en la zona,
+    con apuesta por café ecológico y servicio cuidado.
+  </p>
+  <p>
+    También contamos con Mahou 5 Estrellas, amplia variedad de cervezas y ginebras,
+    dos terrazas —una delantera y otra trasera jardinada para que los niños puedan estar cómodos—
+    y emitimos todos los partidos.
+  </p>
 </section>
+
 <section>
-  <h2>Contacto</h2>
+  <h2>Ubicación y contacto</h2>
   <p>📍 Avenida de la Dársena, 19 · Navia</p>
   <p>📞 <a href="tel:985474534" style="color:#c8a27a;">985 47 45 34</a></p>
 </section>
+
+<div class="footer">
+  El Monolito · Avenida de la Dársena, 19 · Navia
+</div>
+
+</body>
+</html>
