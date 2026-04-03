@@ -1,116 +1,65 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MONOLITO GPT PRO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Monolito</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#0f1419;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  text-align:center;
+  padding:30px 20px;
+}
+h1{
+  font-size:38px;
+  letter-spacing:2px;
+  margin:0 0 10px;
+}
+p{
+  color:#b9c1c8;
+  margin:0 0 36px;
+  max-width:500px;
+}
+.botones{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:100%;
+  max-width:320px;
+}
+.boton{
+  background:#1f2a35;
+  padding:16px;
+  border-radius:14px;
+  text-decoration:none;
+  color:white;
+  font-size:18px;
+}
+.boton:hover{
+  background:#2a3947;
+}
+</style>
+</head>
+<body>
 
-  <style>
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-    }
+<h1>EL MONOLITO</h1>
+<p>Tu sitio en Navia</p>
 
-    body{
-      font-family:Arial, Helvetica, sans-serif;
-      background:#eef1f4;
-      color:#fff;
-    }
+<div class="botones">
+  <a class="boton" href="#">📘 Facebook</a>
+  <a class="boton" href="#">📸 Instagram</a>
+  <a class="boton" href="mailto:info@elmonolito.es">✉️ Email</a>
+  <a class="boton" href="#">📍 Cómo llegar</a>
+</div>
 
-    .topbar{
-      background:linear-gradient(180deg,#0c1b27,#112638);
-      padding:14px 18px 10px;
-      box-shadow:0 2px 10px rgba(0,0,0,.25);
-    }
-
-    .topbar-inner{
-      max-width:1400px;
-      margin:0 auto;
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-    }
-
-    .brand h1{
-      font-size:30px;
-      letter-spacing:.5px;
-      margin-bottom:4px;
-    }
-
-    .brand p{
-      font-size:13px;
-      color:#cfd8df;
-    }
-
-    .fecha{
-      text-align:right;
-      font-size:14px;
-      color:#dce5eb;
-      padding-top:6px;
-      white-space:nowrap;
-    }
-
-    .panel{
-      max-width:1400px;
-      margin:18px auto;
-      padding:0 10px 20px;
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:14px;
-    }
-
-    .tile{
-      position:relative;
-      min-height:130px;
-      border:none;
-      border-radius:18px;
-      cursor:pointer;
-      color:#fff;
-      box-shadow:0 8px 18px rgba(0,0,0,.18);
-      transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
-      overflow:hidden;
-      padding:16px 18px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      text-align:center;
-    }
-
-    .tile:hover{
-      transform:translateY(-2px);
-      box-shadow:0 12px 22px rgba(0,0,0,.22);
-      filter:brightness(1.03);
-    }
-
-    .tile .icono{
-      font-size:34px;
-      line-height:1;
-      margin-bottom:12px;
-    }
-
-    .tile .titulo{
-      font-size:24px;
-      font-weight:bold;
-      line-height:1.1;
-    }
-
-    .contador{
-      position:absolute;
-      top:10px;
-      right:12px;
-      min-width:24px;
-      height:24px;
-      padding:0 7px;
-      border-radius:999px;
-      background:#ffffff;
-      color:#233645;
-      font-size:13px;
-      font-weight:bold;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 2px 6px rgba(0,0,0,.22);
-    }
+</body>
+</html>
+      
