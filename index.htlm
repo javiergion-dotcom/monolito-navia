@@ -1,109 +1,116 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MONOLITO GPT PRO</title>
 
-<style>
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
 
-body{
-margin:0;
-font-family:Arial, Helvetica, sans-serif;
-background:#f4efe8;
-}
+    body{
+      font-family:Arial, Helvetica, sans-serif;
+      background:#eef1f4;
+      color:#fff;
+    }
 
-/* HEADER */
+    .topbar{
+      background:linear-gradient(180deg,#0c1b27,#112638);
+      padding:14px 18px 10px;
+      box-shadow:0 2px 10px rgba(0,0,0,.25);
+    }
 
-header{
-background:#5a3825;
-color:white;
-padding:15px;
-text-align:center;
-font-size:22px;
-font-weight:bold;
-}
+    .topbar-inner{
+      max-width:1400px;
+      margin:0 auto;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
 
-/* GRID */
+    .brand h1{
+      font-size:30px;
+      letter-spacing:.5px;
+      margin-bottom:4px;
+    }
 
-.panel{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:15px;
-padding:15px;
-}
+    .brand p{
+      font-size:13px;
+      color:#cfd8df;
+    }
 
-/* BOTONES */
+    .fecha{
+      text-align:right;
+      font-size:14px;
+      color:#dce5eb;
+      padding-top:6px;
+      white-space:nowrap;
+    }
 
-.boton{
-position:relative;
-padding:25px;
-border-radius:15px;
-color:white;
-font-size:16px;
-font-weight:bold;
-text-align:center;
-box-shadow:0 4px 10px rgba(0,0,0,0.2);
-}
+    .panel{
+      max-width:1400px;
+      margin:18px auto;
+      padding:0 10px 20px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
 
-/* COLORES */
+    .tile{
+      position:relative;
+      min-height:130px;
+      border:none;
+      border-radius:18px;
+      cursor:pointer;
+      color:#fff;
+      box-shadow:0 8px 18px rgba(0,0,0,.18);
+      transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+      overflow:hidden;
+      padding:16px 18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+    }
 
-.verde{background:#2e7d32;}
-.azul{background:#1565c0;}
-.naranja{background:#ef6c00;}
-.rojo{background:#c62828;}
-.morado{background:#6a1b9a;}
-.gris{background:#455a64;}
+    .tile:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 22px rgba(0,0,0,.22);
+      filter:brightness(1.03);
+    }
 
-/* CONTADOR */
+    .tile .icono{
+      font-size:34px;
+      line-height:1;
+      margin-bottom:12px;
+    }
 
-.contador{
-position:absolute;
-top:8px;
-right:10px;
-background:red;
-color:white;
-border-radius:50%;
-padding:5px 8px;
-font-size:12px;
-}
+    .tile .titulo{
+      font-size:24px;
+      font-weight:bold;
+      line-height:1.1;
+    }
 
-</style>
-</head>
-
-<body>
-
-<header>MONOLITO</header>
-
-<div class="panel">
-
-<div class="boton verde" onclick="alert('Ventas diarias')">
-Ventas diarias
-</div>
-
-<div class="boton azul" onclick="alert('Diario del bar')">
-Diario del bar
-</div>
-
-<div class="boton naranja" onclick="alert('Proveedores y pedidos')">
-Proveedores y pedidos
-<span class="contador">3</span>
-</div>
-
-<div class="boton rojo" onclick="alert('Pagos')">
-Pagos
-<span class="contador">1</span>
-</div>
-
-<div class="boton morado" onclick="alert('Análisis')">
-Análisis
-</div>
-
-<div class="boton gris" onclick="alert('Configuración')">
-Configuración
-</div>
-
-</div>
-
-</body>
-</html>
+    .contador{
+      position:absolute;
+      top:10px;
+      right:12px;
+      min-width:24px;
+      height:24px;
+      padding:0 7px;
+      border-radius:999px;
+      background:#ffffff;
+      color:#233645;
+      font-size:13px;
+      font-weight:bold;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 2px 6px rgba(0,0,0,.22);
+    }
