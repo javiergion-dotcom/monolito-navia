@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos - Monolito</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#f2ede6;
+color:#222;
+}
+
+/* CABECERA */
+
+.header{
+background:#bfa58a;
+color:white;
+padding:20px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+}
+
+/* CONTENEDOR */
+
+.container{
+padding:20px;
+}
+
+/* BLOQUES SUPERIORES */
+
+.top-box{
+background:white;
+border-radius:15px;
+padding:15px;
+margin-bottom:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* GRID PRODUCTOS */
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+/* TARJETAS */
+
+.card{
+background:white;
+border-radius:15px;
+padding:20px;
+text-align:center;
+font-size:18px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* INPUT CANTIDAD */
+
+.qty{
+margin-top:10px;
+font-size:20px;
+}
+
+/* BOTÓN */
+
+.btn{
+margin-top:20px;
+background:#222;
+color:white;
+padding:15px;
+border-radius:15px;
+text-align:center;
+font-size:18px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+PEDIDOS
+</div>
+
+<div class="container">
+
+<div class="top-box">
+📅 Fecha: 04/04/2026
+</div>
+
+<div class="top-box">
+🏢 Proveedor: MAHOU
+</div>
+
+<div class="top-box">
+👤 Camarero: 001
+</div>
+
+<div class="grid">
+
+<div class="card">
+CERVEZA
+<div class="qty">➖ 0 ➕</div>
+</div>
+
+<div class="card">
+COCA COLA
+<div class="qty">➖ 0 ➕</div>
+</div>
+
+<div class="card">
+AGUA
+<div class="qty">➖ 0 ➕</div>
+</div>
+
+<div class="card">
+VINO
+<div class="qty">➖ 0 ➕</div>
+</div>
+
+</div>
+
+<div class="btn">
+FINALIZAR PEDIDO
+</div>
+
+</div>
+
+</body>
+</html>
