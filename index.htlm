@@ -1,64 +1,113 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO</title>
+<title>Pedidos - Monolito</title>
 
 <style>
 
 body{
 margin:0;
 font-family:Arial, Helvetica, sans-serif;
-background:#f4efe8;
-color:#2b2b2b;
+background:#f2ede6;
+color:#222;
 }
 
-/* HEADER */
+/* CABECERA */
 
-header{
-background:#5a3825;
+.header{
+background:linear-gradient(90deg,#1f2a33,#2e3e4d);
 color:white;
-padding:20px;
-text-align:center;
-font-size:22px;
-font-weight:bold;
+padding:16px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:18px;
 }
 
-/* GRID */
+.volver{
+background:#c8a27a;
+border:none;
+padding:8px 14px;
+border-radius:10px;
+cursor:pointer;
+}
 
-.container{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:14px;
+/* BLOQUE SUPERIOR */
+
+.top{
+padding:16px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.top input, .top select{
+padding:12px;
+border-radius:10px;
+border:none;
+background:#e5ded3;
+font-size:16px;
+}
+
+/* TABLA */
+
+.tabla{
 padding:16px;
 }
 
-/* BOTONES */
-
-.button{
-background:#c8a27a;
-padding:24px;
-text-align:center;
-border-radius:10px;
-font-size:16px;
-font-weight:700;
-box-shadow:0 6px 14px rgba(0,0,0,0.25);
-border-bottom:3px solid #8a6b4c;
+.fila{
+display:grid;
+grid-template-columns:60px 1fr 100px;
+gap:10px;
+margin-bottom:10px;
 }
 
-.button:active{
-transform:translateY(2px);
-box-shadow:0 2px 6px rgba(0,0,0,0.2);
-}
-
-/* FOOTER */
-
-.footer{
-text-align:center;
+.fila input{
 padding:10px;
-font-size:12px;
-opacity:0.5;
+border-radius:10px;
+border:none;
+background:#e5ded3;
+}
+
+/* BOTONES + / - */
+
+.unidades{
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.btn{
+background:#c8a27a;
+border:none;
+border-radius:8px;
+padding:6px 10px;
+font-size:16px;
+}
+
+/* TOTALES */
+
+.totales{
+padding:16px;
+background:#e5ded3;
+margin:16px;
+border-radius:14px;
+font-size:18px;
+}
+
+/* CONTROL FINAL */
+
+.control{
+display:flex;
+gap:20px;
+padding:16px;
+}
+
+.control label{
+font-size:18px;
 }
 
 </style>
@@ -67,18 +116,66 @@ opacity:0.5;
 
 <body>
 
-<header>MONOLITO NAVIA</header>
-
-<div class="container">
-<div class="button">PEDIDOS</div>
-<div class="button">PROVEEDORES</div>
-<div class="button">ARTÍCULOS</div>
-<div class="button">COMPARADOR</div>
-<div class="button">VENTAS</div>
-<div class="button">DIARIO</div>
+<div class="header">
+<span>🧾 PEDIDOS</span>
+<button class="volver" onclick="history.back()">Volver</button>
 </div>
 
-<div class="footer">Sistema de control</div>
+<div class="top">
+<input type="text" value="Fecha: automático" readonly>
+<select>
+<option>Proveedor...</option>
+<option>Mahou</option>
+<option>Coca-Cola</option>
+</select>
+<input type="text" placeholder="Operario">
+</div>
+
+<div class="tabla">
+
+<!-- FILAS -->
+<div class="fila">
+<div class="unidades">
+<button class="btn">-</button>
+<input type="number" value="1">
+<button class="btn">+</button>
+</div>
+<input type="text" placeholder="Artículo">
+<input type="text" placeholder="€" readonly>
+</div>
+
+<div class="fila">
+<div class="unidades">
+<button class="btn">-</button>
+<input type="number">
+<button class="btn">+</button>
+</div>
+<input type="text">
+<input type="text" readonly>
+</div>
+
+<div class="fila">
+<div class="unidades">
+<button class="btn">-</button>
+<input type="number">
+<button class="btn">+</button>
+</div>
+<input type="text">
+<input type="text" readonly>
+</div>
+
+</div>
+
+<div class="totales">
+Subtotal: 0 €<br>
+IVA: 0 €<br>
+<strong>TOTAL: 0 €</strong>
+</div>
+
+<div class="control">
+<label><input type="checkbox"> Pagado</label>
+<label><input type="checkbox"> Incidencia</label>
+</div>
 
 </body>
 </html>
