@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,163 +17,119 @@ color:#222;
 /* CABECERA */
 
 .header{
-background:linear-gradient(90deg,#1f2a33,#2e3e4d);
+background:#bfa58a;
 color:white;
-padding:16px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-font-size:18px;
+padding:20px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
 }
 
-.volver{
-background:#c8a27a;
-border:none;
-padding:8px 14px;
-border-radius:10px;
-cursor:pointer;
+/* CONTENEDOR */
+
+.container{
+padding:20px;
 }
 
-/* BLOQUE SUPERIOR */
+/* BLOQUES SUPERIORES */
 
-.top{
-padding:16px;
-display:flex;
-flex-direction:column;
-gap:10px;
+.top-box{
+background:white;
+border-radius:15px;
+padding:15px;
+margin-bottom:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
-.top input, .top select{
-padding:12px;
-border-radius:10px;
-border:none;
-background:#e5ded3;
-font-size:16px;
-}
+/* GRID PRODUCTOS */
 
-/* TABLA */
-
-.tabla{
-padding:16px;
-}
-
-.fila{
+.grid{
 display:grid;
-grid-template-columns:60px 1fr 100px;
-gap:10px;
-margin-bottom:10px;
+grid-template-columns:1fr 1fr;
+gap:15px;
 }
 
-.fila input{
-padding:10px;
-border-radius:10px;
-border:none;
-background:#e5ded3;
+/* TARJETAS */
+
+.card{
+background:white;
+border-radius:15px;
+padding:20px;
+text-align:center;
+font-size:18px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
-/* BOTONES + / - */
+/* INPUT CANTIDAD */
 
-.unidades{
-display:flex;
-align-items:center;
-gap:6px;
+.qty{
+margin-top:10px;
+font-size:20px;
 }
+
+/* BOTÓN */
 
 .btn{
-background:#c8a27a;
-border:none;
-border-radius:8px;
-padding:6px 10px;
-font-size:16px;
-}
-
-/* TOTALES */
-
-.totales{
-padding:16px;
-background:#e5ded3;
-margin:16px;
-border-radius:14px;
-font-size:18px;
-}
-
-/* CONTROL FINAL */
-
-.control{
-display:flex;
-gap:20px;
-padding:16px;
-}
-
-.control label{
+margin-top:20px;
+background:#222;
+color:white;
+padding:15px;
+border-radius:15px;
+text-align:center;
 font-size:18px;
 }
 
 </style>
-
 </head>
 
 <body>
 
 <div class="header">
-<span>🧾 PEDIDOS</span>
-<button class="volver" onclick="history.back()">Volver</button>
+PEDIDOS
 </div>
 
-<div class="top">
-<input type="text" value="Fecha: automático" readonly>
-<select>
-<option>Proveedor...</option>
-<option>Mahou</option>
-<option>Coca-Cola</option>
-</select>
-<input type="text" placeholder="Operario">
+<div class="container">
+
+<div class="top-box">
+📅 Fecha: 04/04/2026
 </div>
 
-<div class="tabla">
-
-<!-- FILAS -->
-<div class="fila">
-<div class="unidades">
-<button class="btn">-</button>
-<input type="number" value="1">
-<button class="btn">+</button>
-</div>
-<input type="text" placeholder="Artículo">
-<input type="text" placeholder="€" readonly>
+<div class="top-box">
+🏢 Proveedor: MAHOU
 </div>
 
-<div class="fila">
-<div class="unidades">
-<button class="btn">-</button>
-<input type="number">
-<button class="btn">+</button>
-</div>
-<input type="text">
-<input type="text" readonly>
+<div class="top-box">
+👤 Camarero: 001
 </div>
 
-<div class="fila">
-<div class="unidades">
-<button class="btn">-</button>
-<input type="number">
-<button class="btn">+</button>
+<div class="grid">
+
+<div class="card">
+CERVEZA
+<div class="qty">➖ 0 ➕</div>
 </div>
-<input type="text">
-<input type="text" readonly>
+
+<div class="card">
+COCA COLA
+<div class="qty">➖ 0 ➕</div>
+</div>
+
+<div class="card">
+AGUA
+<div class="qty">➖ 0 ➕</div>
+</div>
+
+<div class="card">
+VINO
+<div class="qty">➖ 0 ➕</div>
 </div>
 
 </div>
 
-<div class="totales">
-Subtotal: 0 €<br>
-IVA: 0 €<br>
-<strong>TOTAL: 0 €</strong>
+<div class="btn">
+FINALIZAR PEDIDO
 </div>
 
-<div class="control">
-<label><input type="checkbox"> Pagado</label>
-<label><input type="checkbox"> Incidencia</label>
 </div>
 
 </body>
