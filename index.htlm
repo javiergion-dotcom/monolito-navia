@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedidos - Monolito</title>
+<title>Pagos - Monolito</title>
 
 <style>
 
@@ -14,8 +14,6 @@ background:#f2ede6;
 color:#222;
 }
 
-/* CABECERA */
-
 .header{
 background:#bfa58a;
 color:white;
@@ -25,112 +23,124 @@ font-size:22px;
 font-weight:bold;
 }
 
-/* CONTENEDOR */
-
 .container{
-padding:20px;
-}
-
-/* BLOQUES SUPERIORES */
-
-.top-box{
-background:white;
-border-radius:15px;
 padding:15px;
-margin-bottom:15px;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
-/* GRID PRODUCTOS */
+/* FILA DE PAGO */
 
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:15px;
-}
-
-/* TARJETAS */
-
-.card{
+.fila{
 background:white;
-border-radius:15px;
-padding:20px;
-text-align:center;
-font-size:18px;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
+border-radius:12px;
+padding:15px;
+margin-bottom:12px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* INPUT CANTIDAD */
-
-.qty{
-margin-top:10px;
-font-size:20px;
+.top{
+display:flex;
+justify-content:space-between;
+font-weight:bold;
+margin-bottom:8px;
 }
 
-/* BOTÓN */
+.detalle{
+font-size:14px;
+color:#555;
+margin-bottom:10px;
+}
 
-.btn{
-margin-top:20px;
+/* BOTONES */
+
+.botones{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.estado{
+padding:6px 10px;
+border-radius:10px;
+font-size:13px;
+}
+
+.pendiente{background:#eee;}
+.pagado{background:#4caf50;color:white;}
+.incidencia{background:#b00020;color:white;}
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:10px;
 background:#222;
 color:white;
-padding:15px;
-border-radius:15px;
-text-align:center;
-font-size:18px;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div class="header">
-PEDIDOS
-</div>
+<div class="header">PAGOS</div>
 
 <div class="container">
 
-<div class="top-box">
-📅 Fecha: 04/04/2026
+<div class="fila">
+<div class="top">
+<span>Mahou</span>
+<span>184,60 €</span>
 </div>
 
-<div class="top-box">
-🏢 Proveedor: MAHOU
+<div class="detalle">
+Pedido 25/03/2026 · Reposición
 </div>
 
-<div class="top-box">
-👤 Camarero: 001
+<div class="botones">
+<div class="estado pendiente">Pendiente</div>
+<div>
+<button onclick="marcarPagado(this)">Pagado</button>
+<button onclick="marcarIncidencia(this)">Incidencia</button>
+</div>
+</div>
 </div>
 
-<div class="grid">
-
-<div class="card">
-CERVEZA
-<div class="qty">➖ 0 ➕</div>
+<div class="fila">
+<div class="top">
+<span>Coca-Cola</span>
+<span>96,40 €</span>
 </div>
 
-<div class="card">
-COCA COLA
-<div class="qty">➖ 0 ➕</div>
+<div class="detalle">
+Pedido 24/03/2026
 </div>
 
-<div class="card">
-AGUA
-<div class="qty">➖ 0 ➕</div>
+<div class="botones">
+<div class="estado pagado">Pagado</div>
+<div>
+<button onclick="marcarPagado(this)">Pagado</button>
+<button onclick="marcarIncidencia(this)">Incidencia</button>
 </div>
-
-<div class="card">
-VINO
-<div class="qty">➖ 0 ➕</div>
 </div>
-
-</div>
-
-<div class="btn">
-FINALIZAR PEDIDO
 </div>
 
 </div>
+
+<script>
+
+function marcarPagado(btn){
+const estado = btn.parentElement.parentElement.querySelector('.estado');
+estado.className = 'estado pagado';
+estado.innerText = 'Pagado';
+}
+
+function marcarIncidencia(btn){
+const estado = btn.parentElement.parentElement.querySelector('.estado');
+estado.className = 'estado incidencia';
+estado.innerText = 'Incidencia';
+}
+
+</script>
 
 </body>
-</html>
+</html>9
