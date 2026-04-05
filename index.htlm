@@ -3,122 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO GPT PRO</title>
+<title>Pedidos - Monolito</title>
 
 <style>
-:root{
- --header:#B79C8C;
- --header-dark:#A68C7D;
- --bg:#E7E3DC;
- --card:#C9C1B3;
- --card-hover:#BFB5A6;
- --text:#1C1C1C;
- --incident:#8B1E1E;
- --comm:#D4A017;
-}
-
 body{
- margin:0;
- font-family:Arial, Helvetica, sans-serif;
- background:var(--bg);
- color:var(--text);
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#f2ede6;
+color:#222;
 }
 
 .header{
- background:linear-gradient(135deg,var(--header),var(--header-dark));
- padding:28px;
- color:white;
- text-align:center;
- box-shadow:0 6px 18px rgba(0,0,0,0.18);
-}
-
-.title{
- font-size:26px;
- font-weight:bold;
-}
-
-.subtitle{
- font-size:14px;
- opacity:0.9;
- margin-top:4px;
+background:#bfa58a;
+color:white;
+padding:20px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
 }
 
 .container{
- padding:20px;
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:15px;
+padding:15px;
 }
 
-.card{
- background:var(--card);
- border-radius:14px;
- padding:22px;
- text-align:center;
- font-size:18px;
- font-weight:600;
- box-shadow:0 5px 12px rgba(0,0,0,0.15);
- transition:0.15s;
+.fila{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:white;
+padding:12px;
+margin-bottom:10px;
+border-radius:10px;
 }
 
-.card:hover{
- background:var(--card-hover);
- transform:translateY(-2px);
+button{
+padding:8px 12px;
+border:none;
+border-radius:8px;
+background:#222;
+color:white;
 }
 
-.fab{
- position:fixed;
- bottom:20px;
- width:60px;
- height:60px;
- border-radius:50%;
- display:flex;
- align-items:center;
- justify-content:center;
- font-size:24px;
- color:white;
- box-shadow:0 6px 15px rgba(0,0,0,0.3);
-}
-
-.inc{
- right:20px;
- background:var(--incident);
-}
-
-.com{
- left:20px;
- background:var(--comm);
+.total{
+font-size:20px;
+font-weight:bold;
+margin-top:20px;
+text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<div class="title">MONOLITO GPT PRO</div>
-<div class="subtitle">Sistema de control · El Monolito</div>
-</div>
+<div class="header">PEDIDOS</div>
 
 <div class="container">
 
-<div class="card" onclick="irPagos()">Proveedores y pedidos</div>
-<div class="card">Ventas diarias</div>
+<div class="fila">
+<span>CERVEZA</span>
+<div>
+<button onclick="menos(0)">-</button>
+<span id="c0">0</span>
+<button onclick="mas(0)">+</button>
+</div>
+</div>
 
-<div class="card">Diario del bar</div>
-<div class="card">Documentos</div>
+<div class="fila">
+<span>COCA COLA</span>
+<div>
+<button onclick="menos(1)">-</button>
+<span id="c1">0</span>
+<button onclick="mas(1)">+</button>
+</div>
+</div>
 
-<div class="card">Comparador de precios</div>
-<div class="card">Artículos</div>
+<div class="fila">
+<span>AGUA</span>
+<div>
+<button onclick="menos(2)">-</button>
+<span id="c2">0</span>
+<button onclick="mas(2)">+</button>
+</div>
+</div>
+
+<div class="total">
+TOTAL: <span id="total">0</span> €
+</div>
 
 </div>
 
-<div class="fab com">✉</div>
-<div class="fab inc">!</div>
-
 <script>
-function irPagos(){
- window.location.href = "pagos.html";
+
+let precios = [1.2, 1.5, 1.0];
+let cantidades = [0,0,0];
+
+function mas(i){
+cantidades[i]++;
+actualizar(i);
 }
+
+function menos(i){
+if(cantidades[i]>0) cantidades[i]--;
+actualizar(i);
+}
+
+function actualizar(i){
+document.getElementById("c"+i).innerText = cantidades[i];
+
+let total = 0;
+for(let j=0;j<3;j++){
+total += cantidades[j]*precios[j];
+}
+
+document.getElementById("total").innerText = total.toFixed(2);
+}
+
 </script>
 
 </body>
