@@ -2,151 +2,522 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MONOLITO GPT PRO</title>
 
 <style>
-
-body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#e9e4dc;
+:root{
+  --bg-dark:#121a21;
+  --bg-panel:#dfe6ec;
+  --header:#14232c;
+  --header-2:#1b2f3b;
+  --btn-blue-1:#6f8fa6;
+  --btn-blue-2:#4c6576;
+  --btn-orange-1:#f6a623;
+  --btn-orange-2:#d57900;
+  --btn-green-1:#71bf55;
+  --btn-green-2:#3d8f2b;
+  --btn-red-1:#d64545;
+  --btn-red-2:#9f2323;
+  --text-white:#ffffff;
+  --text-soft:rgba(255,255,255,0.85);
+  --text-dark:#22313a;
+  --shadow:0 15px 25px rgba(0,0,0,0.30);
+  --shadow-pressed:0 5px 10px rgba(0,0,0,0.45);
+  --radius:26px;
 }
 
-/* HEADER */
+*{box-sizing:border-box}
 
-.header{
-background:#b89b84;
-color:white;
-text-align:center;
-padding:25px;
+html,body{
+  margin:0;
+  padding:0;
+  font-family:Segoe UI, Arial, Helvetica, sans-serif;
+  background:var(--bg-dark);
+  color:var(--text-white);
+  -webkit-tap-highlight-color:transparent;
 }
 
-.title{
-font-size:28px;
-font-weight:bold;
+/* ===== LOGIN ===== */
+
+.login{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(180deg,#0f1a21,#152530);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  z-index:999;
 }
 
-.subtitle{
-font-size:14px;
-opacity:0.9;
+.login-logo{
+  font-size:40px;
+  font-weight:700;
+  letter-spacing:1px;
+  text-align:center;
+  margin-bottom:10px;
 }
 
-/* GRID */
-
-.container{
-padding:20px;
-display:grid;
-grid-template-columns:1fr 1fr 1fr;
-gap:20px;
+.login-sub{
+  font-size:16px;
+  opacity:.78;
+  margin-bottom:32px;
+  text-align:center;
 }
 
-/* BOTONES */
-
-.card{
-border-radius:20px;
-padding:30px;
-text-align:center;
-font-size:18px;
-font-weight:600;
-color:white;
-box-shadow:0 8px 20px rgba(0,0,0,0.25);
-transition:0.2s;
-cursor:pointer;
+.pin{
+  min-height:44px;
+  font-size:36px;
+  letter-spacing:10px;
+  margin-bottom:28px;
 }
 
-.card:hover{
-transform:scale(1.03);
+.keypad{
+  display:grid;
+  grid-template-columns:repeat(3,86px);
+  gap:16px;
 }
 
-/* COLORES */
-
-.blue{ background:#5f7f94; }
-.green{ background:#4caf50; }
-.orange{ background:#f39c12; }
-.red{ background:#b71c1c; }
-
-/* ICONO */
-
-.icon{
-font-size:35px;
-margin-bottom:10px;
-display:block;
+.key{
+  height:86px;
+  border-radius:22px;
+  background:linear-gradient(180deg,var(--btn-blue-1),var(--btn-blue-2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  font-weight:700;
+  color:white;
+  cursor:pointer;
+  box-shadow:
+    inset 0 3px 4px rgba(255,255,255,0.28),
+    0 12px 20px rgba(0,0,0,0.45);
+  user-select:none;
 }
 
+.key:active{
+  transform:translateY(6px);
+  box-shadow:
+    inset 0 6px 10px rgba(0,0,0,0.55),
+    0 4px 10px rgba(0,0,0,0.55);
+}
+
+/* ===== APP ===== */
+
+.app{
+  display:none;
+  min-height:100vh;
+  background:var(--bg-panel);
+}
+
+.topbar{
+  height:72px;
+  background:linear-gradient(180deg,var(--header),var(--header-2));
+  color:white;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 18px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.35);
+}
+
+.top-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.top-icon{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  font-weight:700;
+  background:rgba(255,255,255,0.06);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,0.08);
+  cursor:pointer;
+  user-select:none;
+}
+
+.top-icon:active{
+  transform:scale(.96);
+}
+
+.brand{
+  display:flex;
+  flex-direction:column;
+  line-height:1.1;
+}
+
+.brand-title{
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:.4px;
+}
+
+.brand-sub{
+  font-size:12px;
+  color:var(--text-soft);
+}
+
+.top-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.operator-tag{
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:12px;
+  color:var(--text-soft);
+}
+
+.datetime{
+  font-size:17px;
+  font-weight:600;
+}
+
+.statusbar{
+  background:#eef2f5;
+  color:#41535f;
+  padding:10px 18px;
+  font-size:14px;
+  border-bottom:1px solid rgba(0,0,0,0.06);
+}
+
+.panel{
+  padding:18px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+.btn{
+  min-height:148px;
+  border-radius:var(--radius);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:21px;
+  font-weight:700;
+  position:relative;
+  cursor:pointer;
+  user-select:none;
+  box-shadow:
+    inset 0 3px 4px rgba(255,255,255,0.30),
+    var(--shadow);
+  transition:.12s ease;
+  padding:14px;
+}
+
+.btn:active{
+  transform:translateY(8px);
+  box-shadow:
+    inset 0 6px 10px rgba(0,0,0,0.55),
+    var(--shadow-pressed);
+}
+
+.btn-blue{background:linear-gradient(180deg,var(--btn-blue-1),var(--btn-blue-2))}
+.btn-orange{background:linear-gradient(180deg,var(--btn-orange-1),var(--btn-orange-2))}
+.btn-green{background:linear-gradient(180deg,var(--btn-green-1),var(--btn-green-2))}
+.btn-red{background:linear-gradient(180deg,var(--btn-red-1),var(--btn-red-2))}
+
+.btn-icon{
+  font-size:44px;
+  margin-bottom:10px;
+  line-height:1;
+}
+
+.counter{
+  position:absolute;
+  top:12px;
+  right:16px;
+  min-width:24px;
+  height:24px;
+  padding:0 6px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.18);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:700;
+}
+
+.counter-alert{
+  background:#b71c1c;
+}
+
+@media (max-width: 767px){
+  .topbar{
+    height:auto;
+    min-height:72px;
+    padding:10px 14px;
+    gap:10px;
+  }
+
+  .top-left{
+    gap:10px;
+  }
+
+  .brand-title{
+    font-size:18px;
+  }
+
+  .datetime{
+    font-size:14px;
+  }
+
+  .operator-tag{
+    display:none;
+  }
+
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+
+  .btn{
+    min-height:126px;
+    font-size:17px;
+    border-radius:22px;
+  }
+
+  .btn-icon{
+    font-size:38px;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<div class="title">MONOLITO GPT PRO</div>
-<div class="subtitle">Sistema de control · El Monolito</div>
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="login-logo">MONOLITO GPT PRO</div>
+  <div class="login-sub">Introduce tu PIN</div>
+  <div class="pin" id="pin"></div>
+
+  <div class="keypad">
+    <div class="key" onclick="num(1)">1</div>
+    <div class="key" onclick="num(2)">2</div>
+    <div class="key" onclick="num(3)">3</div>
+    <div class="key" onclick="num(4)">4</div>
+    <div class="key" onclick="num(5)">5</div>
+    <div class="key" onclick="num(6)">6</div>
+    <div class="key" onclick="num(7)">7</div>
+    <div class="key" onclick="num(8)">8</div>
+    <div class="key" onclick="num(9)">9</div>
+    <div class="key" onclick="borrar()">←</div>
+    <div class="key" onclick="num(0)">0</div>
+    <div class="key" onclick="borrarTodo()">C</div>
+  </div>
 </div>
 
-<div class="container">
+<!-- APP -->
+<div class="app" id="app">
 
-<div class="card blue" onclick="location.href='proveedores.html'">
-<span class="icon">🚚</span>
-PROVEEDORES
+  <div class="topbar">
+    <div class="top-left">
+      <div class="top-actions">
+        <div class="top-icon" onclick="accionCabecera('volver')">‹</div>
+        <div class="top-icon" onclick="accionCabecera('buscar')">🔍</div>
+      </div>
+
+      <div class="brand">
+        <div class="brand-title">MONOLITO</div>
+        <div class="brand-sub">Sistema de control</div>
+      </div>
+    </div>
+
+    <div class="top-right">
+      <div class="operator-tag" id="operadorTag">Operador</div>
+      <div class="datetime" id="reloj">00:00</div>
+    </div>
+  </div>
+
+  <div class="statusbar" id="estadoBar">
+    Buenos días · Sin comunicaciones · Sin diferencias
+  </div>
+
+  <div class="panel">
+    <div class="grid">
+
+      <div class="btn btn-blue" onclick="abrir('proveedores')">
+        <div class="counter">1</div>
+        <div class="btn-icon">🚚</div>
+        <div>PROVEEDORES</div>
+      </div>
+
+      <div class="btn btn-blue" onclick="abrir('articulos')">
+        <div class="btn-icon">📦</div>
+        <div>ARTÍCULOS</div>
+      </div>
+
+      <div class="btn btn-blue" onclick="abrir('comparador')">
+        <div class="btn-icon">📊</div>
+        <div>COMPARADOR</div>
+      </div>
+
+      <div class="btn btn-blue" onclick="abrir('pedidos')">
+        <div class="counter">2</div>
+        <div class="btn-icon">📝</div>
+        <div>PEDIDOS</div>
+      </div>
+
+      <div class="btn btn-blue" onclick="abrir('pagos')">
+        <div class="btn-icon">💳</div>
+        <div>PAGOS</div>
+      </div>
+
+      <div class="btn btn-orange" onclick="abrir('revision')">
+        <div class="counter counter-alert">1</div>
+        <div class="btn-icon">🔎</div>
+        <div>REVISIÓN</div>
+      </div>
+
+      <div class="btn btn-green" onclick="abrir('historico')">
+        <div class="btn-icon">📁</div>
+        <div>HISTÓRICO</div>
+      </div>
+
+      <div class="btn btn-blue" onclick="abrir('ventas')">
+        <div class="btn-icon">💰</div>
+        <div>VENTAS</div>
+      </div>
+
+      <div class="btn btn-blue" onclick="abrir('calendario')">
+        <div class="btn-icon">📅</div>
+        <div>CALENDARIO</div>
+      </div>
+
+      <div class="btn btn-orange" onclick="abrir('comunicacion')">
+        <div class="counter">3</div>
+        <div class="btn-icon">✉️</div>
+        <div>COMUNICACIÓN</div>
+      </div>
+
+      <div class="btn btn-orange" onclick="abrir('ayuda')">
+        <div class="btn-icon">🤖</div>
+        <div>AYUDA</div>
+      </div>
+
+      <div class="btn btn-blue" onclick="abrir('configuracion')">
+        <div class="btn-icon">⚙️</div>
+        <div>CONFIGURACIÓN</div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
-<div class="card blue" onclick="location.href='articulos.html'">
-<span class="icon">📦</span>
-ARTÍCULOS
-</div>
+<script>
+const base = {
+  "1111":"DARIO",
+  "2222":"TOÑO",
+  "3333":"ANDREINA",
+  "0985":"JAVI",
+  "4544":"SILVIA",
+  "4444":"FELI"
+};
 
-<div class="card blue">
-<span class="icon">📊</span>
-COMPARADOR
-</div>
+let actual = "";
+let operadorActual = "";
 
-<div class="card blue" onclick="location.href='pedidos.html'">
-<span class="icon">📝</span>
-PEDIDOS
-</div>
+function vibrar(ms = 40){
+  if(navigator.vibrate) navigator.vibrate(ms);
+}
 
-<div class="card blue">
-<span class="icon">💳</span>
-PAGOS
-</div>
+function num(n){
+  vibrar(25);
+  if(actual.length >= 4) return;
+  actual += String(n);
+  document.getElementById("pin").innerHTML = "• ".repeat(actual.length);
 
-<div class="card orange">
-<span class="icon">🔍</span>
-REVISIÓN
-</div>
+  if(actual.length === 4){
+    if(base[actual]){
+      operadorActual = base[actual];
+      document.getElementById("login").style.display = "none";
+      document.getElementById("app").style.display = "block";
+      document.getElementById("operadorTag").innerHTML = operadorActual;
+      actualizarEstado();
+    }else{
+      actual = "";
+      document.getElementById("pin").innerHTML = "";
+      alert("PIN incorrecto");
+    }
+  }
+}
 
-<div class="card green">
-<span class="icon">📁</span>
-HISTÓRICO
-</div>
+function borrar(){
+  vibrar(20);
+  actual = actual.slice(0,-1);
+  document.getElementById("pin").innerHTML = "• ".repeat(actual.length);
+}
 
-<div class="card blue">
-<span class="icon">💰</span>
-VENTAS
-</div>
+function borrarTodo(){
+  vibrar(20);
+  actual = "";
+  document.getElementById("pin").innerHTML = "";
+}
 
-<div class="card blue">
-<span class="icon">📅</span>
-CALENDARIO
-</div>
+function abrir(sec){
+  vibrar(45);
+  alert("Abrir módulo: " + sec);
+}
 
-<div class="card orange">
-<span class="icon">✉️</span>
-COMUNICACIÓN
-</div>
+function accionCabecera(tipo){
+  vibrar(35);
+  if(tipo === "volver"){
+    alert("Volver");
+  }else if(tipo === "buscar"){
+    alert("Buscar");
+  }
+}
 
-<div class="card orange">
-<span class="icon">🤖</span>
-AYUDA
-</div>
+function reloj(){
+  const d = new Date();
+  document.getElementById("reloj").innerHTML =
+    d.toLocaleDateString("es-ES") + " · " +
+    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+}
 
-<div class="card blue">
-<span class="icon">⚙️</span>
-CONFIGURACIÓN
-</div>
+function actualizarEstado(){
+  const saludo = obtenerSaludo();
+  document.getElementById("estadoBar").innerHTML =
+    saludo + " · Sin comunicaciones · Sin diferencias";
+}
 
-</div>
+function obtenerSaludo(){
+  const hora = new Date().getHours();
+  if(hora < 13) return "Buenos días";
+  if(hora < 21) return "Buenas tardes";
+  return "Buenas noches";
+}
+
+setInterval(reloj,1000);
+reloj();
+</script>
 
 </body>
 </html>
