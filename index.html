@@ -6,89 +6,74 @@
 <title>MONOLITO GPT PRO</title>
 
 <style>
-:root{
- --header:#B79C8C;
- --header-dark:#A68C7D;
- --bg:#E7E3DC;
- --card:#C9C1B3;
- --card-hover:#BFB5A6;
- --text:#1C1C1C;
- --incident:#8B1E1E;
- --comm:#D4A017;
-}
 
 body{
- margin:0;
- font-family:Arial, Helvetica, sans-serif;
- background:var(--bg);
- color:var(--text);
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#e9e4dc;
 }
 
+/* HEADER */
+
 .header{
- background:linear-gradient(135deg,var(--header),var(--header-dark));
- padding:28px;
- color:white;
- text-align:center;
- box-shadow:0 6px 18px rgba(0,0,0,0.18);
+background:#b89b84;
+color:white;
+text-align:center;
+padding:25px;
 }
 
 .title{
- font-size:26px;
- font-weight:bold;
+font-size:28px;
+font-weight:bold;
 }
 
 .subtitle{
- font-size:14px;
- opacity:0.9;
- margin-top:4px;
+font-size:14px;
+opacity:0.9;
 }
+
+/* GRID */
 
 .container{
- padding:20px;
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:15px;
+padding:20px;
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:20px;
 }
 
+/* BOTONES */
+
 .card{
- background:var(--card);
- border-radius:14px;
- padding:22px;
- text-align:center;
- font-size:18px;
- font-weight:600;
- box-shadow:0 5px 12px rgba(0,0,0,0.15);
- transition:0.15s;
+border-radius:20px;
+padding:30px;
+text-align:center;
+font-size:18px;
+font-weight:600;
+color:white;
+box-shadow:0 8px 20px rgba(0,0,0,0.25);
+transition:0.2s;
+cursor:pointer;
 }
 
 .card:hover{
- background:var(--card-hover);
- transform:translateY(-2px);
+transform:scale(1.03);
 }
 
-.fab{
- position:fixed;
- bottom:20px;
- width:60px;
- height:60px;
- border-radius:50%;
- display:flex;
- align-items:center;
- justify-content:center;
- font-size:24px;
- color:white;
- box-shadow:0 6px 15px rgba(0,0,0,0.3);
+/* COLORES */
+
+.blue{ background:#5f7f94; }
+.green{ background:#4caf50; }
+.orange{ background:#f39c12; }
+.red{ background:#b71c1c; }
+
+/* ICONO */
+
+.icon{
+font-size:35px;
+margin-bottom:10px;
+display:block;
 }
 
-.inc{
- right:20px;
- background:var(--incident);
-}
-
-.com{
- left:20px;
- background:var(--comm);
-}
 </style>
 </head>
 
@@ -101,26 +86,67 @@ body{
 
 <div class="container">
 
-<div class="card" onclick="irPedidos()">Proveedores y pedidos</div>
-<div class="card">Ventas diarias</div>
+<div class="card blue" onclick="location.href='proveedores.html'">
+<span class="icon">🚚</span>
+PROVEEDORES
+</div>
 
-<div class="card">Diario del bar</div>
-<div class="card">Documentos</div>
+<div class="card blue" onclick="location.href='articulos.html'">
+<span class="icon">📦</span>
+ARTÍCULOS
+</div>
 
-<div class="card">Comparador de precios</div>
-<div class="card">Artículos</div>
+<div class="card blue">
+<span class="icon">📊</span>
+COMPARADOR
+</div>
+
+<div class="card blue" onclick="location.href='pedidos.html'">
+<span class="icon">📝</span>
+PEDIDOS
+</div>
+
+<div class="card blue">
+<span class="icon">💳</span>
+PAGOS
+</div>
+
+<div class="card orange">
+<span class="icon">🔍</span>
+REVISIÓN
+</div>
+
+<div class="card green">
+<span class="icon">📁</span>
+HISTÓRICO
+</div>
+
+<div class="card blue">
+<span class="icon">💰</span>
+VENTAS
+</div>
+
+<div class="card blue">
+<span class="icon">📅</span>
+CALENDARIO
+</div>
+
+<div class="card orange">
+<span class="icon">✉️</span>
+COMUNICACIÓN
+</div>
+
+<div class="card orange">
+<span class="icon">🤖</span>
+AYUDA
+</div>
+
+<div class="card blue">
+<span class="icon">⚙️</span>
+CONFIGURACIÓN
+</div>
 
 </div>
 
-<div class="fab com">✉</div>
-<div class="fab inc">!</div>
-
-<script>
-function irPedidos(){
- window.location.href = "pedidos.html";
-}
-</script>
-
 </body>
 </html>
-<!-- actualización -->
