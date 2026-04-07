@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>MONOLITO GPT PRO</title>
 
 <style>
@@ -12,19 +11,19 @@
   --bg-panel:#dfe6ec;
   --header:#14232c;
   --header-2:#1b2f3b;
-
   --btn-blue-1:#6f8fa6;
   --btn-blue-2:#4c6576;
-
   --btn-orange-1:#f6a623;
   --btn-orange-2:#d57900;
-
   --btn-green-1:#71bf55;
   --btn-green-2:#3d8f2b;
-
   --btn-red-1:#d64545;
   --btn-red-2:#9f2323;
-
+  --text-white:#ffffff;
+  --text-soft:rgba(255,255,255,0.85);
+  --text-dark:#22313a;
+  --shadow:0 15px 25px rgba(0,0,0,0.30);
+  --shadow-pressed:0 5px 10px rgba(0,0,0,0.45);
   --radius:26px;
 }
 
@@ -32,317 +31,64 @@
 
 html,body{
   margin:0;
-  font-family:Segoe UI, Arial;
+  padding:0;
+  font-family:Segoe UI, Arial, Helvetica, sans-serif;
   background:var(--bg-dark);
+  color:var(--text-white);
   -webkit-tap-highlight-color:transparent;
 }
 
-/* LOGIN */
+/* ===== LOGIN ===== */
 
 .login{
   position:fixed;
   inset:0;
-  background:linear-gradient(#0f1a21,#152530);
+  background:linear-gradient(180deg,#0f1a21,#152530);
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
+  padding:24px;
   z-index:999;
 }
 
-.logo{
-  font-size:38px;
+.login-logo{
+  font-size:40px;
   font-weight:700;
+  letter-spacing:1px;
+  text-align:center;
   margin-bottom:10px;
 }
 
-.sub{
-  opacity:.7;
-  margin-bottom:30px;
+.login-sub{
+  font-size:16px;
+  opacity:.78;
+  margin-bottom:32px;
+  text-align:center;
 }
 
 .pin{
-  font-size:34px;
+  min-height:44px;
+  font-size:36px;
   letter-spacing:10px;
-  margin-bottom:25px;
+  margin-bottom:28px;
 }
 
 .keypad{
   display:grid;
-  grid-template-columns:repeat(3,80px);
-  gap:14px;
+  grid-template-columns:repeat(3,86px);
+  gap:16px;
 }
 
 .key{
-  height:80px;
-  border-radius:20px;
-  background:linear-gradient(var(--btn-blue-1),var(--btn-blue-2));
+  height:86px;
+  border-radius:22px;
+  background:linear-gradient(180deg,var(--btn-blue-1),var(--btn-blue-2));
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:26px;
-  font-weight:bold;
-  color:white;
-  cursor:pointer;
-  box-shadow:0 10px 18px rgba(0,0,0,.5), inset 0 3px 4px rgba(255,255,255,.3);
-}
-
-.key:active{
-  transform:translateY(5px);
-}
-
-/* APP */
-
-.app{
-  display:none;
-  min-height:100vh;
-  background:var(--bg-panel);
-}
-
-.topbar{
-  height:70px;
-  background:linear-gradient(var(--header),var(--header-2));
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:0 18px;
-  color:white;
-}
-
-.brand{
-  font-size:20px;
-  font-weight:700;
-}
-
-.datetime{
-  font-size:16px;
-}
-
-.status{
-  background:#eef2f5;
-  padding:10px;
-  font-size:14px;
-  color:#41535f;
-}
-
-.panel{
-  padding:18px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:18px;
-}
-
-.btn{
-  min-height:140px;
-  border-radius:var(--radius);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  font-size:20px;
+  font-size:28px;
   font-weight:700;
   color:white;
-  position:relative;
   cursor:pointer;
-  box-shadow:inset 0 3px 4px rgba(255,255,255,.3),0 15px 25px rgba(0,0,0,.3);
-}
-
-.btn:active{
-  transform:translateY(6px);
-}
-
-.btn-icon{
-  font-size:40px;
-  margin-bottom:10px;
-}
-
-.btn-blue{background:linear-gradient(var(--btn-blue-1),var(--btn-blue-2))}
-.btn-orange{background:linear-gradient(var(--btn-orange-1),var(--btn-orange-2))}
-.btn-green{background:linear-gradient(var(--btn-green-1),var(--btn-green-2))}
-
-.counter{
-  position:absolute;
-  top:10px;
-  right:14px;
-  background:rgba(255,255,255,.2);
-  padding:4px 8px;
-  border-radius:12px;
-  font-size:12px;
-}
-
-.counter-red{
-  background:#b71c1c;
-}
-</style>
-</head>
-
-<body>
-
-<!-- LOGIN -->
-<div class="login" id="login">
-  <div class="logo">MONOLITO GPT PRO</div>
-  <div class="sub">Introduce tu PIN</div>
-  <div class="pin" id="pin"></div>
-
-  <div class="keypad">
-    <div class="key" onclick="num(1)">1</div>
-    <div class="key" onclick="num(2)">2</div>
-    <div class="key" onclick="num(3)">3</div>
-    <div class="key" onclick="num(4)">4</div>
-    <div class="key" onclick="num(5)">5</div>
-    <div class="key" onclick="num(6)">6</div>
-    <div class="key" onclick="num(7)">7</div>
-    <div class="key" onclick="num(8)">8</div>
-    <div class="key" onclick="num(9)">9</div>
-    <div class="key" onclick="borrar()">←</div>
-    <div class="key" onclick="num(0)">0</div>
-    <div class="key" onclick="borrarTodo()">C</div>
-  </div>
-</div>
-
-<!-- APP -->
-<div class="app" id="app">
-
-  <div class="topbar">
-    <div class="brand">MONOLITO</div>
-    <div class="datetime" id="reloj"></div>
-  </div>
-
-  <div class="status" id="estado">
-    Sin incidencias · Sin comunicaciones
-  </div>
-
-  <div class="panel">
-    <div class="grid">
-
-      <div class="btn btn-blue" onclick="abrir('proveedores')">
-        <div class="counter">1</div>
-        <div class="btn-icon">🚚</div>
-        PROVEEDORES
-      </div>
-
-      <div class="btn btn-blue" onclick="abrir('articulos')">
-        <div class="btn-icon">📦</div>
-        ARTÍCULOS
-      </div>
-
-      <div class="btn btn-blue" onclick="abrir('comparador')">
-        <div class="btn-icon">📊</div>
-        COMPARADOR
-      </div>
-
-      <div class="btn btn-blue" onclick="abrir('pedidos')">
-        <div class="counter">2</div>
-        <div class="btn-icon">📝</div>
-        PEDIDOS
-      </div>
-
-      <div class="btn btn-blue" onclick="abrir('pagos')">
-        <div class="btn-icon">💳</div>
-        PAGOS
-      </div>
-
-      <div class="btn btn-orange" onclick="abrir('revision')">
-        <div class="counter counter-red">1</div>
-        <div class="btn-icon">🔎</div>
-        REVISIÓN
-      </div>
-
-      <div class="btn btn-green" onclick="abrir('historico')">
-        <div class="btn-icon">📁</div>
-        HISTÓRICO
-      </div>
-
-      <div class="btn btn-blue" onclick="abrir('ventas')">
-        <div class="btn-icon">💰</div>
-        VENTAS
-      </div>
-
-      <div class="btn btn-blue" onclick="abrir('calendario')">
-        <div class="btn-icon">📅</div>
-        CALENDARIO
-      </div>
-
-      <div class="btn btn-orange" onclick="abrir('comunicacion')">
-        <div class="counter">3</div>
-        <div class="btn-icon">✉️</div>
-        COMUNICACIÓN
-      </div>
-
-      <div class="btn btn-orange" onclick="abrir('ayuda')">
-        <div class="btn-icon">🤖</div>
-        AYUDA
-      </div>
-
-      <div class="btn btn-blue" onclick="abrir('config')">
-        <div class="btn-icon">⚙️</div>
-        CONFIGURACIÓN
-      </div>
-
-    </div>
-  </div>
-
-</div>
-
-<script>
-
-const base = {
-  "1111":"DARIO",
-  "2222":"TOÑO",
-  "3333":"ANDREINA",
-  "0985":"JAVI",
-  "4544":"SILVIA",
-  "4444":"FELI"
-};
-
-let actual = "";
-
-function num(n){
-  if(navigator.vibrate) navigator.vibrate(30);
-  actual += n;
-
-  document.getElementById("pin").innerHTML = "• ".repeat(actual.length);
-
-  if(actual.length === 4){
-    if(base[actual]){
-      document.getElementById("login").style.display="none";
-      document.getElementById("app").style.display="block";
-    }else{
-      actual="";
-      document.getElementById("pin").innerHTML="";
-      alert("PIN incorrecto");
-    }
-  }
-}
-
-function borrar(){
-  actual = actual.slice(0,-1);
-  document.getElementById("pin").innerHTML = "• ".repeat(actual.length);
-}
-
-function borrarTodo(){
-  actual="";
-  document.getElementById("pin").innerHTML="";
-}
-
-function abrir(sec){
-  if(navigator.vibrate) navigator.vibrate(40);
-  alert("Abrir módulo: "+sec);
-}
-
-function reloj(){
-  const d = new Date();
-  document.getElementById("reloj").innerHTML =
-    d.toLocaleDateString()+" · "+d.toLocaleTimeString().slice(0,5);
-}
-
-setInterval(reloj,1000);
-reloj();
-
-</script>
-
-</body>
-</html>
+  box-shadow:
