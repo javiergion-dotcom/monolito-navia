@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Monolito</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#0f1a21;
+color:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.logo{
+font-size:32px;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+.pin{
+font-size:28px;
+letter-spacing:10px;
+margin-bottom:20px;
+}
+
+.teclado{
+display:grid;
+grid-template-columns:repeat(3,80px);
+gap:15px;
+}
+
+.tecla{
+background:#2a3f4a;
+height:80px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:22px;
+border-radius:15px;
+cursor:pointer;
+}
+
+.tecla:active{
+background:#1b2c35;
+}
+</style>
+</head>
+
+<body>
+
+<div class="logo">MONOLITO</div>
+<div class="pin" id="pin"></div>
+
+<div class="teclado">
+<div class="tecla" onclick="num(1)">1</div>
+<div class="tecla" onclick="num(2)">2</div>
+<div class="tecla" onclick="num(3)">3</div>
+<div class="tecla" onclick="num(4)">4</div>
+<div class="tecla" onclick="num(5)">5</div>
+<div class="tecla" onclick="num(6)">6</div>
+<div class="tecla" onclick="num(7)">7</div>
+<div class="tecla" onclick="num(8)">8</div>
+<div class="tecla" onclick="num(9)">9</div>
+<div class="tecla" onclick="borrar()">←</div>
+<div class="tecla" onclick="num(0)">0</div>
+<div class="tecla" onclick="reset()">C</div>
+</div>
+
+<script>
+let codigo="";
+
+const usuarios={
+"0985":"JAVI",
+"1111":"DARIO",
+"2222":"TOÑO"
+};
+
+function num(n){
+codigo+=n;
+document.getElementById("pin").innerHTML="• ".repeat(codigo.length);
+
+if(codigo.length===4){
+if(usuarios[codigo]){
+localStorage.setItem("usuario",usuarios[codigo]);
+window.location.href="index.html";
+}else{
+codigo="";
+document.getElementById("pin").innerHTML="";
+alert("Código incorrecto");
+}
+}
+}
+
+function borrar(){
+codigo=codigo.slice(0,-1);
+document.getElementById("pin").innerHTML="• ".repeat(codigo.length);
+}
+
+function reset(){
+codigo="";
+document.getElementById("pin").innerHTML="";
+}
+</script>
+
+</body>
+</html>
