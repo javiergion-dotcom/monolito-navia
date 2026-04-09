@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Monolito4</title>
+<title>Login Monolito</title>
 
 <style>
 body{
@@ -55,9 +55,8 @@ background:#1b2c35;
 
 <body>
 
-<div class="logo">MONOLITO</div>
+<div class="logo">LOGIN OK</div>
 <div class="pin" id="pin"></div>
-<div id="debug" style="margin-top:10px;font-size:18px;color:#9fb3bf;">0 cifras</div>
 
 <div class="teclado">
 <div class="tecla" onclick="num(1)">1</div>
@@ -75,38 +74,39 @@ background:#1b2c35;
 </div>
 
 <script>
-let codigo="";
+let codigo = "";
 
-const usuarios={
+const usuarios = {
 "0985":"JAVI",
 "1111":"DARIO",
-"2222":"TOÑO"
+"2222":"TOÑO",
+"4544":"SILVIA"
 };
 
 function num(n){
-codigo+=n;
-document.getElementById("pin").innerHTML="• ".repeat(codigo.length);
+codigo += n;
+document.getElementById("pin").innerHTML = "• ".repeat(codigo.length);
 
-if(codigo.length===4){
+if(codigo.length === 4){
 if(usuarios[codigo]){
-localStorage.setItem("usuario",usuarios[codigo]);
-window.location.href="index.html";
+localStorage.setItem("usuario", usuarios[codigo]);
+window.location.href = "index.html";
 }else{
-codigo="";
-document.getElementById("pin").innerHTML="";
+codigo = "";
+document.getElementById("pin").innerHTML = "";
 alert("Código incorrecto");
 }
 }
 }
 
 function borrar(){
-codigo=codigo.slice(0,-1);
-document.getElementById("pin").innerHTML="• ".repeat(codigo.length);
+codigo = codigo.slice(0,-1);
+document.getElementById("pin").innerHTML = "• ".repeat(codigo.length);
 }
 
 function reset(){
-codigo="";
-document.getElementById("pin").innerHTML="";
+codigo = "";
+document.getElementById("pin").innerHTML = "";
 }
 </script>
 
