@@ -209,3 +209,18 @@ refrescar();
 
 </body>
 </html>
+document.addEventListener("keydown", function(e){
+
+  if(e.key >= '0' && e.key <= '9'){
+    num(e.key);
+  }
+
+  if(e.key === "Backspace"){
+    borrar();
+  }
+
+  if(e.key === "Escape"){
+    reset();
+  }
+
+});
