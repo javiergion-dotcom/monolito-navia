@@ -142,3 +142,73 @@ function volver() {
 
 </body>
 </html>
+<div id="modJavi" class="screen">
+    <h2>Módulo JAVI</h2>
+
+    <p style="opacity:0.7">Acciones internas del módulo</p>
+
+    <div style="display:flex; gap:20px; margin-top:20px;">
+
+        <!-- CONTADOR -->
+        <div style="flex:1; background:#222; padding:20px; border-radius:12px; border:2px solid #555;">
+            <h3>Contador</h3>
+            <div id="contadorJavi" style="font-size:40px; margin:20px 0;">0</div>
+
+            <div class="btn" onclick="sumarJavi()">SUMAR</div>
+            <div class="btn" onclick="restarJavi()">RESTAR</div>
+            <div class="btn" onclick="resetJavi()">REINICIAR</div>
+        </div>
+
+        <!-- ACCIÓN DE PRUEBA -->
+        <div style="flex:1; background:#222; padding:20px; border-radius:12px; border:2px solid #555;">
+            <h3>Acción de prueba</h3>
+            <p id="estadoJavi" style="font-size:20px; margin:20px 0; opacity:0.8;">
+                Sin acciones todavía
+            </p>
+
+            <div class="btn" onclick="accionJavi()">EJECUTAR ACCIÓN</div>
+        </div>
+
+    </div>
+
+    <div class="back-btn" onclick="volver()">VOLVER</div>
+</div>
+
+<script>
+let contadorJavi = 0;
+
+function actualizarContadorJavi() {
+    document.getElementById("contadorJavi").innerText = contadorJavi;
+}
+
+function sumarJavi() {
+    vibrar();
+    contadorJavi++;
+    actualizarContadorJavi();
+}
+
+function restarJavi() {
+    vibrar();
+    contadorJavi--;
+    actualizarContadorJavi();
+}
+
+function resetJavi() {
+    vibrar();
+    contadorJavi = 0;
+    actualizarContadorJavi();
+}
+
+function accionJavi() {
+    vibrar();
+    const estado = document.getElementById("estadoJavi");
+    estado.innerText = "Acción ejecutada correctamente";
+    estado.style.opacity = 1;
+    estado.style.color = "#4CAF50";
+
+    setTimeout(() => {
+        estado.style.opacity = 0.7;
+        estado.style.color = "white";
+    }, 1200);
+}
+</script>
