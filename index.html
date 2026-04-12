@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso Camareros</title>
+
     <style>
         body {
             margin: 0;
@@ -11,11 +12,16 @@
             background-color: #000;
             color: white;
             font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .center {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100%;
             text-align: center;
         }
 
@@ -40,15 +46,84 @@
         .btn:hover {
             background-color: #444;
         }
+
+        .screen {
+            display: none;
+            height: 100%;
+            width: 100%;
+        }
+
+        .title {
+            font-size: 40px;
+            margin-bottom: 40px;
+        }
+
+        .back {
+            margin-top: 40px;
+            background-color: #333;
+            border: 2px solid #555;
+        }
     </style>
+
+    <script>
+        function showScreen(id) {
+            document.getElementById("main").style.display = "none";
+            document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
+            document.getElementById(id).style.display = "flex";
+        }
+
+        function goBack() {
+            document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
+            document.getElementById("main").style.display = "flex";
+        }
+    </script>
 </head>
+
 <body>
 
-    <!-- LOGOTIPO -->
-    <img src="logo.png" alt="Logo del Local">
+    <!-- PANTALLA PRINCIPAL -->
+    <div id="main" class="center">
+        <img src="logo.png" alt="Logo">
 
-    <!-- BOTONES DE CAMAREROS -->
-    <button class="btn" onclick="location.href='javi.html'">JAVI</button>
-    <button class="btn" onclick="location.href='silvia.html'">SILVIA</button>
-    <button class="btn" onclick="location.href='dario.html'">DARIO</button>
-    <button class="btn" onclick="location.href
+        <button class="btn" onclick="showScreen('javi')">JAVI</button>
+        <button class="btn" onclick="showScreen('silvia')">SILVIA</button>
+        <button class="btn" onclick="showScreen('dario')">DARIO</button>
+        <button class="btn" onclick="showScreen('tono')">TOÑO</button>
+        <button class="btn" onclick="showScreen('andreina')">ANDREINA</button>
+        <button class="btn" onclick="showScreen('feli')">FELI</button>
+    </div>
+
+    <!-- PANTALLAS INTERNAS -->
+
+    <div id="javi" class="screen center">
+        <div class="title">JAVI</div>
+        <button class="btn back" onclick="goBack()">VOLVER</button>
+    </div>
+
+    <div id="silvia" class="screen center">
+        <div class="title">SILVIA</div>
+        <button class="btn back" onclick="goBack()">VOLVER</button>
+    </div>
+
+    <div id="dario" class="screen center">
+        <div class="title">DARIO</div>
+        <button class="btn back" onclick="goBack()">VOLVER</button>
+    </div>
+
+    <div id="tono" class="screen center">
+        <div class="title">TOÑO</div>
+        <button class="btn back" onclick="goBack()">VOLVER</button>
+    </div>
+
+    <div id="andreina" class="screen center">
+        <div class="title">ANDREINA</div>
+        <button class="btn back" onclick="goBack()">VOLVER</button>
+    </div>
+
+    <div id="feli" class="screen center">
+        <div class="title">FELI</div>
+        <button class="btn back" onclick="goBack()">VOLVER</button>
+    </div>
+
+</body>
+</html>
