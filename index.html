@@ -41,10 +41,12 @@
             border: 2px solid #444;
             border-radius: 10px;
             cursor: pointer;
+            transition: transform 0.12s ease, background-color 0.12s ease;
         }
 
-        .btn:hover {
-            background-color: #444;
+        .btn:active {
+            transform: scale(0.94);
+            background-color: #555;
         }
 
         .screen {
@@ -66,15 +68,29 @@
     </style>
 
     <script>
-        function showScreen(id) {
+        function vibrar(boton) {
+            if (navigator.vibrate) navigator.vibrate(35);
+            boton.style.transform = "scale(0.94)";
+            setTimeout(() => boton.style.transform = "scale(1)", 120);
+        }
+
+        function showScreen(id, boton) {
+            vibrar(boton);
             document.getElementById("main").style.display = "none";
             document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
             document.getElementById(id).style.display = "flex";
         }
 
-        function goBack() {
+        function goBack(boton) {
+            vibrar(boton);
             document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
             document.getElementById("main").style.display = "flex";
+        }
+
+        function prueba(boton) {
+            vibrar(boton);
+            boton.innerText = "✔ OK";
+            boton.style.backgroundColor = "#0a0";
         }
     </script>
 </head>
@@ -85,44 +101,54 @@
     <div id="main" class="center">
         <img src="logo.png" alt="Logo">
 
-        <button class="btn" onclick="showScreen('javi')">JAVI</button>
-        <button class="btn" onclick="showScreen('silvia')">SILVIA</button>
-        <button class="btn" onclick="showScreen('dario')">DARIO</button>
-        <button class="btn" onclick="showScreen('tono')">TOÑO</button>
-        <button class="btn" onclick="showScreen('andreina')">ANDREINA</button>
-        <button class="btn" onclick="showScreen('feli')">FELI</button>
+        <button class="btn" onclick="showScreen('javi', this)">JAVI</button>
+        <button class="btn" onclick="showScreen('silvia', this)">SILVIA</button>
+        <button class="btn" onclick="showScreen('dario', this)">DARIO</button>
+        <button class="btn" onclick="showScreen('tono', this)">TOÑO</button>
+        <button class="btn" onclick="showScreen('andreina', this)">ANDREINA</button>
+        <button class="btn" onclick="showScreen('feli', this)">FELI</button>
+
+        <!-- ENLACE DE PRUEBA -->
+        <button class="btn" onclick="showScreen('prueba', this)">ENLACE DE PRUEBA</button>
     </div>
 
     <!-- PANTALLAS INTERNAS -->
 
     <div id="javi" class="screen center">
         <div class="title">JAVI</div>
-        <button class="btn back" onclick="goBack()">VOLVER</button>
+        <button class="btn back" onclick="goBack(this)">VOLVER</button>
     </div>
 
     <div id="silvia" class="screen center">
         <div class="title">SILVIA</div>
-        <button class="btn back" onclick="goBack()">VOLVER</button>
+        <button class="btn back" onclick="goBack(this)">VOLVER</button>
     </div>
 
     <div id="dario" class="screen center">
         <div class="title">DARIO</div>
-        <button class="btn back" onclick="goBack()">VOLVER</button>
+        <button class="btn back" onclick="goBack(this)">VOLVER</button>
     </div>
 
     <div id="tono" class="screen center">
         <div class="title">TOÑO</div>
-        <button class="btn back" onclick="goBack()">VOLVER</button>
+        <button class="btn back" onclick="goBack(this)">VOLVER</button>
     </div>
 
     <div id="andreina" class="screen center">
         <div class="title">ANDREINA</div>
-        <button class="btn back" onclick="goBack()">VOLVER</button>
+        <button class="btn back" onclick="goBack(this)">VOLVER</button>
     </div>
 
     <div id="feli" class="screen center">
         <div class="title">FELI</div>
-        <button class="btn back" onclick="goBack()">VOLVER</button>
+        <button class="btn back" onclick="goBack(this)">VOLVER</button>
+    </div>
+
+    <!-- PANTALLA DE PRUEBA -->
+    <div id="prueba" class="screen center">
+        <div class="title">PANTALLA DE PRUEBA</div>
+        <button class="btn" onclick="prueba(this)">PRUEBA</button>
+        <button class="btn back" onclick="goBack(this)">VOLVER</button>
     </div>
 
 </body>
