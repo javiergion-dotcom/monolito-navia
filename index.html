@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Monolito – Panel Principal</title>
+<title>Monolito – Panel Interno</title>
 
 <style>
     body {
@@ -17,25 +17,41 @@
 
     .header {
         text-align: center;
-        padding: 20px;
-        font-size: 26px;
+        padding: 16px 10px;
+        font-size: 22px;
         font-weight: bold;
         background: #222;
         border-bottom: 2px solid #444;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
+    }
+
+    .header-title {
+        flex: 1;
+        text-align: center;
+    }
+
+    .header-right {
+        font-size: 12px;
+        opacity: 0.7;
+        padding-right: 6px;
     }
 
     .container {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 20px;
-        padding: 25px;
+        padding: 20px;
+        box-sizing: border-box;
     }
 
     .btn {
         background: #333;
-        padding: 25px;
+        padding: 22px;
         text-align: center;
-        font-size: 22px;
+        font-size: 20px;
         border-radius: 12px;
         border: 2px solid #555;
         transition: transform 0.08s, background 0.08s;
@@ -48,7 +64,22 @@
 
     .screen {
         display: none;
-        padding: 25px;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .block {
+        background:#222;
+        padding:18px;
+        border-radius:12px;
+        border:2px solid #555;
+        margin-bottom:18px;
+    }
+
+    .block h3 {
+        margin-top:0;
+        margin-bottom:10px;
+        font-size:18px;
     }
 
     .back-btn {
@@ -65,9 +96,53 @@
         transform: scale(0.92);
         background: #666;
     }
+
+    input, textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid #555;
+        background:#111;
+        color:white;
+        font-size:14px;
+    }
+
+    textarea {
+        min-height:80px;
+        resize: vertical;
+    }
+
+    .small-btn {
+        display:inline-block;
+        margin-top:8px;
+        padding:8px 12px;
+        background:#333;
+        border-radius:8px;
+        border:1px solid #555;
+        font-size:14px;
+        text-align:center;
+    }
+
+    .small-btn:active {
+        transform: scale(0.94);
+        background:#555;
+    }
+
+    ul {
+        padding-left:18px;
+        margin:8px 0 0 0;
+        font-size:14px;
+    }
+
+    li {
+        margin-bottom:4px;
+    }
 </style>
 
 <script>
+let soportaStorage = false;
+
 function vibrar() {
     if (navigator.vibrate) navigator.vibrate(50);
 }
@@ -75,15 +150,307 @@ function vibrar() {
 function abrir(modulo) {
     vibrar();
     document.getElementById("principal").style.display = "none";
+    document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
     document.getElementById(modulo).style.display = "block";
 }
 
 function volver() {
     vibrar();
-    let screens = document.querySelectorAll(".screen");
-    screens.forEach(s => s.style.display = "none");
+    document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
     document.getElementById("principal").style.display = "block";
 }
+
+function actualizarHora() {
+    const el = document.getElementById("horaActual");
+    if (!el) return;
+    const ahora = new Date();
+    const h = String(ahora.getHours()).padStart(2,"0");
+    const m = String(ahora.getMinutes()).padStart(2,"0");
+    const s = String(ahora.getSeconds()).padStart(2,"0");
+    el.textContent = h + ":" + m + ":" + s;
+}
+
+function initStorage() {
+    try {
+        const testKey = "__monolito_test__";
+        localStorage.setItem(testKey, "1");
+        localStorage.removeItem(testKey);
+        soportaStorage = true;
+    } catch(e) {
+        soportaStorage = false;
+    }
+    const el = document.getElementById("estadoLocal");
+    if (el) el.textContent = soportaStorage ? "LOCAL OK" : "SIN STORAGE";
+}
+
+/* ---------- JAVI ---------- */
+let contadorJavi = 0;
+
+function cargarJavi() {
+    if (soportaStorage) {
+        const v = localStorage.getItem("javi_contador");
+        if (v !== null) contadorJavi = parseInt(v,10) || 0;
+    }
+    actualizarContadorJavi();
+}
+
+function guardarJavi() {
+    if (soportaStorage) {
+        localStorage.setItem("javi_contador", String(contadorJavi));
+    }
+}
+
+function actualizarContadorJavi() {
+    const el = document.getElementById("contadorJavi");
+    if (el) el.innerText = contadorJavi;
+}
+
+function sumarJavi() {
+    vibrar();
+    contadorJavi++;
+    actualizarContadorJavi();
+    guardarJavi();
+}
+
+function restarJavi() {
+    vibrar();
+    contadorJavi--;
+    actualizarContadorJavi();
+    guardarJavi();
+}
+
+function resetJavi() {
+    vibrar();
+    contadorJavi = 0;
+    actualizarContadorJavi();
+    guardarJavi();
+}
+
+function accionJavi() {
+    vibrar();
+    const estado = document.getElementById("estadoJavi");
+    if (!estado) return;
+    estado.innerText = "Acción ejecutada correctamente";
+    estado.style.opacity = 1;
+    estado.style.color = "#4CAF50";
+    setTimeout(() => {
+        estado.style.opacity = 0.7;
+        estado.style.color = "white";
+    }, 1200);
+}
+
+/* ---------- SILVIA ---------- */
+let silviaOn = false;
+
+function cargarSilvia() {
+    if (soportaStorage) {
+        const v = localStorage.getItem("silvia_on");
+        if (v !== null) silviaOn = v === "1";
+    }
+    actualizarSilvia();
+}
+
+function guardarSilvia() {
+    if (soportaStorage) {
+        localStorage.setItem("silvia_on", silviaOn ? "1" : "0");
+    }
+}
+
+function actualizarSilvia() {
+    const el = document.getElementById("estadoSilvia");
+    if (el) el.innerText = silviaOn ? "ON" : "OFF";
+}
+
+function toggleSilvia() {
+    vibrar();
+    silviaOn = !silviaOn;
+    actualizarSilvia();
+    guardarSilvia();
+}
+
+function mensajeSilviaAccion() {
+    vibrar();
+    const msg = document.getElementById("mensajeSilvia");
+    if (!msg) return;
+    msg.innerText = "Mensaje enviado correctamente";
+    msg.style.opacity = 1;
+    msg.style.color = "#4CAF50";
+    setTimeout(() => {
+        msg.style.opacity = 0.7;
+        msg.style.color = "white";
+    }, 1200);
+}
+
+/* ---------- DARÍO (lista simple) ---------- */
+let darioLista = [];
+
+function cargarDario() {
+    if (soportaStorage) {
+        const v = localStorage.getItem("dario_lista");
+        if (v) {
+            try { darioLista = JSON.parse(v) || []; } catch(e) { darioLista = []; }
+        }
+    }
+    pintarDario();
+}
+
+function guardarDario() {
+    if (soportaStorage) {
+        localStorage.setItem("dario_lista", JSON.stringify(darioLista));
+    }
+}
+
+function pintarDario() {
+    const ul = document.getElementById("darioLista");
+    if (!ul) return;
+    ul.innerHTML = "";
+    darioLista.forEach((t, idx) => {
+        const li = document.createElement("li");
+        li.textContent = t;
+        ul.appendChild(li);
+    });
+}
+
+function darioAgregar() {
+    vibrar();
+    const inp = document.getElementById("darioInput");
+    if (!inp) return;
+    const txt = inp.value.trim();
+    if (!txt) return;
+    darioLista.push(txt);
+    inp.value = "";
+    guardarDario();
+    pintarDario();
+}
+
+/* ---------- TOÑO (caja simple) ---------- */
+let tonoCaja = 0;
+
+function cargarTono() {
+    if (soportaStorage) {
+        const v = localStorage.getItem("tono_caja");
+        if (v !== null) tonoCaja = parseFloat(v) || 0;
+    }
+    actualizarTono();
+}
+
+function guardarTono() {
+    if (soportaStorage) {
+        localStorage.setItem("tono_caja", String(tonoCaja));
+    }
+}
+
+function actualizarTono() {
+    const el = document.getElementById("tonoTotal");
+    if (el) el.textContent = tonoCaja.toFixed(2) + " €";
+}
+
+function tonoSumar() {
+    vibrar();
+    const inp = document.getElementById("tonoInput");
+    if (!inp) return;
+    const v = parseFloat(inp.value.replace(",","."));
+    if (isNaN(v)) return;
+    tonoCaja += v;
+    inp.value = "";
+    actualizarTono();
+    guardarTono();
+}
+
+function tonoReset() {
+    vibrar();
+    tonoCaja = 0;
+    actualizarTono();
+    guardarTono();
+}
+
+/* ---------- ANDREINA (nota) ---------- */
+let andreinaNota = "";
+
+function cargarAndreina() {
+    if (soportaStorage) {
+        const v = localStorage.getItem("andreina_nota");
+        if (v !== null) andreinaNota = v;
+    }
+    const ta = document.getElementById("andreinaNota");
+    if (ta) ta.value = andreinaNota;
+}
+
+function guardarAndreina() {
+    vibrar();
+    const ta = document.getElementById("andreinaNota");
+    if (!ta) return;
+    andreinaNota = ta.value;
+    if (soportaStorage) {
+        localStorage.setItem("andreina_nota", andreinaNota);
+    }
+    const msg = document.getElementById("andreinaEstado");
+    if (!msg) return;
+    msg.textContent = "Guardado";
+    msg.style.opacity = 1;
+    msg.style.color = "#4CAF50";
+    setTimeout(() => {
+        msg.style.opacity = 0.7;
+        msg.style.color = "white";
+    }, 1200);
+}
+
+/* ---------- FELI (marcador simple) ---------- */
+let feliValor = 0;
+
+function cargarFeli() {
+    if (soportaStorage) {
+        const v = localStorage.getItem("feli_valor");
+        if (v !== null) feliValor = parseInt(v,10) || 0;
+    }
+    actualizarFeli();
+}
+
+function guardarFeli() {
+    if (soportaStorage) {
+        localStorage.setItem("feli_valor", String(feliValor));
+    }
+}
+
+function actualizarFeli() {
+    const el = document.getElementById("feliValor");
+    if (el) el.textContent = feliValor;
+}
+
+function feliMas() {
+    vibrar();
+    feliValor++;
+    actualizarFeli();
+    guardarFeli();
+}
+
+function feliMenos() {
+    vibrar();
+    feliValor--;
+    actualizarFeli();
+    guardarFeli();
+}
+
+function feliReset() {
+    vibrar();
+    feliValor = 0;
+    actualizarFeli();
+    guardarFeli();
+}
+
+/* ---------- INIT GENERAL ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+    initStorage();
+    actualizarHora();
+    setInterval(actualizarHora, 1000);
+
+    cargarJavi();
+    cargarSilvia();
+    cargarDario();
+    cargarTono();
+    cargarAndreina();
+    cargarFeli();
+});
 </script>
 
 </head>
@@ -91,7 +458,14 @@ function volver() {
 
 <!-- PANTALLA PRINCIPAL -->
 <div id="principal">
-    <div class="header">MONOLITO – PANEL PRINCIPAL</div>
+    <div class="header">
+        <div style="font-size:12px; opacity:0.7; padding-left:6px;">MONOLITO</div>
+        <div class="header-title">PANEL INTERNO</div>
+        <div class="header-right">
+            <div id="horaActual">--:--:--</div>
+            <div id="estadoLocal">...</div>
+        </div>
+    </div>
 
     <div class="container">
         <div class="btn" onclick="abrir('modJavi')">JAVI</div>
@@ -103,107 +477,119 @@ function volver() {
     </div>
 </div>
 
-<!-- MÓDULO JAVI COMPLETO -->
+<!-- MÓDULO JAVI -->
 <div id="modJavi" class="screen">
     <h2>Módulo JAVI</h2>
-
     <p style="opacity:0.7">Acciones internas del módulo</p>
 
-    <div style="display:flex; gap:20px; margin-top:20px;">
+    <div class="block">
+        <h3>Contador</h3>
+        <div id="contadorJavi" style="font-size:40px; margin:10px 0;">0</div>
+        <div class="btn" onclick="sumarJavi()">SUMAR</div>
+        <div style="height:8px;"></div>
+        <div class="btn" onclick="restarJavi()">RESTAR</div>
+        <div style="height:8px;"></div>
+        <div class="btn" onclick="resetJavi()">REINICIAR</div>
+        <p style="margin-top:10px; font-size:12px; opacity:0.6;">Se guarda localmente.</p>
+    </div>
 
-        <!-- CONTADOR -->
-        <div style="flex:1; background:#222; padding:20px; border-radius:12px; border:2px solid #555;">
-            <h3>Contador</h3>
-            <div id="contadorJavi" style="font-size:40px; margin:20px 0;">0</div>
-
-            <div class="btn" onclick="sumarJavi()">SUMAR</div>
-            <div class="btn" onclick="restarJavi()">RESTAR</div>
-            <div class="btn" onclick="resetJavi()">REINICIAR</div>
-        </div>
-
-        <!-- ACCIÓN DE PRUEBA -->
-        <div style="flex:1; background:#222; padding:20px; border-radius:12px; border:2px solid #555;">
-            <h3>Acción de prueba</h3>
-            <p id="estadoJavi" style="font-size:20px; margin:20px 0; opacity:0.8;">
-                Sin acciones todavía
-            </p>
-
-            <div class="btn" onclick="accionJavi()">EJECUTAR ACCIÓN</div>
-        </div>
-
+    <div class="block">
+        <h3>Acción de prueba</h3>
+        <p id="estadoJavi" style="font-size:18px; margin:10px 0; opacity:0.8;">
+            Sin acciones todavía
+        </p>
+        <div class="btn" onclick="accionJavi()">EJECUTAR ACCIÓN</div>
     </div>
 
     <div class="back-btn" onclick="volver()">VOLVER</div>
 </div>
 
-<script>
-let contadorJavi = 0;
-
-function actualizarContadorJavi() {
-    document.getElementById("contadorJavi").innerText = contadorJavi;
-}
-
-function sumarJavi() {
-    vibrar();
-    contadorJavi++;
-    actualizarContadorJavi();
-}
-
-function restarJavi() {
-    vibrar();
-    contadorJavi--;
-    actualizarContadorJavi();
-}
-
-function resetJavi() {
-    vibrar();
-    contadorJavi = 0;
-    actualizarContadorJavi();
-}
-
-function accionJavi() {
-    vibrar();
-    const estado = document.getElementById("estadoJavi");
-    estado.innerText = "Acción ejecutada correctamente";
-    estado.style.opacity = 1;
-    estado.style.color = "#4CAF50";
-
-    setTimeout(() => {
-        estado.style.opacity = 0.7;
-        estado.style.color = "white";
-    }, 1200);
-}
-</script>
-
-<!-- MÓDULOS VACÍOS (se llenarán después) -->
-
+<!-- MÓDULO SILVIA -->
 <div id="modSilvia" class="screen">
     <h2>Módulo SILVIA</h2>
-    <p>Pantalla lista para contenido.</p>
+    <p style="opacity:0.7">Acciones internas del módulo</p>
+
+    <div class="block">
+        <h3>Interruptor</h3>
+        <div id="estadoSilvia" style="font-size:32px; margin:10px 0;">OFF</div>
+        <div class="btn" onclick="toggleSilvia()">CAMBIAR</div>
+        <p style="margin-top:10px; font-size:12px; opacity:0.6;">Estado guardado localmente.</p>
+    </div>
+
+    <div class="block">
+        <h3>Mensaje</h3>
+        <p id="mensajeSilvia" style="font-size:18px; margin:10px 0; opacity:0.8;">
+            Sin mensaje
+        </p>
+        <div class="btn" onclick="mensajeSilviaAccion()">ENVIAR MENSAJE</div>
+    </div>
+
     <div class="back-btn" onclick="volver()">VOLVER</div>
 </div>
 
+<!-- MÓDULO DARÍO -->
 <div id="modDario" class="screen">
     <h2>Módulo DARÍO</h2>
-    <p>Pantalla lista para contenido.</p>
+    <p style="opacity:0.7">Lista simple (se guarda localmente)</p>
+
+    <div class="block">
+        <h3>Lista</h3>
+        <input id="darioInput" type="text" placeholder="Escribe y pulsa AÑADIR" />
+        <div class="small-btn" onclick="darioAgregar()">AÑADIR</div>
+        <ul id="darioLista"></ul>
+    </div>
+
     <div class="back-btn" onclick="volver()">VOLVER</div>
 </div>
 
+<!-- MÓDULO TOÑO -->
 <div id="modTono" class="screen">
     <h2>Módulo TOÑO</h2>
-    <p>Pantalla lista para contenido.</p>
+    <p style="opacity:0.7">Caja simple acumulada</p>
+
+    <div class="block">
+        <h3>Caja</h3>
+        <div id="tonoTotal" style="font-size:32px; margin:10px 0;">0.00 €</div>
+        <input id="tonoInput" type="text" placeholder="Importe (ej: 3.50)" />
+        <div class="small-btn" onclick="tonoSumar()">SUMAR A CAJA</div>
+        <div class="small-btn" onclick="tonoReset()" style="margin-left:8px;">REINICIAR</div>
+        <p style="margin-top:10px; font-size:12px; opacity:0.6;">Se guarda localmente.</p>
+    </div>
+
     <div class="back-btn" onclick="volver()">VOLVER</div>
 </div>
 
+<!-- MÓDULO ANDREINA -->
 <div id="modAndreina" class="screen">
     <h2>Módulo ANDREINA</h2>
-    <p>Pantalla lista para contenido.</p>
+    <p style="opacity:0.7">Nota rápida guardada localmente</p>
+
+    <div class="block">
+        <h3>Nota</h3>
+        <textarea id="andreinaNota" placeholder="Escribe aquí..."></textarea>
+        <div class="small-btn" onclick="guardarAndreina()">GUARDAR</div>
+        <p id="andreinaEstado" style="margin-top:8px; font-size:12px; opacity:0.7;">Sin guardar</p>
+    </div>
+
     <div class="back-btn" onclick="volver()">VOLVER</div>
 </div>
 
+<!-- MÓDULO FELI -->
 <div id="modFeli" class="screen">
     <h2>Módulo FELI</h2>
-    <p>Pantalla lista para contenido.</p>
+    <p style="opacity:0.7">Marcador simple</p>
+
+    <div class="block">
+        <h3>Marcador</h3>
+        <div id="feliValor" style="font-size:40px; margin:10px 0;">0</div>
+        <div class="btn" onclick="feliMas()">+1</div>
+        <div style="height:8px;"></div>
+        <div class="btn" onclick="feliMenos()">-1</div>
+        <div style="height:8px;"></div>
+        <div class="btn" onclick="feliReset()">REINICIAR</div>
+        <p style="margin-top:10px; font-size:12px; opacity:0.6;">Se guarda localmente.</p>
+    </div>
+
     <div class="back-btn" onclick="volver()">VOLVER</div>
 </div>
 
