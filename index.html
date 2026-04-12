@@ -1,155 +1,144 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Camareros</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Monolito – Panel Principal</title>
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            color: white;
-            font-family: Arial, sans-serif;
-            height: 100vh;
-            overflow: hidden;
-        }
+<style>
+    body {
+        margin: 0;
+        background: #111;
+        font-family: Arial, sans-serif;
+        color: white;
+        user-select: none;
+        overflow: hidden;
+    }
 
-        .center {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            text-align: center;
-        }
+    .header {
+        text-align: center;
+        padding: 20px;
+        font-size: 26px;
+        font-weight: bold;
+        background: #222;
+        border-bottom: 2px solid #444;
+    }
 
-        img {
-            width: 180px;
-            margin-bottom: 40px;
-        }
+    .container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding: 25px;
+    }
 
-        .btn {
-            width: 260px;
-            padding: 18px;
-            margin: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            background-color: #222;
-            color: white;
-            border: 2px solid #444;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.12s ease, background-color 0.12s ease;
-        }
+    .btn {
+        background: #333;
+        padding: 25px;
+        text-align: center;
+        font-size: 22px;
+        border-radius: 12px;
+        border: 2px solid #555;
+        transition: transform 0.08s, background 0.08s;
+    }
 
-        .btn:active {
-            transform: scale(0.94);
-            background-color: #555;
-        }
+    .btn:active {
+        transform: scale(0.92);
+        background: #555;
+    }
 
-        .screen {
-            display: none;
-            height: 100%;
-            width: 100%;
-        }
+    .screen {
+        display: none;
+        padding: 25px;
+    }
 
-        .title {
-            font-size: 40px;
-            margin-bottom: 40px;
-        }
+    .back-btn {
+        margin-top: 20px;
+        padding: 15px;
+        background: #444;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 20px;
+        border: 2px solid #666;
+    }
 
-        .back {
-            margin-top: 40px;
-            background-color: #333;
-            border: 2px solid #555;
-        }
-    </style>
+    .back-btn:active {
+        transform: scale(0.92);
+        background: #666;
+    }
+</style>
 
-    <script>
-        function vibrar(boton) {
-            if (navigator.vibrate) navigator.vibrate(35);
-            boton.style.transform = "scale(0.94)";
-            setTimeout(() => boton.style.transform = "scale(1)", 120);
-        }
+<script>
+function vibrar() {
+    if (navigator.vibrate) navigator.vibrate(50);
+}
 
-        function showScreen(id, boton) {
-            vibrar(boton);
-            document.getElementById("main").style.display = "none";
-            document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
-            document.getElementById(id).style.display = "flex";
-        }
+function abrir(modulo) {
+    vibrar();
+    document.getElementById("principal").style.display = "none";
+    document.getElementById(modulo).style.display = "block";
+}
 
-        function goBack(boton) {
-            vibrar(boton);
-            document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
-            document.getElementById("main").style.display = "flex";
-        }
+function volver() {
+    vibrar();
+    let screens = document.querySelectorAll(".screen");
+    screens.forEach(s => s.style.display = "none");
+    document.getElementById("principal").style.display = "block";
+}
+</script>
 
-        function prueba(boton) {
-            vibrar(boton);
-            boton.innerText = "✔ OK";
-            boton.style.backgroundColor = "#0a0";
-        }
-    </script>
 </head>
-
 <body>
 
-    <!-- PANTALLA PRINCIPAL -->
-    <div id="main" class="center">
-        <img src="logo.png" alt="Logo">
+<div id="principal">
+    <div class="header">MONOLITO – PANEL PRINCIPAL</div>
 
-        <button class="btn" onclick="showScreen('javi', this)">JAVI</button>
-        <button class="btn" onclick="showScreen('silvia', this)">SILVIA</button>
-        <button class="btn" onclick="showScreen('dario', this)">DARIO</button>
-        <button class="btn" onclick="showScreen('tono', this)">TOÑO</button>
-        <button class="btn" onclick="showScreen('andreina', this)">ANDREINA</button>
-        <button class="btn" onclick="showScreen('feli', this)">FELI</button>
-
-        <!-- ENLACE DE PRUEBA -->
-        <button class="btn" onclick="showScreen('prueba', this)">ENLACE DE PRUEBA</button>
+    <div class="container">
+        <div class="btn" onclick="abrir('modJavi')">JAVI</div>
+        <div class="btn" onclick="abrir('modSilvia')">SILVIA</div>
+        <div class="btn" onclick="abrir('modDario')">DARÍO</div>
+        <div class="btn" onclick="abrir('modTono')">TOÑO</div>
+        <div class="btn" onclick="abrir('modAndreina')">ANDREINA</div>
+        <div class="btn" onclick="abrir('modFeli')">FELI</div>
     </div>
+</div>
 
-    <!-- PANTALLAS INTERNAS -->
+<!-- MÓDULOS VACÍOS (se llenarán uno a uno) -->
 
-    <div id="javi" class="screen center">
-        <div class="title">JAVI</div>
-        <button class="btn back" onclick="goBack(this)">VOLVER</button>
-    </div>
+<div id="modJavi" class="screen">
+    <h2>Módulo JAVI</h2>
+    <p>Pantalla lista para contenido.</p>
+    <div class="back-btn" onclick="volver()">VOLVER</div>
+</div>
 
-    <div id="silvia" class="screen center">
-        <div class="title">SILVIA</div>
-        <button class="btn back" onclick="goBack(this)">VOLVER</button>
-    </div>
+<div id="modSilvia" class="screen">
+    <h2>Módulo SILVIA</h2>
+    <p>Pantalla lista para contenido.</p>
+    <div class="back-btn" onclick="volver()">VOLVER</div>
+</div>
 
-    <div id="dario" class="screen center">
-        <div class="title">DARIO</div>
-        <button class="btn back" onclick="goBack(this)">VOLVER</button>
-    </div>
+<div id="modDario" class="screen">
+    <h2>Módulo DARÍO</h2>
+    <p>Pantalla lista para contenido.</p>
+    <div class="back-btn" onclick="volver()">VOLVER</div>
+</div>
 
-    <div id="tono" class="screen center">
-        <div class="title">TOÑO</div>
-        <button class="btn back" onclick="goBack(this)">VOLVER</button>
-    </div>
+<div id="modTono" class="screen">
+    <h2>Módulo TOÑO</h2>
+    <p>Pantalla lista para contenido.</p>
+    <div class="back-btn" onclick="volver()">VOLVER</div>
+</div>
 
-    <div id="andreina" class="screen center">
-        <div class="title">ANDREINA</div>
-        <button class="btn back" onclick="goBack(this)">VOLVER</button>
-    </div>
+<div id="modAndreina" class="screen">
+    <h2>Módulo ANDREINA</h2>
+    <p>Pantalla lista para contenido.</p>
+    <div class="back-btn" onclick="volver()">VOLVER</div>
+</div>
 
-    <div id="feli" class="screen center">
-        <div class="title">FELI</div>
-        <button class="btn back" onclick="goBack(this)">VOLVER</button>
-    </div>
-
-    <!-- PANTALLA DE PRUEBA -->
-    <div id="prueba" class="screen center">
-        <div class="title">PANTALLA DE PRUEBA</div>
-        <button class="btn" onclick="prueba(this)">PRUEBA</button>
-        <button class="btn back" onclick="goBack(this)">VOLVER</button>
-    </div>
+<div id="modFeli" class="screen">
+    <h2>Módulo FELI</h2>
+    <p>Pantalla lista para contenido.</p>
+    <div class="back-btn" onclick="volver()">VOLVER</div>
+</div>
 
 </body>
 </html>
