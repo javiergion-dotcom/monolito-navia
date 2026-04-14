@@ -3,59 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PEDIDOS</title>
+<title>MONOLITO GPT PRO</title>
 
 <style>
+*{
+  box-sizing:border-box;
+}
+
 body{
-margin:0;
-font-family:Arial;
-background:#0f1a21;
-color:white;
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#dfe6ec;
 }
 
-.topbar{
-background:#14232c;
-padding:10px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+/* CABECERA */
+
+header{
+  background:#17303d;
+  color:white;
+  padding:14px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
 }
 
-.boton{
-background:#6f8fa6;
-padding:10px 15px;
-border:none;
-border-radius:10px;
-color:white;
-cursor:pointer;
+.header-left{
+  display:flex;
+  flex-direction:column;
 }
 
-.contenido{
-padding:20px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="topbar">
-<button class="boton" onclick="volver()">← Volver</button>
-<div>PEDIDOS</div>
-<div id="usuario"></div>
-</div>
-
-<div class="contenido">
-<h2>Pantalla de pedidos (en construcción)</h2>
-</div>
-
-<script>
-function volver(){
-window.location.href="index.html";
+.title{
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:.3px;
 }
 
-document.getElementById("usuario").textContent =
-localStorage.getItem("usuario") || "";
-</script>
+.sub{
+  font-size:12px;
+  opacity:.8;
+  margin-top:2px;
+}
 
-</body>
-</html>
+#hora{
+  font-size:16px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* PANEL */
+
+.panel{
+  padding:20px;
+  display:grid;
+  grid-template-columns:
