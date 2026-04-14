@@ -1,114 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Programa Final</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MONOLITO · Sistema Principal</title>
 
 <style>
     body {
         margin: 0;
-        background: #111;
-        color: white;
+        background: #000;
         font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-
-    .pantalla {
-        display: none;
-        flex-direction: column;
-        gap: 20px;
+        color: white;
         text-align: center;
     }
 
-    .visible {
-        display: flex;
+    h1 {
+        margin-top: 40px;
+        font-size: 32px;
+        font-weight: bold;
     }
 
-    button {
-        padding: 15px 25px;
-        font-size: 18px;
-        border: none;
-        border-radius: 8px;
-        background: #333;
+    .boton {
+        width: 260px;
+        padding: 18px;
+        margin: 14px auto;
+        background: #222;
+        border: 2px solid #555;
+        border-radius: 10px;
         color: white;
+        font-size: 20px;
         cursor: pointer;
-        transition: 0.1s;
+        transition: 0.15s;
+        display: block;
     }
 
-    button:active {
-        transform: scale(0.95);
-        background: #555;
+    .boton:active {
+        transform: scale(0.96);
+        background: #444;
+    }
+
+    #pantalla, #modulos {
+        display: none;
+    }
+
+    .visible {
+        display: block;
     }
 </style>
 
 <script>
-    function mostrar(id) {
-        document.querySelectorAll(".pantalla").forEach(p => p.classList.remove("visible"));
-        document.getElementById(id).classList.add("visible");
-    }
+function mostrarPantalla(id) {
+    document.getElementById("inicio").classList.remove("visible");
+    document.getElementById("modulos").classList.remove("visible");
+    document.getElementById(id).classList.add("visible");
+}
 
-    function salir() {
-        alert("Programa cerrado.");
-    }
+function volver() {
+    mostrarPantalla("inicio");
+}
 </script>
-</head>
 
+</head>
 <body>
 
 <!-- PANTALLA INICIAL -->
-<div id="inicio" class="pantalla visible">
-    <h1>Pantalla Inicial</h1>
-    <button onclick="mostrar('principal')">ENTRAR</button>
-    <button onclick="mostrar('ayuda')">AYUDA</button>
-    <button onclick="salir()">SALIR</button>
-</div>
-
-<!-- PANTALLA PRINCIPAL -->
-<div id="principal" class="pantalla">
-    <h1>Pantalla Principal</h1>
-    <button onclick="mostrar('modulos')">MÓDULOS</button>
-    <button onclick="mostrar('config')">CONFIGURACIÓN</button>
-    <button onclick="mostrar('inicio')">VOLVER</button>
+<div id="inicio" class="visible">
+    <h1>PANTALLA INICIAL</h1>
+    <button class="boton" onclick="mostrarPantalla('modulos')">ENTRAR</button>
+    <button class="boton">AYUDA</button>
+    <button class="boton">SALIR</button>
 </div>
 
 <!-- SELECTOR DE MÓDULOS -->
-<div id="modulos" class="pantalla">
+<div id="modulos">
     <h1>Selector de Módulos</h1>
-    <button onclick="mostrar('modulo1')">Módulo 1</button>
-    <button onclick="mostrar('modulo2')">Módulo 2</button>
-    <button onclick="mostrar('principal')">VOLVER</button>
-</div>
-
-<!-- MÓDULO 1 -->
-<div id="modulo1" class="pantalla">
-    <h1>Módulo Interno 1</h1>
-    <p>Contenido del módulo 1.</p>
-    <button onclick="mostrar('modulos')">VOLVER</button>
-</div>
-
-<!-- MÓDULO 2 -->
-<div id="modulo2" class="pantalla">
-    <h1>Módulo Interno 2</h1>
-    <p>Contenido del módulo 2.</p>
-    <button onclick="mostrar('modulos')">VOLVER</button>
-</div>
-
-<!-- AYUDA -->
-<div id="ayuda" class="pantalla">
-    <h1>Ayuda</h1>
-    <p>Texto de ayuda interna.</p>
-    <button onclick="mostrar('inicio')">VOLVER</button>
-</div>
-
-<!-- CONFIGURACIÓN -->
-<div id="config" class="pantalla">
-    <h1>Configuración</h1>
-    <p>Ajustes internos del programa.</p>
-    <button onclick="mostrar('principal')">VOLVER</button>
+    <button class="boton">Módulo 1</button>
+    <button class="boton">Módulo 2</button>
+    <button class="boton" onclick="volver()">VOLVER</button>
 </div>
 
 </body>
