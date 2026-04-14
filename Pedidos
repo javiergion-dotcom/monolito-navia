@@ -2,29 +2,148 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pedidos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEDIDOS</title>
+
 <style>
-body{font-family:Arial;margin:0;background:#f2f2f2;}
-.header{background:#222;color:white;padding:14px;display:flex;justify-content:space-between;align-items:center;}
-.btn{background:#3c7ec4;color:white;padding:10px 16px;border-radius:8px;text-decoration:none;}
-.contenido{padding:20px;}
-.bloque{background:white;padding:15px;margin-bottom:12px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
-.titulo{font-weight:bold;margin-bottom:8px;}
+body{
+margin:0;
+font-family:Arial;
+background:#dfe6ec;
+}
+
+header{
+background:#17303d;
+color:white;
+padding:10px 15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.panel{
+padding:15px;
+}
+
+.fila{
+display:flex;
+gap:10px;
+margin-bottom:10px;
+}
+
+input, select{
+padding:8px;
+border-radius:8px;
+border:none;
+}
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:10px;
+background:#547184;
+color:white;
+cursor:pointer;
+}
+
+.linea{
+display:flex;
+justify-content:space-between;
+background:white;
+padding:10px;
+border-radius:10px;
+margin-bottom:6px;
+}
+
+.total{
+font-size:18px;
+font-weight:bold;
+margin-top:15px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<div>📝 Pedidos</div>
-<a href="index.html" class="btn">← Volver</a>
+<header>
+<button onclick="volver()">←</button>
+<div>PEDIDOS</div>
+<div id="usuario"></div>
+</header>
+
+<div class="panel">
+
+<div class="fila">
+<select id="articulo">
+<option value="CERVEZA|1.2">CERVEZA</option>
+<option value="COCA-COLA|1.0">COCA-COLA</option>
+<option value="AGUA|0.5">AGUA</option>
+</select>
+
+<input type="number" id="cantidad" placeholder="Unidades">
+
+<button onclick="agregar()">Añadir</button>
 </div>
 
-<div class="contenido">
-<div class="bloque"><div class="titulo">Pedido nuevo</div></div>
-<div class="bloque"><div class="titulo">Pedidos pendientes</div></div>
-<div class="bloque"><div class="titulo">Histórico</div></div>
+<div id="lista"></div>
+
+<div class="total">
+TOTAL: <span id="total">0</span> €
 </div>
+
+</div>
+
+<script>
+let pedido = [];
+
+function agregar(){
+let articulo = document.getElementById("articulo").value.split("|");
+let nombre = articulo[0];
+let precio = parseFloat(articulo[1]);
+let cantidad = parseInt(document.getElementById("cantidad").value);
+
+if(!cantidad) return;
+
+pedido.push({
+nombre,
+precio,
+cantidad
+});
+
+render();
+}
+
+function render(){
+let lista = document.getElementById("lista");
+lista.innerHTML = "";
+
+let total = 0;
+
+pedido.forEach(item=>{
+let linea = document.createElement("div");
+linea.className="linea";
+
+let importe = item.precio * item.cantidad;
+total += importe;
+
+linea.innerHTML = `
+${item.nombre} x${item.cantidad}
+<span>${importe.toFixed(2)} €</span>
+`;
+
+lista.appendChild(linea);
+});
+
+document.getElementById("total").innerText = total.toFixed(2);
+}
+
+function volver(){
+window.location.href="index.html";
+}
+
+document.getElementById("usuario").innerText =
+localStorage.getItem("usuario") || "";
+</script>
 
 </body>
 </html>
