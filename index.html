@@ -100,17 +100,23 @@ font-weight:bold;
 
 <div class="container">
 
-
+<button class="boton" onclick="ir('pedidos.html')">PEDIDOS</button>
+<button class="boton" onclick="ir('pagos.html')">PAGOS</button>
+<button class="boton" onclick="ir('incidencias.html')">INCIDENCIAS</button>
+<button class="boton" onclick="ir('comunicaciones.html')">COMUNICACIONES</button>
+<button class="boton" onclick="ir('documentos.html')">DOCUMENTOS</button>
+<button class="boton" onclick="ir('historico.html')">HISTÓRICO</button>
 
 </div>
 
 <script>
 const usuario = localStorage.getItem("usuario") || "SIN USUARIO";
 document.getElementById("usuario").textContent = usuario;
+
+function ir(pagina){
+window.location.href = pagina;
+}
 </script>
 
 </body>
 </html>
-function ir(pagina){
-window.location.href = pagina;
-}
