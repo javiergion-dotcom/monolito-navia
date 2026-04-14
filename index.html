@@ -76,3 +76,165 @@ header{
   font-size:17px;
   font-weight:700;
   cursor:pointer;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.22),
+    0 12px 22px rgba(0,0,0,0.26);
+  transition:transform .10s ease;
+  user-select:none;
+  padding:14px 10px;
+}
+
+.boton:active{
+  transform:translateY(4px);
+  box-shadow:
+    inset 0 4px 8px rgba(0,0,0,0.18),
+    0 6px 12px rgba(0,0,0,0.26);
+}
+
+.azul{
+  background:linear-gradient(180deg,#87a6bd 0%, #547184 100%);
+}
+
+.naranja{
+  background:linear-gradient(180deg,#f6ae1b 0%, #df8b00 100%);
+}
+
+.verde{
+  background:linear-gradient(180deg,#78cc4b 0%, #48a530 100%);
+}
+
+.icono{
+  font-size:34px;
+  line-height:1;
+  margin-bottom:10px;
+}
+
+.contador{
+  position:absolute;
+  top:10px;
+  right:12px;
+  min-width:26px;
+  height:26px;
+  padding:0 7px;
+  border-radius:999px;
+  background:#ff0000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  font-weight:700;
+  color:white;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 900px){
+  .panel{
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+    padding:16px;
+  }
+
+  .boton{
+    min-height:118px;
+    font-size:16px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="title">MONOLITO GPT PRO</div>
+    <div class="sub">Sistema de control · El Monolito</div>
+  </div>
+  <div id="hora"></div>
+</header>
+
+<div class="panel">
+
+  <div class="boton azul" onclick="abrir('proveedores')">
+    <div class="icono">🚚</div>
+    <div>PROVEEDORES</div>
+    <div class="contador">1</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('articulos')">
+    <div class="icono">📦</div>
+    <div>ARTÍCULOS</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('comparador')">
+    <div class="icono">📊</div>
+    <div>COMPARADOR</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('pedidos')">
+    <div class="icono">📝</div>
+    <div>PEDIDOS</div>
+    <div class="contador">2</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('pagos')">
+    <div class="icono">💳</div>
+    <div>PAGOS</div>
+  </div>
+
+  <div class="boton naranja" onclick="abrir('revision')">
+    <div class="icono">🔎</div>
+    <div>REVISIÓN</div>
+    <div class="contador">1</div>
+  </div>
+
+  <div class="boton verde" onclick="abrir('historico')">
+    <div class="icono">📁</div>
+    <div>HISTÓRICO</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('ventas')">
+    <div class="icono">💰</div>
+    <div>VENTAS</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('calendario')">
+    <div class="icono">📅</div>
+    <div>CALENDARIO</div>
+  </div>
+
+  <div class="boton naranja" onclick="abrir('comunicacion')">
+    <div class="icono">✉️</div>
+    <div>COMUNICACIÓN</div>
+    <div class="contador">3</div>
+  </div>
+
+  <div class="boton naranja" onclick="abrir('ayuda')">
+    <div class="icono">🤖</div>
+    <div>AYUDA</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('configuracion')">
+    <div class="icono">⚙️</div>
+    <div>CONFIGURACIÓN</div>
+  </div>
+
+</div>
+
+<script>
+function abrir(modulo){
+  window.location.href = modulo + ".html";
+}
+
+function reloj(){
+  const d = new Date();
+  document.getElementById("hora").innerHTML =
+    d.toLocaleDateString("es-ES") + " · " +
+    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+}
+
+setInterval(reloj,1000);
+reloj();
+</script>
+
+</body>
+</html>
