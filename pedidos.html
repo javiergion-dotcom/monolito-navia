@@ -8,7 +8,7 @@
 <style>
 body{
 margin:0;
-font-family:Arial, Helvetica, sans-serif;
+font-family:Arial;
 background:#dfe6ec;
 }
 
@@ -17,28 +17,24 @@ background:#dfe6ec;
 header{
 background:#17303d;
 color:white;
-padding:14px 20px;
+padding:10px 15px;
 display:flex;
 justify-content:space-between;
 align-items:center;
 }
 
-.bloque-top{
-display:flex;
-gap:15px;
-align-items:center;
+.bloque-centro{
+text-align:center;
 }
 
-select, input{
-padding:8px;
-border-radius:8px;
-border:none;
+.bloque-centro div{
+font-size:12px;
 }
 
 /* PANEL */
 
 .panel{
-padding:20px;
+padding:15px;
 }
 
 /* LINEAS */
@@ -54,7 +50,13 @@ margin-bottom:8px;
 align-items:center;
 }
 
-/* BOTONES */
+/* CONTROLES */
+
+select, input{
+padding:8px;
+border-radius:8px;
+border:none;
+}
 
 button{
 padding:8px 12px;
@@ -72,46 +74,41 @@ margin-top:20px;
 background:white;
 padding:15px;
 border-radius:10px;
-}
-
-.totales div{
-margin-bottom:6px;
 font-weight:bold;
 }
-
 </style>
 </head>
 
 <body>
 
 <header>
+
 <button onclick="volver()">←</button>
 
-<div class="bloque-top">
-<select id="proveedor">
-<option>MAHOU</option>
-<option>COCA-COLA</option>
-<option>PROVEEDOR 3</option>
-</select>
-
-<input type="date" id="fecha">
+<div class="bloque-centro">
+<div id="fecha"></div>
+<div>PEDIDOS</div>
 </div>
 
 <div id="usuario"></div>
+
 </header>
 
 <div class="panel">
 
-<!-- AÑADIR LINEA -->
-<div class="linea">
-<select id="articulo">
-<option value="CERVEZA|1.20|21">CERVEZA</option>
-<option value="COCA-COLA|1.00|21">COCA-COLA</option>
-<option value="AGUA|0.50|10">AGUA</option>
+<!-- PROVEEDOR -->
+<select id="proveedor" onchange="cargarArticulos()">
+<option value="">Seleccionar proveedor</option>
+<option value="MAHOU">MAHOU</option>
+<option value="COCACOLA">COCACOLA</option>
 </select>
 
-<input type="number" id="cantidad" placeholder="Unidades">
+<br><br>
 
+<!-- LINEA -->
+<div class="linea">
+<select id="articulo"></select>
+<input type="number" id="cantidad" placeholder="Unidades">
 <button onclick="agregar()">Añadir</button>
 </div>
 
@@ -131,20 +128,43 @@ font-weight:bold;
 
 let pedido = [];
 
-function agregar(){
-let datos = document.getElementById("articulo").value.split("|");
+/* BASE DE ARTICULOS */
+const articulos = {
+MAHOU:[
+{nombre:"CERVEZA", precio:1.20, iva:21},
+{nombre:"TERCIO", precio:1.30, iva:21}
+],
+COCACOLA:[
+{nombre:"COCA-COLA", precio:1.00, iva:21},
+{nombre:"FANTA", precio:0.95, iva:21}
+]
+};
 
-let nombre = datos[0];
-let precio = parseFloat(datos[1]);
-let iva = parseFloat(datos[2]);
+function cargarArticulos(){
+let prov = document.getElementById("proveedor").value;
+let select = document.getElementById("articulo");
+
+select.innerHTML="";
+
+if(!articulos[prov]) return;
+
+articulos[prov].forEach(a=>{
+let opt = document.createElement("option");
+opt.value = JSON.stringify(a);
+opt.text = a.nombre;
+select.appendChild(opt);
+});
+}
+
+function agregar(){
+
+let datos = JSON.parse(document.getElementById("articulo").value);
 let cantidad = parseInt(document.getElementById("cantidad").value);
 
 if(!cantidad) return;
 
 pedido.push({
-nombre,
-precio,
-iva,
+...datos,
 cantidad
 });
 
@@ -165,7 +185,7 @@ let linea = document.createElement("div");
 linea.className="linea";
 
 let importe = item.precio * item.cantidad;
-let ivaCalc = importe * (item.iva / 100);
+let ivaCalc = importe * (item.iva/100);
 
 subtotal += importe;
 totalIVA += ivaCalc;
@@ -183,17 +203,26 @@ lista.appendChild(linea);
 document.getElementById("subtotal").innerText = subtotal.toFixed(2);
 document.getElementById("iva").innerText = totalIVA.toFixed(2);
 document.getElementById("total").innerText = (subtotal + totalIVA).toFixed(2);
-
 }
 
 function volver(){
 window.location.href="index.html";
 }
 
+/* USUARIO */
 document.getElementById("usuario").innerText =
-localStorage.getItem("usuario") || "";
+localStorage.getItem("usuario") || "OPERADOR";
 
-document.getElementById("fecha").valueAsDate = new Date();
+/* FECHA AUTOMATICA */
+function actualizarFecha(){
+let d = new Date();
+document.getElementById("fecha").innerText =
+d.toLocaleDateString("es-ES") + " · " +
+d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+}
+
+setInterval(actualizarFecha,1000);
+actualizarFecha();
 
 </script>
 
