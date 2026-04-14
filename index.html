@@ -3,119 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO</title>
+<title>PEDIDOS</title>
 
 <style>
-*{box-sizing:border-box;}
-
 body{
 margin:0;
-font-family:Arial, Helvetica, sans-serif;
+font-family:Arial;
 background:#0f1a21;
 color:white;
-display:flex;
-flex-direction:column;
-height:100vh;
 }
 
-/* BARRA SUPERIOR */
 .topbar{
 background:#14232c;
-padding:10px 15px;
+padding:10px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-font-size:14px;
 }
 
-.usuario{
-font-weight:bold;
-}
-
-/* CONTENEDOR */
-.container{
-flex:1;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-gap:20px;
-padding:20px;
-}
-
-/* BOTONES */
 .boton{
-width:100%;
-max-width:420px;
-padding:20px;
-font-size:20px;
-font-weight:bold;
-background:linear-gradient(180deg,#6f8fa6,#4c6576);
+background:#6f8fa6;
+padding:10px 15px;
 border:none;
-border-radius:18px;
+border-radius:10px;
 color:white;
 cursor:pointer;
-text-align:center;
-box-shadow:
-inset 0 2px 3px rgba(255,255,255,0.2),
-0 10px 20px rgba(0,0,0,0.4);
 }
 
-.boton:active{
-transform:translateY(3px);
+.contenido{
+padding:20px;
 }
-
-/* AVISOS */
-.badges{
-position:absolute;
-top:10px;
-right:10px;
-display:flex;
-gap:10px;
-}
-
-.badge{
-padding:6px 10px;
-border-radius:10px;
-font-size:12px;
-font-weight:bold;
-}
-
-.rojo{background:#c0392b;}
-.amarillo{background:#f39c12;}
 </style>
 </head>
 
 <body>
 
 <div class="topbar">
-<div class="usuario" id="usuario">USUARIO</div>
-<div>MONOLITO</div>
+<button class="boton" onclick="volver()">← Volver</button>
+<div>PEDIDOS</div>
+<div id="usuario"></div>
 </div>
 
-<div class="badges">
-<div class="badge rojo">0</div>
-<div class="badge amarillo">0</div>
-</div>
-
-<div class="container">
-
-<button class="boton" onclick="ir('pedidos.html')">PEDIDOS</button>
-<button class="boton" onclick="ir('pagos.html')">PAGOS</button>
-<button class="boton" onclick="ir('incidencias.html')">INCIDENCIAS</button>
-<button class="boton" onclick="ir('comunicaciones.html')">COMUNICACIONES</button>
-<button class="boton" onclick="ir('documentos.html')">DOCUMENTOS</button>
-<button class="boton" onclick="ir('historico.html')">HISTÓRICO</button>
-
+<div class="contenido">
+<h2>Pantalla de pedidos (en construcción)</h2>
 </div>
 
 <script>
-const usuario = localStorage.getItem("usuario") || "SIN USUARIO";
-document.getElementById("usuario").textContent = usuario;
-
-function ir(pagina){
-window.location.href = pagina;
+function volver(){
+window.location.href="index.html";
 }
+
+document.getElementById("usuario").textContent =
+localStorage.getItem("usuario") || "";
 </script>
 
 </body>
