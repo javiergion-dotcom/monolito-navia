@@ -8,58 +8,77 @@
 <style>
 body{
 margin:0;
-font-family:Arial;
+font-family:Arial, Helvetica, sans-serif;
 background:#dfe6ec;
 }
+
+/* CABECERA */
 
 header{
 background:#17303d;
 color:white;
-padding:10px 15px;
+padding:14px 20px;
 display:flex;
 justify-content:space-between;
 align-items:center;
 }
 
-.panel{
-padding:15px;
-}
-
-.fila{
+.bloque-top{
 display:flex;
-gap:10px;
-margin-bottom:10px;
+gap:15px;
+align-items:center;
 }
 
-input, select{
+select, input{
 padding:8px;
 border-radius:8px;
 border:none;
 }
 
-button{
-padding:10px 15px;
-border:none;
+/* PANEL */
+
+.panel{
+padding:20px;
+}
+
+/* LINEAS */
+
+.linea{
+display:grid;
+grid-template-columns:2fr 1fr 1fr;
+gap:10px;
+background:white;
+padding:10px;
 border-radius:10px;
+margin-bottom:8px;
+align-items:center;
+}
+
+/* BOTONES */
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:8px;
 background:#547184;
 color:white;
 cursor:pointer;
 }
 
-.linea{
-display:flex;
-justify-content:space-between;
+/* TOTALES */
+
+.totales{
+margin-top:20px;
 background:white;
-padding:10px;
+padding:15px;
 border-radius:10px;
-margin-bottom:6px;
 }
 
-.total{
-font-size:18px;
+.totales div{
+margin-bottom:6px;
 font-weight:bold;
-margin-top:15px;
 }
+
 </style>
 </head>
 
@@ -67,17 +86,28 @@ margin-top:15px;
 
 <header>
 <button onclick="volver()">←</button>
-<div>PEDIDOS</div>
+
+<div class="bloque-top">
+<select id="proveedor">
+<option>MAHOU</option>
+<option>COCA-COLA</option>
+<option>PROVEEDOR 3</option>
+</select>
+
+<input type="date" id="fecha">
+</div>
+
 <div id="usuario"></div>
 </header>
 
 <div class="panel">
 
-<div class="fila">
+<!-- AÑADIR LINEA -->
+<div class="linea">
 <select id="articulo">
-<option value="CERVEZA|1.2">CERVEZA</option>
-<option value="COCA-COLA|1.0">COCA-COLA</option>
-<option value="AGUA|0.5">AGUA</option>
+<option value="CERVEZA|1.20|21">CERVEZA</option>
+<option value="COCA-COLA|1.00|21">COCA-COLA</option>
+<option value="AGUA|0.50|10">AGUA</option>
 </select>
 
 <input type="number" id="cantidad" placeholder="Unidades">
@@ -85,21 +115,28 @@ margin-top:15px;
 <button onclick="agregar()">Añadir</button>
 </div>
 
+<!-- LISTA -->
 <div id="lista"></div>
 
-<div class="total">
-TOTAL: <span id="total">0</span> €
+<!-- TOTALES -->
+<div class="totales">
+<div>SUBTOTAL: <span id="subtotal">0</span> €</div>
+<div>IVA: <span id="iva">0</span> €</div>
+<div>TOTAL: <span id="total">0</span> €</div>
 </div>
 
 </div>
 
 <script>
+
 let pedido = [];
 
 function agregar(){
-let articulo = document.getElementById("articulo").value.split("|");
-let nombre = articulo[0];
-let precio = parseFloat(articulo[1]);
+let datos = document.getElementById("articulo").value.split("|");
+
+let nombre = datos[0];
+let precio = parseFloat(datos[1]);
+let iva = parseFloat(datos[2]);
 let cantidad = parseInt(document.getElementById("cantidad").value);
 
 if(!cantidad) return;
@@ -107,6 +144,7 @@ if(!cantidad) return;
 pedido.push({
 nombre,
 precio,
+iva,
 cantidad
 });
 
@@ -114,27 +152,38 @@ render();
 }
 
 function render(){
+
 let lista = document.getElementById("lista");
 lista.innerHTML = "";
 
-let total = 0;
+let subtotal = 0;
+let totalIVA = 0;
 
 pedido.forEach(item=>{
+
 let linea = document.createElement("div");
 linea.className="linea";
 
 let importe = item.precio * item.cantidad;
-total += importe;
+let ivaCalc = importe * (item.iva / 100);
+
+subtotal += importe;
+totalIVA += ivaCalc;
 
 linea.innerHTML = `
-${item.nombre} x${item.cantidad}
-<span>${importe.toFixed(2)} €</span>
+<div>${item.nombre}</div>
+<div>x${item.cantidad}</div>
+<div>${importe.toFixed(2)} €</div>
 `;
 
 lista.appendChild(linea);
+
 });
 
-document.getElementById("total").innerText = total.toFixed(2);
+document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+document.getElementById("iva").innerText = totalIVA.toFixed(2);
+document.getElementById("total").innerText = (subtotal + totalIVA).toFixed(2);
+
 }
 
 function volver(){
@@ -143,6 +192,9 @@ window.location.href="index.html";
 
 document.getElementById("usuario").innerText =
 localStorage.getItem("usuario") || "";
+
+document.getElementById("fecha").valueAsDate = new Date();
+
 </script>
 
 </body>
