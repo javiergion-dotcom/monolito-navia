@@ -3,81 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO · Sistema Principal</title>
+<title>MONOLITO</title>
 
 <style>
-    body {
-        margin: 0;
-        background: #000;
-        font-family: Arial, sans-serif;
-        color: white;
-        text-align: center;
-    }
+*{box-sizing:border-box;}
 
-    h1 {
-        margin-top: 40px;
-        font-size: 32px;
-        font-weight: bold;
-    }
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background:#0f1a21;
+color:white;
+display:flex;
+flex-direction:column;
+height:100vh;
+}
 
-    .boton {
-        width: 260px;
-        padding: 18px;
-        margin: 14px auto;
-        background: #222;
-        border: 2px solid #555;
-        border-radius: 10px;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-        transition: 0.15s;
-        display: block;
-    }
+/* BARRA SUPERIOR */
+.topbar{
+background:#14232c;
+padding:10px 15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:14px;
+}
 
-    .boton:active {
-        transform: scale(0.96);
-        background: #444;
-    }
+.usuario{
+font-weight:bold;
+}
 
-    #pantalla, #modulos {
-        display: none;
-    }
+/* CONTENEDOR */
+.container{
+flex:1;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+gap:20px;
+padding:20px;
+}
 
-    .visible {
-        display: block;
-    }
+/* BOTONES */
+.boton{
+width:100%;
+max-width:420px;
+padding:20px;
+font-size:20px;
+font-weight:bold;
+background:linear-gradient(180deg,#6f8fa6,#4c6576);
+border:none;
+border-radius:18px;
+color:white;
+cursor:pointer;
+text-align:center;
+box-shadow:
+inset 0 2px 3px rgba(255,255,255,0.2),
+0 10px 20px rgba(0,0,0,0.4);
+}
+
+.boton:active{
+transform:translateY(3px);
+}
+
+/* AVISOS */
+.badges{
+position:absolute;
+top:10px;
+right:10px;
+display:flex;
+gap:10px;
+}
+
+.badge{
+padding:6px 10px;
+border-radius:10px;
+font-size:12px;
+font-weight:bold;
+}
+
+.rojo{background:#c0392b;}
+.amarillo{background:#f39c12;}
 </style>
-
-<script>
-function mostrarPantalla(id) {
-    document.getElementById("inicio").classList.remove("visible");
-    document.getElementById("modulos").classList.remove("visible");
-    document.getElementById(id).classList.add("visible");
-}
-
-function volver() {
-    mostrarPantalla("inicio");
-}
-</script>
-
 </head>
+
 <body>
 
-<!-- PANTALLA INICIAL -->
-<div id="inicio" class="visible">
-    <h1>PANTALLA INICIAL</h1>
-    <button class="boton" onclick="mostrarPantalla('modulos')">ENTRAR</button>
-    <button class="boton">AYUDA</button>
-    <button class="boton">SALIR</button>
+<div class="topbar">
+<div class="usuario" id="usuario">USUARIO</div>
+<div>MONOLITO</div>
 </div>
 
-<!-- SELECTOR DE MÓDULOS -->
-<div id="modulos">
-    <h1>Selector de Módulos</h1>
-    <button class="boton">Módulo 1</button>
-    <button class="boton">Módulo 2</button>
-    <button class="boton" onclick="volver()">VOLVER</button>
+<div class="badges">
+<div class="badge rojo">0</div>
+<div class="badge amarillo">0</div>
 </div>
+
+<div class="container">
+
+<button class="boton">PEDIDOS</button>
+<button class="boton">PAGOS</button>
+<button class="boton">INCIDENCIAS</button>
+<button class="boton">COMUNICACIONES</button>
+<button class="boton">DOCUMENTOS</button>
+<button class="boton">HISTÓRICO</button>
+
+</div>
+
+<script>
+const usuario = localStorage.getItem("usuario") || "SIN USUARIO";
+document.getElementById("usuario").textContent = usuario;
+</script>
 
 </body>
 </html>
