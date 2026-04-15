@@ -10,10 +10,17 @@
   box-sizing:border-box;
 }
 
-body{
+html, body{
   margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
   font-family:Arial, Helvetica, sans-serif;
   background:#dfe6ec;
+}
+
+body{
+  overflow-x:hidden;
 }
 
 /* CABECERA */
@@ -45,10 +52,35 @@ header{
   margin-top:2px;
 }
 
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+#usuario{
+  background:rgba(255,255,255,0.12);
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
 #hora{
   font-size:16px;
   font-weight:600;
   white-space:nowrap;
+}
+
+/* FRANJA INFO */
+
+.franja{
+  background:#eef2f5;
+  color:#4f5f69;
+  padding:10px 22px;
+  font-size:14px;
+  border-bottom:1px solid rgba(0,0,0,0.05);
 }
 
 /* PANEL */
@@ -117,7 +149,6 @@ header{
   height:26px;
   padding:0 7px;
   border-radius:999px;
-  background:#ff0000;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -126,6 +157,16 @@ header{
   color:white;
   box-shadow:0 2px 6px rgba(0,0,0,0.2);
 }
+
+.rojo{
+  background:#ff0000;
+}
+
+.amarillo{
+  background:#d99a00;
+}
+
+/* RESPONSIVE */
 
 @media (max-width: 900px){
   .panel{
@@ -138,6 +179,23 @@ header{
     min-height:118px;
     font-size:16px;
   }
+
+  header{
+    padding:12px 16px;
+  }
+
+  .franja{
+    padding:10px 16px;
+  }
+
+  #hora{
+    font-size:14px;
+  }
+
+  #usuario{
+    font-size:13px;
+    padding:7px 10px;
+  }
 }
 </style>
 </head>
@@ -149,15 +207,23 @@ header{
     <div class="title">MONOLITO GPT PRO</div>
     <div class="sub">Sistema de control · El Monolito</div>
   </div>
-  <div id="hora"></div>
+
+  <div class="header-right">
+    <div id="usuario">OPERADOR</div>
+    <div id="hora"></div>
+  </div>
 </header>
+
+<div class="franja" id="franjaEstado">
+  Buenas tardes · Sin incidencias · Sin comunicaciones
+</div>
 
 <div class="panel">
 
   <div class="boton azul" onclick="abrir('proveedores')">
     <div class="icono">🚚</div>
     <div>PROVEEDORES</div>
-    <div class="contador">1</div>
+    <div class="contador rojo">1</div>
   </div>
 
   <div class="boton azul" onclick="abrir('articulos')">
@@ -173,7 +239,7 @@ header{
   <div class="boton azul" onclick="abrir('pedidos')">
     <div class="icono">📝</div>
     <div>PEDIDOS</div>
-    <div class="contador">2</div>
+    <div class="contador rojo">2</div>
   </div>
 
   <div class="boton azul" onclick="abrir('pagos')">
@@ -184,7 +250,7 @@ header{
   <div class="boton naranja" onclick="abrir('revision')">
     <div class="icono">🔎</div>
     <div>REVISIÓN</div>
-    <div class="contador">1</div>
+    <div class="contador rojo">1</div>
   </div>
 
   <div class="boton verde" onclick="abrir('historico')">
@@ -205,7 +271,7 @@ header{
   <div class="boton naranja" onclick="abrir('comunicacion')">
     <div class="icono">✉️</div>
     <div>COMUNICACIÓN</div>
-    <div class="contador">3</div>
+    <div class="contador amarillo">3</div>
   </div>
 
   <div class="boton naranja" onclick="abrir('ayuda')">
@@ -227,13 +293,38 @@ function abrir(modulo){
 
 function reloj(){
   const d = new Date();
+
   document.getElementById("hora").innerHTML =
-    d.toLocaleDateString("es-ES") + " · " +
+    d.toLocaleDateString("es-ES") + " · ' +
     d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 }
 
-setInterval(reloj,1000);
+function saludo(){
+  const h = new Date().getHours();
+  if(h < 6) return "Buenas noches";
+  if(h < 12) return "Buenos días";
+  if(h < 21) return "Buenas tardes";
+  return "Buenas noches";
+}
+
+function cargarUsuario(){
+  const usuario = localStorage.getItem("usuario") || "OPERADOR";
+  document.getElementById("usuario").textContent = usuario;
+}
+
+function actualizarFranja(){
+  document.getElementById("franjaEstado").textContent =
+    saludo() + " · Sin incidencias · Sin comunicaciones";
+}
+
+setInterval(() => {
+  reloj();
+  actualizarFranja();
+}, 1000);
+
+cargarUsuario();
 reloj();
+actualizarFranja();
 </script>
 
 </body>
