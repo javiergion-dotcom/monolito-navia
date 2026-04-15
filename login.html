@@ -51,7 +51,7 @@ body{
 .estado{
   min-height:22px;
   font-size:14px;
-  opacity:.75;
+  opacity:.8;
   margin-bottom:24px;
 }
 
@@ -77,9 +77,12 @@ body{
 
 .tecla:active{
   transform:translateY(3px);
+  box-shadow:
+    inset 0 4px 8px rgba(0,0,0,0.18),
+    0 6px 12px rgba(0,0,0,0.26);
 }
 
-@media (max-width: 480px){
+@media (max-width:480px){
   .contenedor{
     max-width:360px;
     padding:18px;
@@ -122,10 +125,10 @@ body{
 let codigo = "";
 
 const usuarios = {
-  "0985": { nombre:"JAVI", tipo:"admin" },
-  "4544": { nombre:"SILVIA", tipo:"admin" },
-  "1111": { nombre:"DARIO", tipo:"operador" },
-  "2222": { nombre:"TOÑO", tipo:"operador" }
+  "85": { nombre:"JAVIER", tipo:"admin" },
+  "12": { nombre:"SILVIA", tipo:"admin" },
+  "11": { nombre:"DARIO", tipo:"operador" },
+  "22": { nombre:"TOÑO", tipo:"operador" }
 };
 
 function refrescar(){
@@ -133,12 +136,12 @@ function refrescar(){
 }
 
 function meter(n){
-  if(codigo.length >= 4) return;
+  if(codigo.length >= 2) return;
 
   codigo += n;
   refrescar();
 
-  if(codigo.length === 4){
+  if(codigo.length === 2){
     validar();
   }
 }
@@ -160,12 +163,13 @@ function validar(){
   if(usuario){
     localStorage.setItem("usuario", usuario.nombre);
     localStorage.setItem("tipoUsuario", usuario.tipo);
+    sessionStorage.setItem("loginOK", "SI");
     window.location.href = "index.html";
   }else{
     document.getElementById("estado").textContent = "Código incorrecto";
-    setTimeout(() => {
+    setTimeout(function(){
       reiniciar();
-    }, 700);
+    }, 800);
   }
 }
 
