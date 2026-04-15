@@ -24,7 +24,6 @@ body{
 }
 
 /* CABECERA */
-
 header{
   background:#17303d;
   color:white;
@@ -74,7 +73,6 @@ header{
 }
 
 /* FRANJA INFO */
-
 .franja{
   background:#eef2f5;
   color:#4f5f69;
@@ -84,7 +82,6 @@ header{
 }
 
 /* PANEL */
-
 .panel{
   padding:20px;
   display:grid;
@@ -93,7 +90,6 @@ header{
 }
 
 /* BOTONES */
-
 .boton{
   position:relative;
   min-height:108px;
@@ -167,7 +163,6 @@ header{
 }
 
 /* RESPONSIVE */
-
 @media (max-width: 900px){
   .panel{
     grid-template-columns:repeat(2,1fr);
@@ -293,9 +288,8 @@ function abrir(modulo){
 
 function reloj(){
   const d = new Date();
-
   document.getElementById("hora").innerHTML =
-    d.toLocaleDateString("es-ES") + " · ' +
+    d.toLocaleDateString("es-ES") + " · " +
     d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 }
 
