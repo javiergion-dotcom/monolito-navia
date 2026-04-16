@@ -1,17 +1,117 @@
+
+javiergion-dotcom
+monolito-navia
+Repository navigation
+Code
+Issues
+Pull requests
+Agents
+Actions
+Projects
+Wiki
+Security and quality
+Insights
+Settings
+Commit 02f876b
+javiergion-dotcom
+javiergion-dotcom
+authored
+4 hours ago
+·
+·
+Verified
+Update index.html
+main
+1 parent 
+aa6e035
+ commit 
+02f876b
+File tree
+Filter files…
+index.html
+1 file changed
++78
+-260
+lines changed
+Search within code
+ 
+‎index.html‎
++78
+-260
+Lines changed: 78 additions & 260 deletions
+Original file line number	Diff line number	Diff line change
+@@ -1,326 +1,144 @@
+if(!localStorage.getItem("usuario")){
+  window.location.href = "login.html";
+}<!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MONOLITO GPT PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+*{
+  box-sizing:border-box;
+}
+html, body{
+  margin:0; 
+  padding:0;
+  width:100%;
+  min-height:100%;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#dfe6ec;
+}
 body{
+  overflow-x:hidden;
+}
+/* CABECERA */
+header{
+  background:#17303d;
+  color:white;
+  padding:14px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+}
+.header-left{
+  display:flex;
+  flex-direction:column;
+}
+.title{
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:.3px;
+}
+.sub{
+  font-size:12px;
+  opacity:.8;
+  margin-top:2px;
+}
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+#usuario{
+  background:rgba(255,255,255,0.12);
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:700;
+  white-space:nowrap;
+}
+#hora{
+  font-size:16px;
+  font-weight:600;
+  white-space:nowrap;
     margin:0;
     font-family:Arial, sans-serif;
     background:#dfe6eb;
 }
-
 .header{
     background:#1f3c4d;
     color:white;
@@ -22,10 +122,23 @@ body{
     font-size:14px;
 }
 
+/* FRANJA INFO */
+.franja{
+  background:#eef2f5;
+  color:#4f5f69;
+  padding:10px 22px;
+  font-size:14px;
+  border-bottom:1px solid rgba(0,0,0,0.05);
 .usuario{
     font-weight:bold;
 }
 
+/* PANEL */
+.panel{
+  padding:20px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:22px;
 .grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -33,7 +146,27 @@ body{
     padding:20px;
 }
 
+/* BOTONES */
 .boton{
+  position:relative;
+  min-height:108px;
+  border-radius:22px;
+  background:linear-gradient(180deg,#87a6bd 0%, #547184 100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:white;
+  font-size:17px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.22),
+    0 12px 22px rgba(0,0,0,0.26);
+  transition:transform .10s ease;
+  user-select:none;
+  padding:14px 10px;
     background:#6e8797;
     border-radius:20px;
     padding:30px 10px;
@@ -46,27 +179,99 @@ body{
 }
 
 .boton:active{
+  transform:translateY(4px);
+  box-shadow:
+    inset 0 4px 8px rgba(0,0,0,0.18),
+    0 6px 12px rgba(0,0,0,0.26);
+}
+.azul{
+  background:linear-gradient(180deg,#87a6bd 0%, #547184 100%);
+}
+.naranja{
+  background:linear-gradient(180deg,#f6ae1b 0%, #df8b00 100%);
     transform:translateY(4px);
     box-shadow:0 3px 6px rgba(0,0,0,0.3);
 }
 
 .verde{
+  background:linear-gradient(180deg,#78cc4b 0%, #48a530 100%);
     background:#3db34a;
 }
 
+.icono{
+  font-size:34px;
+  line-height:1;
+  margin-bottom:10px;
+}
+.contador{
+  position:absolute;
+  top:10px;
+  right:12px;
+  min-width:26px;
+  height:26px;
+  padding:0 7px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  font-weight:700;
+  color:white;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
 .naranja{
     background:#f4a100;
 }
 
 .rojo{
+  background:#ff0000;
     background:#e53935;
 }
 
+.amarillo{
+  background:#d99a00;
+}
+/* RESPONSIVE */
+@media (max-width: 900px){
+  .panel{
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+    padding:16px;
+  }
+  .boton{
+    min-height:118px;
+    font-size:16px;
+  }
+  header{
+    padding:12px 16px;
+  }
+  .franja{
+    padding:10px 16px;
+  }
+  #hora{
+    font-size:14px;
+  }
+  #usuario{
+    font-size:13px;
+    padding:7px 10px;
+  }
+}
 </style>
 </head>
 
 <body>
 
+<header>
+  <div class="header-left">
+    <div class="title">MONOLITO GPT PRO</div>
+    <div class="sub">Sistema de control · El Monolito</div>
+  </div>
+  <div class="header-right">
+    <div id="usuario">OPERADOR</div>
+    <div id="hora"></div>
+  </div>
+</header>
+<div class="franja" id="franjaEstado">
+  Buenas tardes · Sin incidencias · Sin comunicaciones
 <div class="header">
     <div>
         MONOLITO GPT PRO<br>
@@ -75,20 +280,73 @@ body{
     <div class="usuario" id="usuario"></div>
 </div>
 
+<div class="panel">
+  <div class="boton azul" onclick="abrir('proveedores')">
+    <div class="icono">🚚</div>
+    <div>PROVEEDORES</div>
+    <div class="contador rojo">1</div>
+  </div>
+  <div class="boton azul" onclick="abrir('articulos')">
+    <div class="icono">📦</div>
+    <div>ARTÍCULOS</div>
+  </div>
+  <div class="boton azul" onclick="abrir('comparador')">
+    <div class="icono">📊</div>
+    <div>COMPARADOR</div>
+  </div>
+  <div class="boton azul" onclick="abrir('pedidos')">
+    <div class="icono">📝</div>
+    <div>PEDIDOS</div>
+    <div class="contador rojo">2</div>
+  </div>
+  <div class="boton azul" onclick="abrir('pagos')">
+    <div class="icono">💳</div>
+    <div>PAGOS</div>
+  </div>
+  <div class="boton naranja" onclick="abrir('revision')">
+    <div class="icono">🔎</div>
+    <div>REVISIÓN</div>
+    <div class="contador rojo">1</div>
+  </div>
 <div class="grid">
 
+  <div class="boton verde" onclick="abrir('historico')">
+    <div class="icono">📁</div>
+    <div>HISTÓRICO</div>
+  </div>
     <div class="boton" onclick="abrir('proveedores')">PROVEEDORES</div>
     <div class="boton" onclick="abrir('articulos')">ARTÍCULOS</div>
     <div class="boton" onclick="abrir('comparador')">COMPARADOR</div>
 
+  <div class="boton azul" onclick="abrir('ventas')">
+    <div class="icono">💰</div>
+    <div>VENTAS</div>
+  </div>
     <div class="boton" onclick="abrir('pedidos')">PEDIDOS</div>
     <div class="boton" onclick="abrir('pagos')">PAGOS</div>
     <div class="boton naranja" onclick="abrir('revision')">REVISIÓN</div>
 
+  <div class="boton azul" onclick="abrir('calendario')">
+    <div class="icono">📅</div>
+    <div>CALENDARIO</div>
+  </div>
     <div class="boton verde" onclick="abrir('historico')">HISTÓRICO</div>
     <div class="boton" onclick="abrir('ventas')">VENTAS</div>
     <div class="boton" onclick="abrir('calendario')">CALENDARIO</div>
 
+  <div class="boton naranja" onclick="abrir('comunicacion')">
+    <div class="icono">✉️</div>
+    <div>COMUNICACIÓN</div>
+    <div class="contador amarillo">3</div>
+  </div>
+  <div class="boton naranja" onclick="abrir('ayuda')">
+    <div class="icono">🤖</div>
+    <div>AYUDA</div>
+  </div>
+  <div class="boton azul" onclick="abrir('configuracion')">
+    <div class="icono">⚙️</div>
+    <div>CONFIGURACIÓN</div>
+  </div>
     <div class="boton naranja" onclick="abrir('comunicacion')">COMUNICACIÓN</div>
     <div class="boton naranja" onclick="abrir('ayuda')">AYUDA</div>
     <div class="boton" onclick="abrir('configuracion')">CONFIGURACIÓN</div>
@@ -96,16 +354,19 @@ body{
 </div>
 
 <script>
-
 if(!sessionStorage.getItem("loginOK")){
     window.location.href = "login.html";
 }
-
 function abrir(modulo){
+  window.location.href = modulo + ".html";
     window.location.href = modulo + ".html";
 }
 
 function reloj(){
+  const d = new Date();
+  document.getElementById("hora").innerHTML =
+    d.toLocaleDateString("es-ES") + " · " +
+    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
     const d = new Date();
     document.getElementById("franjaEstado").innerHTML =
         d.toLocaleDateString("es-ES") + " · " +
@@ -113,6 +374,11 @@ function reloj(){
 }
 
 function saludo(){
+  const h = new Date().getHours();
+  if(h < 6) return "Buenas noches";
+  if(h < 12) return "Buenos días";
+  if(h < 21) return "Buenas tardes";
+  return "Buenas noches";
     const h = new Date().getHours();
     if(h < 6) return "Buenas noches";
     if(h < 12) return "Buenos días";
@@ -121,16 +387,22 @@ function saludo(){
 }
 
 function cargarUsuario(){
+  const usuario = localStorage.getItem("usuario") || "OPERADOR";
+  document.getElementById("usuario").textContent = usuario;
     const usuario = localStorage.getItem("usuario") || "OPERADOR";
     document.getElementById("usuario").textContent = usuario;
 }
 
 function actualizarFranja(){
+  document.getElementById("franjaEstado").textContent =
+    saludo() + " · Sin incidencias · Sin comunicaciones";
     document.getElementById("franjaEstado").textContent =
         saludo() + " · Sin incidencias · Sin comunicaciones";
 }
 
 setInterval(() => {
+  reloj();
+  actualizarFranja();
     reloj();
     actualizarFranja();
 }, 1000);
@@ -138,8 +410,6 @@ setInterval(() => {
 cargarUsuario();
 reloj();
 actualizarFranja();
-
 </script>
 
 </body>
-</html>
