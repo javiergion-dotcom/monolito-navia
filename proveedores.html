@@ -3,107 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO</title>
+<title>PROVEEDORES - MONOLITO</title>
 
 <style>
 *{box-sizing:border-box;}
-html,body{
+
+body{
   margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
   font-family:Arial, Helvetica, sans-serif;
   background:#dfe6ec;
 }
+
+/* CABECERA */
 header{
   background:#17303d;
   color:white;
-  padding:14px 22px;
+  padding:14px 20px;
   display:flex;
   justify-content:space-between;
   align-items:center;
 }
-.title{font-size:18px;font-weight:700;}
-.sub{font-size:12px;opacity:.8;}
-#usuario{background:rgba(255,255,255,0.12);padding:8px 12px;border-radius:999px;}
-.panel{
-  padding:20px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
+
+.title{
+  font-size:18px;
+  font-weight:700;
 }
-.boton{
-  min-height:100px;
-  border-radius:20px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+
+.volver{
+  background:rgba(255,255,255,0.15);
+  padding:8px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+/* CONTENIDO */
+.contenedor{
+  padding:20px;
+}
+
+/* LISTA PROVEEDORES */
+.proveedor{
+  background:linear-gradient(#8fb0c8,#4e6b7c);
   color:white;
+  padding:14px 16px;
+  border-radius:14px;
+  margin-bottom:12px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+/* TABLA PRECIOS */
+.tabla{
+  margin-top:20px;
+  background:white;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 6px 12px rgba(0,0,0,0.15);
+}
+
+.fila{
+  display:flex;
+  justify-content:space-between;
+  padding:12px 14px;
+  border-bottom:1px solid #eee;
+}
+
+.fila:nth-child(1){
+  background:#f4f6f8;
+  font-weight:700;
+}
+
+input{
+  width:80px;
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  text-align:right;
+}
+
+.guardar{
+  margin-top:20px;
+  background:linear-gradient(#78cc4b,#48a530);
+  color:white;
+  padding:14px;
+  text-align:center;
+  border-radius:14px;
   font-weight:700;
   cursor:pointer;
-  background:linear-gradient(#8fb0c8,#4e6b7c);
 }
-.naranja{background:linear-gradient(#f6ae1b,#df8b00);}
-.verde{background:linear-gradient(#78cc4b,#48a530);}
-.icono{font-size:30px;margin-bottom:6px;}
 </style>
 </head>
 
 <body>
 
 <header>
-  <div>
-    <div class="title">MONOLITO</div>
-    <div class="sub">Sistema de control</div>
-  </div>
-  <div id="usuario">OPERADOR</div>
+  <div class="title">PROVEEDORES</div>
+  <div class="volver" onclick="volver()">← VOLVER</div>
 </header>
 
-<div class="panel">
+<div class="contenedor">
 
-<div class="boton" onclick="abrir('proveedores')">
-<div class="icono">🚚</div>PROVEEDORES</div>
+  <!-- LISTA -->
+  <div id="listaProveedores"></div>
 
-<div class="boton" onclick="abrir('articulos')">
-<div class="icono">📦</div>ARTÍCULOS</div>
-
-<div class="boton" onclick="abrir('comparador')">
-<div class="icono">📊</div>COMPARADOR</div>
-
-<div class="boton" onclick="abrir('pedidos')">
-<div class="icono">📝</div>PEDIDOS</div>
-
-<div class="boton" onclick="abrir('pagos')">
-<div class="icono">💳</div>PAGOS</div>
-
-<div class="boton naranja" onclick="abrir('revision')">
-<div class="icono">🔎</div>REVISIÓN</div>
-
-<div class="boton verde" onclick="abrir('historico')">
-<div class="icono">📁</div>HISTÓRICO</div>
-
-<div class="boton" onclick="abrir('ventas')">
-<div class="icono">💰</div>VENTAS</div>
-
-<div class="boton" onclick="abrir('calendario')">
-<div class="icono">📅</div>CALENDARIO</div>
-
-<div class="boton naranja" onclick="abrir('comunicacion')">
-<div class="icono">✉️</div>COMUNICACIÓN</div>
-
-<div class="boton naranja" onclick="abrir('ayuda')">
-<div class="icono">🤖</div>AYUDA</div>
-
-<div class="boton" onclick="abrir('configuracion')">
-<div class="icono">⚙️</div>CONFIGURACIÓN</div>
+  <!-- TABLA -->
+  <div id="zonaPrecios" style="display:none;">
+    <div class="tabla" id="tablaPrecios"></div>
+    <div class="guardar" onclick="guardar()">GUARDAR PRECIOS</div>
+  </div>
 
 </div>
 
 <script>
-function abrir(modulo){
-  alert("Módulo: " + modulo + " (aún sin crear)");
+
+/* DATOS BASE (luego los cambiamos por los tuyos reales) */
+let proveedores = {
+  "CocaCola": [
+    {articulo:"Coca Cola lata", precio:0.85},
+    {articulo:"Coca Cola botella", precio:1.20}
+  ],
+  "Mahou": [
+    {articulo:"Barril 50L", precio:78},
+    {articulo:"Caja tercios", precio:16}
+  ]
+};
+
+let proveedorActual = "";
+
+/* CARGAR LISTA */
+function cargarProveedores(){
+  let html = "";
+  for(let p in proveedores){
+    html += `<div class="proveedor" onclick="abrirProveedor('${p}')">${p}</div>`;
+  }
+  document.getElementById("listaProveedores").innerHTML = html;
 }
+
+/* ABRIR PROVEEDOR */
+function abrirProveedor(nombre){
+  proveedorActual = nombre;
+  document.getElementById("zonaPrecios").style.display = "block";
+
+  let datos = proveedores[nombre];
+  let html = `
+    <div class="fila">
+      <div>ARTÍCULO</div>
+      <div>PRECIO</div>
+    </div>
+  `;
+
+  datos.forEach((item,i)=>{
+    html += `
+      <div class="fila">
+        <div>${item.articulo}</div>
+        <div>
+          <input type="number" step="0.01" value="${item.precio}" id="p${i}">
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("tablaPrecios").innerHTML = html;
+}
+
+/* GUARDAR */
+function guardar(){
+  let datos = proveedores[proveedorActual];
+
+  datos.forEach((item,i)=>{
+    let valor = document.getElementById("p"+i).value;
+    item.precio = parseFloat(valor);
+  });
+
+  alert("Precios guardados");
+}
+
+/* VOLVER */
+function volver(){
+  window.location.href = "index.html";
+}
+
+/* INIT */
+cargarProveedores();
+
 </script>
 
 </body>
