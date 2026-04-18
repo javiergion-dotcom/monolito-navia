@@ -85,18 +85,22 @@ input[type=number]{
 
 <script>
 
+<script>
+
 let datos = {
   "Cafés Candelas":[
-    {nombre:"Café mezcla", precio:17},
-    {nombre:"Café natural", precio:18.5},
-    {nombre:"Descafeinado", precio:19}
+    {nombre:"Café mezcla", precio:17, iva:10},
+    {nombre:"Café natural", precio:18.5, iva:10},
+    {nombre:"Descafeinado", precio:19, iva:10}
   ],
   "Turrado (Mahou)":[
-    {nombre:"Barril 50L", precio:78},
-    {nombre:"Caja tercios", precio:16},
-    {nombre:"Caja quintos", precio:14.5}
+    {nombre:"Barril 50L", precio:78, iva:21},
+    {nombre:"Caja tercios", precio:16, iva:21},
+    {nombre:"Caja quintos", precio:14.5, iva:21}
   ]
 };
+
+let pedidoActivo = false;
 
 function cargarUsuario(){
   document.getElementById("usuario").innerText =
@@ -110,37 +114,69 @@ function fecha(){
 }
 
 function cargarArticulos(){
-  let prov = document.getElementById("proveedor").value;
+
+  if(pedidoActivo){
+    alert("⚠️ Termina o limpia el pedido antes de cambiar proveedor");
+    document.getElementById("proveedor").value = proveedorActual;
+    return;
+  }
+
+  proveedorActual = document.getElementById("proveedor").value;
+
   let tabla = document.getElementById("tabla");
   tabla.innerHTML = "";
 
-  datos[prov].forEach((a,i)=>{
+  datos[proveedorActual].forEach((a,i)=>{
     tabla.innerHTML += `
     <tr>
-      <td><input type="number" value="0" onchange="calcular()"></td>
+      <td><input type="number" placeholder="" oninput="calcular()"></td>
       <td>${a.nombre}</td>
       <td>${a.precio}</td>
-      <td class="imp">0</td>
+      <td class="imp"></td>
     </tr>`;
   });
 }
 
+let proveedorActual = "Cafés Candelas";
+
 function calcular(){
+
   let filas = document.querySelectorAll("#tabla tr");
   let prov = document.getElementById("proveedor").value;
 
-  let total = 0;
+  let subtotal = 0;
+  let ivaTotal = 0;
 
   filas.forEach((f,i)=>{
-    let unidades = f.children[0].children[0].value;
-    let precio = datos[prov][i].precio;
-    let imp = unidades * precio;
 
-    f.children[3].innerText = imp.toFixed(2);
-    total += imp;
+    let unidades = f.children[0].children[0].value;
+
+    if(unidades > 0){
+
+      pedidoActivo = true;
+
+      let precio = datos[prov][i].precio;
+      let iva = datos[prov][i].iva;
+
+      let base = unidades * precio;
+      let ivaCalc = base * (iva/100);
+
+      subtotal += base;
+      ivaTotal += ivaCalc;
+
+      f.children[3].innerText = base.toFixed(2);
+
+    }else{
+      f.children[3].innerText = "";
+    }
+
   });
 
-  document.getElementById("total").innerText =
+  let total = subtotal + ivaTotal;
+
+  document.getElementById("total").innerHTML =
+    "SUBTOTAL: " + subtotal.toFixed(2) + " €<br>" +
+    "IVA: " + ivaTotal.toFixed(2) + " €<br>" +
     "TOTAL: " + total.toFixed(2) + " €";
 }
 
@@ -149,6 +185,3 @@ fecha();
 cargarArticulos();
 
 </script>
-
-</body>
-</html>
