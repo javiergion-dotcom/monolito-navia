@@ -6,88 +6,149 @@
 <title>PEDIDOS</title>
 
 <style>
-*{box-sizing:border-box;}
-
 body{
   margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#dfe6ec;
-  color:#111;
+  font-family:Arial;
+  background:#eef2f5;
 }
 
 header{
   background:#17303d;
   color:white;
-  padding:12px 14px;
-  display:grid;
-  grid-template-columns:80px 1fr 120px;
-  align-items:center;
-  gap:10px;
-}
-
-.btn-volver{
-  background:#547184;
-  color:white;
-  border:none;
-  border-radius:10px;
-  padding:10px 12px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.cabecera-centro{
-  text-align:center;
-}
-
-.cabecera-centro .titulo{
-  font-size:20px;
-  font-weight:700;
-}
-
-.cabecera-centro .sub{
-  font-size:13px;
-  opacity:.9;
-  margin-top:2px;
-}
-
-.usuario{
-  text-align:right;
-  font-size:14px;
-  font-weight:700;
-}
-
-.panel{
-  padding:16px;
-  max-width:1100px;
-  margin:0 auto;
-}
-
-.tarjeta{
-  background:white;
-  border-radius:16px;
   padding:14px;
-  box-shadow:0 6px 14px rgba(0,0,0,.10);
-  margin-bottom:14px;
+  display:flex;
+  justify-content:space-between;
 }
 
-.grid-top{
-  display:grid;
-  grid-template-columns:1.2fr 1fr 1fr;
-  gap:12px;
+.contenido{
+  padding:16px;
 }
 
-label{
-  display:block;
-  font-size:12px;
-  font-weight:700;
-  margin-bottom:6px;
-  color:#355162;
-  text-transform:uppercase;
-  letter-spacing:.3px;
+.bloque{
+  background:white;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:12px;
 }
 
-select,input,button,textarea{
+select, input{
   width:100%;
-  padding:11px 12px;
-  border-radius:10px;
-  border:1px solid #c7
+  padding:10px;
+  font-size:16px;
+  margin-top:6px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+td{
+  padding:8px;
+}
+
+input[type=number]{
+  width:60px;
+}
+
+.total{
+  font-size:18px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div id="usuario">OPERADOR</div>
+  <div id="fecha"></div>
+</header>
+
+<div class="contenido">
+
+<div class="bloque">
+  PROVEEDOR
+  <select id="proveedor" onchange="cargarArticulos()">
+    <option>Cafés Candelas</option>
+    <option>Turrado (Mahou)</option>
+  </select>
+</div>
+
+<div class="bloque">
+  <table id="tabla"></table>
+</div>
+
+<div class="bloque total" id="total"></div>
+
+</div>
+
+<script>
+
+let datos = {
+  "Cafés Candelas":[
+    {nombre:"Café mezcla", precio:17},
+    {nombre:"Café natural", precio:18.5},
+    {nombre:"Descafeinado", precio:19}
+  ],
+  "Turrado (Mahou)":[
+    {nombre:"Barril 50L", precio:78},
+    {nombre:"Caja tercios", precio:16},
+    {nombre:"Caja quintos", precio:14.5}
+  ]
+};
+
+function cargarUsuario(){
+  document.getElementById("usuario").innerText =
+    localStorage.getItem("usuario") || "OPERADOR";
+}
+
+function fecha(){
+  let d = new Date();
+  document.getElementById("fecha").innerText =
+    d.toLocaleDateString() + " " + d.toLocaleTimeString();
+}
+
+function cargarArticulos(){
+  let prov = document.getElementById("proveedor").value;
+  let tabla = document.getElementById("tabla");
+  tabla.innerHTML = "";
+
+  datos[prov].forEach((a,i)=>{
+    tabla.innerHTML += `
+    <tr>
+      <td><input type="number" value="0" onchange="calcular()"></td>
+      <td>${a.nombre}</td>
+      <td>${a.precio}</td>
+      <td class="imp">0</td>
+    </tr>`;
+  });
+}
+
+function calcular(){
+  let filas = document.querySelectorAll("#tabla tr");
+  let prov = document.getElementById("proveedor").value;
+
+  let total = 0;
+
+  filas.forEach((f,i)=>{
+    let unidades = f.children[0].children[0].value;
+    let precio = datos[prov][i].precio;
+    let imp = unidades * precio;
+
+    f.children[3].innerText = imp.toFixed(2);
+    total += imp;
+  });
+
+  document.getElementById("total").innerText =
+    "TOTAL: " + total.toFixed(2) + " €";
+}
+
+cargarUsuario();
+fecha();
+cargarArticulos();
+
+</script>
+
+</body>
+</html>
