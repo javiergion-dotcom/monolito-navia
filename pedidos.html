@@ -85,8 +85,7 @@ input[type=number]{
 
 <script>
 
-<script>
-
+// 🔹 DATOS
 let datos = {
   "Cafés Candelas":[
     {nombre:"Café mezcla", precio:17, iva:10},
@@ -100,29 +99,35 @@ let datos = {
   ]
 };
 
+let proveedorActual = "";
 let pedidoActivo = false;
 
+// 👤 USUARIO
 function cargarUsuario(){
   document.getElementById("usuario").innerText =
     localStorage.getItem("usuario") || "OPERADOR";
 }
 
+// 📅 FECHA
 function fecha(){
   let d = new Date();
   document.getElementById("fecha").innerText =
     d.toLocaleDateString() + " " + d.toLocaleTimeString();
 }
 
+// 🔄 CARGAR ARTÍCULOS
 function cargarArticulos(){
 
-  if(pedidoActivo){
-  if(confirm("⚠️ Hay un pedido en curso. ¿Cambiar proveedor?") === false){
-    document.getElementById("proveedor").value = proveedorActual;
-    return;
-  }
-}
+  let nuevo = document.getElementById("proveedor").value;
 
-  proveedorActual = document.getElementById("proveedor").value;
+  if(pedidoActivo){
+    if(confirm("⚠️ Hay un pedido en curso. ¿Cambiar proveedor?") === false){
+      document.getElementById("proveedor").value = proveedorActual;
+      return;
+    }
+  }
+
+  proveedorActual = nuevo;
 
   let tabla = document.getElementById("tabla");
   tabla.innerHTML = "";
@@ -130,35 +135,36 @@ function cargarArticulos(){
   datos[proveedorActual].forEach((a,i)=>{
     tabla.innerHTML += `
     <tr>
-      <td><input type="number" placeholder="" oninput="calcular()"></td>
+      <td><input type="number" oninput="calcular()"></td>
       <td>${a.nombre}</td>
       <td>${a.precio}</td>
       <td class="imp"></td>
     </tr>`;
   });
+
+  calcular();
 }
 
-let proveedorActual = "Cafés Candelas";
-
+// 🧮 CALCULAR
 function calcular(){
 
   let filas = document.querySelectorAll("#tabla tr");
-  let prov = document.getElementById("proveedor").value;
 
   let subtotal = 0;
   let ivaTotal = 0;
+
+  pedidoActivo = false;
 
   filas.forEach((f,i)=>{
 
     let unidades = f.children[0].children[0].value;
 
     if(unidades > 0){
-      f.style.opacity = 1;
 
       pedidoActivo = true;
 
-      let precio = datos[prov][i].precio;
-      let iva = datos[prov][i].iva;
+      let precio = datos[proveedorActual][i].precio;
+      let iva = datos[proveedorActual][i].iva;
 
       let base = unidades * precio;
       let ivaCalc = base * (iva/100);
@@ -167,11 +173,12 @@ function calcular(){
       ivaTotal += ivaCalc;
 
       f.children[3].innerText = base.toFixed(2);
+      f.style.opacity = 1;
 
     }else{
-  f.children[3].innerText = "";
-  f.style.opacity = 0.3;
-}
+      f.children[3].innerText = "";
+      f.style.opacity = 0.3;
+    }
 
   });
 
@@ -183,8 +190,13 @@ function calcular(){
     "TOTAL: " + total.toFixed(2) + " €";
 }
 
+// 🚀 INICIO
 cargarUsuario();
 fecha();
+proveedorActual = document.getElementById("proveedor").value;
 cargarArticulos();
 
 </script>
+
+</body>
+</html>
