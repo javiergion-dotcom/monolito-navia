@@ -2,48 +2,79 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Proveedores</title>
 
 <style>
 body{
-font-family:Arial;
 margin:0;
-background:#f2f2f2;
+font-family:Arial, Helvetica, sans-serif;
+background:#dfe6ec;
 }
 
-.header{
-background:#222;
+header{
+background:#17303d;
 color:white;
-padding:14px;
+padding:14px 16px;
 display:flex;
 justify-content:space-between;
 align-items:center;
 }
 
+.titulo{
+font-size:24px;
+font-weight:bold;
+}
+
 .btn{
-background:#3c7ec4;
+background:#547184;
 color:white;
 padding:10px 16px;
-border-radius:8px;
+border-radius:10px;
 text-decoration:none;
+display:inline-block;
 }
 
 .contenido{
 padding:20px;
+}
+
+.proveedor{
+background:white;
+padding:18px;
+border-radius:14px;
+margin-bottom:12px;
+font-size:20px;
+font-weight:bold;
+box-shadow:0 4px 10px rgba(0,0,0,0.12);
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<div>📦 Proveedores</div>
+<header>
+<div class="titulo">📦 Proveedores</div>
 <a href="index.html" class="btn">← Volver</a>
-</div>
+</header>
 
-<div class="contenido">
-Aquí irá el listado de proveedores.
-</div>
+<div class="contenido" id="lista"></div>
+
+<script>
+const proveedores = [
+"TURRADO",
+"CAFÉS CANDELAS"
+];
+
+const lista = document.getElementById("lista");
+
+proveedores.forEach(nombre=>{
+const div = document.createElement("div");
+div.className = "proveedor";
+div.textContent = nombre;
+lista.appendChild(div);
+});
+</script>
 
 </body>
 </html>
