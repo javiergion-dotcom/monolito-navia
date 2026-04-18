@@ -6,192 +6,76 @@
 <title>MONOLITO</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
-
-html, body{
-  margin:0;
-  padding:0;
-  width:100%;
-  min-height:100%;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#dfe6ec;
-}
+*{box-sizing:border-box;}
 
 body{
-  overflow-x:hidden;
+  margin:0;
+  font-family:Arial;
+  background:#dfe6ec;
 }
 
 /* CABECERA */
 header{
   background:#17303d;
   color:white;
-  padding:14px 22px;
+  padding:14px 18px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  box-shadow:0 4px 12px rgba(0,0,0,0.25);
-}
-
-.header-left{
-  display:flex;
-  flex-direction:column;
 }
 
 .title{
   font-size:18px;
   font-weight:700;
-  letter-spacing:.3px;
 }
 
-.sub{
-  font-size:12px;
-  opacity:.8;
-  margin-top:2px;
-}
-
-.header-right{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-#usuario{
-  background:rgba(255,255,255,0.12);
-  padding:8px 12px;
-  border-radius:999px;
+.info{
+  text-align:right;
   font-size:14px;
-  font-weight:700;
-  white-space:nowrap;
-}
-
-#hora{
-  font-size:16px;
-  font-weight:600;
-  white-space:nowrap;
-}
-
-/* FRANJA */
-.franja{
-  background:#eef2f5;
-  color:#4f5f69;
-  padding:10px 22px;
-  font-size:14px;
-  border-bottom:1px solid rgba(0,0,0,0.05);
 }
 
 /* PANEL */
 .panel{
-  padding:20px;
+  padding:18px;
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:22px;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
 }
 
 /* BOTONES */
 .boton{
-  position:relative;
-  min-height:108px;
-  border-radius:22px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
+  background:linear-gradient(#87a6bd,#547184);
   color:white;
-  font-size:17px;
+  padding:20px;
+  border-radius:16px;
+  text-align:center;
+  font-size:18px;
   font-weight:700;
-  letter-spacing:0.3px;
   cursor:pointer;
-  user-select:none;
-  padding:14px 10px;
-  background:linear-gradient(180deg,#87a6bd 0%, #547184 100%);
-  box-shadow:
-    inset 0 2px 4px rgba(255,255,255,0.22),
-    0 12px 22px rgba(0,0,0,0.26);
-  transition:all 0.08s ease;
 }
 
-.boton:active{
-  transform:translateY(6px) scale(0.98);
-  box-shadow:
-    inset 0 6px 12px rgba(0,0,0,0.25),
-    0 6px 12px rgba(0,0,0,0.35);
-}
+.naranja{background:linear-gradient(#f6ae1b,#df8b00);}
+.verde{background:linear-gradient(#78cc4b,#48a530);}
 
-.azul{
-  background:linear-gradient(180deg,#87a6bd 0%, #547184 100%);
-}
-
-.naranja{
-  background:linear-gradient(180deg,#f6ae1b 0%, #df8b00 100%);
-}
-
-.verde{
-  background:linear-gradient(180deg,#78cc4b 0%, #48a530 100%);
-}
-
-.icono{
-  font-size:34px;
-  line-height:1;
-  margin-bottom:10px;
-}
-
-.contador{
+.alerta{
   position:absolute;
   top:10px;
-  right:12px;
-  min-width:26px;
-  height:26px;
-  padding:0 7px;
-  border-radius:999px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:13px;
-  font-weight:700;
+  right:10px;
+  background:red;
   color:white;
-  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  border-radius:50%;
+  padding:6px 10px;
+  font-size:12px;
 }
 
-.rojo{
-  background:#ff0000;
-}
-
-.amarillo{
-  background:#d99a00;
-}
-
-/* RESPONSIVE */
-@media (max-width:900px){
-  .panel{
-    grid-template-columns:repeat(2,1fr);
-    gap:16px;
-    padding:16px;
-  }
-
-  .boton{
-    min-height:118px;
-    font-size:16px;
-  }
-
-  header{
-    padding:12px 16px;
-  }
-
-  .franja{
-    padding:10px 16px;
-  }
-
-  #hora{
-    font-size:14px;
-  }
-
-  #usuario{
-    font-size:13px;
-    padding:7px 10px;
-  }
+/* AVISO STOCK */
+.stock-alerta{
+  background:#ffefc2;
+  margin:10px;
+  padding:12px;
+  border-radius:10px;
+  font-size:16px;
+  display:none;
 }
 </style>
 </head>
@@ -199,124 +83,79 @@ header{
 <body>
 
 <header>
-  <div class="header-left">
-    <div class="title">MONOLITO</div>
-    <div class="sub">Sistema de control · El Monolito</div>
-  </div>
-
-  <div class="header-right">
+  <div class="title">MONOLITO</div>
+  <div class="info">
     <div id="usuario">OPERADOR</div>
     <div id="hora"></div>
   </div>
 </header>
 
-<div class="franja" id="franjaEstado">
-  Buenas tardes · Sin incidencias · Sin comunicaciones
+<div id="stockAviso" class="stock-alerta">
+⚠️ CONTROL DE STOCK: revisar “cuántas hay / cuántas pido”
 </div>
 
 <div class="panel">
 
-  <div class="boton azul" onclick="abrir('proveedores.html')">
-    <div class="icono">🚚</div>
-    <div>PROVEEDORES</div>
-  </div>
+  <div class="boton" onclick="abrir('proveedores.html')">PROVEEDORES</div>
+  <div class="boton" onclick="abrir('pedidos.html')">PEDIDOS</div>
 
-  <div class="boton azul" onclick="abrir('articulos.html')">
-    <div class="icono">📦</div>
-    <div>ARTÍCULOS</div>
-  </div>
+  <div class="boton" onclick="abrir('pagos.html')">PAGOS</div>
+  <div class="boton naranja" onclick="abrir('comunicacion.html')">COMUNICACIÓN</div>
 
-  <div class="boton azul" onclick="abrir('comparador.html')">
-    <div class="icono">📊</div>
-    <div>COMPARADOR</div>
-  </div>
-
-  <div class="boton azul" onclick="abrir('pedidos.html')">
-    <div class="icono">📝</div>
-    <div>PEDIDOS</div>
-  </div>
-
-  <div class="boton azul" onclick="abrir('pagos.html')">
-    <div class="icono">💳</div>
-    <div>PAGOS</div>
-  </div>
-
-  <div class="boton naranja" onclick="abrir('revision.html')">
-    <div class="icono">🔎</div>
-    <div>REVISIÓN</div>
-  </div>
-
-  <div class="boton verde" onclick="abrir('historico.html')">
-    <div class="icono">📁</div>
-    <div>HISTÓRICO</div>
-  </div>
-
-  <div class="boton azul" onclick="abrir('ventas.html')">
-    <div class="icono">💰</div>
-    <div>VENTAS</div>
-  </div>
-
-  <div class="boton azul" onclick="abrir('calendario.html')">
-    <div class="icono">📅</div>
-    <div>CALENDARIO</div>
-  </div>
-
-  <div class="boton naranja" onclick="abrir('comunicacion.html')">
-    <div class="icono">✉️</div>
-    <div>COMUNICACIÓN</div>
-    <div class="contador amarillo">3</div>
-  </div>
-
-  <div class="boton naranja" onclick="abrir('ayuda.html')">
-    <div class="icono">🤖</div>
-    <div>AYUDA</div>
-  </div>
-
-  <div class="boton azul" onclick="abrir('configuracion.html')">
-    <div class="icono">⚙️</div>
-    <div>CONFIGURACIÓN</div>
-  </div>
+  <div class="boton verde" onclick="abrir('historico.html')">HISTÓRICO</div>
+  <div class="boton" onclick="abrir('configuracion.html')">CONFIGURACIÓN</div>
 
 </div>
 
 <script>
+
+/* ABRIR PÁGINAS */
 function abrir(destino){
   window.location.href = destino;
 }
 
+/* USUARIO (NO EDITABLE) */
+function cargarUsuario(){
+  let u = localStorage.getItem("usuario");
+  if(!u){ u = "SIN IDENTIFICAR"; }
+  document.getElementById("usuario").textContent = u;
+}
+
+/* RELOJ */
 function reloj(){
-  const d = new Date();
-  document.getElementById("hora").innerHTML =
-    d.toLocaleDateString("es-ES") + " · " +
+  let d = new Date();
+  document.getElementById("hora").textContent =
+    d.toLocaleDateString("es-ES") + " " +
     d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 }
 
-function saludo(){
-  const h = new Date().getHours();
-  if(h < 6) return "Buenas noches";
-  if(h < 12) return "Buenos días";
-  if(h < 21) return "Buenas tardes";
-  return "Buenas noches";
+/* CONTROL STOCK POR SEMANAS */
+function controlStock(){
+
+  let semanas = localStorage.getItem("controlSemanas") || 3;
+  let ultima = localStorage.getItem("ultimaRevision");
+
+  let hoy = new Date();
+
+  if(!ultima){
+    localStorage.setItem("ultimaRevision", hoy);
+    return;
+  }
+
+  let ultimaFecha = new Date(ultima);
+  let dias = (hoy - ultimaFecha) / (1000*60*60*24);
+
+  if(dias >= (7 * semanas)){
+    document.getElementById("stockAviso").style.display = "block";
+  }
 }
 
-function cargarUsuario(){
-  const usuario = localStorage.getItem("usuario") || "OPERADOR";
-  document.getElementById("usuario").textContent = usuario;
-}
-
-function actualizarFranja(){
-  document.getElementById("franjaEstado").textContent =
-    saludo() + " · Sin incidencias · Sin comunicaciones";
-}
-
-setInterval(() => {
-  reloj();
-  actualizarFranja();
-}, 1000);
-
+/* INICIO */
 cargarUsuario();
 reloj();
-actualizarFranja();
+setInterval(reloj,1000);
+controlStock();
+
 </script>
 
 </body>
