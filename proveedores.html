@@ -16,41 +16,55 @@ body{
 header{
   background:#17303d;
   color:white;
-  padding:18px;
-  font-size:20px;
-  font-weight:700;
+  padding:20px;
+  font-size:22px;
+  font-weight:bold;
 }
 
-/* LISTA */
+/* LISTA PROVEEDORES */
 .proveedor{
   background:#547184;
   color:white;
-  margin:14px;
+  margin:12px;
   padding:18px;
-  border-radius:12px;
+  border-radius:14px;
   font-size:20px;
   cursor:pointer;
 }
 
 /* TABLA */
-.tabla{
-  margin:14px;
-  background:white;
-  border-radius:12px;
-  padding:14px;
+#tabla{
+  margin:15px;
 }
 
+/* FILAS */
 .fila{
+  background:white;
+  padding:14px;
+  margin-bottom:8px;
+  border-radius:10px;
   display:flex;
   justify-content:space-between;
-  padding:14px 6px;
-  border-bottom:1px solid #ddd;
   font-size:18px;
 }
 
+/* INPUT */
 input{
   width:90px;
   font-size:18px;
+  padding:6px;
+}
+
+/* BOTÓN */
+button{
+  margin:15px;
+  padding:15px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  background:#48a530;
+  color:white;
+  width:90%;
 }
 </style>
 </head>
@@ -66,20 +80,33 @@ input{
 
 let proveedores = {
 
-  "Cafés Candelas (Café)": [
-    {articulo:"Café mezcla", precio:17.00},
-    {articulo:"Café natural", precio:18.50},
-    {articulo:"Descafeinado", precio:19.00}
+  "Cafés Candelas": [
+    {articulo:"Café mezcla 1kg", precio:17.00},
+    {articulo:"Café natural 1kg", precio:18.50},
+    {articulo:"Descafeinado 1kg", precio:19.00},
+    {articulo:"Café molido", precio:16.50},
+    {articulo:"Azúcar sobres", precio:1.20},
+    {articulo:"Sacarina", precio:2.10},
+    {articulo:"Chocolate taza", precio:3.20},
+    {articulo:"Cacao soluble", precio:2.50}
   ],
 
   "Turrado (Mahou)": [
     {articulo:"Barril 50L", precio:78.00},
+    {articulo:"Barril 30L", precio:56.00},
     {articulo:"Caja tercios", precio:16.00},
-    {articulo:"Caja quintos", precio:14.50}
+    {articulo:"Caja quintos", precio:14.50},
+    {articulo:"Mahou 0,0", precio:15.20},
+    {articulo:"Radler", precio:15.00},
+    {articulo:"Cerveza especial", precio:17.20},
+    {articulo:"Agua mineral", precio:6.00}
   ]
 
 };
 
+let actual = "";
+
+/* CARGAR PROVEEDORES */
 function cargar(){
   let html="";
   for(let p in proveedores){
@@ -88,23 +115,39 @@ function cargar(){
   document.getElementById("lista").innerHTML = html;
 }
 
+/* VER PRODUCTOS */
 function ver(p){
+  actual = p;
   let datos = proveedores[p];
 
-  let html = `<div class="tabla">`;
+  let html = `<h2 style="margin:15px;">${p}</h2>`;
 
   datos.forEach((d,i)=>{
     html += `
       <div class="fila">
         <div>${d.articulo}</div>
-        <input type="number" step="0.01" value="${d.precio}">
+        <div>
+          <input type="number" step="0.01" value="${d.precio}" id="p${i}">
+        </div>
       </div>
     `;
   });
 
-  html += `</div>`;
+  html += `<button onclick="guardar()">GUARDAR PRECIOS</button>`;
 
   document.getElementById("tabla").innerHTML = html;
+}
+
+/* GUARDAR */
+function guardar(){
+  let datos = proveedores[actual];
+
+  datos.forEach((d,i)=>{
+    let val = document.getElementById("p"+i).value;
+    d.precio = parseFloat(val);
+  });
+
+  alert("Guardado (temporal)");
 }
 
 cargar();
