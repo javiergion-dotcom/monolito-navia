@@ -208,3 +208,31 @@ cargarArticulos();
 
 </body>
 </html>
+function guardarPedido(){
+  alert("✅ Pedido guardado (de momento en memoria)");
+}
+
+function cerrarPedido(){
+
+  if(!pedidoActivo){
+    alert("⚠️ No hay nada en el pedido");
+    return;
+  }
+
+  if(confirm("¿Seguro que quieres cerrar el pedido?") === false){
+    return;
+  }
+
+  if(confirm("⚠️ Última confirmación. El pedido se dará por cerrado.") === false){
+    return;
+  }
+
+  alert("✅ Pedido cerrado correctamente");
+
+  // limpiar
+  document.getElementById("tabla").innerHTML = "";
+  document.getElementById("total").innerHTML = "";
+  pedidoActivo = false;
+
+  cargarArticulos();
+}
