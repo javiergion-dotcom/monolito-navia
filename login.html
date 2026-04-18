@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acceso Monolito</title>
+<title>MONOLITO · ACCESO</title>
 
 <style>
 *{
@@ -14,84 +14,65 @@
 body{
   margin:0;
   font-family:Arial, Helvetica, sans-serif;
-  background:linear-gradient(180deg,#0f1a21 0%, #17303d 100%);
+  background:linear-gradient(180deg,#17303d 0%, #0f1f28 100%);
   color:white;
-  min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
+  height:100vh;
 }
 
+/* CONTENEDOR */
 .contenedor{
   width:100%;
-  max-width:420px;
-  padding:24px;
+  max-width:380px;
+  padding:30px 20px;
   text-align:center;
 }
 
+/* LOGO */
 .logo{
-  font-size:34px;
+  font-size:36px;
   font-weight:700;
-  margin-bottom:8px;
-}
-
-.sub{
-  font-size:15px;
-  opacity:.8;
-  margin-bottom:24px;
-}
-
-.pin{
-  min-height:38px;
-  font-size:30px;
-  letter-spacing:12px;
+  letter-spacing:2px;
   margin-bottom:10px;
 }
 
-.estado{
-  min-height:22px;
+.sub{
   font-size:14px;
-  opacity:.8;
-  margin-bottom:24px;
+  opacity:0.7;
+  margin-bottom:30px;
 }
 
-.teclado{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-
-.tecla{
+/* INPUT */
+input{
+  width:100%;
+  padding:18px;
+  font-size:22px;
+  text-align:center;
   border:none;
+  border-radius:14px;
+  outline:none;
+  margin-bottom:20px;
+}
+
+/* BOTÓN */
+.boton{
+  background:linear-gradient(180deg,#8fb1c7 0%, #4f6f82 100%);
+  padding:18px;
   border-radius:18px;
-  height:84px;
-  font-size:28px;
+  font-size:20px;
   font-weight:700;
-  color:white;
-  background:linear-gradient(180deg,#6f8fa6 0%, #4c6576 100%);
-  box-shadow:
-    inset 0 2px 4px rgba(255,255,255,0.22),
-    0 10px 20px rgba(0,0,0,0.25);
   cursor:pointer;
-}
 
-.tecla:active{
-  transform:translateY(3px);
   box-shadow:
-    inset 0 4px 8px rgba(0,0,0,0.18),
-    0 6px 12px rgba(0,0,0,0.26);
+    inset 0 3px 6px rgba(255,255,255,0.25),
+    inset 0 -8px 16px rgba(0,0,0,0.15),
+    0 16px 30px rgba(0,0,0,0.30);
 }
 
-@media (max-width:480px){
-  .contenedor{
-    max-width:360px;
-    padding:18px;
-  }
-
-  .tecla{
-    height:76px;
-    font-size:25px;
-  }
+.boton:active{
+  transform:translateY(8px) scale(0.96);
 }
 </style>
 </head>
@@ -99,91 +80,54 @@ body{
 <body>
 
 <div class="contenedor">
+
   <div class="logo">MONOLITO</div>
-  <div class="sub">Identificación de operador</div>
+  <div class="sub">Acceso por código</div>
 
-  <div class="pin" id="pin"></div>
-  <div class="estado" id="estado">Introduce tu código</div>
+  <input type="number" id="codigo" placeholder="Código" autofocus>
 
-  <div class="teclado">
-    <button class="tecla" type="button" onclick="meter('1')">1</button>
-    <button class="tecla" type="button" onclick="meter('2')">2</button>
-    <button class="tecla" type="button" onclick="meter('3')">3</button>
-    <button class="tecla" type="button" onclick="meter('4')">4</button>
-    <button class="tecla" type="button" onclick="meter('5')">5</button>
-    <button class="tecla" type="button" onclick="meter('6')">6</button>
-    <button class="tecla" type="button" onclick="meter('7')">7</button>
-    <button class="tecla" type="button" onclick="meter('8')">8</button>
-    <button class="tecla" type="button" onclick="meter('9')">9</button>
-    <button class="tecla" type="button" onclick="borrar()">←</button>
-    <button class="tecla" type="button" onclick="meter('0')">0</button>
-    <button class="tecla" type="button" onclick="reiniciar()">C</button>
-  </div>
+  <div class="boton" onclick="entrar()">ENTRAR</div>
+
 </div>
 
 <script>
-let codigo = "";
+function entrar(){
+  let codigo = document.getElementById("codigo").value;
 
-const usuarios = {
-  "85": { nombre:"JAVIER", tipo:"admin" },
-  "12": { nombre:"SILVIA", tipo:"admin" },
-  "11": { nombre:"DARIO", tipo:"operador" },
-  "22": { nombre:"TOÑO", tipo:"operador" }
-};
-
-function refrescar(){
-  document.getElementById("pin").textContent = "• ".repeat(codigo.length);
-}
-
-function meter(n){
-  if(codigo.length >= 2) return;
-
-  codigo += n;
-  refrescar();
-
-  if(codigo.length === 2){
-    validar();
+  if(!codigo){
+    alert("Introduce código");
+    return;
   }
-}
 
-function borrar(){
-  codigo = codigo.slice(0,-1);
-  refrescar();
-}
+  // Guardar operador
+  localStorage.setItem("usuario", codigo);
 
-function reiniciar(){
-  codigo = "";
-  document.getElementById("estado").textContent = "Introduce tu código";
-  refrescar();
-}
+  // Vibración
+  if(navigator.vibrate){
+    navigator.vibrate(20);
+  }
 
-function validar(){
-  const usuario = usuarios[codigo];
+  // Sonido
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
 
-  if(usuario){
-    localStorage.setItem("usuario", usuario.nombre);
-    localStorage.setItem("tipoUsuario", usuario.tipo);
-    sessionStorage.setItem("loginOK", "SI");
+    osc.frequency.value = 240;
+    gain.gain.value = 0.03;
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.08);
+  }catch(e){}
+
+  // Ir al programa
+  setTimeout(()=>{
     window.location.href = "index.html";
-  }else{
-    document.getElementById("estado").textContent = "Código incorrecto";
-    setTimeout(function(){
-      reiniciar();
-    }, 800);
-  }
+  },100);
 }
-
-document.addEventListener("keydown", function(e){
-  if(e.key >= "0" && e.key <= "9"){
-    meter(e.key);
-  }else if(e.key === "Backspace"){
-    borrar();
-  }else if(e.key === "Escape"){
-    reiniciar();
-  }
-});
-
-refrescar();
 </script>
 
 </body>
