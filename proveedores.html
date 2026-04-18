@@ -6,9 +6,52 @@
 <title>PROVEEDORES</title>
 
 <style>
-body{font-family:Arial;background:#dfe6ec;margin:0;}
-header{background:#17303d;color:white;padding:15px;}
-.proveedor{background:#547184;color:white;margin:10px;padding:15px;border-radius:10px;cursor:pointer;}
+body{
+  font-family:Arial;
+  background:#dfe6ec;
+  margin:0;
+}
+
+/* CABECERA */
+header{
+  background:#17303d;
+  color:white;
+  padding:18px;
+  font-size:20px;
+  font-weight:700;
+}
+
+/* LISTA */
+.proveedor{
+  background:#547184;
+  color:white;
+  margin:14px;
+  padding:18px;
+  border-radius:12px;
+  font-size:20px;
+  cursor:pointer;
+}
+
+/* TABLA */
+.tabla{
+  margin:14px;
+  background:white;
+  border-radius:12px;
+  padding:14px;
+}
+
+.fila{
+  display:flex;
+  justify-content:space-between;
+  padding:14px 6px;
+  border-bottom:1px solid #ddd;
+  font-size:18px;
+}
+
+input{
+  width:90px;
+  font-size:18px;
+}
 </style>
 </head>
 
@@ -47,11 +90,19 @@ function cargar(){
 
 function ver(p){
   let datos = proveedores[p];
-  let html = "<h3>"+p+"</h3>";
 
-  datos.forEach(d=>{
-    html += d.articulo + " - " + d.precio + "<br>";
+  let html = `<div class="tabla">`;
+
+  datos.forEach((d,i)=>{
+    html += `
+      <div class="fila">
+        <div>${d.articulo}</div>
+        <input type="number" step="0.01" value="${d.precio}">
+      </div>
+    `;
   });
+
+  html += `</div>`;
 
   document.getElementById("tabla").innerHTML = html;
 }
