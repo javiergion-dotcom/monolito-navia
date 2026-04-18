@@ -75,7 +75,7 @@ header{
 }
 
 input{
-  width:80px;
+  width:90px;
   padding:6px;
   border-radius:6px;
   border:1px solid #ccc;
@@ -104,10 +104,8 @@ input{
 
 <div class="contenedor">
 
-  <!-- LISTA -->
   <div id="listaProveedores"></div>
 
-  <!-- TABLA -->
   <div id="zonaPrecios" style="display:none;">
     <div class="tabla" id="tablaPrecios"></div>
     <div class="guardar" onclick="guardar()">GUARDAR PRECIOS</div>
@@ -117,21 +115,31 @@ input{
 
 <script>
 
-/* DATOS BASE (luego los cambiamos por los tuyos reales) */
+/* PROVEEDORES REALES */
 let proveedores = {
-  "CocaCola": [
-    {articulo:"Coca Cola lata", precio:0.85},
-    {articulo:"Coca Cola botella", precio:1.20}
+
+  "Cafés Candelas": [
+    {articulo:"Café mezcla", precio:17.00},
+    {articulo:"Café natural", precio:18.50},
+    {articulo:"Café torrado", precio:16.80},
+    {articulo:"Descafeinado", precio:19.00},
+    {articulo:"Café molido", precio:16.50},
+    {articulo:"Azúcar", precio:1.20},
+    {articulo:"Sacarina", precio:2.10}
   ],
+
   "Mahou": [
-    {articulo:"Barril 50L", precio:78},
-    {articulo:"Caja tercios", precio:16}
+    {articulo:"Barril 50L", precio:78.00},
+    {articulo:"Caja tercios", precio:16.00},
+    {articulo:"Caja quintos", precio:14.50},
+    {articulo:"Mahou 0,0", precio:15.20}
   ]
+
 };
 
 let proveedorActual = "";
 
-/* CARGAR LISTA */
+/* LISTA */
 function cargarProveedores(){
   let html = "";
   for(let p in proveedores){
@@ -140,7 +148,7 @@ function cargarProveedores(){
   document.getElementById("listaProveedores").innerHTML = html;
 }
 
-/* ABRIR PROVEEDOR */
+/* ABRIR */
 function abrirProveedor(nombre){
   proveedorActual = nombre;
   document.getElementById("zonaPrecios").style.display = "block";
