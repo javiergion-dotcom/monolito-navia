@@ -116,10 +116,11 @@ function fecha(){
 function cargarArticulos(){
 
   if(pedidoActivo){
-    alert("⚠️ Termina o limpia el pedido antes de cambiar proveedor");
+  if(confirm("⚠️ Hay un pedido en curso. ¿Cambiar proveedor?") === false){
     document.getElementById("proveedor").value = proveedorActual;
     return;
   }
+}
 
   proveedorActual = document.getElementById("proveedor").value;
 
