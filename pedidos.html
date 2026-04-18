@@ -6,225 +6,88 @@
 <title>PEDIDOS</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#dfe6ec;
-}
+*{box-sizing:border-box;}
 
-/* CABECERA */
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#dfe6ec;
+  color:#111;
+}
 
 header{
-background:#17303d;
-color:white;
-padding:10px 15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+  background:#17303d;
+  color:white;
+  padding:12px 14px;
+  display:grid;
+  grid-template-columns:80px 1fr 120px;
+  align-items:center;
+  gap:10px;
 }
 
-.bloque-centro{
-text-align:center;
+.btn-volver{
+  background:#547184;
+  color:white;
+  border:none;
+  border-radius:10px;
+  padding:10px 12px;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.bloque-centro div{
-font-size:12px;
+.cabecera-centro{
+  text-align:center;
 }
 
-/* PANEL */
+.cabecera-centro .titulo{
+  font-size:20px;
+  font-weight:700;
+}
+
+.cabecera-centro .sub{
+  font-size:13px;
+  opacity:.9;
+  margin-top:2px;
+}
+
+.usuario{
+  text-align:right;
+  font-size:14px;
+  font-weight:700;
+}
 
 .panel{
-padding:15px;
+  padding:16px;
+  max-width:1100px;
+  margin:0 auto;
 }
 
-/* LINEAS */
-
-.linea{
-display:grid;
-grid-template-columns:2fr 1fr 1fr;
-gap:10px;
-background:white;
-padding:10px;
-border-radius:10px;
-margin-bottom:8px;
-align-items:center;
+.tarjeta{
+  background:white;
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 6px 14px rgba(0,0,0,.10);
+  margin-bottom:14px;
 }
 
-/* CONTROLES */
-
-select, input{
-padding:8px;
-border-radius:8px;
-border:none;
+.grid-top{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 1fr;
+  gap:12px;
 }
 
-button{
-padding:8px 12px;
-border:none;
-border-radius:8px;
-background:#547184;
-color:white;
-cursor:pointer;
+label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:6px;
+  color:#355162;
+  text-transform:uppercase;
+  letter-spacing:.3px;
 }
 
-/* TOTALES */
-
-.totales{
-margin-top:20px;
-background:white;
-padding:15px;
-border-radius:10px;
-font-weight:bold;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-
-<button onclick="volver()">←</button>
-
-<div class="bloque-centro">
-<div id="fecha"></div>
-<div>PEDIDOS</div>
-</div>
-
-<div id="usuario"></div>
-
-</header>
-
-<div class="panel">
-
-<!-- PROVEEDOR -->
-<select id="proveedor" onchange="cargarArticulos()">
-<option value="">Seleccionar proveedor</option>
-<option value="MAHOU">MAHOU</option>
-<option value="COCACOLA">COCACOLA</option>
-</select>
-
-<br><br>
-
-<!-- LINEA -->
-<div class="linea">
-<select id="articulo"></select>
-<input type="number" id="cantidad" placeholder="Unidades">
-<button onclick="agregar()">Añadir</button>
-</div>
-
-<!-- LISTA -->
-<div id="lista"></div>
-
-<!-- TOTALES -->
-<div class="totales">
-<div>SUBTOTAL: <span id="subtotal">0</span> €</div>
-<div>IVA: <span id="iva">0</span> €</div>
-<div>TOTAL: <span id="total">0</span> €</div>
-</div>
-
-</div>
-
-<script>
-
-let pedido = [];
-
-/* BASE DE ARTICULOS */
-const articulos = {
-MAHOU:[
-{nombre:"CERVEZA", precio:1.20, iva:21},
-{nombre:"TERCIO", precio:1.30, iva:21}
-],
-COCACOLA:[
-{nombre:"COCA-COLA", precio:1.00, iva:21},
-{nombre:"FANTA", precio:0.95, iva:21}
-]
-};
-
-function cargarArticulos(){
-let prov = document.getElementById("proveedor").value;
-let select = document.getElementById("articulo");
-
-select.innerHTML="";
-
-if(!articulos[prov]) return;
-
-articulos[prov].forEach(a=>{
-let opt = document.createElement("option");
-opt.value = JSON.stringify(a);
-opt.text = a.nombre;
-select.appendChild(opt);
-});
-}
-
-function agregar(){
-
-let datos = JSON.parse(document.getElementById("articulo").value);
-let cantidad = parseInt(document.getElementById("cantidad").value);
-
-if(!cantidad) return;
-
-pedido.push({
-...datos,
-cantidad
-});
-
-render();
-}
-
-function render(){
-
-let lista = document.getElementById("lista");
-lista.innerHTML = "";
-
-let subtotal = 0;
-let totalIVA = 0;
-
-pedido.forEach(item=>{
-
-let linea = document.createElement("div");
-linea.className="linea";
-
-let importe = item.precio * item.cantidad;
-let ivaCalc = importe * (item.iva/100);
-
-subtotal += importe;
-totalIVA += ivaCalc;
-
-linea.innerHTML = `
-<div>${item.nombre}</div>
-<div>x${item.cantidad}</div>
-<div>${importe.toFixed(2)} €</div>
-`;
-
-lista.appendChild(linea);
-
-});
-
-document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-document.getElementById("iva").innerText = totalIVA.toFixed(2);
-document.getElementById("total").innerText = (subtotal + totalIVA).toFixed(2);
-}
-
-function volver(){
-window.location.href="index.html";
-}
-
-/* USUARIO */
-document.getElementById("usuario").innerText =
-localStorage.getItem("usuario") || "OPERADOR";
-
-/* FECHA AUTOMATICA */
-function actualizarFecha(){
-let d = new Date();
-document.getElementById("fecha").innerText =
-d.toLocaleDateString("es-ES") + " · " +
-d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
-}
-
-setInterval(actualizarFecha,1000);
-actualizarFecha();
-
-</script>
-
-</body>
-</html>
+select,input,button,textarea{
+  width:100%;
+  padding:11px 12px;
+  border-radius:10px;
+  border:1px solid #c7
