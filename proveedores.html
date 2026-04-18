@@ -1,19 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROVEEDORES</title>
+
+<style>
+body{font-family:Arial;background:#dfe6ec;margin:0;}
+header{background:#17303d;color:white;padding:15px;}
+.proveedor{background:#547184;color:white;margin:10px;padding:15px;border-radius:10px;cursor:pointer;}
+</style>
+</head>
+
+<body>
+
+<header>PROVEEDORES</header>
+
+<div id="lista"></div>
+<div id="tabla"></div>
+
+<script>
+
 let proveedores = {
 
   "Cafés Candelas (Café)": [
     {articulo:"Café mezcla", precio:17.00},
     {articulo:"Café natural", precio:18.50},
-    {articulo:"Descafeinado", precio:19.00},
-    {articulo:"Café molido", precio:16.50},
-    {articulo:"Azúcar", precio:1.20},
-    {articulo:"Sacarina", precio:2.10}
+    {articulo:"Descafeinado", precio:19.00}
   ],
 
   "Turrado (Mahou)": [
     {articulo:"Barril 50L", precio:78.00},
     {articulo:"Caja tercios", precio:16.00},
-    {articulo:"Caja quintos", precio:14.50},
-    {articulo:"Mahou 0,0", precio:15.20}
+    {articulo:"Caja quintos", precio:14.50}
   ]
 
 };
+
+function cargar(){
+  let html="";
+  for(let p in proveedores){
+    html += `<div class="proveedor" onclick="ver('${p}')">${p}</div>`;
+  }
+  document.getElementById("lista").innerHTML = html;
+}
+
+function ver(p){
+  let datos = proveedores[p];
+  let html = "<h3>"+p+"</h3>";
+
+  datos.forEach(d=>{
+    html += d.articulo + " - " + d.precio + "<br>";
+  });
+
+  document.getElementById("tabla").innerHTML = html;
+}
+
+cargar();
+
+</script>
+
+</body>
+</html>
