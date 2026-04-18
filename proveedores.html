@@ -3,77 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proveedores</title>
+<title>MONOLITO</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial, Helvetica, sans-serif;
-background:#dfe6ec;
+*{box-sizing:border-box;}
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#dfe6ec;
 }
-
 header{
-background:#17303d;
-color:white;
-padding:14px 16px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+  background:#17303d;
+  color:white;
+  padding:14px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
-
-.titulo{
-font-size:24px;
-font-weight:bold;
+.title{font-size:18px;font-weight:700;}
+.sub{font-size:12px;opacity:.8;}
+#usuario{background:rgba(255,255,255,0.12);padding:8px 12px;border-radius:999px;}
+.panel{
+  padding:20px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
 }
-
-.btn{
-background:#547184;
-color:white;
-padding:10px 16px;
-border-radius:10px;
-text-decoration:none;
-display:inline-block;
+.boton{
+  min-height:100px;
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+  background:linear-gradient(#8fb0c8,#4e6b7c);
 }
-
-.contenido{
-padding:20px;
-}
-
-.proveedor{
-background:white;
-padding:18px;
-border-radius:14px;
-margin-bottom:12px;
-font-size:20px;
-font-weight:bold;
-box-shadow:0 4px 10px rgba(0,0,0,0.12);
-}
+.naranja{background:linear-gradient(#f6ae1b,#df8b00);}
+.verde{background:linear-gradient(#78cc4b,#48a530);}
+.icono{font-size:30px;margin-bottom:6px;}
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="titulo">📦 Proveedores</div>
-<a href="index.html" class="btn">← Volver</a>
+  <div>
+    <div class="title">MONOLITO</div>
+    <div class="sub">Sistema de control</div>
+  </div>
+  <div id="usuario">OPERADOR</div>
 </header>
 
-<div class="contenido" id="lista"></div>
+<div class="panel">
+
+<div class="boton" onclick="abrir('proveedores')">
+<div class="icono">🚚</div>PROVEEDORES</div>
+
+<div class="boton" onclick="abrir('articulos')">
+<div class="icono">📦</div>ARTÍCULOS</div>
+
+<div class="boton" onclick="abrir('comparador')">
+<div class="icono">📊</div>COMPARADOR</div>
+
+<div class="boton" onclick="abrir('pedidos')">
+<div class="icono">📝</div>PEDIDOS</div>
+
+<div class="boton" onclick="abrir('pagos')">
+<div class="icono">💳</div>PAGOS</div>
+
+<div class="boton naranja" onclick="abrir('revision')">
+<div class="icono">🔎</div>REVISIÓN</div>
+
+<div class="boton verde" onclick="abrir('historico')">
+<div class="icono">📁</div>HISTÓRICO</div>
+
+<div class="boton" onclick="abrir('ventas')">
+<div class="icono">💰</div>VENTAS</div>
+
+<div class="boton" onclick="abrir('calendario')">
+<div class="icono">📅</div>CALENDARIO</div>
+
+<div class="boton naranja" onclick="abrir('comunicacion')">
+<div class="icono">✉️</div>COMUNICACIÓN</div>
+
+<div class="boton naranja" onclick="abrir('ayuda')">
+<div class="icono">🤖</div>AYUDA</div>
+
+<div class="boton" onclick="abrir('configuracion')">
+<div class="icono">⚙️</div>CONFIGURACIÓN</div>
+
+</div>
 
 <script>
-const proveedores = [
-"TURRADO",
-"CAFÉS CANDELAS"
-];
-
-const lista = document.getElementById("lista");
-
-proveedores.forEach(nombre=>{
-const div = document.createElement("div");
-div.className = "proveedor";
-div.textContent = nombre;
-lista.appendChild(div);
-});
+function abrir(modulo){
+  alert("Módulo: " + modulo + " (aún sin crear)");
+}
 </script>
 
 </body>
