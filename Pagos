@@ -2,28 +2,143 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pagos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAGOS</title>
+
 <style>
-body{font-family:Arial;margin:0;background:#f2f2f2;}
-.header{background:#222;color:white;padding:14px;display:flex;justify-content:space-between;align-items:center;}
-.btn{background:#3c7ec4;color:white;padding:10px 16px;border-radius:8px;text-decoration:none;}
-.contenido{padding:20px;}
-.bloque{background:white;padding:15px;margin-bottom:12px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
-.titulo{font-weight:bold;margin-bottom:8px;}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#eef2f5;
+}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+}
+
+.contenido{
+  padding:15px;
+}
+
+.bloque{
+  background:white;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+.fila{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px;
+  border-bottom:1px solid #ddd;
+}
+
+.nombre{
+  font-weight:bold;
+}
+
+.total{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.botones{
+  display:flex;
+  gap:10px;
+}
+
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.ok{
+  background:#4f8a3a;
+  color:white;
+}
+
+.error{
+  background:#c0392b;
+  color:white;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<div>💳 Pagos proveedores</div>
-<a href="index.html" class="btn">← Volver</a>
-</div>
+<header>
+  <div>PAGOS</div>
+  <div onclick="volver()">←</div>
+</header>
 
-<div class="contenido">
-<div class="bloque"><div class="titulo">Pagos semanales</div></div>
-<div class="bloque"><div class="titulo">Incidencias de pago</div></div>
-</div>
+<div class="contenido" id="lista"></div>
+
+<script>
+
+function leerPagos(){
+  return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+}
+
+function guardarPagos(p){
+  localStorage.setItem("pagos_pendientes", JSON.stringify(p));
+}
+
+function pintar(){
+  let pagos = leerPagos();
+  let html="";
+
+  pagos.forEach((p,i)=>{
+
+    html += `
+    <div class="bloque">
+      <div class="fila">
+        <div class="nombre">${p.proveedor}</div>
+        <div class="total">${p.total.toFixed(2)} €</div>
+      </div>
+
+      <div class="botones">
+        <button class="ok" onclick="pagar(${i})">✔ PAGADO</button>
+        <button class="error" onclick="incidencia(${i})">⚠ INCIDENCIA</button>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById("lista").innerHTML = html;
+}
+
+/* MARCAR PAGADO */
+function pagar(i){
+  let pagos = leerPagos();
+  pagos[i].estado = "pagado";
+  guardarPagos(pagos);
+  pintar();
+}
+
+/* MARCAR INCIDENCIA */
+function incidencia(i){
+  let pagos = leerPagos();
+  pagos[i].estado = "incidencia";
+  guardarPagos(pagos);
+  pintar();
+}
+
+/* VOLVER */
+function volver(){
+  window.location.href="index.html";
+}
+
+pintar();
+
+</script>
 
 </body>
 </html>
