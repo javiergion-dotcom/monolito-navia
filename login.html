@@ -22,7 +22,6 @@ body{
   height:100vh;
 }
 
-/* CONTENEDOR */
 .contenedor{
   width:100%;
   max-width:380px;
@@ -30,7 +29,6 @@ body{
   text-align:center;
 }
 
-/* LOGO */
 .logo{
   font-size:36px;
   font-weight:700;
@@ -44,7 +42,6 @@ body{
   margin-bottom:30px;
 }
 
-/* INPUT */
 input{
   width:100%;
   padding:18px;
@@ -56,7 +53,6 @@ input{
   margin-bottom:20px;
 }
 
-/* BOTÓN */
 .boton{
   background:linear-gradient(180deg,#8fb1c7 0%, #4f6f82 100%);
   padding:18px;
@@ -64,7 +60,6 @@ input{
   font-size:20px;
   font-weight:700;
   cursor:pointer;
-
   box-shadow:
     inset 0 3px 6px rgba(255,255,255,0.25),
     inset 0 -8px 16px rgba(0,0,0,0.15),
@@ -80,14 +75,10 @@ input{
 <body>
 
 <div class="contenedor">
-
   <div class="logo">MONOLITO</div>
   <div class="sub">Acceso por código</div>
-
   <input type="number" id="codigo" placeholder="Código" autofocus>
-
   <div class="boton" onclick="entrar()">ENTRAR</div>
-
 </div>
 
 <script>
@@ -99,15 +90,13 @@ function entrar(){
     return;
   }
 
-  // Guardar operador
   localStorage.setItem("usuario", codigo);
+  sessionStorage.setItem("loginOK", "SI");
 
-  // Vibración
   if(navigator.vibrate){
     navigator.vibrate(20);
   }
 
-  // Sonido
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
@@ -123,8 +112,7 @@ function entrar(){
     osc.stop(ctx.currentTime + 0.08);
   }catch(e){}
 
-  // Ir al programa
-  setTimeout(()=>{
+  setTimeout(function(){
     window.location.href = "index.html";
   },100);
 }
