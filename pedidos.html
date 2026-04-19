@@ -6,216 +6,447 @@
 <title>PEDIDOS</title>
 
 <style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
 body{
   margin:0;
-  font-family:Arial; 
+  font-family:Arial, Helvetica, sans-serif;
   background:#eef2f5;
+  color:#2b2b2b;
 }
 
 header{
   background:#17303d;
   color:white;
-  padding:14px;
+  padding:16px;
   display:flex;
   justify-content:space-between;
+  align-items:center;
+}
+
+.title{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.info{
+  font-size:14px;
+  text-align:right;
 }
 
 .contenido{
   padding:16px;
 }
 
-.bloque{
-  background:white;
-  padding:12px;
-  border-radius:12px;
-  margin-bottom:12px;
+/* FILA DE PROVEEDORES */
+.zona-proveedores{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  margin-bottom:16px;
 }
 
-select, input{
-  width:100%;
-  padding:10px;
-  font-size:16px;
-  margin-top:6px;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-
-td{
-  padding:8px;
-}
-
-input[type=number]{
-  width:60px;
-}
-
-.total{
+.proveedor{
+  padding:18px;
+  border-radius:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   font-size:18px;
   font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  transition:transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.proveedor:active{
+  transform:translateY(4px) scale(0.98);
+}
+
+.check{
+  font-size:26px;
+  color:#4f8a3a;
+}
+
+/* COLORES SUAVES */
+.candelas{ background:#f4efe6; }
+.turrado{ background:#eae3d6; }
+.otro{ background:#f8f6f1; }
+
+/* HOJA DE PEDIDO */
+.hoja{
+  display:none;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.encabezado-hoja{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+  gap:12px;
+}
+
+.nombre-proveedor{
+  font-size:22px;
+  font-weight:700;
+}
+
+.boton-volver{
+  padding:10px 14px;
+  border:none;
+  border-radius:12px;
+  background:rgba(0,0,0,0.08);
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* TABLA */
+.tabla{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+
+.tabla th,
+.tabla td{
+  padding:10px 8px;
+  text-align:left;
+  font-size:16px;
+}
+
+.tabla th{
+  border-bottom:2px solid rgba(0,0,0,0.12);
+}
+
+.tabla td{
+  border-bottom:1px solid rgba(0,0,0,0.08);
+}
+
+.tabla input{
+  width:70px;
+  padding:8px;
+  font-size:16px;
+}
+
+.importe{
+  font-weight:bold;
+}
+
+/* TOTALES */
+.totales{
+  margin-top:18px;
+  background:rgba(255,255,255,0.65);
+  border-radius:14px;
+  padding:14px;
+  font-size:18px;
+  line-height:1.7;
+  font-weight:bold;
+}
+
+/* BOTONES */
+.acciones{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:16px;
+}
+
+.boton{
+  padding:16px;
+  border:none;
+  border-radius:14px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.guardar{
+  background:#4f8a3a;
+  color:white;
+}
+
+.borrar{
+  background:#b04b4b;
+  color:white;
+}
+
+@media (max-width:900px){
+  .zona-proveedores{
+    grid-template-columns:1fr;
+  }
+
+  .encabezado-hoja{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .tabla th,
+  .tabla td{
+    font-size:15px;
+    padding:8px 6px;
+  }
+
+  .tabla input{
+    width:60px;
+  }
+
+  .acciones{
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
-
 <body>
 
 <header>
-  <div id="usuario">OPERADOR</div>
-  <div id="fecha"></div>
+  <div class="title">PEDIDOS</div>
+  <div class="info">
+    <div id="usuario">OPERADOR</div>
+    <div id="fechaHora"></div>
+  </div>
 </header>
 
 <div class="contenido">
 
-<div class="bloque">
-  PROVEEDOR
-  <select id="proveedor" onchange="cargarArticulos()">
-    <option>Cafés Candelas</option>
-    <option>Turrado (Mahou)</option>
-  </select>
-</div>
+  <div id="zonaProveedores" class="zona-proveedores"></div>
 
-<div class="bloque">
-  <table id="tabla"></table>
-</div>
+  <div id="hojaPedido" class="hoja">
+    <div class="encabezado-hoja">
+      <div class="nombre-proveedor" id="nombreProveedorActivo"></div>
+      <button class="boton-volver" onclick="volverProveedores()">← VOLVER A PROVEEDORES</button>
+    </div>
 
-<div class="bloque total" id="total"></div>
-<div class="bloque">
-  <button onclick="guardarPedido()" style="width:100%;padding:12px;margin-bottom:8px;">
-    💾 GUARDAR PEDIDO
-  </button>
+    <table class="tabla" id="tablaPedido">
+      <thead>
+        <tr>
+          <th>UNIDADES</th>
+          <th>ARTÍCULO</th>
+          <th>PRECIO</th>
+          <th>IMPORTE</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-  <button onclick="cerrarPedido()" style="width:100%;padding:12px;background:#d9534f;color:white;">
-    🔒 CERRAR PEDIDO
-  </button>
-</div>
+    <div class="totales" id="totales">
+      SUBTOTAL: 0.00 €<br>
+      IVA: 0.00 €<br>
+      TOTAL: 0.00 €
+    </div>
+
+    <div class="acciones">
+      <button class="boton guardar" onclick="finalizarPedido()">FINALIZAR PEDIDO</button>
+      <button class="boton borrar" onclick="borrarPedidoProveedor()">BORRAR PEDIDO</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
-
-// 🔹 DATOS
-let datos = {
-  "Cafés Candelas":[
-    {nombre:"Café mezcla", precio:17, iva:10},
-    {nombre:"Café natural", precio:18.5, iva:10},
-    {nombre:"Descafeinado", precio:19, iva:10}
-  ],
-  "Turrado (Mahou)":[
-    {nombre:"Barril 50L", precio:78, iva:21},
-    {nombre:"Caja tercios", precio:16, iva:21},
-    {nombre:"Caja quintos", precio:14.5, iva:21}
-  ]
+let proveedores = {
+  "Cafés Candelas": {
+    color: "candelas",
+    formaPago: "contado",
+    articulos: [
+      {articulo:"Café mezcla 1kg", precio:17.00, iva:10},
+      {articulo:"Café natural 1kg", precio:18.50, iva:10},
+      {articulo:"Descafeinado 1kg", precio:19.00, iva:10},
+      {articulo:"Café molido", precio:16.50, iva:10},
+      {articulo:"Azúcar sobres", precio:1.20, iva:10},
+      {articulo:"Sacarina", precio:2.10, iva:10},
+      {articulo:"Chocolate taza", precio:3.20, iva:10},
+      {articulo:"Cacao soluble", precio:2.50, iva:10}
+    ]
+  },
+  "Turrado (Mahou)": {
+    color: "turrado",
+    formaPago: "reposicion",
+    articulos: [
+      {articulo:"Barril 50L", precio:78.00, iva:21},
+      {articulo:"Barril 30L", precio:56.00, iva:21},
+      {articulo:"Caja tercios", precio:16.00, iva:21},
+      {articulo:"Caja quintos", precio:14.50, iva:21},
+      {articulo:"Mahou 0,0", precio:15.20, iva:21},
+      {articulo:"Radler", precio:15.00, iva:21},
+      {articulo:"Cerveza especial", precio:17.20, iva:21},
+      {articulo:"Agua mineral", precio:6.00, iva:10}
+    ]
+  }
 };
 
-let proveedorActual = "";
+let proveedorActivo = "";
 let pedidoActivo = false;
 
-// 👤 USUARIO
-function cargarUsuario(){
-  document.getElementById("usuario").innerText =
-    localStorage.getItem("usuario") || "OPERADOR";
+function clavePedido(nombre){
+  return "pedido_" + nombre;
 }
 
-// 📅 FECHA
-function fecha(){
-  let d = new Date();
-  document.getElementById("fecha").innerText =
-    d.toLocaleDateString() + " " + d.toLocaleTimeString();
+function claveHistorico(){
+  return "historico_pedidos";
 }
 
-// 🔄 CARGAR ARTÍCULOS
-function cargarArticulos(){
+function clavePagos(){
+  return "pagos_pendientes";
+}
 
-  let nuevo = document.getElementById("proveedor").value;
+function cargarCabecera(){
+  document.getElementById("usuario").textContent = localStorage.getItem("usuario") || "OPERADOR";
+  actualizarFechaHora();
+  setInterval(actualizarFechaHora, 1000);
+}
 
-  if(pedidoActivo){
-    if(confirm("⚠️ Hay un pedido en curso. ¿Cambiar proveedor?") === false){
-      document.getElementById("proveedor").value = proveedorActual;
-      return;
-    }
+function actualizarFechaHora(){
+  const d = new Date();
+  document.getElementById("fechaHora").textContent =
+    d.toLocaleDateString("es-ES") + " · " +
+    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+}
+
+function leerJSON(clave, defecto){
+  const raw = localStorage.getItem(clave);
+  if(!raw) return defecto;
+  try{
+    return JSON.parse(raw);
+  }catch(e){
+    return defecto;
+  }
+}
+
+function guardarJSON(clave, valor){
+  localStorage.setItem(clave, JSON.stringify(valor));
+}
+
+function tienePedido(nombre){
+  const pedido = leerJSON(clavePedido(nombre), []);
+  return pedido.length > 0;
+}
+
+function pintarProveedores(){
+  let html = "";
+
+  for(const nombre in proveedores){
+    const clase = proveedores[nombre].color || "otro";
+    const check = tienePedido(nombre) ? "✔" : "";
+
+    html += `
+      <div class="proveedor ${clase}" onclick="abrirProveedor('${nombre.replace(/'/g,"\\'")}')">
+        <div>${nombre}</div>
+        <div class="check">${check}</div>
+      </div>
+    `;
   }
 
-  proveedorActual = nuevo;
+  document.getElementById("zonaProveedores").innerHTML = html;
+}
 
-  let tabla = document.getElementById("tabla");
-  tabla.innerHTML = "";
+function abrirProveedor(nombre){
+  proveedorActivo = nombre;
 
-  datos[proveedorActual].forEach((a,i)=>{
-    tabla.innerHTML += `
-    <tr>
-      <td><input type="number" oninput="calcular()"></td>
-      <td>${a.nombre}</td>
-      <td>${a.precio}</td>
-      <td class="imp"></td>
-    </tr>`;
+  document.getElementById("zonaProveedores").style.display = "none";
+  document.getElementById("hojaPedido").style.display = "block";
+  document.getElementById("hojaPedido").className = "hoja " + (proveedores[nombre].color || "otro");
+  document.getElementById("nombreProveedorActivo").textContent = nombre;
+
+  pintarTabla();
+}
+
+function volverProveedores(){
+  document.getElementById("zonaProveedores").style.display = "grid";
+  document.getElementById("hojaPedido").style.display = "none";
+  proveedorActivo = "";
+  pintarProveedores();
+}
+
+function leerPedidoProveedor(nombre){
+  return leerJSON(clavePedido(nombre), []);
+}
+
+function guardarPedidoProveedor(nombre, lineas){
+  guardarJSON(clavePedido(nombre), lineas);
+}
+
+function pintarTabla(){
+  const tbody = document.querySelector("#tablaPedido tbody");
+  tbody.innerHTML = "";
+
+  const articulos = proveedores[proveedorActivo].articulos;
+  const pedidoGuardado = leerPedidoProveedor(proveedorActivo);
+
+  articulos.forEach((item, i) => {
+    const existente = pedidoGuardado.find(x => x.indice === i);
+    const unidades = existente ? existente.unidades : "";
+
+    tbody.innerHTML += `
+      <tr>
+        <td><input type="number" step="1" value="${unidades}" oninput="calcular()"></td>
+        <td>${item.articulo}</td>
+        <td>${item.precio.toFixed(2)} €</td>
+        <td class="importe"></td>
+      </tr>
+    `;
   });
 
   calcular();
 }
 
-// 🧮 CALCULAR
 function calcular(){
-
-  let filas = document.querySelectorAll("#tabla tr");
+  const filas = document.querySelectorAll("#tablaPedido tbody tr");
+  const articulos = proveedores[proveedorActivo].articulos;
 
   let subtotal = 0;
   let ivaTotal = 0;
+  let pedido = [];
 
   pedidoActivo = false;
 
-  filas.forEach((f,i)=>{
+  filas.forEach((fila, i) => {
+    const input = fila.children[0].children[0];
+    const valor = input.value;
+    const unidades = parseFloat(valor);
 
-    let unidades = f.children[0].children[0].value;
-
-    if(unidades > 0){
-
+    if(!isNaN(unidades) && unidades > 0){
       pedidoActivo = true;
 
-      let precio = datos[proveedorActual][i].precio;
-      let iva = datos[proveedorActual][i].iva;
-
-      let base = unidades * precio;
-      let ivaCalc = base * (iva/100);
+      const precio = articulos[i].precio;
+      const iva = articulos[i].iva;
+      const base = unidades * precio;
+      const ivaCalc = base * (iva / 100);
 
       subtotal += base;
       ivaTotal += ivaCalc;
 
-      f.children[3].innerText = base.toFixed(2);
-      f.style.opacity = 1;
+      fila.children[3].textContent = base.toFixed(2) + " €";
+      fila.style.opacity = 1;
 
+      pedido.push({
+        indice: i,
+        unidades: unidades
+      });
     }else{
-      f.children[3].innerText = "";
-      f.style.opacity = 0.3;
+      fila.children[3].textContent = "";
+      fila.style.opacity = 0.35;
     }
-
   });
 
-  let total = subtotal + ivaTotal;
+  const total = subtotal + ivaTotal;
 
-  document.getElementById("total").innerHTML =
+  document.getElementById("totales").innerHTML =
     "SUBTOTAL: " + subtotal.toFixed(2) + " €<br>" +
     "IVA: " + ivaTotal.toFixed(2) + " €<br>" +
     "TOTAL: " + total.toFixed(2) + " €";
+
+  guardarPedidoProveedor(proveedorActivo, pedido);
 }
 
-// 🚀 INICIO
-cargarUsuario();
-fecha();
-proveedorActual = document.getElementById("proveedor").value;
-cargarArticulos();
-
-</script>
-
-</body>
-</html>
-function guardarPedido(){
-  alert("✅ Pedido guardado (de momento en memoria)");
-}
-
-function cerrarPedido(){
-
+function finalizarPedido(){
   if(!pedidoActivo){
-    alert("⚠️ No hay nada en el pedido");
+    alert("No hay nada en el pedido");
     return;
   }
 
@@ -223,21 +454,71 @@ function cerrarPedido(){
     return;
   }
 
-  if(confirm("⚠️ Última confirmación. El pedido se dará por cerrado.") === false){
+  if(confirm("Última confirmación. Este pedido se enviará a histórico y a pagos.") === false){
     return;
   }
 
-  alert("✅ Pedido cerrado correctamente");
+  const lineas = leerPedidoProveedor(proveedorActivo);
+  const articulos = proveedores[proveedorActivo].articulos;
 
-  // limpiar
-  document.getElementById("tabla").innerHTML = "";
-  document.getElementById("total").innerHTML = "";
-  pedidoActivo = false;
+  let subtotal = 0;
+  let ivaTotal = 0;
 
-  cargarArticulos();
+  lineas.forEach(linea => {
+    const item = articulos[linea.indice];
+    const base = linea.unidades * item.precio;
+    subtotal += base;
+    ivaTotal += base * (item.iva / 100);
+  });
+
+  const total = subtotal + ivaTotal;
+
+  const historico = leerJSON(claveHistorico(), []);
+  historico.push({
+    proveedor: proveedorActivo,
+    operador: localStorage.getItem("usuario") || "OPERADOR",
+    fecha: new Date().toISOString(),
+    lineas: lineas,
+    subtotal: subtotal,
+    iva: ivaTotal,
+    total: total
+  });
+  guardarJSON(claveHistorico(), historico);
+
+  const pagos = leerJSON(clavePagos(), []);
+  pagos.push({
+    proveedor: proveedorActivo,
+    total: total,
+    fecha: new Date().toISOString(),
+    formaPago: proveedores[proveedorActivo].formaPago,
+    estado: "pendiente"
+  });
+  guardarJSON(clavePagos(), pagos);
+
+  localStorage.removeItem(clavePedido(proveedorActivo));
+
+  alert("Pedido guardado. Ya está en histórico y en pagos.");
+
+  volverProveedores();
 }
-<div class="bloque">
-  <button onclick="cerrarPedido()" style="width:100%;padding:14px;font-size:18px;">
-    FINALIZAR PEDIDO
-  </button>
-</div>
+
+function borrarPedidoProveedor(){
+  if(!proveedorActivo){
+    return;
+  }
+
+  if(confirm("¿Seguro que quieres borrar el pedido de este proveedor?") === false){
+    return;
+  }
+
+  localStorage.removeItem(clavePedido(proveedorActivo));
+  pintarTabla();
+  pintarProveedores();
+}
+
+cargarCabecera();
+pintarProveedores();
+</script>
+
+</body>
+</html>
