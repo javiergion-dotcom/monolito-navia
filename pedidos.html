@@ -1,25 +1,72 @@
+
+javiergion-dotcom
+monolito-navia
+Repository navigation
+Code
+Issues
+Pull requests
+Agents
+Actions
+Projects
+Wiki
+Security and quality
+Insights
+Settings
+Commit 7740dff
+javiergion-dotcom
+javiergion-dotcom
+authored
+4 minutes ago
+·
+·
+Verified
+Update pedidos.html
+main
+1 parent 
+ad66d34
+ commit 
+7740dff
+File tree
+Filter files…
+pedidos.html
+1 file changed
++45
+-499
+lines changed
+Search within code
+ 
+‎pedidos.html‎
++45
+-499
+Lines changed: 45 additions & 499 deletions
+Original file line number	Diff line number	Diff line change
+@@ -1,541 +1,87 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEDIDOS</title>
 <title>MONOLITO</title>
 
 <style>
 *{
   box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
   -webkit-tap-highlight-color: transparent;
 }
 
+body{
 html, body{
   margin:0;
   padding:0;
   width:100%;
   min-height:100%;
   font-family:Arial, Helvetica, sans-serif;
+  background:#eef2f5;
+  color:#2b2b2b;
   background:#dfe6ec;
 }
-
 body{
   overflow-x:hidden;
 }
@@ -27,6 +74,7 @@ body{
 header{
   background:#17303d;
   color:white;
+  padding:16px;
   padding:16px 24px;
   display:flex;
   justify-content:space-between;
@@ -34,29 +82,93 @@ header{
   box-shadow:0 4px 12px rgba(0,0,0,0.25);
 }
 
+.title{
+  font-size:20px;
+  font-weight:bold;
+}
+.info{
+  font-size:14px;
+  text-align:right;
+}
+.contenido{
+  padding:16px;
+}
+/* FILA ÚNICA DE PROVEEDORES */
+.zona-proveedores{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  padding-bottom:6px;
+  margin-bottom:16px;
+  scrollbar-width:thin;
+}
+.zona-proveedores::-webkit-scrollbar{
+  height:8px;
+}
+.zona-proveedores::-webkit-scrollbar-thumb{
+  background:#c9cfd4;
+  border-radius:20px;
+}
+.proveedor{
+  min-width:220px;
+  padding:18px 16px;
+  border-radius:18px;
 .header-left{
   display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+  transition:transform 0.08s ease;
+  flex-shrink:0;
   flex-direction:column;
 }
 
+.proveedor:active{
+  transform:translateY(4px) scale(0.98);
+}
+.check{
+  font-size:26px;
+  color:#4f8a3a;
 .title{
   font-size:22px;
   font-weight:700;
   letter-spacing:.3px;
 }
 
+/* COLORES SUAVES */
+.candelas{ background:#f4efe6; }
+.turrado{ background:#eae3d6; }
+.otro{ background:#f8f6f1; }
+.gris{ background:#f0f1f2; }
+.mostaza{ background:#f3ecd2; }
+.cafe{ background:#ede4d8; }
+/* HOJA DE PEDIDO */
+.hoja{
+  display:none;
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
 .sub{
   font-size:13px;
   opacity:.85;
   margin-top:3px;
 }
 
+.encabezado-hoja{
 .header-right{
   display:flex;
+  justify-content:space-between;
   align-items:center;
+  margin-bottom:12px;
+  gap:12px;
   gap:16px;
 }
 
+.nombre-proveedor{
+  font-size:22px;
 #usuario{
   background:rgba(255,255,255,0.14);
   padding:9px 14px;
@@ -66,12 +178,352 @@ header{
   white-space:nowrap;
 }
 
+.boton-volver{
+  padding:10px 14px;
+  border:none;
+  border-radius:12px;
+  background:rgba(0,0,0,0.08);
+  cursor:pointer;
+  font-weight:bold;
+}
+/* TABLA */
+.tabla{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+.tabla th,
+.tabla td{
+  padding:10px 8px;
+  text-align:left;
+  font-size:16px;
+}
+.tabla th{
+  border-bottom:2px solid rgba(0,0,0,0.12);
+}
+.tabla td{
+  border-bottom:1px solid rgba(0,0,0,0.08);
+}
+.tabla input{
+  width:70px;
+  padding:8px;
+  font-size:16px;
+}
+.importe{
+  font-weight:bold;
+}
+/* TOTALES */
+.totales{
+  margin-top:18px;
+  background:rgba(255,255,255,0.65);
+  border-radius:14px;
+  padding:14px;
 #hora{
   font-size:18px;
+  line-height:1.7;
+  font-weight:bold;
+}
+/* BOTONES */
+.acciones{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:16px;
+}
+.boton{
+  padding:16px;
+  border:none;
+  border-radius:14px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.guardar{
+  background:#4f8a3a;
+  color:white;
+}
+.borrar{
+  background:#b04b4b;
+  color:white;
+}
+@media (max-width:900px){
+  .proveedor{
+    min-width:200px;
+    font-size:17px;
+  }
+  .encabezado-hoja{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .tabla th,
+  .tabla td{
+    font-size:15px;
+    padding:8px 6px;
+  }
+  .tabla input{
+    width:60px;
+  }
+  .acciones{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="title">PEDIDOS</div>
+  <div class="info">
+    <div id="usuario">OPERADOR</div>
+    <div id="fechaHora"></div>
+  </div>
+</header>
+<div class="contenido">
+  <div id="zonaProveedores" class="zona-proveedores"></div>
+  <div id="hojaPedido" class="hoja">
+    <div class="encabezado-hoja">
+      <div class="nombre-proveedor" id="nombreProveedorActivo"></div>
+      <button class="boton-volver" onclick="volverProveedores()">← VOLVER A PROVEEDORES</button>
+    </div>
+    <table class="tabla" id="tablaPedido">
+      <thead>
+        <tr>
+          <th>UNIDADES</th>
+          <th>ARTÍCULO</th>
+          <th>PRECIO</th>
+          <th>IMPORTE</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="totales" id="totales">
+      SUBTOTAL: 0.00 €<br>
+      IVA: 0.00 €<br>
+      TOTAL: 0.00 €
+    </div>
+    <div class="acciones">
+      <button class="boton guardar" onclick="finalizarPedido()">FINALIZAR PEDIDO</button>
+      <button class="boton borrar" onclick="borrarPedidoProveedor()">BORRAR PEDIDO</button>
+    </div>
+  </div>
+</div>
+<script>
+let proveedores = {
+  "Cafés Candelas": {
+    color: "candelas",
+    formaPago: "contado",
+    articulos: [
+      {articulo:"Café mezcla 1kg", precio:17.00, iva:10},
+      {articulo:"Café natural 1kg", precio:18.50, iva:10},
+      {articulo:"Descafeinado 1kg", precio:19.00, iva:10},
+      {articulo:"Café molido", precio:16.50, iva:10},
+      {articulo:"Azúcar sobres", precio:1.20, iva:10},
+      {articulo:"Sacarina", precio:2.10, iva:10},
+      {articulo:"Chocolate taza", precio:3.20, iva:10},
+      {articulo:"Cacao soluble", precio:2.50, iva:10}
+    ]
+  },
+  "Turrado (Mahou)": {
+    color: "turrado",
+    formaPago: "reposicion",
+    articulos: [
+      {articulo:"Barril 50L", precio:78.00, iva:21},
+      {articulo:"Barril 30L", precio:56.00, iva:21},
+      {articulo:"Caja tercios", precio:16.00, iva:21},
+      {articulo:"Caja quintos", precio:14.50, iva:21},
+      {articulo:"Mahou 0,0", precio:15.20, iva:21},
+      {articulo:"Radler", precio:15.00, iva:21},
+      {articulo:"Cerveza especial", precio:17.20, iva:21},
+      {articulo:"Agua mineral", precio:6.00, iva:10}
+    ]
+  }
+};
+let proveedorActivo = "";
+let pedidoActivo = false;
+function clavePedido(nombre){
+  return "pedido_" + nombre;
+}
+function claveHistorico(){
+  return "historico_pedidos";
+}
+function clavePagos(){
+  return "pagos_pendientes";
+}
+function cargarCabecera(){
+  document.getElementById("usuario").textContent = localStorage.getItem("usuario") || "OPERADOR";
+  actualizarFechaHora();
+  setInterval(actualizarFechaHora, 1000);
+}
+function actualizarFechaHora(){
+  const d = new Date();
+  document.getElementById("fechaHora").textContent =
+    d.toLocaleDateString("es-ES") + " · " +
+    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+}
+function leerJSON(clave, defecto){
+  const raw = localStorage.getItem(clave);
+  if(!raw) return defecto;
+  try{
+    return JSON.parse(raw);
+  }catch(e){
+    return defecto;
+  }
+}
+function guardarJSON(clave, valor){
+  localStorage.setItem(clave, JSON.stringify(valor));
+}
+function tienePedido(nombre){
+  const pedido = leerJSON(clavePedido(nombre), []);
+  return pedido.length > 0;
+}
+function pintarProveedores(){
+  let html = "";
+  for(const nombre in proveedores){
+    const clase = proveedores[nombre].color || "otro";
+    const check = tienePedido(nombre) ? "✔" : "";
+    html += `
+      <div class="proveedor ${clase}" onclick="abrirProveedor('${nombre.replace(/'/g,"\\'")}')">
+        <div>${nombre}</div>
+        <div class="check">${check}</div>
+      </div>
+    `;
+  }
+  document.getElementById("zonaProveedores").innerHTML = html;
+}
+function abrirProveedor(nombre){
+  proveedorActivo = nombre;
+  document.getElementById("zonaProveedores").style.display = "none";
+  document.getElementById("hojaPedido").style.display = "block";
+  document.getElementById("hojaPedido").className = "hoja " + (proveedores[nombre].color || "otro");
+  document.getElementById("nombreProveedorActivo").textContent = nombre;
+  pintarTabla();
+}
+function volverProveedores(){
+  document.getElementById("zonaProveedores").style.display = "flex";
+  document.getElementById("hojaPedido").style.display = "none";
+  proveedorActivo = "";
+  pintarProveedores();
+}
+function leerPedidoProveedor(nombre){
+  return leerJSON(clavePedido(nombre), []);
   font-weight:600;
   white-space:nowrap;
 }
 
+function guardarPedidoProveedor(nombre, lineas){
+  guardarJSON(clavePedido(nombre), lineas);
+}
+function pintarTabla(){
+  const tbody = document.querySelector("#tablaPedido tbody");
+  tbody.innerHTML = "";
+  const articulos = proveedores[proveedorActivo].articulos;
+  const pedidoGuardado = leerPedidoProveedor(proveedorActivo);
+  articulos.forEach((item, i) => {
+    const existente = pedidoGuardado.find(x => x.indice === i);
+    const unidades = existente ? existente.unidades : "";
+    tbody.innerHTML += `
+      <tr>
+        <td><input type="number" step="1" value="${unidades}" oninput="calcular()"></td>
+        <td>${item.articulo}</td>
+        <td>${item.precio.toFixed(2)} €</td>
+        <td class="importe"></td>
+      </tr>
+    `;
+  });
+  calcular();
+}
+function calcular(){
+  const filas = document.querySelectorAll("#tablaPedido tbody tr");
+  const articulos = proveedores[proveedorActivo].articulos;
+  let subtotal = 0;
+  let ivaTotal = 0;
+  let pedido = [];
+  pedidoActivo = false;
+  filas.forEach((fila, i) => {
+    const input = fila.children[0].children[0];
+    const valor = input.value;
+    const unidades = parseFloat(valor);
+    if(!isNaN(unidades) && unidades > 0){
+      pedidoActivo = true;
+      const precio = articulos[i].precio;
+      const iva = articulos[i].iva;
+      const base = unidades * precio;
+      const ivaCalc = base * (iva / 100);
+      subtotal += base;
+      ivaTotal += ivaCalc;
+      fila.children[3].textContent = base.toFixed(2) + " €";
+      fila.style.opacity = 1;
+      pedido.push({
+        indice: i,
+        unidades: unidades
+      });
+    }else{
+      fila.children[3].textContent = "";
+      fila.style.opacity = 0.35;
+    }
+  });
+  const total = subtotal + ivaTotal;
+  document.getElementById("totales").innerHTML =
+    "SUBTOTAL: " + subtotal.toFixed(2) + " €<br>" +
+    "IVA: " + ivaTotal.toFixed(2) + " €<br>" +
+    "TOTAL: " + total.toFixed(2) + " €";
+  guardarPedidoProveedor(proveedorActivo, pedido);
+}
+function finalizarPedido(){
+  if(!pedidoActivo){
+    alert("No hay nada en el pedido");
+    return;
+  }
+  if(confirm("¿Seguro que quieres cerrar el pedido?") === false){
+    return;
+  }
+  if(confirm("Última confirmación. Este pedido se enviará a histórico y a pagos.") === false){
+    return;
+  }
+  const lineas = leerPedidoProveedor(proveedorActivo);
+  const articulos = proveedores[proveedorActivo].articulos;
+  let subtotal = 0;
+  let ivaTotal = 0;
+  lineas.forEach(linea => {
+    const item = articulos[linea.indice];
+    const base = linea.unidades * item.precio;
+    subtotal += base;
+    ivaTotal += base * (item.iva / 100);
+  });
+  const total = subtotal + ivaTotal;
+  const historico = leerJSON(claveHistorico(), []);
+  historico.push({
+    proveedor: proveedorActivo,
+    operador: localStorage.getItem("usuario") || "OPERADOR",
+    fecha: new Date().toISOString(),
+    lineas: lineas,
+    subtotal: subtotal,
+    iva: ivaTotal,
+    total: total
+  });
+  guardarJSON(claveHistorico(), historico);
+  const pagos = leerJSON(clavePagos(), []);
+  pagos.push({
+    proveedor: proveedorActivo,
+    total: total,
+    fecha: new Date().toISOString(),
+    formaPago: proveedores[proveedorActivo].formaPago,
+    estado: "pendiente"
+  });
+  guardarJSON(clavePagos(), pagos);
+  localStorage.removeItem(clavePedido(proveedorActivo));
+  alert("Pedido guardado. Ya está en histórico y en pagos.");
+  volverProveedores();
+}
+function borrarPedidoProveedor(){
+  if(!proveedorActivo){
+    return;
+  }
+  if(confirm("¿Seguro que quieres borrar el pedido de este proveedor?") === false){
+    return;
+  }
+  localStorage.removeItem(clavePedido(proveedorActivo));
+  pintarTabla();
+  pintarProveedores();
 .franja{
   background:#eef2f5;
   color:#4f5f69;
@@ -80,8 +532,17 @@ header{
   border-bottom:1px solid rgba(0,0,0,0.05);
 }
 
+cargarCabecera();
+pintarProveedores();
+</script>
+</body>
+</html>
 .panel{
   padding:24px;
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:30px;
+0 commit comments
+Comments
+0
+ (0)
