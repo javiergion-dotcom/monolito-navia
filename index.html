@@ -132,6 +132,10 @@ header{
   background:linear-gradient(180deg,#78cc4b 0%, #48a530 100%);
 }
 
+.rojo-boton{
+  background:linear-gradient(180deg,#d65454 0%, #a83333 100%);
+}
+
 .icono{
   font-size:46px;
   line-height:1;
@@ -240,7 +244,6 @@ header{
   <div class="boton azul" onclick="abrir('proveedores.html')">
     <div class="icono">🚚</div>
     <div>PROVEEDORES</div>
-    <div class="contador rojo">1</div>
   </div>
 
   <div class="boton azul" onclick="abrir('articulos.html')">
@@ -256,7 +259,6 @@ header{
   <div class="boton azul" onclick="abrir('pedidos.html')">
     <div class="icono">📝</div>
     <div>PEDIDOS</div>
-    <div class="contador rojo">2</div>
   </div>
 
   <div class="boton azul" onclick="abrir('pagos.html')">
@@ -264,13 +266,7 @@ header{
     <div>PAGOS</div>
   </div>
 
-  <div class="boton naranja" onclick="abrir('revision.html')">
-    <div class="icono">🔎</div>
-    <div>REVISIÓN</div>
-    <div class="contador rojo">1</div>
-  </div>
-
-  <div class="boton verde" onclick="abrir('historico.html')">
+  <div class="boton azul" onclick="abrir('historico.html')">
     <div class="icono">📁</div>
     <div>HISTÓRICO</div>
   </div>
@@ -285,13 +281,19 @@ header{
     <div>CALENDARIO</div>
   </div>
 
+  <div class="boton rojo-boton" onclick="abrir('incidencias.html')">
+    <div class="icono">🚨</div>
+    <div>INCIDENCIAS</div>
+    <div class="contador rojo" id="contIncidencias">0</div>
+  </div>
+
   <div class="boton naranja" onclick="abrir('comunicacion.html')">
     <div class="icono">✉️</div>
     <div>COMUNICACIÓN</div>
-    <div class="contador amarillo">3</div>
+    <div class="contador amarillo" id="contComunicaciones">0</div>
   </div>
 
-  <div class="boton naranja" onclick="abrir('ayuda.html')">
+  <div class="boton azul" onclick="abrir('ayuda.html')">
     <div class="icono">🤖</div>
     <div>AYUDA</div>
   </div>
@@ -309,6 +311,7 @@ if(!sessionStorage.getItem("loginOK")){
   window.location.href = "login.html";
 }
 
+// SONIDO
 function sonidoClick(){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -330,6 +333,7 @@ function sonidoClick(){
   }catch(e){}
 }
 
+// VIBRAR
 function vibrar(){
   try{
     if(navigator.vibrate){
@@ -338,6 +342,7 @@ function vibrar(){
   }catch(e){}
 }
 
+// ABRIR MÓDULOS
 function abrir(destino){
   vibrar();
   sonidoClick();
@@ -346,6 +351,7 @@ function abrir(destino){
   },70);
 }
 
+// RELOJ
 function reloj(){
   const d = new Date();
   document.getElementById("hora").innerHTML =
@@ -353,6 +359,7 @@ function reloj(){
     d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 }
 
+// SALUDO
 function saludo(){
   const h = new Date().getHours();
   if(h < 6) return "Buenas noches";
@@ -361,24 +368,49 @@ function saludo(){
   return "Buenas noches";
 }
 
+// USUARIO
 function cargarUsuario(){
   const usuario = localStorage.getItem("usuario") || "OPERADOR";
   document.getElementById("usuario").textContent = usuario;
 }
 
-function actualizarFranja(){
-  document.getElementById("franjaEstado").textContent =
-    saludo() + " · Sin incidencias · Sin comunicaciones";
+// CONTADORES
+function actualizarContadores(){
+  let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+  let comunicaciones = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
+
+  let incidencias = pagos.filter(p => p.estado === "incidencia").length;
+
+  document.getElementById("contIncidencias").textContent = incidencias;
+  document.getElementById("contComunicaciones").textContent = comunicaciones.length;
 }
 
+// FRANJA
+function actualizarFranja(){
+  let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+  let comunicaciones = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
+
+  let incidencias = pagos.filter(p => p.estado === "incidencia").length;
+
+  let textoIncidencias = incidencias > 0 ? incidencias + " incidencias" : "Sin incidencias";
+  let textoComunicaciones = comunicaciones.length > 0 ? comunicaciones.length + " comunicaciones" : "Sin comunicaciones";
+
+  document.getElementById("franjaEstado").textContent =
+    saludo() + " · " + textoIncidencias + " · " + textoComunicaciones;
+}
+
+// LOOP
 setInterval(function(){
   reloj();
   actualizarFranja();
 },1000);
 
+// INIT
 cargarUsuario();
 reloj();
+actualizarContadores();
 actualizarFranja();
+
 </script>
 
 </body>
