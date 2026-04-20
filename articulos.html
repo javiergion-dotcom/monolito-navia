@@ -37,7 +37,7 @@ header{
 
 .item{
   background:white;
-  padding:15px;
+  padding:12px;
   border-radius:12px;
   margin-bottom:10px;
   display:flex;
@@ -89,17 +89,12 @@ button{
 <body>
 
 <header>
-  <div style="display:flex; align-items:center; gap:10px;">
-    <div onclick="volver()" style="font-size:24px; cursor:pointer;">←</div>
-    <div class="titulo">ARTÍCULOS</div>
-  </div>
-
+  <div class="titulo">ARTÍCULOS</div>
   <div class="add" onclick="nuevo()">+</div>
 </header>
 
 <div class="lista" id="lista"></div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box">
 
@@ -107,7 +102,7 @@ button{
 
     <select id="proveedor"></select>
 
-    <input id="precio" placeholder="Precio sin IVA">
+    <input id="precio" placeholder="Precio compra" type="number" step="0.01">
 
     <select id="iva">
       <option value="4">IVA 4%</option>
@@ -126,6 +121,16 @@ let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
 let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
 let editIndex = null;
 
+/* CARGAR PROVEEDORES */
+function cargarProveedores(){
+  let select = document.getElementById("proveedor");
+  select.innerHTML = "";
+
+  proveedores.forEach(p=>{
+    select.innerHTML += `<option>${p.nombre}</option>`;
+  });
+}
+
 /* PINTAR */
 function pintar(){
   let html="";
@@ -134,20 +139,12 @@ function pintar(){
     <div class="item">
       <div>
         ${a.nombre}<br>
-        <small>${a.proveedor} · ${a.precio}€</small>
+        <small>${a.proveedor} · ${a.precio}€ · IVA ${a.iva}%</small>
       </div>
       <div class="editar" onclick="editar(${i})">✏</div>
     </div>`;
   });
-  lista.innerHTML=html;
-}
-
-/* CARGAR PROVEEDORES */
-function cargarProveedores(){
-  proveedor.innerHTML="";
-  proveedores.forEach(p=>{
-    proveedor.innerHTML+=`<option>${p.nombre}</option>`;
-  });
+  document.getElementById("lista").innerHTML=html;
 }
 
 /* NUEVO */
@@ -196,11 +193,6 @@ function guardar(){
 
   modal.style.display="none";
   pintar();
-}
-
-/* VOLVER */
-function volver(){
-  window.history.back();
 }
 
 /* INIT */
