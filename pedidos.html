@@ -3,299 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedidos</title>
+<title>PROVEEDORES</title>
 
 <style>
 body{
-    margin:0;
-    font-family:Arial;
-    background:#f5f7f8;
+  margin:0;
+  font-family:Arial;
+  background:#eef2f5;
 }
 
 /* HEADER */
-header{
-    background:#17303d;
-    color:white;
-    padding:15px;
-    display:flex;
-    justify-content:space-between;
-}
-
-/* PROVEEDORES */
-.zona-proveedores{
-    display:flex;
-    gap:10px;
-    overflow-x:auto;
-    padding:15px;
-}
-
-.proveedor{
-    min-width:180px;
-    padding:15px;
-    border-radius:15px;
-    cursor:pointer;
-    text-align:center;
-    font-weight:bold;
-}
-
-/* COLORES SUAVES */
-.cafe{ background:#ede4d8; }
-.gris{ background:#f0f1f2; }
-.carton{ background:#f3e7d3; }
-.blanco{ background:#f7f7f5; }
-.mostaza{ background:#f3ecd2; }
-
-/* HOJA PEDIDO */
-.hoja{
-    display:none;
-    padding:15px;
-}
-
-.nombre-proveedor{
-    font-size:22px;
-    margin-bottom:10px;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-td{
-    padding:10px;
-    border-bottom:1px solid #ddd;
-}
-
-input{
-    width:60px;
-}
-
-/* BOTONES */
-.botones{
-    margin-top:15px;
-    display:flex;
-    gap:10px;
-}
-
-button{
-    flex:1;
-    padding:15px;
-    border:none;
-    border-radius:10px;
-    font-weight:bold;
-}
-
-.guardar{ background:#4f8a3a; color:white; }
-.borrar{ background:#b04b4b; color:white; }
-
-.totales{
-    margin-top:15px;
-    padding:15px;
-    background:white;
-    border-radius:10px;
-}
-</style>
-</head>
-<body>
-
 header{
   background:#17303d;
   color:white;
   padding:15px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  gap:10px;
+  align-items:center;
 }
 
-.titulo-header{
+.titulo{
+  font-size:20px;
   font-weight:bold;
-  font-size:20px;
-  flex:1;
-  text-align:center;
 }
 
-.volver{
-  background:rgba(255,255,255,0.15);
-  border:none;
-  color:white;
-  font-size:20px;
-  width:42px;
-  height:42px;
-  border-radius:10px;
+.add{
+  font-size:28px;
   cursor:pointer;
 }
 
-#fecha{
-  min-width:90px;
-  text-align:right;
-  font-size:14px;
+/* LISTA */
+.lista{
+  padding:15px;
 }
 
-<div id="zonaProveedores" class="zona-proveedores"></div>
+.proveedor{
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:bold;
+}
 
-<div id="hoja" class="hoja">
-    <div class="nombre-proveedor" id="nombre"></div>
+/* COLORES SUAVES */
+.c1{background:#f4efe6;}
+.c2{background:#eae3d6;}
+.c3{background:#f0f1f2;}
+.c4{background:#f3ecd2;}
+.c5{background:#ede4d8;}
 
-    <table id="tabla"></table>
+.editar{
+  cursor:pointer;
+}
 
-    <div class="totales" id="totales"></div>
+/* MODAL */
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
 
-    <div class="botones">
-        <button class="guardar" onclick="cerrarPedido()">GUARDAR PEDIDO</button>
-        <button class="borrar" onclick="volver()">VOLVER</button>
-    </div>
+.modal-box{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  width:90%;
+  max-width:400px;
+}
+
+input, select{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  background:#17303d;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="titulo">PROVEEDORES</div>
+  <div class="add" onclick="nuevo()">+</div>
+</header>
+
+<div class="lista" id="lista"></div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+
+    <input id="nombre" placeholder="Nombre">
+    <input id="telefono" placeholder="Teléfono">
+    <input id="producto" placeholder="Producto principal">
+
+    <input id="diaPedido" placeholder="Día de pedido">
+    <input id="diaReparto" placeholder="Día de reparto">
+
+    <select id="pago">
+      <option value="contado">Contado</option>
+      <option value="reposicion">Reposición</option>
+      <option value="banco">Banco</option>
+      <option value="cuenta">Entregas a cuenta</option>
+    </select>
+
+    <select id="color">
+      <option value="c1">Crema</option>
+      <option value="c2">Cartón</option>
+      <option value="c3">Gris</option>
+      <option value="c4">Mostaza suave</option>
+      <option value="c5">Café con leche</option>
+    </select>
+
+    <button onclick="guardar()">GUARDAR</button>
+
+  </div>
 </div>
 
 <script>
-let proveedorActivo = "";
-let pedidoActivo = false;
 
-/* DATOS */
-const proveedores = {
-    "Mahou": {
-        color:"cafe",
-        articulos:[
-            {nombre:"Barril 50L", precio:78, iva:21},
-            {nombre:"Caja tercios", precio:16, iva:21}
-        ]
-    },
-    "Cafés": {
-        color:"mostaza",
-        articulos:[
-            {nombre:"Café natural", precio:12, iva:10}
-        ]
-    }
-};
+let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
+let editIndex = null;
 
-/* FECHA */
-function fecha(){
-    document.getElementById("fecha").innerText =
-    new Date().toLocaleString();
+/* PINTAR */
+function pintar(){
+  let html="";
+  proveedores.forEach((p,i)=>{
+    html+=`
+    <div class="proveedor ${p.color}">
+      <div>
+        ${p.nombre}<br>
+        <small>${p.producto}</small>
+      </div>
+      <div class="editar" onclick="editar(${i})">✏</div>
+    </div>`;
+  });
+  document.getElementById("lista").innerHTML=html;
 }
 
-/* PINTAR PROVEEDORES */
-function pintarProveedores(){
-    let zona = document.getElementById("zonaProveedores");
-    zona.innerHTML="";
-
-    for(let p in proveedores){
-        let check = localStorage.getItem("pedido_"+p) ? "✔️" : "";
-
-        zona.innerHTML += `
-        <div class="proveedor ${proveedores[p].color}" onclick="abrir('${p}')">
-            ${p}<br>${check}
-        </div>`;
-    }
+/* NUEVO */
+function nuevo(){
+  editIndex=null;
+  limpiar();
+  document.getElementById("modal").style.display="flex";
 }
 
-/* ABRIR PROVEEDOR */
-function abrir(p){
-    if(pedidoActivo){
-        if(!confirm("Tienes un pedido abierto")) return;
-    }
+/* EDITAR */
+function editar(i){
+  editIndex=i;
+  let p=proveedores[i];
 
-    proveedorActivo = p;
-    pedidoActivo = false;
+  nombre.value=p.nombre;
+  telefono.value=p.telefono;
+  producto.value=p.producto;
+  diaPedido.value=p.diaPedido;
+  diaReparto.value=p.diaReparto;
+  pago.value=p.pago;
+  color.value=p.color;
 
-    document.getElementById("zonaProveedores").style.display="none";
-    document.getElementById("hoja").style.display="block";
-    document.getElementById("nombre").innerText = p;
-
-    pintarTabla();
+  modal.style.display="flex";
 }
 
-/* TABLA */
-function pintarTabla(){
-    let tabla = document.getElementById("tabla");
-    tabla.innerHTML="";
-
-    let guardado = JSON.parse(localStorage.getItem("pedido_"+proveedorActivo) || "[]");
-
-    proveedores[proveedorActivo].articulos.forEach((a,i)=>{
-
-        let u = guardado[i] || "";
-
-        tabla.innerHTML += `
-        <tr>
-            <td><input type="number" value="${u}" oninput="calcular()"></td>
-            <td>${a.nombre}</td>
-            <td>${a.precio}</td>
-            <td class="imp"></td>
-        </tr>`;
-    });
-
-    calcular();
+/* LIMPIAR */
+function limpiar(){
+  nombre.value="";
+  telefono.value="";
+  producto.value="";
+  diaPedido.value="";
+  diaReparto.value="";
 }
 
-/* CALCULAR */
-function calcular(){
-    let filas = document.querySelectorAll("#tabla tr");
-    let subtotal = 0;
-    let ivaTotal = 0;
-    let datos = [];
+/* GUARDAR */
+function guardar(){
 
-    filas.forEach((f,i)=>{
-        let u = f.children[0].children[0].value;
+  let p={
+    nombre:nombre.value,
+    telefono:telefono.value,
+    producto:producto.value,
+    diaPedido:diaPedido.value,
+    diaReparto:diaReparto.value,
+    pago:pago.value,
+    color:color.value
+  };
 
-        if(u > 0){
-            pedidoActivo = true;
+  if(editIndex===null){
+    proveedores.push(p);
+  }else{
+    proveedores[editIndex]=p;
+  }
 
-            let art = proveedores[proveedorActivo].articulos[i];
-            let base = u * art.precio;
-            let iva = base * art.iva /100;
+  localStorage.setItem("proveedores", JSON.stringify(proveedores));
 
-            subtotal += base;
-            ivaTotal += iva;
-
-            f.children[3].innerText = base.toFixed(2);
-
-            datos[i] = u;
-        }else{
-            f.children[3].innerText="";
-        }
-    });
-
-    localStorage.setItem("pedido_"+proveedorActivo, JSON.stringify(datos));
-
-    let total = subtotal + ivaTotal;
-
-    document.getElementById("totales").innerHTML =
-    "SUBTOTAL: "+subtotal.toFixed(2)+" €<br>"+
-    "IVA: "+ivaTotal.toFixed(2)+" €<br>"+
-    "TOTAL: "+total.toFixed(2)+" €";
-}
-
-/* CERRAR PEDIDO */
-function cerrarPedido(){
-    if(!pedidoActivo){
-        alert("No hay pedido");
-        return;
-    }
-
-    if(!confirm("¿Seguro cerrar pedido?")) return;
-    if(!confirm("Se enviará a histórico y pagos")) return;
-
-    localStorage.removeItem("pedido_"+proveedorActivo);
-
-    pedidoActivo = false;
-
-    alert("Pedido guardado");
-
-    volver();
-}
-
-/* VOLVER */
-function volver(){
-    document.getElementById("zonaProveedores").style.display="flex";
-    document.getElementById("hoja").style.display="none";
-    proveedorActivo="";
-    pintarProveedores();
+  modal.style.display="none";
+  pintar();
 }
 
 /* INIT */
-fecha();
-pintarProveedores();
+pintar();
+
 </script>
 
 </body>
