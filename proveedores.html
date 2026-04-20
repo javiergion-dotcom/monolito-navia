@@ -100,7 +100,22 @@ button{
 <body>
 
 <header>
-  <div class="titulo">PROVEEDORES</div>
+  <div style="display:flex; align-items:center; gap:12px;">
+
+    <div onclick="volver()" style="
+      font-size:26px;
+      cursor:pointer;
+      padding:6px 10px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.1);
+    ">
+      ←
+    </div>
+
+    <div class="titulo">PROVEEDORES</div>
+
+  </div>
+
   <div class="add" onclick="nuevo()">+</div>
 </header>
 
