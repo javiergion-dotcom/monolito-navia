@@ -3,140 +3,220 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO</title>
+<title>PROVEEDORES</title>
 
 <style>
 body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#eef2f5;
+  margin:0;
+  font-family:Arial;
+  background:#eef2f5;
 }
 
 /* HEADER */
 header{
-background:#17303d;
-color:white;
-padding:15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+  background:#17303d;
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
 .titulo{
-font-size:22px;
-font-weight:bold;
+  font-size:20px;
+  font-weight:bold;
 }
 
-.usuario{
-background:rgba(255,255,255,0.2);
-padding:6px 12px;
-border-radius:20px;
+.add{
+  font-size:28px;
+  cursor:pointer;
 }
 
-/* ESTADO */
-.estado{
-padding:10px;
-text-align:center;
-font-weight:bold;
+/* LISTA */
+.lista{
+  padding:15px;
 }
 
-/* BOTONES */
-.panel{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:20px;
-padding:20px;
+.proveedor{
+  padding:15px;
+  border-radius:15px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:bold;
 }
 
-.boton{
-background:linear-gradient(180deg,#8fb1c7,#4f6f82);
-color:white;
-border-radius:20px;
-height:120px;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-font-size:20px;
-cursor:pointer;
+/* COLORES SUAVES */
+.c1{background:#f4efe6;}
+.c2{background:#eae3d6;}
+.c3{background:#f0f1f2;}
+.c4{background:#f3ecd2;}
+.c5{background:#ede4d8;}
+
+.editar{
+  cursor:pointer;
 }
 
-.rojo{
-background:linear-gradient(180deg,#d65454,#a83333);
+/* MODAL */
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
 }
 
-.amarillo{
-background:linear-gradient(180deg,#e6b800,#c99700);
+.modal-box{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  width:90%;
+  max-width:400px;
 }
 
+input, select{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  background:#17303d;
+  color:white;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="titulo">MONOLITO</div>
-<div class="usuario" id="usuario">OPERADOR</div>
+  <div class="titulo">PROVEEDORES</div>
+  <div class="add" onclick="nuevo()">+</div>
 </header>
 
-<div class="estado" id="estado">
-Sin incidencias · Sin comunicaciones
-</div>
+<div class="lista" id="lista"></div>
 
-<div class="panel">
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
 
-<div class="boton" onclick="ir('proveedores.html')">🚚<br>PROVEEDORES</div>
+    <input id="nombre" placeholder="Nombre">
+    <input id="telefono" placeholder="Teléfono">
+    <input id="producto" placeholder="Producto principal">
 
-<div class="boton" onclick="ir('articulos.html')">📦<br>ARTÍCULOS</div>
+    <input id="diaPedido" placeholder="Día de pedido">
+    <input id="diaReparto" placeholder="Día de reparto">
 
-<div class="boton" onclick="ir('comparador.html')">📊<br>COMPARADOR</div>
+    <select id="pago">
+      <option value="contado">Contado</option>
+      <option value="reposicion">Reposición</option>
+      <option value="banco">Banco</option>
+      <option value="cuenta">Entregas a cuenta</option>
+    </select>
 
-<div class="boton" onclick="ir('pedidos.html')">📝<br>PEDIDOS</div>
+    <select id="color">
+      <option value="c1">Crema</option>
+      <option value="c2">Cartón</option>
+      <option value="c3">Gris</option>
+      <option value="c4">Mostaza suave</option>
+      <option value="c5">Café con leche</option>
+    </select>
 
-<div class="boton" onclick="ir('pagos.html')">💳<br>PAGOS</div>
+    <button onclick="guardar()">GUARDAR</button>
 
-<div class="boton rojo" onclick="ir('incidencias.html')">🔴<br>INCIDENCIAS</div>
-
-<div class="boton amarillo" onclick="ir('avisos.html')">🟡<br>COMUNICACIÓN</div>
-
+  </div>
 </div>
 
 <script>
 
-function ir(pagina){
-window.location.href = pagina;
+let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
+let editIndex = null;
+
+/* PINTAR */
+function pintar(){
+  let html="";
+  proveedores.forEach((p,i)=>{
+    html+=`
+    <div class="proveedor ${p.color}">
+      <div>
+        ${p.nombre}<br>
+        <small>${p.producto}</small>
+      </div>
+      <div class="editar" onclick="editar(${i})">✏</div>
+    </div>`;
+  });
+  document.getElementById("lista").innerHTML=html;
 }
 
-function cargar(){
-let user = localStorage.getItem("usuario") || "OPERADOR";
-document.getElementById("usuario").textContent = user;
-
-let incidencias = JSON.parse(localStorage.getItem("incidencias") || "[]");
-let avisos = JSON.parse(localStorage.getItem("avisos") || "[]");
-
-let estado = "";
-
-if(incidencias.length > 0){
-estado += "🔴 Incidencias activas ";
-}else{
-estado += "Sin incidencias ";
+/* NUEVO */
+function nuevo(){
+  editIndex=null;
+  limpiar();
+  document.getElementById("modal").style.display="flex";
 }
 
-if(avisos.length > 0){
-estado += "· 🟡 Comunicaciones activas";
-}else{
-estado += "· Sin comunicaciones";
+/* EDITAR */
+function editar(i){
+  editIndex=i;
+  let p=proveedores[i];
+
+  nombre.value=p.nombre;
+  telefono.value=p.telefono;
+  producto.value=p.producto;
+  diaPedido.value=p.diaPedido;
+  diaReparto.value=p.diaReparto;
+  pago.value=p.pago;
+  color.value=p.color;
+
+  modal.style.display="flex";
 }
 
-document.getElementById("estado").textContent = estado;
-
-if(incidencias.length > 0){
-navigator.vibrate(200);
+/* LIMPIAR */
+function limpiar(){
+  nombre.value="";
+  telefono.value="";
+  producto.value="";
+  diaPedido.value="";
+  diaReparto.value="";
 }
 
+/* GUARDAR */
+function guardar(){
+
+  let p={
+    nombre:nombre.value,
+    telefono:telefono.value,
+    producto:producto.value,
+    diaPedido:diaPedido.value,
+    diaReparto:diaReparto.value,
+    pago:pago.value,
+    color:color.value
+  };
+
+  if(editIndex===null){
+    proveedores.push(p);
+  }else{
+    proveedores[editIndex]=p;
+  }
+
+  localStorage.setItem("proveedores", JSON.stringify(proveedores));
+
+  modal.style.display="none";
+  pintar();
 }
 
-cargar();
+/* INIT */
+pintar();
 
 </script>
 
