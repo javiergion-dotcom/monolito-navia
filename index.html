@@ -1,29 +1,37 @@
--webkit-tap-highlight-color: transparent;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MONOLITO</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html, body{
-body{
-margin:0;
+  margin:0;
   padding:0;
   width:100%;
   min-height:100%;
-font-family:Arial, Helvetica, sans-serif;
-background:#dfe6ec;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#dfe6ec;
 }
 
 body{
   overflow-x:hidden;
 }
 
-/* HEADER */
+/* CABECERA */
 header{
-background:#17303d;
-color:white;
+  background:#17303d;
+  color:white;
   padding:16px 24px;
-  padding:16px;
-display:flex;
-justify-content:space-between;
-align-items:center;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   box-shadow:0 4px 12px rgba(0,0,0,0.25);
 }
 
@@ -33,7 +41,7 @@ align-items:center;
 }
 
 .title{
-font-size:22px;
+  font-size:22px;
   font-weight:700;
   letter-spacing:.3px;
 }
@@ -42,18 +50,12 @@ font-size:22px;
   font-size:13px;
   opacity:.85;
   margin-top:3px;
-  font-weight:bold;
 }
 
 .header-right{
   display:flex;
   align-items:center;
   gap:16px;
-#usuario{
-  background:rgba(255,255,255,0.15);
-  padding:8px 12px;
-  border-radius:20px;
-  font-weight:bold;
 }
 
 #usuario{
@@ -63,41 +65,29 @@ font-size:22px;
   font-size:15px;
   font-weight:700;
   white-space:nowrap;
-/* FRANJA SUPERIOR (CLAVE) */
-.franja{
-  background:#eef2f5;
-  padding:12px 16px;
-  font-size:16px;
-  font-weight:bold;
-  text-align:center;
 }
 
 #hora{
   font-size:18px;
   font-weight:600;
   white-space:nowrap;
-.ok{
-  color:#4f8a3a;
 }
 
+/* FRANJA */
 .franja{
   background:#eef2f5;
   color:#4f5f69;
   padding:11px 24px;
   font-size:15px;
   border-bottom:1px solid rgba(0,0,0,0.05);
-.alerta{
-  color:#b02a2a;
 }
 
 /* PANEL */
 .panel{
   padding:24px;
-  padding:20px;
-display:grid;
-grid-template-columns:repeat(3,1fr);
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
   gap:30px;
-  gap:20px;
 }
 
 /* BOTONES */
@@ -105,29 +95,27 @@ grid-template-columns:repeat(3,1fr);
   position:relative;
   min-height:132px;
   border-radius:28px;
-  height:120px;
-  border-radius:20px;
-display:flex;
-flex-direction:column;
+  display:flex;
+  flex-direction:column;
   align-items:center;
-justify-content:center;
+  justify-content:center;
   text-align:center;
-  align-items:center;
-color:white;
+  color:white;
   font-size:22px;
   font-weight:700;
   letter-spacing:0.4px;
-  font-size:18px;
-  font-weight:bold;
-cursor:pointer;
+  cursor:pointer;
   user-select:none;
   padding:20px 14px;
   touch-action:manipulation;
+
   background:linear-gradient(180deg,#8fb1c7 0%, #4f6f82 100%);
+
   box-shadow:
     inset 0 3px 6px rgba(255,255,255,0.24),
     inset 0 -8px 16px rgba(0,0,0,0.12),
     0 16px 30px rgba(0,0,0,0.30);
+
   transition:transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
 }
 
@@ -138,7 +126,6 @@ cursor:pointer;
     0 6px 12px rgba(0,0,0,0.28);
   filter:brightness(0.96);
 }
-  background:linear-gradient(#8fb1c7,#4f6f82);
 
 .azul{
   background:linear-gradient(180deg,#8fb1c7 0%, #4f6f82 100%);
@@ -147,20 +134,9 @@ cursor:pointer;
 .naranja{
   background:linear-gradient(180deg,#f6ae1b 0%, #df8b00 100%);
 }
-  box-shadow:
-    inset 0 4px 8px rgba(255,255,255,0.2),
-    inset 0 -10px 20px rgba(0,0,0,0.2),
-    0 12px 20px rgba(0,0,0,0.3);
 
 .verde{
   background:linear-gradient(180deg,#78cc4b 0%, #48a530 100%);
-  transition:all 0.08s;
-}
-
-.rojo-boton{
-  background:linear-gradient(180deg,#d65454 0%, #a83333 100%);
-.boton:active{
-  transform:translateY(8px) scale(0.96);
 }
 
 .icono{
@@ -194,6 +170,7 @@ cursor:pointer;
   background:#d99a00;
 }
 
+/* TABLET */
 @media (max-width:1200px){
   .panel{
     gap:24px;
@@ -207,14 +184,12 @@ cursor:pointer;
   .icono{
     font-size:42px;
   }
-  font-size:36px;
-  margin-bottom:6px;
 }
 
+/* MÓVIL */
 @media (max-width:900px){
-@media(max-width:900px){
-.panel{
-grid-template-columns:repeat(2,1fr);
+  .panel{
+    grid-template-columns:repeat(2,1fr);
     gap:20px;
     padding:18px;
   }
@@ -246,10 +221,11 @@ grid-template-columns:repeat(2,1fr);
   #usuario{
     font-size:13px;
     padding:8px 11px;
-}
+  }
 }
 </style>
-@@ -224,192 +107,94 @@
+</head>
+
 <body>
 
 <header>
@@ -262,20 +238,18 @@ grid-template-columns:repeat(2,1fr);
     <div id="usuario">OPERADOR</div>
     <div id="hora"></div>
   </div>
-  <div class="title">MONOLITO</div>
-  <div id="usuario">OPERADOR</div>
 </header>
 
 <div class="franja" id="franjaEstado">
   Buenas tardes · Sin incidencias · Sin comunicaciones
 </div>
-<div class="franja" id="estado"></div>
 
 <div class="panel">
 
   <div class="boton azul" onclick="abrir('proveedores.html')">
     <div class="icono">🚚</div>
     <div>PROVEEDORES</div>
+    <div class="contador rojo">1</div>
   </div>
 
   <div class="boton azul" onclick="abrir('articulos.html')">
@@ -289,19 +263,23 @@ grid-template-columns:repeat(2,1fr);
   </div>
 
   <div class="boton azul" onclick="abrir('pedidos.html')">
-  <div class="boton" onclick="abrir('pedidos.html')">
-<div class="icono">📝</div>
+    <div class="icono">📝</div>
     <div>PEDIDOS</div>
-    PEDIDOS
-</div>
+    <div class="contador rojo">2</div>
+  </div>
 
   <div class="boton azul" onclick="abrir('pagos.html')">
-  <div class="boton" onclick="abrir('pagos.html')">
-<div class="icono">💳</div>
+    <div class="icono">💳</div>
     <div>PAGOS</div>
   </div>
 
-  <div class="boton azul" onclick="abrir('historico.html')">
+  <div class="boton naranja" onclick="abrir('revision.html')">
+    <div class="icono">🔎</div>
+    <div>REVISIÓN</div>
+    <div class="contador rojo">1</div>
+  </div>
+
+  <div class="boton verde" onclick="abrir('historico.html')">
     <div class="icono">📁</div>
     <div>HISTÓRICO</div>
   </div>
@@ -309,56 +287,32 @@ grid-template-columns:repeat(2,1fr);
   <div class="boton azul" onclick="abrir('ventas.html')">
     <div class="icono">💰</div>
     <div>VENTAS</div>
-    PAGOS
-</div>
+  </div>
 
   <div class="boton azul" onclick="abrir('calendario.html')">
     <div class="icono">📅</div>
     <div>CALENDARIO</div>
   </div>
 
-  <div class="boton rojo-boton" onclick="abrir('incidencias.html')">
-    <div class="icono">🚨</div>
-    <div>INCIDENCIAS</div>
-    <div class="contador rojo" id="contIncidencias">0</div>
-  <div class="boton" onclick="abrir('proveedores.html')">
-    <div class="icono">🚚</div>
-    PROVEEDORES
-</div>
-
   <div class="boton naranja" onclick="abrir('comunicacion.html')">
     <div class="icono">✉️</div>
     <div>COMUNICACIÓN</div>
-    <div class="contador amarillo" id="contComunicaciones">0</div>
-  <div class="boton" onclick="abrir('articulos.html')">
-    <div class="icono">📦</div>
-    ARTÍCULOS
-</div>
+    <div class="contador amarillo">3</div>
+  </div>
 
-  <div class="boton azul" onclick="abrir('ayuda.html')">
+  <div class="boton naranja" onclick="abrir('ayuda.html')">
     <div class="icono">🤖</div>
     <div>AYUDA</div>
-  <div class="boton" onclick="abrir('historico.html')">
-    <div class="icono">📁</div>
-    HISTÓRICO
-</div>
+  </div>
 
   <div class="boton azul" onclick="abrir('configuracion.html')">
-  <div class="boton" onclick="abrir('configuracion.html')">
-<div class="icono">⚙️</div>
+    <div class="icono">⚙️</div>
     <div>CONFIGURACIÓN</div>
-    CONFIGURACIÓN
-</div>
+  </div>
 
 </div>
 
 <script>
-// LOGIN OBLIGATORIO POR SESIÓN
-if(!sessionStorage.getItem("loginOK")){
-  window.location.href = "login.html";
-}
-
-// SONIDO
 function sonidoClick(){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -374,15 +328,12 @@ function sonidoClick(){
 
     osc.connect(gain);
     gain.connect(ctx.destination);
-/* 🔐 CONTROL DE ACCESO (MUY IMPORTANTE) */
-const CODIGO_PERMITIDO = "1234"; // CAMBIA ESTE
 
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.08);
   }catch(e){}
 }
 
-// VIBRAR
 function vibrar(){
   try{
     if(navigator.vibrate){
@@ -391,99 +342,48 @@ function vibrar(){
   }catch(e){}
 }
 
-// ABRIR MÓDULOS
 function abrir(destino){
   vibrar();
   sonidoClick();
   setTimeout(function(){
     window.location.href = destino;
-  },70);
-if(localStorage.getItem("usuario") !== CODIGO_PERMITIDO){
-  alert("Acceso no autorizado");
-  window.location.href = "login.html";
+  }, 70);
 }
 
-// RELOJ
 function reloj(){
   const d = new Date();
   document.getElementById("hora").innerHTML =
     d.toLocaleDateString("es-ES") + " · " +
     d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 }
-/* USUARIO */
-document.getElementById("usuario").innerText =
-  localStorage.getItem("usuario") || "OPERADOR";
 
-// SALUDO
 function saludo(){
   const h = new Date().getHours();
   if(h < 6) return "Buenas noches";
   if(h < 12) return "Buenos días";
   if(h < 21) return "Buenas tardes";
   return "Buenas noches";
-/* ABRIR */
-function abrir(p){
-  if(navigator.vibrate) navigator.vibrate(20);
-  window.location.href = p;
 }
 
-// USUARIO
 function cargarUsuario(){
   const usuario = localStorage.getItem("usuario") || "OPERADOR";
   document.getElementById("usuario").textContent = usuario;
 }
-/* ESTADO SUPERIOR */
-function actualizarEstado(){
 
-// CONTADORES
-function actualizarContadores(){
-let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
-let comunicaciones = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
-
-let incidencias = pagos.filter(p => p.estado === "incidencia").length;
-
-  document.getElementById("contIncidencias").textContent = incidencias;
-  document.getElementById("contComunicaciones").textContent = comunicaciones.length;
-}
-  let texto = "";
-
-// FRANJA
 function actualizarFranja(){
-  let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
-  let comunicaciones = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
-  if(incidencias === 0){
-    texto += "<span class='ok'>✔ Sin incidencias</span>";
-  }else{
-    texto += "<span class='alerta'>⚠ " + incidencias + " incidencias → revisar</span>";
-  }
-
-  let incidencias = pagos.filter(p => p.estado === "incidencia").length;
-  texto += " · ";
-
-  let textoIncidencias = incidencias > 0 ? incidencias + " incidencias" : "Sin incidencias";
-  let textoComunicaciones = comunicaciones.length > 0 ? comunicaciones.length + " comunicaciones" : "Sin comunicaciones";
-  if(comunicaciones.length === 0){
-    texto += "<span class='ok'>✔ Sin comunicaciones</span>";
-  }else{
-    texto += "<span class='alerta'>✉ " + comunicaciones.length + " comunicaciones</span>";
-  }
-
   document.getElementById("franjaEstado").textContent =
-    saludo() + " · " + textoIncidencias + " · " + textoComunicaciones;
-  document.getElementById("estado").innerHTML = texto;
+    saludo() + " · Sin incidencias · Sin comunicaciones";
 }
 
-// LOOP
 setInterval(function(){
   reloj();
   actualizarFranja();
-},1000);
+}, 1000);
 
-// INIT
 cargarUsuario();
 reloj();
-actualizarContadores();
 actualizarFranja();
-actualizarEstado();
-
 </script>
+
+</body>
+</html>
