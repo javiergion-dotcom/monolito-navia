@@ -8,8 +8,9 @@
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, Helvetica, sans-serif;
   background:#eef2f5;
+  color:#2b2b2b;
 }
 
 /* HEADER */
@@ -27,9 +28,24 @@ header{
   font-weight:bold;
 }
 
+.acciones-header{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
 .add{
   font-size:28px;
   cursor:pointer;
+  font-weight:bold;
+}
+
+.volver{
+  cursor:pointer;
+  font-size:22px;
+  padding:4px 10px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.12);
 }
 
 /* LISTA */
@@ -38,13 +54,34 @@ header{
 }
 
 .proveedor{
-  padding:15px;
-  border-radius:15px;
-  margin-bottom:10px;
+  padding:16px;
+  border-radius:16px;
+  margin-bottom:12px;
   display:flex;
   justify-content:space-between;
   align-items:center;
   font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 6px 14px rgba(0,0,0,.08);
+}
+
+.proveedor-izq{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.proveedor small{
+  font-weight:normal;
+  opacity:.8;
+}
+
+.editar{
+  cursor:pointer;
+  font-size:20px;
+  padding:6px 10px;
+  border-radius:10px;
+  background:rgba(0,0,0,.08);
 }
 
 /* COLORES SUAVES */
@@ -54,8 +91,65 @@ header{
 .c4{background:#f3ecd2;}
 .c5{background:#ede4d8;}
 
-.editar{
+/* FICHA */
+.ficha{
+  margin:0 15px 15px 15px;
+  background:white;
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 8px 18px rgba(0,0,0,.08);
+  display:none;
+}
+
+.ficha h2{
+  margin:0 0 14px 0;
+  font-size:22px;
+}
+
+.dato{
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+}
+
+.dato strong{
+  display:inline-block;
+  width:150px;
+}
+
+.bloque-articulos{
+  margin-top:16px;
+}
+
+.articulo{
+  padding:10px 12px;
+  border-radius:10px;
+  background:#f7f7f7;
+  margin-bottom:8px;
+}
+
+.botones-ficha{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+}
+
+.botones-ficha button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:10px;
   cursor:pointer;
+  font-weight:bold;
+}
+
+.btn-articulos{
+  background:#17303d;
+  color:white;
+}
+
+.btn-cerrar{
+  background:#d7dde2;
+  color:#2b2b2b;
 }
 
 /* MODAL */
@@ -65,27 +159,31 @@ header{
   left:0;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,.5);
   display:none;
   justify-content:center;
   align-items:center;
+  padding:16px;
 }
 
 .modal-box{
   background:white;
   padding:20px;
-  border-radius:12px;
-  width:90%;
-  max-width:400px;
+  border-radius:14px;
+  width:100%;
+  max-width:420px;
 }
 
 input, select{
   width:100%;
-  padding:10px;
+  padding:12px;
   margin-bottom:10px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  font-size:16px;
 }
 
-button{
+button.guardar{
   width:100%;
   padding:12px;
   background:#17303d;
@@ -93,6 +191,7 @@ button{
   border:none;
   border-radius:8px;
   cursor:pointer;
+  font-weight:bold;
 }
 </style>
 </head>
@@ -101,19 +200,40 @@ button{
 
 <header>
   <div class="titulo">PROVEEDORES</div>
-  <div class="add" onclick="nuevo()">+</div>
+  <div class="acciones-header">
+    <div class="add" onclick="nuevo()">+</div>
+    <div class="volver" onclick="volver()">←</div>
+  </div>
 </header>
 
 <div class="lista" id="lista"></div>
 
-<!-- MODAL -->
+<div class="ficha" id="ficha">
+  <h2 id="fichaNombre"></h2>
+
+  <div class="dato"><strong>Teléfono:</strong> <span id="fichaTelefono"></span></div>
+  <div class="dato"><strong>Principal:</strong> <span id="fichaProducto"></span></div>
+  <div class="dato"><strong>Día pedido:</strong> <span id="fichaDiaPedido"></span></div>
+  <div class="dato"><strong>Día reparto:</strong> <span id="fichaDiaReparto"></span></div>
+  <div class="dato"><strong>Forma pago:</strong> <span id="fichaPago"></span></div>
+  <div class="dato"><strong>Color:</strong> <span id="fichaColor"></span></div>
+
+  <div class="bloque-articulos">
+    <h3>Artículos asociados</h3>
+    <div id="listaArticulosProveedor"></div>
+  </div>
+
+  <div class="botones-ficha">
+    <button class="btn-articulos" onclick="irArticulos()">VER ARTÍCULOS</button>
+    <button class="btn-cerrar" onclick="cerrarFicha()">CERRAR</button>
+  </div>
+</div>
+
 <div class="modal" id="modal">
   <div class="modal-box">
-
     <input id="nombre" placeholder="Nombre">
     <input id="telefono" placeholder="Teléfono">
     <input id="producto" placeholder="Producto principal">
-
     <input id="diaPedido" placeholder="Día de pedido">
     <input id="diaReparto" placeholder="Día de reparto">
 
@@ -132,92 +252,159 @@ button{
       <option value="c5">Café con leche</option>
     </select>
 
-    <button onclick="guardar()">GUARDAR</button>
-
+    <button class="guardar" onclick="guardar()">GUARDAR</button>
   </div>
 </div>
 
 <script>
-
 let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
 let editIndex = null;
+let proveedorAbierto = null;
 
-/* PINTAR */
 function pintar(){
-  let html="";
+  let html = "";
+
   proveedores.forEach((p,i)=>{
-    html+=`
-    <div class="proveedor ${p.color}">
-      <div>
-        ${p.nombre}<br>
-        <small>${p.producto}</small>
+    html += `
+      <div class="proveedor ${p.color}" onclick="abrirProveedor(${i})">
+        <div class="proveedor-izq">
+          <div>${p.nombre}</div>
+          <small>${p.producto || ""}</small>
+        </div>
+        <div class="editar" onclick="event.stopPropagation(); editar(${i})">✏</div>
       </div>
-      <div class="editar" onclick="editar(${i})">✏</div>
-    </div>`;
+    `;
   });
-  document.getElementById("lista").innerHTML=html;
+
+  document.getElementById("lista").innerHTML = html;
 }
 
-/* NUEVO */
 function nuevo(){
-  editIndex=null;
+  editIndex = null;
   limpiar();
-  document.getElementById("modal").style.display="flex";
+  document.getElementById("modal").style.display = "flex";
 }
 
-/* EDITAR */
 function editar(i){
-  editIndex=i;
-  let p=proveedores[i];
+  editIndex = i;
+  let p = proveedores[i];
 
-  nombre.value=p.nombre;
-  telefono.value=p.telefono;
-  producto.value=p.producto;
-  diaPedido.value=p.diaPedido;
-  diaReparto.value=p.diaReparto;
-  pago.value=p.pago;
-  color.value=p.color;
+  nombre.value = p.nombre || "";
+  telefono.value = p.telefono || "";
+  producto.value = p.producto || "";
+  diaPedido.value = p.diaPedido || "";
+  diaReparto.value = p.diaReparto || "";
+  pago.value = p.pago || "contado";
+  color.value = p.color || "c1";
 
-  modal.style.display="flex";
+  document.getElementById("modal").style.display = "flex";
 }
 
-/* LIMPIAR */
 function limpiar(){
-  nombre.value="";
-  telefono.value="";
-  producto.value="";
-  diaPedido.value="";
-  diaReparto.value="";
+  nombre.value = "";
+  telefono.value = "";
+  producto.value = "";
+  diaPedido.value = "";
+  diaReparto.value = "";
+  pago.value = "contado";
+  color.value = "c1";
 }
 
-/* GUARDAR */
 function guardar(){
-
-  let p={
-    nombre:nombre.value,
-    telefono:telefono.value,
-    producto:producto.value,
-    diaPedido:diaPedido.value,
-    diaReparto:diaReparto.value,
-    pago:pago.value,
-    color:color.value
+  let p = {
+    nombre: nombre.value,
+    telefono: telefono.value,
+    producto: producto.value,
+    diaPedido: diaPedido.value,
+    diaReparto: diaReparto.value,
+    pago: pago.value,
+    color: color.value
   };
 
-  if(editIndex===null){
+  if(editIndex === null){
     proveedores.push(p);
   }else{
-    proveedores[editIndex]=p;
+    proveedores[editIndex] = p;
   }
 
   localStorage.setItem("proveedores", JSON.stringify(proveedores));
-
-  modal.style.display="none";
+  document.getElementById("modal").style.display = "none";
   pintar();
+
+  if(proveedorAbierto !== null){
+    abrirProveedor(proveedorAbierto);
+  }
 }
 
-/* INIT */
-pintar();
+function abrirProveedor(i){
+  proveedorAbierto = i;
+  const p = proveedores[i];
+  if(!p) return;
 
+  document.getElementById("ficha").style.display = "block";
+  document.getElementById("fichaNombre").textContent = p.nombre || "";
+  document.getElementById("fichaTelefono").textContent = p.telefono || "";
+  document.getElementById("fichaProducto").textContent = p.producto || "";
+  document.getElementById("fichaDiaPedido").textContent = p.diaPedido || "";
+  document.getElementById("fichaDiaReparto").textContent = p.diaReparto || "";
+  document.getElementById("fichaPago").textContent = textoPago(p.pago || "");
+  document.getElementById("fichaColor").textContent = textoColor(p.color || "");
+
+  pintarArticulosProveedor(p.nombre);
+}
+
+function pintarArticulosProveedor(nombreProveedor){
+  const caja = document.getElementById("listaArticulosProveedor");
+  let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
+
+  let filtrados = articulos.filter(a =>
+    (a.proveedor || "").toLowerCase() === (nombreProveedor || "").toLowerCase()
+  );
+
+  if(filtrados.length === 0){
+    caja.innerHTML = `<div class="articulo">Sin artículos asociados todavía.</div>`;
+    return;
+  }
+
+  let html = "";
+  filtrados.forEach(a=>{
+    html += `<div class="articulo">${a.nombre || "Artículo"}${a.precio ? " — " + a.precio + " €" : ""}</div>`;
+  });
+
+  caja.innerHTML = html;
+}
+
+function textoPago(v){
+  if(v === "contado") return "Contado";
+  if(v === "reposicion") return "Reposición";
+  if(v === "banco") return "Banco";
+  if(v === "cuenta") return "Entregas a cuenta";
+  return v;
+}
+
+function textoColor(v){
+  if(v === "c1") return "Crema";
+  if(v === "c2") return "Cartón";
+  if(v === "c3") return "Gris";
+  if(v === "c4") return "Mostaza suave";
+  if(v === "c5") return "Café con leche";
+  return v;
+}
+
+function cerrarFicha(){
+  document.getElementById("ficha").style.display = "none";
+  proveedorAbierto = null;
+}
+
+function irArticulos(){
+  window.location.href = "articulos.html";
+}
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+pintar();
 </script>
 
 </body>
