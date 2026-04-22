@@ -12,6 +12,7 @@ body{
   background:#eef2f5;
 }
 
+/* HEADER */
 header{
   background:#17303d;
   color:white;
@@ -31,24 +32,27 @@ header{
   cursor:pointer;
 }
 
+/* LISTA */
 .lista{
   padding:15px;
 }
 
-.item{
-  background:white;
-  padding:12px;
-  border-radius:12px;
+.articulo{
+  padding:15px;
+  border-radius:15px;
   margin-bottom:10px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  font-weight:bold;
+  background:white;
 }
 
 .editar{
   cursor:pointer;
 }
 
+/* MODAL */
 .modal{
   position:fixed;
   top:0;
@@ -82,6 +86,7 @@ button{
   color:white;
   border:none;
   border-radius:8px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -95,6 +100,7 @@ button{
 
 <div class="lista" id="lista"></div>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box">
 
@@ -102,7 +108,7 @@ button{
 
     <select id="proveedor"></select>
 
-    <input id="precio" placeholder="Precio compra" type="number" step="0.01">
+    <input id="precio" placeholder="Precio sin IVA">
 
     <select id="iva">
       <option value="4">IVA 4%</option>
@@ -119,32 +125,35 @@ button{
 
 let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
 let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
+
 let editIndex = null;
 
-/* CARGAR PROVEEDORES */
+/* CARGAR PROVEEDORES EN SELECT */
 function cargarProveedores(){
   let select = document.getElementById("proveedor");
-  select.innerHTML = "";
+  select.innerHTML="";
 
   proveedores.forEach(p=>{
-    select.innerHTML += `<option>${p.nombre}</option>`;
+    select.innerHTML += `<option value="${p.nombre}">${p.nombre}</option>`;
   });
 }
 
 /* PINTAR */
 function pintar(){
   let html="";
+
   articulos.forEach((a,i)=>{
-    html+=`
-    <div class="item">
+    html += `
+    <div class="articulo">
       <div>
         ${a.nombre}<br>
-        <small>${a.proveedor} · ${a.precio}€ · IVA ${a.iva}%</small>
+        <small>${a.proveedor} · ${a.precio}€</small>
       </div>
       <div class="editar" onclick="editar(${i})">✏</div>
     </div>`;
   });
-  document.getElementById("lista").innerHTML=html;
+
+  document.getElementById("lista").innerHTML = html;
 }
 
 /* NUEVO */
@@ -157,12 +166,12 @@ function nuevo(){
 /* EDITAR */
 function editar(i){
   editIndex=i;
-  let a=articulos[i];
+  let a = articulos[i];
 
-  nombre.value=a.nombre;
-  proveedor.value=a.proveedor;
-  precio.value=a.precio;
-  iva.value=a.iva;
+  nombre.value = a.nombre;
+  proveedor.value = a.proveedor;
+  precio.value = a.precio;
+  iva.value = a.iva;
 
   modal.style.display="flex";
 }
@@ -179,8 +188,8 @@ function guardar(){
   let a={
     nombre:nombre.value,
     proveedor:proveedor.value,
-    precio:parseFloat(precio.value),
-    iva:parseInt(iva.value)
+    precio:precio.value,
+    iva:iva.value
   };
 
   if(editIndex===null){
