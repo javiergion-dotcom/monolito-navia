@@ -6,8 +6,6 @@
 <title>PROVEEDORES</title>
 
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-
 body{
   margin:0;
   font-family:Arial, Helvetica, sans-serif;
@@ -15,6 +13,7 @@ body{
   color:#2b2b2b;
 }
 
+/* CABECERA */
 header{
   background:#17303d;
   color:white;
@@ -32,93 +31,68 @@ header{
 .add{
   font-size:28px;
   cursor:pointer;
-  user-select:none;
+  font-weight:bold;
 }
 
-.contenido{
+/* LISTA */
+.lista{
   padding:15px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
 }
 
 .proveedor{
   padding:16px;
   border-radius:16px;
+  margin-bottom:12px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  cursor:pointer;
   font-weight:bold;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  cursor:pointer;
+  box-shadow:0 6px 14px rgba(0,0,0,0.08);
 }
 
-.proveedor:active{
-  transform:scale(.98);
+.proveedor-info{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
 }
 
-.info-proveedor{
-  line-height:1.25;
-}
-
-.info-proveedor small{
+.proveedor small{
   font-weight:normal;
-  opacity:.8;
+  opacity:0.8;
+}
+
+.lado-derecho{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.check{
+  font-size:22px;
+  color:#4f8a3a;
 }
 
 .editar{
-  font-size:20px;
   cursor:pointer;
-  padding:8px;
-  border-radius:10px;
-  background:rgba(255,255,255,.5);
+  font-size:20px;
 }
 
-/* colores suaves */
+/* COLORES SUAVES */
 .c1{background:#f4efe6;}
 .c2{background:#eae3d6;}
 .c3{background:#f0f1f2;}
 .c4{background:#f3ecd2;}
 .c5{background:#ede4d8;}
 
-.detalle{
-  margin-top:18px;
-  background:white;
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
-}
-
-.detalle h3{
-  margin:0 0 12px 0;
-}
-
-.fila{
-  padding:10px 0;
-  border-bottom:1px solid #eee;
-}
-
-.fila:last-child{
-  border-bottom:none;
-}
-
-.vacio{
-  margin-top:18px;
-  background:white;
-  border-radius:16px;
-  padding:16px;
-  color:#666;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
-}
-
-/* modal */
+/* MODAL */
 .modal{
   position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.45);
   display:none;
   justify-content:center;
   align-items:center;
@@ -127,38 +101,114 @@ header{
 
 .modal-box{
   background:white;
+  padding:20px;
+  border-radius:14px;
   width:100%;
   max-width:420px;
-  border-radius:16px;
-  padding:18px;
 }
 
-input, select{
+input, select, button{
   width:100%;
-  padding:11px;
+  padding:12px;
   margin-bottom:10px;
   font-size:16px;
 }
 
 button{
-  width:100%;
-  padding:12px;
   border:none;
   border-radius:10px;
-  background:#17303d;
-  color:white;
-  font-size:16px;
   cursor:pointer;
 }
 
-@media(max-width:900px){
-  .grid{
+.btn-guardar{
+  background:#17303d;
+  color:white;
+}
+
+/* FICHA PROVEEDOR */
+.ficha{
+  display:none;
+  padding:15px;
+}
+
+.tarjeta{
+  background:white;
+  border-radius:16px;
+  padding:16px;
+  box-shadow:0 6px 14px rgba(0,0,0,0.08);
+  margin-bottom:14px;
+}
+
+.nombre-ficha{
+  font-size:24px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.dato{
+  margin-bottom:8px;
+  font-size:16px;
+}
+
+.acciones{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-top:14px;
+}
+
+.btn{
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.btn-volver{
+  background:#d8dde1;
+}
+
+.btn-pedido{
+  background:#4f8a3a;
+  color:white;
+}
+
+.btn-editar{
+  background:#17303d;
+  color:white;
+}
+
+.subtitulo{
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.articulo{
+  background:#f8f8f8;
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.vacio{
+  background:#f8f8f8;
+  border-radius:10px;
+  padding:12px;
+  color:#666;
+}
+
+@media(max-width:700px){
+  .acciones{
     grid-template-columns:1fr;
   }
 }
 </style>
 </head>
-
 <body>
 
 <header>
@@ -166,13 +216,23 @@ button{
   <div class="add" onclick="nuevo()">+</div>
 </header>
 
-<div class="contenido">
-  <div class="grid" id="lista"></div>
-  <div id="detalleZona"></div>
+<!-- LISTA -->
+<div class="lista" id="lista"></div>
+
+<!-- FICHA -->
+<div class="ficha" id="ficha">
+  <div class="tarjeta" id="tarjetaFicha"></div>
+
+  <div class="tarjeta">
+    <div class="subtitulo">ARTÍCULOS DEL PROVEEDOR</div>
+    <div id="listaArticulosProveedor"></div>
+  </div>
 </div>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-box">
+
     <input id="nombre" placeholder="Nombre">
     <input id="telefono" placeholder="Teléfono">
     <input id="producto" placeholder="Producto principal">
@@ -194,71 +254,82 @@ button{
       <option value="c5">Café con leche</option>
     </select>
 
-    <button onclick="guardar()">GUARDAR</button>
+    <button class="btn-guardar" onclick="guardar()">GUARDAR</button>
+
   </div>
 </div>
 
 <script>
 let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
 let editIndex = null;
+let fichaIndex = null;
 
+/* BASE SI NO HAY NADA */
+if(proveedores.length === 0){
+  proveedores = [
+    {
+      nombre:"Cafés Candelas",
+      telefono:"",
+      producto:"Café",
+      diaPedido:"",
+      diaReparto:"",
+      pago:"contado",
+      color:"c1"
+    },
+    {
+      nombre:"Turrado",
+      telefono:"",
+      producto:"Mahou",
+      diaPedido:"",
+      diaReparto:"",
+      pago:"reposicion",
+      color:"c2"
+    }
+  ];
+  localStorage.setItem("proveedores", JSON.stringify(proveedores));
+}
+
+/* PINTAR LISTA */
 function pintar(){
   let html = "";
 
-  proveedores.forEach((p, i) => {
+  proveedores.forEach((p,i)=>{
+    let check = localStorage.getItem("pedido_" + p.nombre) ? "✔" : "";
+
     html += `
-      <div class="proveedor ${p.color}" onclick="abrirProveedor(${i})">
-        <div class="info-proveedor">
-          ${p.nombre}<br>
-          <small>${p.producto || ""}</small>
-        </div>
-        <div class="editar" onclick="editar(event, ${i})">✏</div>
+    <div class="proveedor ${p.color}" onclick="abrirFicha(${i})">
+      <div class="proveedor-info">
+        <div>${p.nombre}</div>
+        <small>${p.producto || ""}</small>
       </div>
-    `;
+
+      <div class="lado-derecho">
+        <div class="check">${check}</div>
+        <div class="editar" onclick="eventoEditar(event, ${i})">✏</div>
+      </div>
+    </div>`;
   });
 
   document.getElementById("lista").innerHTML = html;
-
-  if(proveedores.length === 0){
-    document.getElementById("detalleZona").innerHTML =
-      `<div class="vacio">No hay proveedores todavía. Pulsa + para crear el primero.</div>`;
-  }
 }
 
-function abrirProveedor(i){
-  const p = proveedores[i];
-
-  document.getElementById("detalleZona").innerHTML = `
-    <div class="detalle ${p.color}">
-      <h3>${p.nombre}</h3>
-      <div class="fila"><strong>Teléfono:</strong> ${p.telefono || "-"}</div>
-      <div class="fila"><strong>Producto principal:</strong> ${p.producto || "-"}</div>
-      <div class="fila"><strong>Día de pedido:</strong> ${p.diaPedido || "-"}</div>
-      <div class="fila"><strong>Día de reparto:</strong> ${p.diaReparto || "-"}</div>
-      <div class="fila"><strong>Forma de pago:</strong> ${textoPago(p.pago)}</div>
-    </div>
-  `;
+/* EVITAR QUE AL DAR AL LÁPIZ ABRA LA FICHA */
+function eventoEditar(e, i){
+  e.stopPropagation();
+  editar(i);
 }
 
-function textoPago(v){
-  if(v === "contado") return "Contado";
-  if(v === "reposicion") return "Reposición";
-  if(v === "banco") return "Banco";
-  if(v === "cuenta") return "Entregas a cuenta";
-  return "-";
-}
-
+/* NUEVO */
 function nuevo(){
   editIndex = null;
   limpiar();
   document.getElementById("modal").style.display = "flex";
 }
 
-function editar(ev, i){
-  ev.stopPropagation();
-
+/* EDITAR */
+function editar(i){
   editIndex = i;
-  const p = proveedores[i];
+  let p = proveedores[i];
 
   nombre.value = p.nombre || "";
   telefono.value = p.telefono || "";
@@ -271,6 +342,7 @@ function editar(ev, i){
   document.getElementById("modal").style.display = "flex";
 }
 
+/* LIMPIAR */
 function limpiar(){
   nombre.value = "";
   telefono.value = "";
@@ -281,16 +353,22 @@ function limpiar(){
   color.value = "c1";
 }
 
+/* GUARDAR */
 function guardar(){
-  const p = {
-    nombre: nombre.value,
-    telefono: telefono.value,
-    producto: producto.value,
-    diaPedido: diaPedido.value,
-    diaReparto: diaReparto.value,
-    pago: pago.value,
-    color: color.value
+  let p = {
+    nombre:nombre.value.trim(),
+    telefono:telefono.value.trim(),
+    producto:producto.value.trim(),
+    diaPedido:diaPedido.value.trim(),
+    diaReparto:diaReparto.value.trim(),
+    pago:pago.value,
+    color:color.value
   };
+
+  if(!p.nombre){
+    alert("Pon nombre al proveedor");
+    return;
+  }
 
   if(editIndex === null){
     proveedores.push(p);
@@ -300,9 +378,101 @@ function guardar(){
 
   localStorage.setItem("proveedores", JSON.stringify(proveedores));
   document.getElementById("modal").style.display = "none";
+
+  pintar();
+
+  if(fichaIndex !== null){
+    abrirFicha(fichaIndex);
+  }
+}
+
+/* ABRIR FICHA */
+function abrirFicha(i){
+  fichaIndex = i;
+  let p = proveedores[i];
+
+  document.getElementById("lista").style.display = "none";
+  document.getElementById("ficha").style.display = "block";
+
+  let check = localStorage.getItem("pedido_" + p.nombre) ? "✔ Pedido ya hecho" : "Sin pedido hecho";
+
+  document.getElementById("tarjetaFicha").innerHTML = `
+    <div class="nombre-ficha">${p.nombre}</div>
+    <div class="dato"><b>Teléfono:</b> ${p.telefono || "-"}</div>
+    <div class="dato"><b>Producto principal:</b> ${p.producto || "-"}</div>
+    <div class="dato"><b>Día de pedido:</b> ${p.diaPedido || "-"}</div>
+    <div class="dato"><b>Día de reparto:</b> ${p.diaReparto || "-"}</div>
+    <div class="dato"><b>Forma de pago:</b> ${textoPago(p.pago)}</div>
+    <div class="dato"><b>Estado:</b> ${check}</div>
+
+    <div class="acciones">
+      <button class="btn btn-volver" onclick="volverLista()">VOLVER</button>
+      <button class="btn btn-pedido" onclick="irAPedidos()">PEDIDOS</button>
+      <button class="btn btn-editar" onclick="editar(${i})">EDITAR</button>
+    </div>
+  `;
+
+  pintarArticulosProveedor(p.nombre);
+}
+
+/* VOLVER A LISTA */
+function volverLista(){
+  fichaIndex = null;
+  document.getElementById("ficha").style.display = "none";
+  document.getElementById("lista").style.display = "block";
   pintar();
 }
 
+/* TEXTO FORMA PAGO */
+function textoPago(v){
+  if(v === "contado") return "Contado";
+  if(v === "reposicion") return "Reposición";
+  if(v === "banco") return "Banco";
+  if(v === "cuenta") return "Entregas a cuenta";
+  return v || "-";
+}
+
+/* IR A PEDIDOS */
+function irAPedidos(){
+  if(fichaIndex === null) return;
+  let p = proveedores[fichaIndex];
+  localStorage.setItem("proveedorSeleccionado", p.nombre);
+  window.location.href = "pedidos.html";
+}
+
+/* PINTAR ARTÍCULOS DEL PROVEEDOR */
+function pintarArticulosProveedor(nombreProveedor){
+  let contenedor = document.getElementById("listaArticulosProveedor");
+  let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
+
+  let filtrados = articulos.filter(a =>
+    a.proveedor === nombreProveedor ||
+    a.proveedorNombre === nombreProveedor
+  );
+
+  if(filtrados.length === 0){
+    contenedor.innerHTML = `
+      <div class="vacio">
+        No hay artículos enlazados todavía a este proveedor.
+      </div>
+    `;
+    return;
+  }
+
+  let html = "";
+  filtrados.forEach((a,i)=>{
+    html += `
+      <div class="articulo">
+        <div>${i+1}. ${a.nombre || a.articulo || "Artículo"}</div>
+        <div>${a.precio || ""}</div>
+      </div>
+    `;
+  });
+
+  contenedor.innerHTML = html;
+}
+
+/* INIT */
 pintar();
 </script>
 
