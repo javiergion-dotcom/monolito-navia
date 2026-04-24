@@ -9,23 +9,24 @@
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, Helvetica, sans-serif;
   background:#eef3f5;
+  color:#222;
 }
 
 .barra{
-  background:#14313d;
+  background:#17303d;
   color:white;
   padding:18px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  font-size:26px;
+  font-size:28px;
   font-weight:bold;
 }
 
 .barra span{
-  font-size:38px;
+  font-size:40px;
   cursor:pointer;
 }
 
@@ -36,55 +37,89 @@ body{
 select,input{
   width:100%;
   padding:14px;
-  margin:6px 0;
-  font-size:18px;
-  border-radius:10px;
+  margin:7px 0;
+  font-size:20px;
+  border-radius:12px;
   border:1px solid #ccc;
+  box-sizing:border-box;
 }
 
-.boton{
+button{
   width:100%;
   padding:16px;
-  border-radius:12px;
+  border-radius:14px;
   border:0;
-  font-size:20px;
+  font-size:22px;
   font-weight:bold;
   margin-top:10px;
   cursor:pointer;
 }
 
-.verde{ background:#4b8f36; color:white; }
-.azul{ background:#14313d; color:white; }
-.rojo{ background:#b8332f; color:white; }
+.verde{
+  background:#4b8f36;
+  color:white;
+}
+
+.azul{
+  background:#17303d;
+  color:white;
+}
+
+.rojo{
+  background:#b8332f;
+  color:white;
+}
 
 .aviso{
   display:none;
   background:#fff3cd;
-  padding:12px;
-  border-radius:10px;
+  color:#7a4b00;
+  padding:14px;
+  border-radius:12px;
   font-weight:bold;
-  margin-top:6px;
+  margin:8px 0;
+  font-size:18px;
 }
 
 table{
   width:100%;
-  margin-top:10px;
+  margin-top:14px;
   border-collapse:collapse;
   background:white;
-  border-radius:12px;
+  border-radius:14px;
   overflow:hidden;
 }
 
-th,td{
+th{
+  background:#17303d;
+  color:white;
+  padding:10px;
+  font-size:16px;
+}
+
+td{
   padding:10px;
   text-align:center;
   border-bottom:1px solid #eee;
+  font-size:17px;
 }
 
-.total{
-  font-size:20px;
+td:first-child{
+  text-align:left;
   font-weight:bold;
-  margin-top:12px;
+}
+
+.resumen{
+  background:white;
+  padding:16px;
+  border-radius:16px;
+  margin-top:16px;
+  font-size:22px;
+  line-height:1.7;
+}
+
+.resumen strong{
+  font-size:25px;
 }
 
 .admin{
@@ -92,7 +127,7 @@ th,td{
 }
 
 .admin-activo .admin{
-  display:block;
+  display:table-cell;
 }
 </style>
 </head>
@@ -100,8 +135,8 @@ th,td{
 <body>
 
 <div class="barra">
-  <span onclick="history.back()">←</span>
-  PEDIDOS
+  <span onclick="volver()">←</span>
+  <div>PEDIDOS</div>
   <span onclick="activarAdmin()">🔒</span>
 </div>
 
@@ -113,164 +148,234 @@ th,td{
 
 <div id="aviso" class="aviso"></div>
 
-<input type="number" id="cantidad" placeholder="Cantidad">
+<input type="number" id="cantidad" placeholder="Cantidad" min="0" step="1">
 
-<button class="boton verde" onclick="añadir()">+ AÑADIR PRODUCTO</button>
+<button class="verde" onclick="anadirProducto()">+ AÑADIR PRODUCTO</button>
 
 <table>
 <thead>
 <tr>
-<th>Artículo</th>
-<th>Ud</th>
-<th>Precio</th>
-<th>IVA</th>
-<th>Total</th>
-<th class="admin">X</th>
+  <th>Artículo</th>
+  <th>Ud</th>
+  <th>Precio</th>
+  <th>IVA</th>
+  <th>Total</th>
+  <th class="admin">X</th>
 </tr>
 </thead>
 
 <tbody id="lineas"></tbody>
 </table>
 
-<div class="total">Subtotal: <span id="subtotal">0</span> €</div>
-<div>IVA 4%: <span id="iva4">0</span></div>
-<div>IVA 10%: <span id="iva10">0</span></div>
-<div>IVA 21%: <span id="iva21">0</span></div>
-<div class="total">TOTAL: <span id="total">0</span> €</div>
+<div class="resumen">
+  <div><strong>Subtotal sin IVA:</strong> <span id="subtotal">0,00</span> €</div>
+  <div>IVA 4%: <span id="iva4">0,00</span> €</div>
+  <div>IVA 10%: <span id="iva10">0,00</span> €</div>
+  <div>IVA 21%: <span id="iva21">0,00</span> €</div>
+  <hr>
+  <div><strong>TOTAL PEDIDO:</strong> <span id="total">0,00</span> €</div>
+</div>
 
-<button class="boton azul" onclick="validarPedido()">VALIDAR PEDIDO</button>
+<button class="azul" onclick="validarPedido()">VALIDAR PEDIDO</button>
 
 </div>
 
 <script>
+const PIN = "1234";
 
-const PIN="1234";
+let admin = false;
+let lineasPedido = [];
 
-let admin=false;
-let lineas=[];
+let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
+let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
 
-let proveedores=JSON.parse(localStorage.getItem("proveedores")||"[]");
-let articulos=JSON.parse(localStorage.getItem("articulos")||"[]");
+function volver(){
+  history.back();
+}
+
+function formato(numero){
+  return Number(numero || 0).toFixed(2).replace(".", ",");
+}
+
+function numero(valor){
+  if(valor === undefined || valor === null || valor === "") return 0;
+  return Number(String(valor).replace(",", "."));
+}
 
 function cargarProveedores(){
-  let sel=document.getElementById("proveedor");
-  sel.innerHTML="<option>Proveedor</option>";
+  const sel = document.getElementById("proveedor");
+  sel.innerHTML = '<option value="">Seleccionar proveedor</option>';
 
   proveedores.forEach(p=>{
-    let op=document.createElement("option");
-    op.value=p.nombre;
-    op.textContent=p.nombre;
+    const op = document.createElement("option");
+    op.value = p.nombre;
+    op.textContent = p.nombre;
     sel.appendChild(op);
   });
+
+  cargarArticulos();
 }
 
 function cargarArticulos(){
-  let prov=document.getElementById("proveedor").value;
-  let sel=document.getElementById("articulo");
-  sel.innerHTML="";
+  const prov = document.getElementById("proveedor").value;
+  const sel = document.getElementById("articulo");
 
-  articulos.filter(a=>a.proveedor===prov)
-  .forEach(a=>{
-    let op=document.createElement("option");
-    op.value=a.nombre;
-    op.textContent=a.nombre;
-    sel.appendChild(op);
-  });
+  sel.innerHTML = '<option value="">Seleccionar artículo</option>';
+
+  articulos
+    .filter(a => a.proveedor === prov)
+    .forEach(a=>{
+      const op = document.createElement("option");
+      op.value = a.nombre;
+      op.textContent = a.nombre;
+      sel.appendChild(op);
+    });
 
   avisarOferta();
 }
 
-document.getElementById("proveedor").onchange=cargarArticulos;
-document.getElementById("articulo").onchange=avisarOferta;
+function buscarArticulo(){
+  const prov = document.getElementById("proveedor").value;
+  const nombre = document.getElementById("articulo").value;
+
+  return articulos.find(a => a.proveedor === prov && a.nombre === nombre);
+}
 
 function avisarOferta(){
-  let nombre=document.getElementById("articulo").value;
-  let art=articulos.find(a=>a.nombre===nombre);
-  let aviso=document.getElementById("aviso");
+  const art = buscarArticulo();
+  const aviso = document.getElementById("aviso");
 
   if(art && art.oferta){
-    aviso.style.display="block";
-    aviso.innerText="⚠ OFERTA: "+art.oferta;
+    aviso.style.display = "block";
+    aviso.innerText = "⚠ OFERTA ACTIVA: " + art.oferta;
   }else{
-    aviso.style.display="none";
+    aviso.style.display = "none";
+    aviso.innerText = "";
   }
 }
 
-function añadir(){
+function anadirProducto(){
+  const proveedor = document.getElementById("proveedor").value;
+  const nombre = document.getElementById("articulo").value;
+  const cantidad = numero(document.getElementById("cantidad").value);
 
-  let nombre=document.getElementById("articulo").value;
-  let cantidad=Number(document.getElementById("cantidad").value);
+  if(!proveedor){
+    alert("Selecciona proveedor");
+    return;
+  }
 
-  if(!nombre || cantidad<=0) return;
+  if(!nombre){
+    alert("Selecciona artículo");
+    return;
+  }
 
-  let art=articulos.find(a=>a.nombre===nombre);
+  if(cantidad <= 0){
+    alert("La cantidad tiene que ser mayor que 0");
+    return;
+  }
 
-  lineas.push({
-    nombre,
-    cantidad,
-    precio:art.precio,
-    iva:art.iva,
-    oferta:art.oferta
+  const art = buscarArticulo();
+
+  if(!art){
+    alert("No encuentro el artículo");
+    return;
+  }
+
+  lineasPedido.push({
+    nombre: art.nombre,
+    cantidad: cantidad,
+    precio: numero(art.precio),
+    iva: numero(art.iva),
+    oferta: art.oferta || ""
   });
 
-  pintar();
+  document.getElementById("cantidad").value = "";
+  pintarLineas();
 }
 
-function pintar(){
+function pintarLineas(){
+  const tbody = document.getElementById("lineas");
+  tbody.innerHTML = "";
 
-  let tbody=document.getElementById("lineas");
-  tbody.innerHTML="";
+  lineasPedido.forEach((l,i)=>{
+    const totalLinea = numero(l.cantidad) * numero(l.precio);
 
-  let subtotal=0,iva4=0,iva10=0,iva21=0;
+    const tr = document.createElement("tr");
 
-  lineas.forEach((l,i)=>{
-
-    let total=l.cantidad*l.precio;
-    subtotal+=total;
-
-    if(l.iva==4) iva4+=total*0.04;
-    if(l.iva==10) iva10+=total*0.10;
-    if(l.iva==21) iva21+=total*0.21;
-
-    let tr=document.createElement("tr");
-
-    tr.innerHTML=`
-      <td>${l.nombre}${l.oferta?" ⚠":""}</td>
+    tr.innerHTML = `
+      <td>${l.nombre}${l.oferta ? " ⚠" : ""}</td>
       <td>${l.cantidad}</td>
-      <td>${l.precio.toFixed(2)}</td>
+      <td>${formato(l.precio)} €</td>
       <td>${l.iva}%</td>
-      <td>${total.toFixed(2)}</td>
-      <td class="admin"><button onclick="borrar(${i})">X</button></td>
+      <td>${formato(totalLinea)} €</td>
+      <td class="admin">
+        <button class="rojo" onclick="borrarLinea(${i})">X</button>
+      </td>
     `;
 
     tbody.appendChild(tr);
   });
 
-  let total=subtotal+iva4+iva10+iva21;
-
-  document.getElementById("subtotal").innerText=subtotal.toFixed(2);
-  document.getElementById("iva4").innerText=iva4.toFixed(2);
-  document.getElementById("iva10").innerText=iva10.toFixed(2);
-  document.getElementById("iva21").innerText=iva21.toFixed(2);
-  document.getElementById("total").innerText=total.toFixed(2);
+  calcularTotales();
 }
 
-function borrar(i){
-  if(!admin) return alert("Solo admin");
-  lineas.splice(i,1);
-  pintar();
+function calcularTotales(){
+  let subtotal = 0;
+  let iva4 = 0;
+  let iva10 = 0;
+  let iva21 = 0;
+
+  lineasPedido.forEach(l=>{
+    const base = numero(l.cantidad) * numero(l.precio);
+    const iva = numero(l.iva);
+
+    subtotal += base;
+
+    if(iva === 4) iva4 += base * 0.04;
+    if(iva === 10) iva10 += base * 0.10;
+    if(iva === 21) iva21 += base * 0.21;
+  });
+
+  const total = subtotal + iva4 + iva10 + iva21;
+
+  document.getElementById("subtotal").innerText = formato(subtotal);
+  document.getElementById("iva4").innerText = formato(iva4);
+  document.getElementById("iva10").innerText = formato(iva10);
+  document.getElementById("iva21").innerText = formato(iva21);
+  document.getElementById("total").innerText = formato(total);
+}
+
+function borrarLinea(i){
+  if(!admin){
+    alert("Solo administrador");
+    return;
+  }
+
+  lineasPedido.splice(i,1);
+  pintarLineas();
 }
 
 function validarPedido(){
+  const proveedor = document.getElementById("proveedor").value;
 
-  let proveedor=document.getElementById("proveedor").value;
+  if(!proveedor){
+    alert("Selecciona proveedor");
+    return;
+  }
 
-  if(!proveedor) return alert("Selecciona proveedor");
-  if(lineas.length==0) return alert("Sin productos");
+  if(lineasPedido.length === 0){
+    alert("No hay productos en el pedido");
+    return;
+  }
 
-  let total=document.getElementById("total").innerText;
+  calcularTotales();
 
-  let ok=confirm("¿Confirmas pedido?\n\n"+proveedor+"\n"+total+" €");
+  const total = document.getElementById("total").innerText;
+
+  const ok = confirm(
+    "¿Confirmas el pedido?\n\nProveedor: " + proveedor +
+    "\nTotal: " + total + " €"
+  );
 
   if(!ok) return;
 
@@ -278,37 +383,60 @@ function validarPedido(){
 }
 
 function cerrarPedido(){
+  const proveedor = document.getElementById("proveedor").value;
+  const total = document.getElementById("total").innerText;
 
-  let proveedor=document.getElementById("proveedor").value;
-  let total=document.getElementById("total").innerText;
+  const pedidos = JSON.parse(localStorage.getItem("pedidos") || "[]");
+  const pagos = JSON.parse(localStorage.getItem("pagos") || "[]");
 
-  let pagos=JSON.parse(localStorage.getItem("pagos")||"[]");
-
-  pagos.push({
-    proveedor,
-    total,
-    fecha:new Date().toLocaleDateString(),
-    estado:"pendiente"
+  pedidos.push({
+    fecha: new Date().toLocaleDateString("es-ES"),
+    proveedor: proveedor,
+    lineas: lineasPedido,
+    total: total,
+    estado: "cerrado"
   });
 
-  localStorage.setItem("pagos",JSON.stringify(pagos));
+  pagos.push({
+    fecha: new Date().toLocaleDateString("es-ES"),
+    proveedor: proveedor,
+    importe: total,
+    estado: "pendiente"
+  });
 
-  alert("Pedido enviado a pagos");
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
+  localStorage.setItem("pagos", JSON.stringify(pagos));
 
-  lineas=[];
-  pintar();
+  alert("Pedido cerrado y enviado a pagos");
+
+  lineasPedido = [];
+  pintarLineas();
 }
 
 function activarAdmin(){
-  let pin=prompt("PIN");
-  if(pin!==PIN) return alert("Incorrecto");
+  const pin = prompt("PIN administrador");
 
-  admin=!admin;
-  document.body.classList.toggle("admin-activo");
+  if(pin !== PIN){
+    alert("Código incorrecto");
+    return;
+  }
+
+  admin = !admin;
+
+  if(admin){
+    document.body.classList.add("admin-activo");
+    alert("Administrador activado");
+  }else{
+    document.body.classList.remove("admin-activo");
+    alert("Administrador desactivado");
+  }
 }
 
-cargarProveedores();
+document.getElementById("proveedor").addEventListener("change", cargarArticulos);
+document.getElementById("articulo").addEventListener("change", avisarOferta);
 
+cargarProveedores();
+calcularTotales();
 </script>
 
 </body>
