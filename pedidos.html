@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>PEDIDOS</title>
 
 <style>
@@ -55,30 +54,27 @@ button{
   cursor:pointer;
 }
 
-.verde{
-  background:#4b8f36;
-  color:white;
-}
-
-.azul{
-  background:#17303d;
-  color:white;
-}
-
-.rojo{
-  background:#b8332f;
-  color:white;
-}
+.verde{ background:#4b8f36; color:white; }
+.azul{ background:#17303d; color:white; }
+.rojo{ background:#b8332f; color:white; }
 
 .aviso{
   display:none;
-  background:#fff3cd;
-  color:#7a4b00;
   padding:14px;
   border-radius:12px;
   font-weight:bold;
   margin:8px 0;
   font-size:18px;
+}
+
+.aviso-oferta{
+  background:#fff3cd;
+  color:#7a4b00;
+}
+
+.aviso-incidencia{
+  background:#ffe0e0;
+  color:#9b0000;
 }
 
 table{
@@ -144,9 +140,11 @@ td:first-child{
 
 <select id="proveedor"></select>
 
+<div id="avisoIncidencia" class="aviso aviso-incidencia"></div>
+
 <select id="articulo"></select>
 
-<div id="aviso" class="aviso"></div>
+<div id="avisoOferta" class="aviso aviso-oferta"></div>
 
 <input type="number" id="cantidad" placeholder="Cantidad" min="0" step="1">
 
@@ -163,7 +161,6 @@ td:first-child{
   <th class="admin">X</th>
 </tr>
 </thead>
-
 <tbody id="lineas"></tbody>
 </table>
 
@@ -199,7 +196,14 @@ function formato(numero){
 
 function numero(valor){
   if(valor === undefined || valor === null || valor === "") return 0;
-  return Number(String(valor).replace(",", "."));
+
+  return Number(
+    String(valor)
+      .replace("€","")
+      .replace(",", ".")
+      .replace("'", ".")
+      .trim()
+  );
 }
 
 function cargarProveedores(){
@@ -207,6 +211,8 @@ function cargarProveedores(){
   sel.innerHTML = '<option value="">Seleccionar proveedor</option>';
 
   proveedores.forEach(p=>{
+    if(!p.nombre) return;
+
     const op = document.createElement("option");
     op.value = p.nombre;
     op.textContent = p.nombre;
@@ -243,7 +249,7 @@ function buscarArticulo(){
 
 function avisarOferta(){
   const art = buscarArticulo();
-  const aviso = document.getElementById("aviso");
+  const aviso = document.getElementById("avisoOferta");
 
   if(art && art.oferta){
     aviso.style.display = "block";
@@ -252,6 +258,62 @@ function avisarOferta(){
     aviso.style.display = "none";
     aviso.innerText = "";
   }
+}
+
+function comprobarIncidenciaProveedor(){
+  const proveedor = document.getElementById("proveedor").value;
+  const aviso = document.getElementById("avisoIncidencia");
+
+  if(!proveedor){
+    aviso.style.display = "none";
+    aviso.innerText = "";
+    return;
+  }
+
+  const incidencias = JSON.parse(localStorage.getItem("incidencias") || "[]");
+
+  const tiene = incidencias.some(i =>
+    i.proveedor === proveedor &&
+    (i.estado === "pendiente" || i.resuelta === false)
+  );
+
+  if(tiene){
+    aviso.style.display = "block";
+    aviso.innerText = "⚠ ESTE PROVEEDOR TIENE UNA INCIDENCIA PENDIENTE";
+  }else{
+    aviso.style.display = "none";
+    aviso.innerText = "";
+  }
+}
+
+function comprobarRevisionProveedor(){
+  const proveedor = document.getElementById("proveedor").value;
+  if(!proveedor) return;
+
+  let revisiones = JSON.parse(localStorage.getItem("revisionesProveedor") || "{}");
+
+  const hoy = new Date();
+  const ultima = revisiones[proveedor]?.fecha;
+
+  if(ultima){
+    const fechaUltima = new Date(ultima);
+    const dias = (hoy - fechaUltima) / (1000 * 60 * 60 * 24);
+
+    if(dias < 21){
+      return;
+    }
+  }
+
+  const hay = prompt("CONTROL CADA 3 SEMANAS\n\n¿Cuántas hay?");
+  const pido = prompt("CONTROL CADA 3 SEMANAS\n\n¿Cuántas pido?");
+
+  revisiones[proveedor] = {
+    fecha: hoy.toISOString(),
+    hay: hay || "",
+    pido: pido || ""
+  };
+
+  localStorage.setItem("revisionesProveedor", JSON.stringify(revisiones));
 }
 
 function anadirProducto(){
@@ -407,7 +469,7 @@ function cerrarPedido(){
   localStorage.setItem("pedidos", JSON.stringify(pedidos));
   localStorage.setItem("pagos", JSON.stringify(pagos));
 
-  alert("Pedido cerrado y enviado a pagos");
+  alert("Pedido validado y enviado a pagos");
 
   lineasPedido = [];
   pintarLineas();
@@ -432,7 +494,12 @@ function activarAdmin(){
   }
 }
 
-document.getElementById("proveedor").addEventListener("change", cargarArticulos);
+document.getElementById("proveedor").addEventListener("change", ()=>{
+  cargarArticulos();
+  comprobarIncidenciaProveedor();
+  comprobarRevisionProveedor();
+});
+
 document.getElementById("articulo").addEventListener("change", avisarOferta);
 
 cargarProveedores();
