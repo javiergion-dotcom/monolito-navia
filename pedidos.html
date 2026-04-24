@@ -2,570 +2,266 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PEDIDOS</title>
+<title>Pedidos - MONOLITO</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
 body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#eef2f5;
-  color:#2b2b2b;
+font-family:Arial;
+background:#0f1419;
+color:white;
+margin:0;
 }
 
 header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+background:#1c2833;
+padding:15px;
+display:flex;
+align-items:center;
+justify-content:space-between;
 }
 
-.titulo{
-  font-size:20px;
-  font-weight:bold;
+.flecha{
+font-size:22px;
+cursor:pointer;
 }
 
-.info{
-  text-align:right;
-  font-size:14px;
+.admin{
+cursor:pointer;
 }
 
-.contenido{
-  padding:16px;
+.container{
+padding:15px;
 }
 
-/* PROVEEDORES ARRIBA EN UNA SOLA FILA */
-.zona-proveedores{
-  display:flex;
-  gap:12px;
-  overflow-x:auto;
-  padding-bottom:6px;
-  margin-bottom:16px;
-  scrollbar-width:thin;
+select, input{
+padding:8px;
+margin:5px;
 }
 
-.zona-proveedores::-webkit-scrollbar{
-  height:8px;
+table{
+width:100%;
+margin-top:10px;
+border-collapse:collapse;
 }
 
-.zona-proveedores::-webkit-scrollbar-thumb{
-  background:#c9cfd4;
-  border-radius:20px;
+td, th{
+border:1px solid #444;
+padding:8px;
+text-align:center;
 }
 
-.proveedor{
-  min-width:220px;
-  padding:18px 16px;
-  border-radius:18px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:18px;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 8px 20px rgba(0,0,0,0.08);
-  transition:transform 0.08s ease;
-  flex-shrink:0;
+.linea{
+transition:.2s;
 }
 
-.proveedor:active{
-  transform:translateY(4px) scale(0.98);
+button{
+padding:8px;
+margin:5px;
+cursor:pointer;
 }
 
-.check{
-  font-size:26px;
-  color:#4f8a3a;
+.rojo{
+background:#c0392b;
+color:white;
 }
 
-/* COLORES SUAVES */
-.c1{background:#f4efe6;}
-.c2{background:#eae3d6;}
-.c3{background:#f0f1f2;}
-.c4{background:#f3ecd2;}
-.c5{background:#ede4d8;}
-.otro{background:#f8f6f1;}
-
-/* HOJA PEDIDO */
-.hoja{
-  display:none;
-  border-radius:18px;
-  padding:16px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+.verde{
+background:#27ae60;
+color:white;
 }
 
-.encabezado-hoja{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin-bottom:12px;
-}
-
-.nombre-proveedor{
-  font-size:22px;
-  font-weight:700;
-}
-
-.boton-volver{
-  padding:10px 14px;
-  border:none;
-  border-radius:12px;
-  background:rgba(0,0,0,0.08);
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* TABLA */
-.tabla{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-}
-
-.tabla th,
-.tabla td{
-  padding:10px 8px;
-  text-align:left;
-  font-size:16px;
-}
-
-.tabla th{
-  border-bottom:2px solid rgba(0,0,0,0.12);
-}
-
-.tabla td{
-  border-bottom:1px solid rgba(0,0,0,0.08);
-}
-
-.tabla input{
-  width:70px;
-  padding:8px;
-  font-size:16px;
-}
-
-.importe{
-  font-weight:bold;
-}
-
-/* TOTALES */
-.totales{
-  margin-top:18px;
-  background:rgba(255,255,255,0.65);
-  border-radius:14px;
-  padding:14px;
-  font-size:18px;
-  line-height:1.7;
-  font-weight:bold;
-}
-
-/* BOTONES */
-.acciones{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:16px;
-}
-
-.boton{
-  padding:16px;
-  border:none;
-  border-radius:14px;
-  font-size:18px;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.guardar{
-  background:#4f8a3a;
-  color:white;
-}
-
-.borrar{
-  background:#b04b4b;
-  color:white;
-}
-
-@media (max-width:900px){
-  .proveedor{
-    min-width:200px;
-    font-size:17px;
-  }
-
-  .encabezado-hoja{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .tabla th,
-  .tabla td{
-    font-size:15px;
-    padding:8px 6px;
-  }
-
-  .tabla input{
-    width:60px;
-  }
-
-  .acciones{
-    grid-template-columns:1fr;
-  }
+.alerta{
+color:red;
+font-weight:bold;
+margin-top:10px;
 }
 </style>
 </head>
+
 <body>
 
 <header>
-  <div class="titulo">PEDIDOS</div>
-  <div class="info">
-    <div id="usuario">OPERADOR</div>
-    <div id="fechaHora"></div>
-  </div>
+<span class="flecha" onclick="volver()">⬅</span>
+<span>📝 PEDIDOS</span>
+<span class="admin" onclick="modoAdmin()">🔒</span>
 </header>
 
-<div class="contenido">
+<div class="container">
 
-  <div id="zonaProveedores" class="zona-proveedores"></div>
+<table>
+<thead>
+<tr>
+<th>Artículo</th>
+<th>Unidades</th>
+<th>Precio</th>
+<th>Total</th>
+<th class="admin-col" style="display:none;">Acción</th>
+</tr>
+</thead>
 
-  <div id="hojaPedido" class="hoja">
-    <div class="encabezado-hoja">
-      <div class="nombre-proveedor" id="nombreProveedorActivo"></div>
-      <button class="boton-volver" onclick="volverProveedores()">← VOLVER</button>
-    </div>
+<tbody id="lineas"></tbody>
+</table>
 
-    <table class="tabla" id="tablaPedido">
-      <thead>
-        <tr>
-          <th>UNIDADES</th>
-          <th>ARTÍCULO</th>
-          <th>PRECIO</th>
-          <th>IMPORTE</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+<button class="verde" onclick="añadirLinea()">➕ Añadir línea</button>
 
-    <div class="totales" id="totales">
-      SUBTOTAL: 0.00 €<br>
-      IVA: 0.00 €<br>
-      TOTAL: 0.00 €
-    </div>
+<h3>Subtotal: <span id="subtotal">0</span> €</h3>
+<h2>Total: <span id="total">0</span> €</h2>
 
-    <div class="acciones">
-      <button class="boton guardar" onclick="finalizarPedido()">FINALIZAR PEDIDO</button>
-      <button class="boton borrar" onclick="borrarPedidoProveedor()">BORRAR PEDIDO</button>
-    </div>
-  </div>
+<input type="number" id="factura" placeholder="Total factura proveedor">
+<button onclick="validar()">✔ Validar</button>
+
+<div id="alerta" class="alerta"></div>
 
 </div>
 
 <script>
-let proveedorActivo = "";
-let pedidoActivo = false;
 
-/* CABECERA */
-function nombreOperador(valor){
-  const mapa = {
-    "85":"JAVIER",
-    "12":"SILVIA",
-    "11":"DARIO",
-    "22":"TOÑO"
-  };
-  return mapa[valor] || valor || "OPERADOR";
-}
+// 🔐 PIN ADMIN
+const PIN = "1234";
+let adminActivo = false;
 
-function cargarCabecera(){
-  const usuarioGuardado = localStorage.getItem("usuario") || "OPERADOR";
-  document.getElementById("usuario").textContent = nombreOperador(usuarioGuardado);
-  actualizarFechaHora();
-  setInterval(actualizarFechaHora, 1000);
-}
+// 🧠 ARTÍCULOS (usa los tuyos)
+let articulos = [
+  {nombre:"Café", precio:17/105, iva:10, proveedor:"Café Rico", color:"#a0522d"},
+  {nombre:"Cerveza", precio:0.8, iva:21, proveedor:"Mahou", color:"#b22222"}
+];
 
-function actualizarFechaHora(){
-  const d = new Date();
-  document.getElementById("fechaHora").textContent =
-    d.toLocaleDateString("es-ES") + " · " +
-    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
-}
+// ➕ Añadir línea
+function añadirLinea(){
 
-/* UTILS */
-function leerJSON(clave, defecto){
-  const raw = localStorage.getItem(clave);
-  if(!raw) return defecto;
-  try{
-    return JSON.parse(raw);
-  }catch(e){
-    return defecto;
+  const fila = document.createElement("tr");
+  fila.className = "linea";
+
+  const select = document.createElement("select");
+
+  articulos.forEach(a=>{
+    const option = document.createElement("option");
+    option.value = a.nombre;
+    option.textContent = a.nombre;
+    select.appendChild(option);
+  });
+
+  const tdArticulo = document.createElement("td");
+  tdArticulo.appendChild(select);
+
+  const tdUnidades = document.createElement("td");
+  const inputU = document.createElement("input");
+  inputU.type = "number";
+  inputU.value = 1;
+  tdUnidades.appendChild(inputU);
+
+  const tdPrecio = document.createElement("td");
+  const inputP = document.createElement("input");
+  inputP.type = "number";
+  inputP.step = "0.01";
+  tdPrecio.appendChild(inputP);
+
+  const tdTotal = document.createElement("td");
+  tdTotal.innerText = "0";
+
+  const tdAccion = document.createElement("td");
+  tdAccion.style.display = adminActivo ? "block" : "none";
+
+  const btnEliminar = document.createElement("button");
+  btnEliminar.innerText = "🗑";
+  btnEliminar.className = "rojo";
+  btnEliminar.onclick = ()=> fila.remove();
+
+  tdAccion.appendChild(btnEliminar);
+
+  fila.appendChild(tdArticulo);
+  fila.appendChild(tdUnidades);
+  fila.appendChild(tdPrecio);
+  fila.appendChild(tdTotal);
+  fila.appendChild(tdAccion);
+
+  document.getElementById("lineas").appendChild(fila);
+
+  // auto rellenar al elegir artículo
+  function actualizarArticulo(){
+    const art = articulos.find(a=>a.nombre === select.value);
+
+    inputP.value = art.precio;
+    fila.style.borderLeft = "8px solid " + art.color;
+
+    calcular();
   }
+
+  select.onchange = actualizarArticulo;
+  inputU.oninput = calcular;
+  inputP.oninput = calcular;
+
+  actualizarArticulo();
 }
 
-function guardarJSON(clave, valor){
-  localStorage.setItem(clave, JSON.stringify(valor));
-}
-
-function clavePedido(nombre){
-  return "pedido_" + nombre;
-}
-
-/* PROVEEDORES DESDE localStorage */
-function leerProveedores(){
-  const lista = leerJSON("proveedores", []);
-  return lista.map((p, i) => ({
-    nombre: p.nombre || ("Proveedor " + (i + 1)),
-    color: p.color || "otro",
-    pago: p.pago || "contado",
-    telefono: p.telefono || "",
-    producto: p.producto || "",
-    diaPedido: p.diaPedido || "",
-    diaReparto: p.diaReparto || ""
-  }));
-}
-
-/* ARTÍCULOS DESDE localStorage */
-function leerArticulos(){
-  return leerJSON("articulos", []);
-}
-
-/* FILTRAR ARTÍCULOS DEL PROVEEDOR */
-function articulosDeProveedor(nombreProveedor){
-  const articulos = leerArticulos();
-
-  const filtrados = articulos.filter(a => {
-    const proveedor =
-      a.proveedor ||
-      a.proveedorNombre ||
-      a.nombreProveedor ||
-      a.distribuidor ||
-      "";
-
-    return proveedor === nombreProveedor;
-  });
-
-  return filtrados.map(a => ({
-    articulo: a.nombre || a.articulo || a.producto || "Artículo",
-    precio: parseFloat(a.precio || a.precioCompra || a.precioBase || 0),
-    iva: parseFloat(a.iva || 21)
-  }));
-}
-
-/* CHECK SI YA HAY PEDIDO */
-function tienePedido(nombre){
-  const pedido = leerJSON(clavePedido(nombre), []);
-  return pedido.length > 0;
-}
-
-/* PINTAR PROVEEDORES */
-function pintarProveedores(){
-  const proveedores = leerProveedores();
-  let html = "";
-
-  proveedores.forEach(p => {
-    const check = tienePedido(p.nombre) ? "✔" : "";
-    html += `
-      <div class="proveedor ${p.color}" onclick="abrirProveedor('${p.nombre.replace(/'/g,"\\'")}')">
-        <div>${p.nombre}</div>
-        <div class="check">${check}</div>
-      </div>
-    `;
-  });
-
-  document.getElementById("zonaProveedores").innerHTML = html;
-}
-
-/* ABRIR PROVEEDOR */
-function abrirProveedor(nombre){
-  proveedorActivo = nombre;
-
-  document.getElementById("zonaProveedores").style.display = "none";
-  document.getElementById("hojaPedido").style.display = "block";
-
-  const proveedores = leerProveedores();
-  const p = proveedores.find(x => x.nombre === nombre);
-  const color = p ? p.color : "otro";
-
-  document.getElementById("hojaPedido").className = "hoja " + color;
-  document.getElementById("nombreProveedorActivo").textContent = nombre;
-
-  pintarTabla();
-}
-
-/* VOLVER */
-function volverProveedores(){
-  document.getElementById("zonaProveedores").style.display = "flex";
-  document.getElementById("hojaPedido").style.display = "none";
-  proveedorActivo = "";
-  pintarProveedores();
-}
-
-/* PEDIDO GUARDADO DEL PROVEEDOR */
-function leerPedidoProveedor(nombre){
-  return leerJSON(clavePedido(nombre), []);
-}
-
-function guardarPedidoProveedor(nombre, lineas){
-  guardarJSON(clavePedido(nombre), lineas);
-}
-
-/* TABLA */
-function pintarTabla(){
-  const tbody = document.querySelector("#tablaPedido tbody");
-  tbody.innerHTML = "";
-
-  const articulos = articulosDeProveedor(proveedorActivo);
-  const pedidoGuardado = leerPedidoProveedor(proveedorActivo);
-
-  articulos.forEach((item, i) => {
-    const existente = pedidoGuardado.find(x => x.indice === i);
-    const unidades = existente ? existente.unidades : "";
-
-    tbody.innerHTML += `
-      <tr>
-        <td><input type="number" step="1" value="${unidades}" oninput="calcular()"></td>
-        <td>${item.articulo}</td>
-        <td>${item.precio.toFixed(2)} €</td>
-        <td class="importe"></td>
-      </tr>
-    `;
-  });
-
-  calcular();
-}
-
-/* CALCULAR */
+// 🧮 Calcular
 function calcular(){
-  const filas = document.querySelectorAll("#tablaPedido tbody tr");
-  const articulos = articulosDeProveedor(proveedorActivo);
 
   let subtotal = 0;
-  let ivaTotal = 0;
-  let pedido = [];
 
-  pedidoActivo = false;
+  document.querySelectorAll("#lineas tr").forEach(fila=>{
+    const u = fila.children[1].querySelector("input").value;
+    const p = fila.children[2].querySelector("input").value;
 
-  filas.forEach((fila, i) => {
-    const input = fila.children[0].children[0];
-    const valor = input.value;
-    const unidades = parseFloat(valor);
+    const total = u * p;
+    fila.children[3].innerText = total.toFixed(2);
 
-    if(!isNaN(unidades) && unidades > 0){
-      pedidoActivo = true;
-
-      const precio = articulos[i].precio;
-      const iva = articulos[i].iva;
-      const base = unidades * precio;
-      const ivaCalc = base * (iva / 100);
-
-      subtotal += base;
-      ivaTotal += ivaCalc;
-
-      fila.children[3].textContent = base.toFixed(2) + " €";
-      fila.style.opacity = 1;
-
-      pedido.push({
-        indice: i,
-        unidades: unidades
-      });
-    }else{
-      fila.children[3].textContent = "";
-      fila.style.opacity = 0.35;
-    }
+    subtotal += total;
   });
 
-  const total = subtotal + ivaTotal;
-
-  document.getElementById("totales").innerHTML =
-    "SUBTOTAL: " + subtotal.toFixed(2) + " €<br>" +
-    "IVA: " + ivaTotal.toFixed(2) + " €<br>" +
-    "TOTAL: " + total.toFixed(2) + " €";
-
-  guardarPedidoProveedor(proveedorActivo, pedido);
+  document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+  document.getElementById("total").innerText = subtotal.toFixed(2);
 }
 
-/* FINALIZAR PEDIDO */
-function finalizarPedido(){
-  if(!pedidoActivo){
-    alert("No hay nada en el pedido");
+// ✔ Validar factura
+function validar(){
+
+  const sistema = parseFloat(document.getElementById("total").innerText);
+  const factura = parseFloat(document.getElementById("factura").value);
+
+  if(!factura){
+    alert("Introduce total factura");
     return;
   }
 
-  if(confirm("¿Seguro que quieres cerrar el pedido?") === false){
-    return;
+  const dif = (factura - sistema).toFixed(2);
+
+  if(Math.abs(dif) > 0.5){
+    document.getElementById("alerta").innerText =
+    "⚠ INCIDENCIA: diferencia de " + dif + " €";
+  } else {
+    document.getElementById("alerta").innerText =
+    "✔ Pedido correcto";
   }
-
-  if(confirm("Última confirmación. Este pedido se enviará a histórico y a pagos.") === false){
-    return;
-  }
-
-  const lineas = leerPedidoProveedor(proveedorActivo);
-  const articulos = articulosDeProveedor(proveedorActivo);
-  const proveedores = leerProveedores();
-  const proveedor = proveedores.find(p => p.nombre === proveedorActivo);
-
-  let subtotal = 0;
-  let ivaTotal = 0;
-
-  lineas.forEach(linea => {
-    const item = articulos[linea.indice];
-    const base = linea.unidades * item.precio;
-    subtotal += base;
-    ivaTotal += base * (item.iva / 100);
-  });
-
-  const total = subtotal + ivaTotal;
-
-  const historico = leerJSON("historico_pedidos", []);
-  historico.push({
-    proveedor: proveedorActivo,
-    operador: localStorage.getItem("usuario") || "OPERADOR",
-    fecha: new Date().toISOString(),
-    lineas: lineas,
-    subtotal: subtotal,
-    iva: ivaTotal,
-    total: total
-  });
-  guardarJSON("historico_pedidos", historico);
-
-  const pagos = leerJSON("pagos_pendientes", []);
-  pagos.push({
-    proveedor: proveedorActivo,
-    total: total,
-    fecha: new Date().toISOString(),
-    formaPago: proveedor ? proveedor.pago : "contado",
-    estado: "pendiente"
-  });
-  guardarJSON("pagos_pendientes", pagos);
-
-  localStorage.removeItem(clavePedido(proveedorActivo));
-
-  alert("Pedido guardado. Ya está en histórico y en pagos.");
-
-  volverProveedores();
 }
 
-/* BORRAR PEDIDO */
-function borrarPedidoProveedor(){
-  if(!proveedorActivo){
-    return;
-  }
+// 🔒 Modo admin
+function modoAdmin(){
 
-  if(confirm("¿Seguro que quieres borrar el pedido de este proveedor?") === false){
-    return;
-  }
+  const pin = prompt("PIN administrador");
 
-  localStorage.removeItem(clavePedido(proveedorActivo));
-  pintarTabla();
-  pintarProveedores();
+  if(pin === PIN){
+    adminActivo = !adminActivo;
+
+    document.querySelectorAll(".admin-col").forEach(e=>{
+      e.style.display = adminActivo ? "block" : "none";
+    });
+
+    document.querySelectorAll("#lineas tr").forEach(fila=>{
+      fila.lastChild.style.display = adminActivo ? "block" : "none";
+    });
+
+    alert("Modo admin " + (adminActivo ? "ACTIVO" : "DESACTIVADO"));
+  } else {
+    alert("PIN incorrecto");
+  }
 }
 
-/* INIT */
-cargarCabecera();
-pintarProveedores();
+// ⬅ Volver
+function volver(){
+  history.back();
+}
+
 </script>
 
 </body>
