@@ -3,88 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PEDIDOS - MONOLITO</title>
+<title>PEDIDOS</title>
 
 <style>
 body{
   margin:0;
   font-family:Arial, Helvetica, sans-serif;
   background:#eef3f5;
-  color:#2b2b2b;
+  color:#1f2933;
 }
 
 .barra{
-  height:76px;
   background:#14313d;
   color:white;
+  height:72px;
+  padding:0 22px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  padding:0 26px;
-  font-size:34px;
+  align-items:center;
+  font-size:28px;
   font-weight:bold;
 }
 
-.flecha{
-  font-size:46px;
+.barra span{
   cursor:pointer;
+  font-size:38px;
 }
 
-.mas{
-  font-size:46px;
-  cursor:pointer;
+.container{
+  padding:18px;
 }
 
-.contenedor{
-  padding:26px;
-}
-
-.tarjeta{
-  background:white;
-  border-radius:28px;
-  padding:28px;
-  margin-bottom:26px;
-  box-shadow:0 8px 22px rgba(0,0,0,.08);
-}
-
-.titulo{
-  font-size:32px;
-  font-weight:bold;
-  margin-bottom:22px;
-}
-
-.campo{
+select,input{
   width:100%;
-  padding:18px;
-  margin:10px 0;
-  font-size:22px;
+  padding:16px;
+  margin:8px 0;
+  font-size:20px;
   border-radius:14px;
-  border:1px solid #ddd;
+  border:1px solid #cfd8dc;
   box-sizing:border-box;
-}
-
-.linea{
-  background:#f7f7f7;
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:16px;
-  border-left:16px solid #14313d;
-}
-
-.linea-total{
-  font-size:24px;
-  font-weight:bold;
-  margin-top:10px;
 }
 
 .boton{
   width:100%;
-  padding:22px;
+  padding:18px;
+  border-radius:16px;
   border:0;
-  border-radius:18px;
-  margin-top:18px;
-  font-size:26px;
+  font-size:22px;
   font-weight:bold;
+  margin-top:10px;
   cursor:pointer;
 }
 
@@ -98,45 +65,83 @@ body{
   color:white;
 }
 
-.gris{
-  background:#d7dbe1;
-  color:#111;
-}
-
 .rojo{
   background:#b8332f;
   color:white;
 }
 
+.aviso-oferta{
+  display:none;
+  background:#fff3cd;
+  color:#7a4b00;
+  padding:14px;
+  border-radius:14px;
+  font-size:20px;
+  font-weight:bold;
+  margin:8px 0 12px 0;
+  border:1px solid #f1d98b;
+}
+
+table{
+  width:100%;
+  margin-top:16px;
+  border-collapse:collapse;
+  background:white;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+th{
+  background:#14313d;
+  color:white;
+  font-size:17px;
+  padding:12px 8px;
+}
+
+td{
+  padding:12px 8px;
+  text-align:center;
+  border-bottom:1px solid #e5e7eb;
+  font-size:18px;
+}
+
+td:first-child{
+  text-align:left;
+  font-weight:bold;
+}
+
 .resumen{
-  font-size:26px;
+  background:white;
+  margin-top:18px;
+  padding:18px;
+  border-radius:18px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  font-size:22px;
   line-height:1.7;
 }
 
 .resumen strong{
-  font-size:30px;
+  font-size:26px;
 }
 
-.oculto{
+.fila-total{
+  border-top:2px solid #ddd;
+  margin-top:8px;
+  padding-top:8px;
+}
+
+.admin-boton{
   display:none;
-}
-
-.alerta{
-  margin-top:20px;
-  padding:18px;
-  border-radius:18px;
-  font-size:24px;
+  padding:8px 10px;
+  border-radius:10px;
+  border:0;
   font-weight:bold;
+  cursor:pointer;
 }
 
-.alerta-roja{
-  background:#ffe0e0;
-  color:#9b0000;
-}
-
-.alerta-ok{
-  background:#e0ffe4;
-  color:#146b22;
+.admin-activo .admin-boton{
+  display:inline-block;
 }
 </style>
 </head>
@@ -144,216 +149,263 @@ body{
 <body>
 
 <div class="barra">
-  <div class="flecha" onclick="volver()">←</div>
+  <span onclick="volver()">←</span>
   <div>PEDIDOS</div>
-  <div class="mas" onclick="activarAdmin()">🔒</div>
+  <span onclick="activarAdmin()">🔒</span>
 </div>
 
-<div class="contenedor">
+<div class="container">
 
-  <div class="tarjeta">
-    <div class="titulo">Nuevo pedido</div>
+  <select id="proveedor"></select>
 
-    <select id="proveedorPedido" class="campo" onchange="cargarArticulosProveedor()">
-      <option value="">Seleccionar proveedor</option>
-    </select>
+  <select id="articulo"></select>
 
-    <button class="boton verde" onclick="añadirLinea()">+ AÑADIR ARTÍCULO</button>
-  </div>
+  <div id="avisoOferta" class="aviso-oferta"></div>
 
-  <div class="tarjeta">
-    <div class="titulo">Líneas del pedido</div>
-    <div id="lineasPedido"></div>
-  </div>
+  <input type="number" id="cantidad" placeholder="Cantidad" min="0" step="1">
 
-  <div class="tarjeta resumen">
+  <button class="boton verde" onclick="anadirProducto()">+ AÑADIR PRODUCTO</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Artículo</th>
+        <th>Ud</th>
+        <th>Precio</th>
+        <th>IVA</th>
+        <th>Total</th>
+        <th>Admin</th>
+      </tr>
+    </thead>
+    <tbody id="lineas"></tbody>
+  </table>
+
+  <div class="resumen">
     <div><strong>Subtotal sin IVA:</strong> <span id="subtotal">0,00</span> €</div>
     <div>IVA 4%: <span id="iva4">0,00</span> €</div>
     <div>IVA 10%: <span id="iva10">0,00</span> €</div>
     <div>IVA 21%: <span id="iva21">0,00</span> €</div>
-    <hr>
-    <div><strong>Total:</strong> <span id="total">0,00</span> €</div>
+    <div class="fila-total"><strong>TOTAL PEDIDO:</strong> <span id="total">0,00</span> €</div>
   </div>
 
-  <div class="tarjeta">
-    <div class="titulo">Control factura</div>
-
-    <input id="totalFactura" class="campo" type="number" step="0.01" placeholder="Total factura proveedor">
-
-    <button class="boton azul" onclick="validarFactura()">VALIDAR FACTURA</button>
-
-    <div id="mensajeIncidencia"></div>
-  </div>
+  <button class="boton azul" onclick="cerrarPedido()">CERRAR PEDIDO</button>
 
 </div>
 
 <script>
 const PIN_ADMIN = "1234";
-let adminActivo = false;
-let lineas = [];
 
-/* Carga datos ya existentes */
+let adminActivo = false;
+let lineasPedido = [];
+
 let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
 let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
 
-/* Si tus claves tienen otro nombre, esto intenta recuperarlas */
 if(proveedores.length === 0){
   proveedores = JSON.parse(localStorage.getItem("listaProveedores") || "[]");
 }
+
 if(articulos.length === 0){
   articulos = JSON.parse(localStorage.getItem("listaArticulos") || "[]");
-}
-
-function formato(num){
-  return Number(num || 0).toFixed(2).replace(".", ",");
 }
 
 function volver(){
   window.location.href = "index.html";
 }
 
+function formato(numero){
+  return Number(numero || 0).toFixed(2).replace(".", ",");
+}
+
+function normalizarPrecio(valor){
+  if(typeof valor === "string"){
+    return Number(valor.replace(",", "."));
+  }
+  return Number(valor || 0);
+}
+
+function nombreProveedor(p){
+  return p.nombre || p.proveedor || p.name || "";
+}
+
+function nombreArticulo(a){
+  return a.nombre || a.articulo || a.name || "";
+}
+
+function proveedorArticulo(a){
+  return a.proveedor || a.proveedorNombre || a.nombreProveedor || "";
+}
+
+function precioArticulo(a){
+  return normalizarPrecio(
+    a.precioSinIva ||
+    a.precio ||
+    a.precio_compra ||
+    a.precioCompra ||
+    0
+  );
+}
+
+function ivaArticulo(a){
+  return Number(a.iva || a.tipoIva || a.tipo_iva || 10);
+}
+
+function ofertaArticulo(a){
+  return a.oferta || a.promocion || a.promoción || a.promo || "";
+}
+
 function cargarProveedores(){
-  const select = document.getElementById("proveedorPedido");
+  const select = document.getElementById("proveedor");
   select.innerHTML = '<option value="">Seleccionar proveedor</option>';
 
   proveedores.forEach(p=>{
-    const nombre = p.nombre || p.proveedor || p.name;
+    const nombre = nombreProveedor(p);
     if(!nombre) return;
 
-    const op = document.createElement("option");
-    op.value = nombre;
-    op.textContent = nombre;
-    select.appendChild(op);
+    const option = document.createElement("option");
+    option.value = nombre;
+    option.textContent = nombre;
+    select.appendChild(option);
   });
+
+  cargarArticulos();
 }
 
 function articulosDelProveedor(){
-  const proveedor = document.getElementById("proveedorPedido").value;
+  const proveedor = document.getElementById("proveedor").value;
 
   return articulos.filter(a=>{
-    const provArticulo = a.proveedor || a.proveedorNombre || a.nombreProveedor;
-    return provArticulo === proveedor;
+    return proveedorArticulo(a) === proveedor;
   });
 }
 
-function cargarArticulosProveedor(){
-  lineas = [];
-  pintarLineas();
-  calcular();
-}
+function cargarArticulos(){
+  const select = document.getElementById("articulo");
+  select.innerHTML = '<option value="">Seleccionar artículo</option>';
 
-function añadirLinea(){
-  const proveedor = document.getElementById("proveedorPedido").value;
+  articulosDelProveedor().forEach(a=>{
+    const nombre = nombreArticulo(a);
+    if(!nombre) return;
 
-  if(!proveedor){
-    alert("Primero selecciona proveedor");
-    return;
-  }
-
-  const lista = articulosDelProveedor();
-
-  if(lista.length === 0){
-    alert("Este proveedor no tiene artículos creados");
-    return;
-  }
-
-  lineas.push({
-    articulo:"",
-    unidades:1
+    const option = document.createElement("option");
+    option.value = nombre;
+    option.textContent = nombre;
+    select.appendChild(option);
   });
 
+  document.getElementById("cantidad").value = "";
+  avisarOfertaArticulo();
+}
+
+function buscarArticulo(nombre){
+  const proveedor = document.getElementById("proveedor").value;
+
+  return articulos.find(a=>{
+    return nombreArticulo(a) === nombre && proveedorArticulo(a) === proveedor;
+  });
+}
+
+function avisarOfertaArticulo(){
+  const nombre = document.getElementById("articulo").value;
+  const articulo = buscarArticulo(nombre);
+  const aviso = document.getElementById("avisoOferta");
+
+  if(articulo && ofertaArticulo(articulo)){
+    aviso.textContent = "⚠ OFERTA ACTIVA: " + ofertaArticulo(articulo);
+    aviso.style.display = "block";
+  }else{
+    aviso.textContent = "";
+    aviso.style.display = "none";
+  }
+}
+
+function anadirProducto(){
+  const nombre = document.getElementById("articulo").value;
+  const cantidad = Number(document.getElementById("cantidad").value || 0);
+
+  if(!document.getElementById("proveedor").value){
+    alert("Selecciona proveedor");
+    return;
+  }
+
+  if(!nombre){
+    alert("Selecciona artículo");
+    return;
+  }
+
+  if(cantidad <= 0){
+    alert("La cantidad tiene que ser mayor que 0");
+    return;
+  }
+
+  const articulo = buscarArticulo(nombre);
+
+  if(!articulo){
+    alert("No encuentro el artículo");
+    return;
+  }
+
+  lineasPedido.push({
+    nombre:nombre,
+    cantidad:cantidad,
+    precio:precioArticulo(articulo),
+    iva:ivaArticulo(articulo),
+    oferta:ofertaArticulo(articulo)
+  });
+
+  document.getElementById("cantidad").value = "";
   pintarLineas();
 }
 
 function pintarLineas(){
-  const cont = document.getElementById("lineasPedido");
-  cont.innerHTML = "";
+  const tbody = document.getElementById("lineas");
+  tbody.innerHTML = "";
 
-  const lista = articulosDelProveedor();
+  lineasPedido.forEach((linea,index)=>{
+    const totalLinea = linea.cantidad * linea.precio;
 
-  lineas.forEach((linea, index)=>{
-    const div = document.createElement("div");
-    div.className = "linea";
+    const tr = document.createElement("tr");
 
-    const articuloSeleccionado = lista.find(a => (a.nombre || a.articulo || a.name) === linea.articulo);
-    const color = articuloSeleccionado?.color || articuloSeleccionado?.colorProveedor || "#14313d";
-    div.style.borderLeftColor = color;
-
-    let opciones = '<option value="">Seleccionar artículo</option>';
-
-    lista.forEach(a=>{
-      const nombre = a.nombre || a.articulo || a.name;
-      opciones += `<option value="${nombre}" ${linea.articulo === nombre ? "selected" : ""}>${nombre}</option>`;
-    });
-
-    div.innerHTML = `
-      <select class="campo" onchange="cambiarArticulo(${index}, this.value)">
-        ${opciones}
-      </select>
-
-      <input class="campo" type="number" min="0" step="1" value="${linea.unidades}" 
-      placeholder="Unidades" oninput="cambiarUnidades(${index}, this.value)">
-
-      <div class="linea-total">
-        Total línea: ${formato(calcularLinea(index))} €
-      </div>
-
-      <button class="boton rojo ${adminActivo ? "" : "oculto"}" onclick="eliminarLinea(${index})">
-        ELIMINAR
-      </button>
+    tr.innerHTML = `
+      <td>${linea.nombre}${linea.oferta ? " ⚠" : ""}</td>
+      <td>${linea.cantidad}</td>
+      <td>${formato(linea.precio)} €</td>
+      <td>${linea.iva}%</td>
+      <td>${formato(totalLinea)} €</td>
+      <td>
+        <button class="admin-boton rojo" onclick="eliminarLinea(${index})">Eliminar</button>
+      </td>
     `;
 
-    cont.appendChild(div);
+    tbody.appendChild(tr);
   });
+
+  calcularTotales();
 }
 
-function cambiarArticulo(index, valor){
-  lineas[index].articulo = valor;
+function eliminarLinea(index){
+  if(!adminActivo){
+    alert("Solo administrador");
+    return;
+  }
+
+  lineasPedido.splice(index,1);
   pintarLineas();
-  calcular();
 }
 
-function cambiarUnidades(index, valor){
-  lineas[index].unidades = Number(valor || 0);
-  pintarLineas();
-  calcular();
-}
-
-function datosArticulo(nombre){
-  return articulos.find(a=>{
-    const n = a.nombre || a.articulo || a.name;
-    return n === nombre;
-  });
-}
-
-function calcularLinea(index){
-  const linea = lineas[index];
-  const art = datosArticulo(linea.articulo);
-
-  if(!art) return 0;
-
-  const precio = Number(art.precio || art.precioSinIva || art.precio_compra || 0);
-  return Number(linea.unidades || 0) * precio;
-}
-
-function calcular(){
+function calcularTotales(){
   let subtotal = 0;
   let iva4 = 0;
   let iva10 = 0;
   let iva21 = 0;
 
-  lineas.forEach((linea, index)=>{
-    const art = datosArticulo(linea.articulo);
-    if(!art) return;
-
-    const base = calcularLinea(index);
-    const iva = Number(art.iva || art.tipoIva || 10);
-
+  lineasPedido.forEach(linea=>{
+    const base = linea.cantidad * linea.precio;
     subtotal += base;
 
-    if(iva === 4) iva4 += base * 0.04;
-    if(iva === 10) iva10 += base * 0.10;
-    if(iva === 21) iva21 += base * 0.21;
+    if(Number(linea.iva) === 4) iva4 += base * 0.04;
+    if(Number(linea.iva) === 10) iva10 += base * 0.10;
+    if(Number(linea.iva) === 21) iva21 += base * 0.21;
   });
 
   const total = subtotal + iva4 + iva10 + iva21;
@@ -365,30 +417,50 @@ function calcular(){
   document.getElementById("total").textContent = formato(total);
 }
 
-function validarFactura(){
-  calcular();
+function cerrarPedido(){
+  const proveedor = document.getElementById("proveedor").value;
 
-  const totalSistema = Number(
-    document.getElementById("total").textContent.replace(",", ".")
-  );
-
-  const totalFactura = Number(document.getElementById("totalFactura").value || 0);
-  const cont = document.getElementById("mensajeIncidencia");
-
-  if(!totalFactura){
-    alert("Introduce el total de la factura");
+  if(!proveedor){
+    alert("Selecciona proveedor");
     return;
   }
 
-  const diferencia = totalFactura - totalSistema;
-
-  if(Math.abs(diferencia) > 0.01){
-    cont.className = "alerta alerta-roja";
-    cont.textContent = "⚠ INCIDENCIA: diferencia de " + formato(diferencia) + " €";
-  }else{
-    cont.className = "alerta alerta-ok";
-    cont.textContent = "✔ Pedido correcto. No hay diferencia.";
+  if(lineasPedido.length === 0){
+    alert("No hay productos en el pedido");
+    return;
   }
+
+  calcularTotales();
+
+  const totalPedido = document.getElementById("total").textContent;
+
+  const pedidos = JSON.parse(localStorage.getItem("pedidos") || "[]");
+  const pagos = JSON.parse(localStorage.getItem("pagos") || "[]");
+
+  const pedido = {
+    fecha:new Date().toLocaleDateString("es-ES"),
+    proveedor:proveedor,
+    lineas:lineasPedido,
+    total:totalPedido,
+    estado:"cerrado"
+  };
+
+  pedidos.push(pedido);
+
+  pagos.push({
+    fecha:new Date().toLocaleDateString("es-ES"),
+    proveedor:proveedor,
+    importe:totalPedido,
+    estado:"pendiente"
+  });
+
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
+  localStorage.setItem("pagos", JSON.stringify(pagos));
+
+  alert("Pedido cerrado y enviado a pagos");
+
+  lineasPedido = [];
+  pintarLineas();
 }
 
 function activarAdmin(){
@@ -400,13 +472,21 @@ function activarAdmin(){
   }
 
   adminActivo = !adminActivo;
-  pintarLineas();
 
-  alert(adminActivo ? "Administrador activado" : "Administrador desactivado");
+  if(adminActivo){
+    document.body.classList.add("admin-activo");
+    alert("Administrador activado");
+  }else{
+    document.body.classList.remove("admin-activo");
+    alert("Administrador desactivado");
+  }
 }
 
+document.getElementById("proveedor").addEventListener("change", cargarArticulos);
+document.getElementById("articulo").addEventListener("change", avisarOfertaArticulo);
+
 cargarProveedores();
-calcular();
+calcularTotales();
 </script>
 
 </body>
