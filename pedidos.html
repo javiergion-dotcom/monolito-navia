@@ -304,13 +304,10 @@ function comprobarRevisionProveedor(){
     }
   }
 
-  const hay = prompt("CONTROL CADA 3 SEMANAS\n\n¿Cuántas hay?");
-  const pido = prompt("CONTROL CADA 3 SEMANAS\n\n¿Cuántas pido?");
-
+  const hay = prompt("CONTROL CADA 3 SEMANAS\n\n¿Cuántas hay?") || "";
   revisiones[proveedor] = {
     fecha: hoy.toISOString(),
     hay: hay || "",
-    pido: pido || ""
   };
 
   localStorage.setItem("revisionesProveedor", JSON.stringify(revisiones));
