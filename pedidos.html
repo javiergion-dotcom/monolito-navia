@@ -2,266 +2,411 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pedidos - MONOLITO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEDIDOS - MONOLITO</title>
 
 <style>
 body{
-font-family:Arial;
-background:#0f1419;
-color:white;
-margin:0;
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#eef3f5;
+  color:#2b2b2b;
 }
 
-header{
-background:#1c2833;
-padding:15px;
-display:flex;
-align-items:center;
-justify-content:space-between;
+.barra{
+  height:76px;
+  background:#14313d;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 26px;
+  font-size:34px;
+  font-weight:bold;
 }
 
 .flecha{
-font-size:22px;
-cursor:pointer;
+  font-size:46px;
+  cursor:pointer;
 }
 
-.admin{
-cursor:pointer;
+.mas{
+  font-size:46px;
+  cursor:pointer;
 }
 
-.container{
-padding:15px;
+.contenedor{
+  padding:26px;
 }
 
-select, input{
-padding:8px;
-margin:5px;
+.tarjeta{
+  background:white;
+  border-radius:28px;
+  padding:28px;
+  margin-bottom:26px;
+  box-shadow:0 8px 22px rgba(0,0,0,.08);
 }
 
-table{
-width:100%;
-margin-top:10px;
-border-collapse:collapse;
+.titulo{
+  font-size:32px;
+  font-weight:bold;
+  margin-bottom:22px;
 }
 
-td, th{
-border:1px solid #444;
-padding:8px;
-text-align:center;
+.campo{
+  width:100%;
+  padding:18px;
+  margin:10px 0;
+  font-size:22px;
+  border-radius:14px;
+  border:1px solid #ddd;
+  box-sizing:border-box;
 }
 
 .linea{
-transition:.2s;
+  background:#f7f7f7;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:16px;
+  border-left:16px solid #14313d;
 }
 
-button{
-padding:8px;
-margin:5px;
-cursor:pointer;
+.linea-total{
+  font-size:24px;
+  font-weight:bold;
+  margin-top:10px;
 }
 
-.rojo{
-background:#c0392b;
-color:white;
+.boton{
+  width:100%;
+  padding:22px;
+  border:0;
+  border-radius:18px;
+  margin-top:18px;
+  font-size:26px;
+  font-weight:bold;
+  cursor:pointer;
 }
 
 .verde{
-background:#27ae60;
-color:white;
+  background:#4b8f36;
+  color:white;
+}
+
+.azul{
+  background:#14313d;
+  color:white;
+}
+
+.gris{
+  background:#d7dbe1;
+  color:#111;
+}
+
+.rojo{
+  background:#b8332f;
+  color:white;
+}
+
+.resumen{
+  font-size:26px;
+  line-height:1.7;
+}
+
+.resumen strong{
+  font-size:30px;
+}
+
+.oculto{
+  display:none;
 }
 
 .alerta{
-color:red;
-font-weight:bold;
-margin-top:10px;
+  margin-top:20px;
+  padding:18px;
+  border-radius:18px;
+  font-size:24px;
+  font-weight:bold;
+}
+
+.alerta-roja{
+  background:#ffe0e0;
+  color:#9b0000;
+}
+
+.alerta-ok{
+  background:#e0ffe4;
+  color:#146b22;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<span class="flecha" onclick="volver()">⬅</span>
-<span>📝 PEDIDOS</span>
-<span class="admin" onclick="modoAdmin()">🔒</span>
-</header>
+<div class="barra">
+  <div class="flecha" onclick="volver()">←</div>
+  <div>PEDIDOS</div>
+  <div class="mas" onclick="activarAdmin()">🔒</div>
+</div>
 
-<div class="container">
+<div class="contenedor">
 
-<table>
-<thead>
-<tr>
-<th>Artículo</th>
-<th>Unidades</th>
-<th>Precio</th>
-<th>Total</th>
-<th class="admin-col" style="display:none;">Acción</th>
-</tr>
-</thead>
+  <div class="tarjeta">
+    <div class="titulo">Nuevo pedido</div>
 
-<tbody id="lineas"></tbody>
-</table>
+    <select id="proveedorPedido" class="campo" onchange="cargarArticulosProveedor()">
+      <option value="">Seleccionar proveedor</option>
+    </select>
 
-<button class="verde" onclick="añadirLinea()">➕ Añadir línea</button>
+    <button class="boton verde" onclick="añadirLinea()">+ AÑADIR ARTÍCULO</button>
+  </div>
 
-<h3>Subtotal: <span id="subtotal">0</span> €</h3>
-<h2>Total: <span id="total">0</span> €</h2>
+  <div class="tarjeta">
+    <div class="titulo">Líneas del pedido</div>
+    <div id="lineasPedido"></div>
+  </div>
 
-<input type="number" id="factura" placeholder="Total factura proveedor">
-<button onclick="validar()">✔ Validar</button>
+  <div class="tarjeta resumen">
+    <div><strong>Subtotal sin IVA:</strong> <span id="subtotal">0,00</span> €</div>
+    <div>IVA 4%: <span id="iva4">0,00</span> €</div>
+    <div>IVA 10%: <span id="iva10">0,00</span> €</div>
+    <div>IVA 21%: <span id="iva21">0,00</span> €</div>
+    <hr>
+    <div><strong>Total:</strong> <span id="total">0,00</span> €</div>
+  </div>
 
-<div id="alerta" class="alerta"></div>
+  <div class="tarjeta">
+    <div class="titulo">Control factura</div>
+
+    <input id="totalFactura" class="campo" type="number" step="0.01" placeholder="Total factura proveedor">
+
+    <button class="boton azul" onclick="validarFactura()">VALIDAR FACTURA</button>
+
+    <div id="mensajeIncidencia"></div>
+  </div>
 
 </div>
 
 <script>
-
-// 🔐 PIN ADMIN
-const PIN = "1234";
+const PIN_ADMIN = "1234";
 let adminActivo = false;
+let lineas = [];
 
-// 🧠 ARTÍCULOS (usa los tuyos)
-let articulos = [
-  {nombre:"Café", precio:17/105, iva:10, proveedor:"Café Rico", color:"#a0522d"},
-  {nombre:"Cerveza", precio:0.8, iva:21, proveedor:"Mahou", color:"#b22222"}
-];
+/* Carga datos ya existentes */
+let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
+let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
 
-// ➕ Añadir línea
+/* Si tus claves tienen otro nombre, esto intenta recuperarlas */
+if(proveedores.length === 0){
+  proveedores = JSON.parse(localStorage.getItem("listaProveedores") || "[]");
+}
+if(articulos.length === 0){
+  articulos = JSON.parse(localStorage.getItem("listaArticulos") || "[]");
+}
+
+function formato(num){
+  return Number(num || 0).toFixed(2).replace(".", ",");
+}
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+function cargarProveedores(){
+  const select = document.getElementById("proveedorPedido");
+  select.innerHTML = '<option value="">Seleccionar proveedor</option>';
+
+  proveedores.forEach(p=>{
+    const nombre = p.nombre || p.proveedor || p.name;
+    if(!nombre) return;
+
+    const op = document.createElement("option");
+    op.value = nombre;
+    op.textContent = nombre;
+    select.appendChild(op);
+  });
+}
+
+function articulosDelProveedor(){
+  const proveedor = document.getElementById("proveedorPedido").value;
+
+  return articulos.filter(a=>{
+    const provArticulo = a.proveedor || a.proveedorNombre || a.nombreProveedor;
+    return provArticulo === proveedor;
+  });
+}
+
+function cargarArticulosProveedor(){
+  lineas = [];
+  pintarLineas();
+  calcular();
+}
+
 function añadirLinea(){
+  const proveedor = document.getElementById("proveedorPedido").value;
 
-  const fila = document.createElement("tr");
-  fila.className = "linea";
-
-  const select = document.createElement("select");
-
-  articulos.forEach(a=>{
-    const option = document.createElement("option");
-    option.value = a.nombre;
-    option.textContent = a.nombre;
-    select.appendChild(option);
-  });
-
-  const tdArticulo = document.createElement("td");
-  tdArticulo.appendChild(select);
-
-  const tdUnidades = document.createElement("td");
-  const inputU = document.createElement("input");
-  inputU.type = "number";
-  inputU.value = 1;
-  tdUnidades.appendChild(inputU);
-
-  const tdPrecio = document.createElement("td");
-  const inputP = document.createElement("input");
-  inputP.type = "number";
-  inputP.step = "0.01";
-  tdPrecio.appendChild(inputP);
-
-  const tdTotal = document.createElement("td");
-  tdTotal.innerText = "0";
-
-  const tdAccion = document.createElement("td");
-  tdAccion.style.display = adminActivo ? "block" : "none";
-
-  const btnEliminar = document.createElement("button");
-  btnEliminar.innerText = "🗑";
-  btnEliminar.className = "rojo";
-  btnEliminar.onclick = ()=> fila.remove();
-
-  tdAccion.appendChild(btnEliminar);
-
-  fila.appendChild(tdArticulo);
-  fila.appendChild(tdUnidades);
-  fila.appendChild(tdPrecio);
-  fila.appendChild(tdTotal);
-  fila.appendChild(tdAccion);
-
-  document.getElementById("lineas").appendChild(fila);
-
-  // auto rellenar al elegir artículo
-  function actualizarArticulo(){
-    const art = articulos.find(a=>a.nombre === select.value);
-
-    inputP.value = art.precio;
-    fila.style.borderLeft = "8px solid " + art.color;
-
-    calcular();
-  }
-
-  select.onchange = actualizarArticulo;
-  inputU.oninput = calcular;
-  inputP.oninput = calcular;
-
-  actualizarArticulo();
-}
-
-// 🧮 Calcular
-function calcular(){
-
-  let subtotal = 0;
-
-  document.querySelectorAll("#lineas tr").forEach(fila=>{
-    const u = fila.children[1].querySelector("input").value;
-    const p = fila.children[2].querySelector("input").value;
-
-    const total = u * p;
-    fila.children[3].innerText = total.toFixed(2);
-
-    subtotal += total;
-  });
-
-  document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-  document.getElementById("total").innerText = subtotal.toFixed(2);
-}
-
-// ✔ Validar factura
-function validar(){
-
-  const sistema = parseFloat(document.getElementById("total").innerText);
-  const factura = parseFloat(document.getElementById("factura").value);
-
-  if(!factura){
-    alert("Introduce total factura");
+  if(!proveedor){
+    alert("Primero selecciona proveedor");
     return;
   }
 
-  const dif = (factura - sistema).toFixed(2);
+  const lista = articulosDelProveedor();
 
-  if(Math.abs(dif) > 0.5){
-    document.getElementById("alerta").innerText =
-    "⚠ INCIDENCIA: diferencia de " + dif + " €";
-  } else {
-    document.getElementById("alerta").innerText =
-    "✔ Pedido correcto";
+  if(lista.length === 0){
+    alert("Este proveedor no tiene artículos creados");
+    return;
+  }
+
+  lineas.push({
+    articulo:"",
+    unidades:1
+  });
+
+  pintarLineas();
+}
+
+function pintarLineas(){
+  const cont = document.getElementById("lineasPedido");
+  cont.innerHTML = "";
+
+  const lista = articulosDelProveedor();
+
+  lineas.forEach((linea, index)=>{
+    const div = document.createElement("div");
+    div.className = "linea";
+
+    const articuloSeleccionado = lista.find(a => (a.nombre || a.articulo || a.name) === linea.articulo);
+    const color = articuloSeleccionado?.color || articuloSeleccionado?.colorProveedor || "#14313d";
+    div.style.borderLeftColor = color;
+
+    let opciones = '<option value="">Seleccionar artículo</option>';
+
+    lista.forEach(a=>{
+      const nombre = a.nombre || a.articulo || a.name;
+      opciones += `<option value="${nombre}" ${linea.articulo === nombre ? "selected" : ""}>${nombre}</option>`;
+    });
+
+    div.innerHTML = `
+      <select class="campo" onchange="cambiarArticulo(${index}, this.value)">
+        ${opciones}
+      </select>
+
+      <input class="campo" type="number" min="0" step="1" value="${linea.unidades}" 
+      placeholder="Unidades" oninput="cambiarUnidades(${index}, this.value)">
+
+      <div class="linea-total">
+        Total línea: ${formato(calcularLinea(index))} €
+      </div>
+
+      <button class="boton rojo ${adminActivo ? "" : "oculto"}" onclick="eliminarLinea(${index})">
+        ELIMINAR
+      </button>
+    `;
+
+    cont.appendChild(div);
+  });
+}
+
+function cambiarArticulo(index, valor){
+  lineas[index].articulo = valor;
+  pintarLineas();
+  calcular();
+}
+
+function cambiarUnidades(index, valor){
+  lineas[index].unidades = Number(valor || 0);
+  pintarLineas();
+  calcular();
+}
+
+function datosArticulo(nombre){
+  return articulos.find(a=>{
+    const n = a.nombre || a.articulo || a.name;
+    return n === nombre;
+  });
+}
+
+function calcularLinea(index){
+  const linea = lineas[index];
+  const art = datosArticulo(linea.articulo);
+
+  if(!art) return 0;
+
+  const precio = Number(art.precio || art.precioSinIva || art.precio_compra || 0);
+  return Number(linea.unidades || 0) * precio;
+}
+
+function calcular(){
+  let subtotal = 0;
+  let iva4 = 0;
+  let iva10 = 0;
+  let iva21 = 0;
+
+  lineas.forEach((linea, index)=>{
+    const art = datosArticulo(linea.articulo);
+    if(!art) return;
+
+    const base = calcularLinea(index);
+    const iva = Number(art.iva || art.tipoIva || 10);
+
+    subtotal += base;
+
+    if(iva === 4) iva4 += base * 0.04;
+    if(iva === 10) iva10 += base * 0.10;
+    if(iva === 21) iva21 += base * 0.21;
+  });
+
+  const total = subtotal + iva4 + iva10 + iva21;
+
+  document.getElementById("subtotal").textContent = formato(subtotal);
+  document.getElementById("iva4").textContent = formato(iva4);
+  document.getElementById("iva10").textContent = formato(iva10);
+  document.getElementById("iva21").textContent = formato(iva21);
+  document.getElementById("total").textContent = formato(total);
+}
+
+function validarFactura(){
+  calcular();
+
+  const totalSistema = Number(
+    document.getElementById("total").textContent.replace(",", ".")
+  );
+
+  const totalFactura = Number(document.getElementById("totalFactura").value || 0);
+  const cont = document.getElementById("mensajeIncidencia");
+
+  if(!totalFactura){
+    alert("Introduce el total de la factura");
+    return;
+  }
+
+  const diferencia = totalFactura - totalSistema;
+
+  if(Math.abs(diferencia) > 0.01){
+    cont.className = "alerta alerta-roja";
+    cont.textContent = "⚠ INCIDENCIA: diferencia de " + formato(diferencia) + " €";
+  }else{
+    cont.className = "alerta alerta-ok";
+    cont.textContent = "✔ Pedido correcto. No hay diferencia.";
   }
 }
 
-// 🔒 Modo admin
-function modoAdmin(){
+function activarAdmin(){
+  const pin = prompt("Código administrador");
 
-  const pin = prompt("PIN administrador");
-
-  if(pin === PIN){
-    adminActivo = !adminActivo;
-
-    document.querySelectorAll(".admin-col").forEach(e=>{
-      e.style.display = adminActivo ? "block" : "none";
-    });
-
-    document.querySelectorAll("#lineas tr").forEach(fila=>{
-      fila.lastChild.style.display = adminActivo ? "block" : "none";
-    });
-
-    alert("Modo admin " + (adminActivo ? "ACTIVO" : "DESACTIVADO"));
-  } else {
-    alert("PIN incorrecto");
+  if(pin !== PIN_ADMIN){
+    alert("Código incorrecto");
+    return;
   }
+
+  adminActivo = !adminActivo;
+  pintarLineas();
+
+  alert(adminActivo ? "Administrador activado" : "Administrador desactivado");
 }
 
-// ⬅ Volver
-function volver(){
-  history.back();
-}
-
+cargarProveedores();
+calcular();
 </script>
 
 </body>
