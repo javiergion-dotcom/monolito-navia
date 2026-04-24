@@ -3,87 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PAGOS</title>
+<title>PAGOS · MONOLITO</title>
 
 <style>
 body{
   margin:0;
-  font-family:Arial;
-  background:#eef2f5;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#dfe6ec;
+  color:#17303d;
 }
 
 header{
   background:#17303d;
   color:white;
-  padding:15px;
+  padding:16px;
   display:flex;
+  align-items:center;
   justify-content:space-between;
 }
 
+button{
+  border:0;
+  border-radius:14px;
+  padding:12px 16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.volver{
+  background:#eef2f5;
+  color:#17303d;
+}
+
 .contenido{
-  padding:15px;
+  padding:18px;
 }
 
 .bloque{
   background:white;
-  padding:15px;
-  border-radius:12px;
-  margin-bottom:10px;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.15);
 }
 
 .fila{
   display:flex;
   justify-content:space-between;
+  gap:12px;
   align-items:center;
-  padding:12px;
-  border-bottom:1px solid #ddd;
 }
 
 .nombre{
-  font-weight:bold;
+  font-size:20px;
+  font-weight:800;
 }
 
 .total{
-  font-size:18px;
-  font-weight:bold;
+  font-size:20px;
+  font-weight:800;
+}
+
+.estado{
+  margin-top:10px;
+  font-size:14px;
 }
 
 .botones{
   display:flex;
   gap:10px;
-}
-
-button{
-  padding:8px 12px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
+  margin-top:14px;
 }
 
 .ok{
-  background:#4f8a3a;
+  flex:1;
+  background:#48a530;
   color:white;
 }
 
 .error{
-  background:#c0392b;
+  flex:1;
+  background:#ff0000;
   color:white;
 }
 
+.vacio{
+  background:white;
+  padding:18px;
+  border-radius:20px;
+  text-align:center;
+  font-weight:700;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <div>PAGOS</div>
-  <div onclick="volver()">←</div>
+  <button class="volver" onclick="volver()">← Volver</button>
+  <h2>💳 PAGOS</h2>
 </header>
 
-<div class="contenido" id="lista"></div>
+<div class="contenido">
+  <div id="lista"></div>
+</div>
 
 <script>
-
 function leerPagos(){
   return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 }
@@ -92,17 +117,35 @@ function guardarPagos(p){
   localStorage.setItem("pagos_pendientes", JSON.stringify(p));
 }
 
+function leerIncidencias(){
+  return JSON.parse(localStorage.getItem("incidencias_pendientes") || "[]");
+}
+
+function guardarIncidencias(i){
+  localStorage.setItem("incidencias_pendientes", JSON.stringify(i));
+}
+
 function pintar(){
   let pagos = leerPagos();
-  let html="";
+  let html = "";
+
+  if(pagos.length === 0){
+    html = `<div class="vacio">No hay pagos pendientes todavía.</div>`;
+  }
 
   pagos.forEach((p,i)=>{
+    let estado = p.estado || "pendiente";
+    let total = Number(p.total || 0);
 
     html += `
     <div class="bloque">
       <div class="fila">
-        <div class="nombre">${p.proveedor}</div>
-        <div class="total">${p.total.toFixed(2)} €</div>
+        <div class="nombre">${p.proveedor || "SIN PROVEEDOR"}</div>
+        <div class="total">${total.toFixed(2)} €</div>
+      </div>
+
+      <div class="estado">
+        Estado: <strong>${estado.toUpperCase()}</strong>
       </div>
 
       <div class="botones">
@@ -115,7 +158,6 @@ function pintar(){
   document.getElementById("lista").innerHTML = html;
 }
 
-/* MARCAR PAGADO */
 function pagar(i){
   let pagos = leerPagos();
   pagos[i].estado = "pagado";
@@ -123,21 +165,32 @@ function pagar(i){
   pintar();
 }
 
-/* MARCAR INCIDENCIA */
 function incidencia(i){
   let pagos = leerPagos();
+  let incidencias = leerIncidencias();
+
   pagos[i].estado = "incidencia";
+
+  incidencias.unshift({
+    fecha: new Date().toLocaleString("es-ES"),
+    proveedor: pagos[i].proveedor || "SIN PROVEEDOR",
+    total: Number(pagos[i].total || 0),
+    texto: "Pago marcado con incidencia",
+    resuelta: false
+  });
+
   guardarPagos(pagos);
+  guardarIncidencias(incidencias);
+
+  alert("Incidencia registrada para " + (pagos[i].proveedor || "SIN PROVEEDOR"));
   pintar();
 }
 
-/* VOLVER */
 function volver(){
-  window.location.href="index.html";
+  window.location.href = "index.html";
 }
 
 pintar();
-
 </script>
 
 </body>
