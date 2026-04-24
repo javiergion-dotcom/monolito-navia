@@ -385,21 +385,6 @@ reloj();
 actualizarFranja();
 </script>
 <script>
-function abrir(pagina){
-  window.location.href = pagina;
-}
 
-function reloj(){
-  const ahora = new Date();
-  document.getElementById("hora").textContent =
-    ahora.toLocaleTimeString("es-ES", {
-      hour:"2-digit",
-      minute:"2-digit"
-    });
-}
-
-reloj();
-setInterval(reloj, 1000);
-</script>
 </body>
 </html>
