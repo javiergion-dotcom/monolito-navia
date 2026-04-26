@@ -40,7 +40,9 @@ button{border:0;border-radius:14px;padding:11px 14px;font-weight:800}
 
 <script>
 function usuarioActual(){
-  return (localStorage.getItem("usuario") || "OPERADOR").toUpperCase();
+  localStorage.setItem("usuario", "JAVI");
+  return "JAVI";
+}
 }
 
 function puedeEditar(){
