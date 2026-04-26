@@ -6,13 +6,13 @@
 <title>PAGOS · MONOLITO</title>
 
 <style>
+*{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Arial, Helvetica, sans-serif;
+  font-family:Arial,Helvetica,sans-serif;
   background:#dfe6ec;
   color:#17303d;
 }
-
 header{
   background:#17303d;
   color:white;
@@ -21,24 +21,19 @@ header{
   align-items:center;
   justify-content:space-between;
 }
-
 button{
   border:0;
   border-radius:14px;
-  padding:12px 16px;
+  padding:12px 14px;
   font-weight:700;
-  cursor:pointer;
 }
-
 .volver{
   background:#eef2f5;
   color:#17303d;
 }
-
 .contenido{
   padding:18px;
 }
-
 .bloque{
   background:white;
   border-radius:22px;
@@ -46,47 +41,61 @@ button{
   margin-bottom:14px;
   box-shadow:0 8px 18px rgba(0,0,0,.15);
 }
-
 .fila{
   display:flex;
   justify-content:space-between;
   gap:12px;
   align-items:center;
 }
-
 .nombre{
   font-size:20px;
   font-weight:800;
 }
-
 .total{
   font-size:20px;
   font-weight:800;
 }
-
-.estado{
-  margin-top:10px;
-  font-size:14px;
+.detalle{
+  margin-top:8px;
+  font-size:15px;
+  color:#4f5f69;
 }
-
 .botones{
   display:flex;
   gap:10px;
   margin-top:14px;
 }
-
 .ok{
   flex:1;
   background:#48a530;
   color:white;
 }
-
 .error{
   flex:1;
   background:#ff0000;
   color:white;
 }
-
+.cuenta{
+  flex:1;
+  background:#f6ae1b;
+  color:white;
+}
+.sello{
+  display:inline-block;
+  margin-top:10px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:800;
+}
+.pagado{
+  background:#48a530;
+  color:white;
+}
+.incidencia{
+  background:#ff0000;
+  color:white;
+}
 .vacio{
   background:white;
   padding:18px;
@@ -113,44 +122,71 @@ function leerPagos(){
   return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 }
 
-function guardarPagos(p){
-  localStorage.setItem("pagos_pendientes", JSON.stringify(p));
+function guardarPagos(pagos){
+  localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
+}
+
+function leerHistorico(){
+  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
+}
+
+function guardarHistorico(historico){
+  localStorage.setItem("historico_pedidos", JSON.stringify(historico));
 }
 
 function leerIncidencias(){
   return JSON.parse(localStorage.getItem("incidencias_pendientes") || "[]");
 }
 
-function guardarIncidencias(i){
-  localStorage.setItem("incidencias_pendientes", JSON.stringify(i));
+function guardarIncidencias(incidencias){
+  localStorage.setItem("incidencias_pendientes", JSON.stringify(incidencias));
 }
 
 function pintar(){
-  let pagos = leerPagos();
+  const pagos = leerPagos();
   let html = "";
 
   if(pagos.length === 0){
-    html = `<div class="vacio">No hay pagos pendientes todavía.</div>`;
+    html = `<div class="vacio">No hay pedidos pendientes de pago.</div>`;
   }
 
   pagos.forEach((p,i)=>{
-    let estado = p.estado || "pendiente";
-    let total = Number(p.total || 0);
+    const proveedor = p.proveedor || "SIN PROVEEDOR";
+    const total = Number(p.total || 0);
+    const formaPago = (p.formaPago || p.forma_pago || "SIN FORMA DE PAGO").toUpperCase();
+    const estado = p.estado || "pendiente";
+    const pagadoCuenta = Number(p.pagadoCuenta || 0);
+    const queda = total - pagadoCuenta;
+
+    let aviso = "";
+
+    if(formaPago === "CONTADO"){
+      aviso = "Contado · Último pedido";
+    }else if(formaPago === "REPOSICION" || formaPago === "REPOSICIÓN"){
+      aviso = "Reposición · Pedido semana anterior";
+    }else if(formaPago === "BANCO"){
+      aviso = "Banco · Suma mensual y cotejo";
+    }else if(formaPago === "A CUENTA"){
+      aviso = "A cuenta · Entregado: " + pagadoCuenta.toFixed(2) + " € · Queda: " + queda.toFixed(2) + " €";
+    }
 
     html += `
     <div class="bloque">
       <div class="fila">
-        <div class="nombre">${p.proveedor || "SIN PROVEEDOR"}</div>
+        <div class="nombre">${proveedor}</div>
         <div class="total">${total.toFixed(2)} €</div>
       </div>
 
-      <div class="estado">
-        Estado: <strong>${estado.toUpperCase()}</strong>
-      </div>
+      <div class="detalle">${aviso}</div>
+      <div class="detalle">Estado: <strong>${estado.toUpperCase()}</strong></div>
+
+      ${estado === "pagado" ? `<span class="sello pagado">PAGADO</span>` : ""}
+      ${estado === "pagado_incidencia" ? `<span class="sello pagado">PAGADO</span> <span class="sello incidencia">INCIDENCIA ABIERTA</span>` : ""}
 
       <div class="botones">
-        <button class="ok" onclick="pagar(${i})">✔ PAGADO</button>
-        <button class="error" onclick="incidencia(${i})">⚠ INCIDENCIA</button>
+        <button class="ok" onclick="marcarPagado(${i})">✔ PAGADO</button>
+        <button class="error" onclick="marcarIncidencia(${i})">⚠ INCIDENCIA</button>
+        ${formaPago === "A CUENTA" ? `<button class="cuenta" onclick="entregaCuenta(${i})">💶 ENTREGA</button>` : ""}
       </div>
     </div>`;
   });
@@ -158,31 +194,93 @@ function pintar(){
   document.getElementById("lista").innerHTML = html;
 }
 
-function pagar(i){
+function pasarAHistorico(pedido){
+  const historico = leerHistorico();
+  historico.unshift({
+    ...pedido,
+    fechaHistorico: new Date().toLocaleString("es-ES")
+  });
+  guardarHistorico(historico);
+}
+
+function marcarPagado(i){
   let pagos = leerPagos();
-  pagos[i].estado = "pagado";
+  let pedido = pagos[i];
+
+  pedido.estado = "pagado";
+  pedido.sello = "PAGADO";
+  pedido.fechaPago = new Date().toLocaleString("es-ES");
+
+  pasarAHistorico(pedido);
+
+  pagos.splice(i,1);
   guardarPagos(pagos);
   pintar();
 }
 
-function incidencia(i){
+function marcarIncidencia(i){
   let pagos = leerPagos();
   let incidencias = leerIncidencias();
+  let pedido = pagos[i];
 
-  pagos[i].estado = "incidencia";
+  const motivo = prompt("Motivo de la incidencia:");
+  if(!motivo) return;
+
+  const solucion = prompt("Solución tomada por el proveedor / pendiente:") || "Pendiente de solución";
+
+  pedido.estado = "pagado_incidencia";
+  pedido.sello = "PAGADO";
+  pedido.incidenciaAbierta = true;
+  pedido.fechaPago = new Date().toLocaleString("es-ES");
 
   incidencias.unshift({
+    id: Date.now(),
     fecha: new Date().toLocaleString("es-ES"),
-    proveedor: pagos[i].proveedor || "SIN PROVEEDOR",
-    total: Number(pagos[i].total || 0),
-    texto: "Pago marcado con incidencia",
-    resuelta: false
+    proveedor: pedido.proveedor || "SIN PROVEEDOR",
+    total: Number(pedido.total || 0),
+    motivo: motivo,
+    solucion: solucion,
+    resuelta: false,
+    pedido: pedido
   });
 
-  guardarPagos(pagos);
   guardarIncidencias(incidencias);
+  pasarAHistorico(pedido);
 
-  alert("Incidencia registrada para " + (pagos[i].proveedor || "SIN PROVEEDOR"));
+  pagos.splice(i,1);
+  guardarPagos(pagos);
+  pintar();
+}
+
+function entregaCuenta(i){
+  let pagos = leerPagos();
+  let pedido = pagos[i];
+
+  const total = Number(pedido.total || 0);
+  const entregadoAnterior = Number(pedido.pagadoCuenta || 0);
+
+  const cantidad = parseFloat(prompt("¿Cuánto se entrega ahora?") || 0);
+  if(!cantidad || cantidad <= 0) return;
+
+  const nuevoPagado = entregadoAnterior + cantidad;
+  pedido.pagadoCuenta = nuevoPagado;
+
+  const queda = total - nuevoPagado;
+
+  if(queda <= 0){
+    pedido.estado = "pagado";
+    pedido.sello = "PAGADO";
+    pedido.fechaPago = new Date().toLocaleString("es-ES");
+
+    pasarAHistorico(pedido);
+    pagos.splice(i,1);
+    alert("Pedido cerrado. PAGADO.");
+  }else{
+    pedido.estado = "a_cuenta";
+    alert("Entrega guardada. Quedan " + queda.toFixed(2) + " €.");
+  }
+
+  guardarPagos(pagos);
   pintar();
 }
 
