@@ -3,476 +3,242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROVEEDORES</title>
+<title>PROVEEDORES · MONOLITO</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#eef2f5;
-  color:#2b2b2b;
-}
-
-/* CABECERA */
-header{
-  background:#17303d;
-  color:white;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.titulo{
-  font-size:20px;
-  font-weight:bold;
-}
-
-.add{
-  font-size:28px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* LISTA */
-.lista{
-  padding:15px;
-}
-
-.proveedor{
-  padding:16px;
-  border-radius:16px;
-  margin-bottom:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 6px 14px rgba(0,0,0,0.08);
-}
-
-.proveedor-info{
-  display:flex;
-  flex-direction:column;
-  gap:3px;
-}
-
-.proveedor small{
-  font-weight:normal;
-  opacity:0.8;
-}
-
-.lado-derecho{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.check{
-  font-size:22px;
-  color:#4f8a3a;
-}
-
-.editar{
-  cursor:pointer;
-  font-size:20px;
-}
-
-/* COLORES SUAVES */
-.c1{background:#f4efe6;}
-.c2{background:#eae3d6;}
-.c3{background:#f0f1f2;}
-.c4{background:#f3ecd2;}
-.c5{background:#ede4d8;}
-
-/* MODAL */
-.modal{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.45);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  padding:16px;
-}
-
-.modal-box{
-  background:white;
-  padding:20px;
-  border-radius:14px;
-  width:100%;
-  max-width:420px;
-}
-
-input, select, button{
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
-  font-size:16px;
-}
-
-button{
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-.btn-guardar{
-  background:#17303d;
-  color:white;
-}
-
-/* FICHA PROVEEDOR */
-.ficha{
-  display:none;
-  padding:15px;
-}
-
-.tarjeta{
-  background:white;
-  border-radius:16px;
-  padding:16px;
-  box-shadow:0 6px 14px rgba(0,0,0,0.08);
-  margin-bottom:14px;
-}
-
-.nombre-ficha{
-  font-size:24px;
-  font-weight:bold;
-  margin-bottom:10px;
-}
-
-.dato{
-  margin-bottom:8px;
-  font-size:16px;
-}
-
-.acciones{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:10px;
-  margin-top:14px;
-}
-
-.btn{
-  padding:14px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-.btn-volver{
-  background:#d8dde1;
-}
-
-.btn-pedido{
-  background:#4f8a3a;
-  color:white;
-}
-
-.btn-editar{
-  background:#17303d;
-  color:white;
-}
-
-.subtitulo{
-  font-size:18px;
-  font-weight:bold;
-  margin-bottom:10px;
-}
-
-.articulo{
-  background:#f8f8f8;
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:8px;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.vacio{
-  background:#f8f8f8;
-  border-radius:10px;
-  padding:12px;
-  color:#666;
-}
-
-@media(max-width:700px){
-  .acciones{
-    grid-template-columns:1fr;
-  }
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#dfe6ec;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:11px 14px;font-weight:800}
+.volver{background:#eef2f5;color:#17303d}
+.contenido{padding:16px}
+.bloque{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.nombre{font-size:22px;font-weight:900}
+.detalle{margin-top:6px;color:#4f5f69;font-size:15px}
+.botones{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.editar{background:#48a530;color:white}
+.desactivar{background:#ff0000;color:white}
+.reactivar{background:#2f80ed;color:white}
+.nuevo{background:#f6ae1b;color:white;width:100%;margin-bottom:14px}
+.inactivo{opacity:.45}
+.aviso{background:#fff3cd;border-left:8px solid #d99a00;border-radius:18px;padding:12px;margin-bottom:14px}
 </style>
 </head>
+
 <body>
 
 <header>
-  <div class="titulo">PROVEEDORES</div>
-  <div class="add" onclick="nuevo()">+</div>
+  <button class="volver" onclick="volver()">← Volver</button>
+  <h2>🚚 PROVEEDORES</h2>
 </header>
 
-<!-- LISTA -->
-<div class="lista" id="lista"></div>
-
-<!-- FICHA -->
-<div class="ficha" id="ficha">
-  <div class="tarjeta" id="tarjetaFicha"></div>
-
-  <div class="tarjeta">
-    <div class="subtitulo">ARTÍCULOS DEL PROVEEDOR</div>
-    <div id="listaArticulosProveedor"></div>
-  </div>
-</div>
-
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-box">
-
-    <input id="nombre" placeholder="Nombre">
-    <input id="telefono" placeholder="Teléfono">
-    <input id="producto" placeholder="Producto principal">
-    <input id="diaPedido" placeholder="Día de pedido">
-    <input id="diaReparto" placeholder="Día de reparto">
-
-    <select id="pago">
-      <option value="contado">Contado</option>
-      <option value="reposicion">Reposición</option>
-      <option value="banco">Banco</option>
-      <option value="cuenta">Entregas a cuenta</option>
-    </select>
-
-    <select id="color">
-      <option value="c1">Crema</option>
-      <option value="c2">Cartón</option>
-      <option value="c3">Gris</option>
-      <option value="c4">Mostaza suave</option>
-      <option value="c5">Café con leche</option>
-    </select>
-
-    <button class="btn-guardar" onclick="guardar()">GUARDAR</button>
-
-  </div>
+<div class="contenido">
+  <div id="avisoPermiso"></div>
+  <button class="nuevo" id="btnNuevo" onclick="nuevoProveedor()">➕ Nuevo proveedor</button>
+  <div id="lista"></div>
 </div>
 
 <script>
-let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
-let editIndex = null;
-let fichaIndex = null;
+function usuarioActual(){
+  return (localStorage.getItem("usuario") || "OPERADOR").toUpperCase();
+}
 
-/* BASE SI NO HAY NADA */
-if(proveedores.length === 0){
-  proveedores = [
-    {
-      nombre:"Cafés Candelas",
-      telefono:"",
-      producto:"Café",
-      diaPedido:"",
-      diaReparto:"",
-      pago:"contado",
-      color:"c1"
-    },
-    {
-      nombre:"Turrado",
-      telefono:"",
-      producto:"Mahou",
-      diaPedido:"",
-      diaReparto:"",
-      pago:"reposicion",
-      color:"c2"
-    }
+function puedeEditar(){
+  const u = usuarioActual();
+  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+}
+
+function proveedoresIniciales(){
+  return [
+    {nombre:"CANDELAS", formaPago:"BANCO", activo:true},
+    {nombre:"TURRADO", formaPago:"BANCO", activo:true},
+    {nombre:"SANPEDRO", formaPago:"CONTADO", activo:true},
+    {nombre:"DEO", formaPago:"BANCO", activo:true}
   ];
-  localStorage.setItem("proveedores", JSON.stringify(proveedores));
 }
 
-/* PINTAR LISTA */
-function pintar(){
-  let html = "";
-
-  proveedores.forEach((p,i)=>{
-    let check = localStorage.getItem("pedido_" + p.nombre) ? "✔" : "";
-
-    html += `
-    <div class="proveedor ${p.color}" onclick="abrirFicha(${i})">
-      <div class="proveedor-info">
-        <div>${p.nombre}</div>
-        <small>${p.producto || ""}</small>
-      </div>
-
-      <div class="lado-derecho">
-        <div class="check">${check}</div>
-        <div class="editar" onclick="eventoEditar(event, ${i})">✏</div>
-      </div>
-    </div>`;
-  });
-
-  document.getElementById("lista").innerHTML = html;
+function leerProveedores(){
+  return JSON.parse(localStorage.getItem("proveedores") || "[]");
 }
 
-/* EVITAR QUE AL DAR AL LÁPIZ ABRA LA FICHA */
-function eventoEditar(e, i){
-  e.stopPropagation();
-  editar(i);
+function guardarProveedores(data){
+  localStorage.setItem("proveedores", JSON.stringify(data));
 }
 
-/* NUEVO */
-function nuevo(){
-  editIndex = null;
-  limpiar();
-  document.getElementById("modal").style.display = "flex";
-}
+function asegurarProveedores(){
+  let data = leerProveedores();
 
-/* EDITAR */
-function editar(i){
-  editIndex = i;
-  let p = proveedores[i];
-
-  nombre.value = p.nombre || "";
-  telefono.value = p.telefono || "";
-  producto.value = p.producto || "";
-  diaPedido.value = p.diaPedido || "";
-  diaReparto.value = p.diaReparto || "";
-  pago.value = p.pago || "contado";
-  color.value = p.color || "c1";
-
-  document.getElementById("modal").style.display = "flex";
-}
-
-/* LIMPIAR */
-function limpiar(){
-  nombre.value = "";
-  telefono.value = "";
-  producto.value = "";
-  diaPedido.value = "";
-  diaReparto.value = "";
-  pago.value = "contado";
-  color.value = "c1";
-}
-
-/* GUARDAR */
-function guardar(){
-  let p = {
-    nombre:nombre.value.trim(),
-    telefono:telefono.value.trim(),
-    producto:producto.value.trim(),
-    diaPedido:diaPedido.value.trim(),
-    diaReparto:diaReparto.value.trim(),
-    pago:pago.value,
-    color:color.value
-  };
-
-  if(!p.nombre){
-    alert("Pon nombre al proveedor");
+  if(data.length === 0){
+    guardarProveedores(proveedoresIniciales());
     return;
   }
 
-  if(editIndex === null){
-    proveedores.push(p);
+  data = data.map(p => ({
+    nombre: (p.nombre || p.proveedor || "").toUpperCase(),
+    formaPago: (p.formaPago || p.forma_pago || "BANCO").toUpperCase(),
+    activo: p.activo !== false,
+    telefono: p.telefono || "",
+    contacto: p.contacto || "",
+    notas: p.notas || ""
+  }));
+
+  guardarProveedores(data);
+}
+
+function pintar(){
+  const lista = document.getElementById("lista");
+  const aviso = document.getElementById("avisoPermiso");
+  const btnNuevo = document.getElementById("btnNuevo");
+
+  if(!puedeEditar()){
+    aviso.innerHTML = `<div class="aviso">Modo empleado: puedes ver proveedores, pero no editar ni desactivar.</div>`;
+    btnNuevo.style.display = "none";
   }else{
-    proveedores[editIndex] = p;
+    aviso.innerHTML = "";
+    btnNuevo.style.display = "block";
   }
 
-  localStorage.setItem("proveedores", JSON.stringify(proveedores));
-  document.getElementById("modal").style.display = "none";
+  const data = leerProveedores();
+  let html = "";
 
-  pintar();
-
-  if(fichaIndex !== null){
-    abrirFicha(fichaIndex);
+  if(data.length === 0){
+    html = `<div class="bloque">No hay proveedores todavía.</div>`;
   }
+
+  data.forEach((p,i)=>{
+    html += `
+      <div class="bloque ${p.activo === false ? "inactivo" : ""}">
+        <div class="nombre">${p.nombre || "SIN NOMBRE"}</div>
+        <div class="detalle">Forma de pago: <strong>${p.formaPago || "SIN DEFINIR"}</strong></div>
+        ${p.contacto ? `<div class="detalle">Contacto: ${p.contacto}</div>` : ""}
+        ${p.telefono ? `<div class="detalle">Teléfono: ${p.telefono}</div>` : ""}
+        ${p.notas ? `<div class="detalle">Notas: ${p.notas}</div>` : ""}
+        <div class="detalle">Estado: <strong>${p.activo === false ? "DESACTIVADO" : "ACTIVO"}</strong></div>
+
+        ${puedeEditar() ? `
+          <div class="botones">
+            <button class="editar" onclick="editarProveedor(${i})">Editar</button>
+            ${
+              p.activo === false
+              ? `<button class="reactivar" onclick="reactivarProveedor(${i})">Reactivar</button>`
+              : `<button class="desactivar" onclick="desactivarProveedor(${i})">Desactivar</button>`
+            }
+          </div>
+        ` : ""}
+      </div>
+    `;
+  });
+
+  lista.innerHTML = html;
 }
 
-/* ABRIR FICHA */
-function abrirFicha(i){
-  fichaIndex = i;
-  let p = proveedores[i];
-
-  document.getElementById("lista").style.display = "none";
-  document.getElementById("ficha").style.display = "block";
-
-  let check = localStorage.getItem("pedido_" + p.nombre) ? "✔ Pedido ya hecho" : "Sin pedido hecho";
-
-  document.getElementById("tarjetaFicha").innerHTML = `
-    <div class="nombre-ficha">${p.nombre}</div>
-    <div class="dato"><b>Teléfono:</b> ${p.telefono || "-"}</div>
-    <div class="dato"><b>Producto principal:</b> ${p.producto || "-"}</div>
-    <div class="dato"><b>Día de pedido:</b> ${p.diaPedido || "-"}</div>
-    <div class="dato"><b>Día de reparto:</b> ${p.diaReparto || "-"}</div>
-    <div class="dato"><b>Forma de pago:</b> ${textoPago(p.pago)}</div>
-    <div class="dato"><b>Estado:</b> ${check}</div>
-
-    <div class="acciones">
-      <button class="btn btn-volver" onclick="volverLista()">VOLVER</button>
-      <button class="btn btn-pedido" onclick="irAPedidos()">PEDIDOS</button>
-      <button class="btn btn-editar" onclick="editar(${i})">EDITAR</button>
-    </div>
-  `;
-
-  pintarArticulosProveedor(p.nombre);
-}
-
-/* VOLVER A LISTA */
-function volverLista(){
-  fichaIndex = null;
-  document.getElementById("ficha").style.display = "none";
-  document.getElementById("lista").style.display = "block";
-  pintar();
-}
-
-/* TEXTO FORMA PAGO */
-function textoPago(v){
-  if(v === "contado") return "Contado";
-  if(v === "reposicion") return "Reposición";
-  if(v === "banco") return "Banco";
-  if(v === "cuenta") return "Entregas a cuenta";
-  return v || "-";
-}
-
-/* IR A PEDIDOS */
-function irAPedidos(){
-  if(fichaIndex === null) return;
-  let p = proveedores[fichaIndex];
-  localStorage.setItem("proveedorSeleccionado", p.nombre);
-  window.location.href = "pedidos.html";
-}
-
-/* PINTAR ARTÍCULOS DEL PROVEEDOR */
-function pintarArticulosProveedor(nombreProveedor){
-  let contenedor = document.getElementById("listaArticulosProveedor");
-  let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
-
-  let filtrados = articulos.filter(a =>
-    a.proveedor === nombreProveedor ||
-    a.proveedorNombre === nombreProveedor
+function elegirFormaPago(actual){
+  const valor = prompt(
+    "Forma de pago: CONTADO, REPOSICION, BANCO o A CUENTA",
+    actual || "BANCO"
   );
 
-  if(filtrados.length === 0){
-    contenedor.innerHTML = `
-      <div class="vacio">
-        No hay artículos enlazados todavía a este proveedor.
-      </div>
-    `;
+  if(valor === null) return null;
+
+  const f = valor.trim().toUpperCase();
+
+  if(!["CONTADO","REPOSICION","REPOSICIÓN","BANCO","A CUENTA","ACUENTA"].includes(f)){
+    alert("Forma de pago no válida.");
+    return null;
+  }
+
+  if(f === "REPOSICIÓN") return "REPOSICION";
+  if(f === "ACUENTA") return "A CUENTA";
+
+  return f;
+}
+
+function nuevoProveedor(){
+  if(!puedeEditar()) return;
+
+  let data = leerProveedores();
+
+  const nombre = prompt("Nombre del proveedor:");
+  if(!nombre) return;
+
+  const nombreLimpio = nombre.trim().toUpperCase();
+
+  const existeActivo = data.find(p => (p.nombre || "").toUpperCase() === nombreLimpio && p.activo !== false);
+  if(existeActivo){
+    alert("Ese proveedor ya existe activo.");
     return;
   }
 
-  let html = "";
-  filtrados.forEach((a,i)=>{
-    html += `
-      <div class="articulo">
-        <div>${i+1}. ${a.nombre || a.articulo || "Artículo"}</div>
-        <div>${a.precio || ""}</div>
-      </div>
-    `;
+  const formaPago = elegirFormaPago("BANCO");
+  if(!formaPago) return;
+
+  const contacto = prompt("Contacto / persona:", "") || "";
+  const telefono = prompt("Teléfono:", "") || "";
+  const notas = prompt("Notas:", "") || "";
+
+  data.unshift({
+    nombre: nombreLimpio,
+    formaPago,
+    contacto,
+    telefono,
+    notas,
+    activo:true
   });
 
-  contenedor.innerHTML = html;
+  guardarProveedores(data);
+  pintar();
 }
 
-/* INIT */
+function editarProveedor(i){
+  if(!puedeEditar()) return;
+
+  let data = leerProveedores();
+  let p = data[i];
+
+  const nombre = prompt("Nombre proveedor:", p.nombre || "");
+  if(nombre === null) return;
+
+  const formaPago = elegirFormaPago(p.formaPago || "BANCO");
+  if(!formaPago) return;
+
+  p.nombre = nombre.trim().toUpperCase();
+  p.formaPago = formaPago;
+  p.contacto = prompt("Contacto / persona:", p.contacto || "") || "";
+  p.telefono = prompt("Teléfono:", p.telefono || "") || "";
+  p.notas = prompt("Notas:", p.notas || "") || "";
+
+  data[i] = p;
+  guardarProveedores(data);
+  pintar();
+}
+
+function desactivarProveedor(i){
+  if(!puedeEditar()) return;
+
+  let data = leerProveedores();
+  const nombre = data[i].nombre || "este proveedor";
+
+  if(confirm("¿Desactivar " + nombre + "? No aparecerá en pedidos nuevos, pero no se borra del histórico.")){
+    data[i].activo = false;
+    guardarProveedores(data);
+    pintar();
+  }
+}
+
+function reactivarProveedor(i){
+  if(!puedeEditar()) return;
+
+  let data = leerProveedores();
+  data[i].activo = true;
+  guardarProveedores(data);
+  pintar();
+}
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+asegurarProveedores();
 pintar();
 </script>
 
