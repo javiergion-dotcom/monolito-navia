@@ -3,378 +3,243 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROVEEDORES · MONOLITO</title>
+<title>ARTÍCULOS</title>
 
 <style>
-*{box-sizing:border-box}
-
 body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#eef2f5;
-  color:#17303d;
+margin:0;
+font-family:Arial;
+background:#eef2f5;
 }
 
 header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+background:#14323f;
+color:white;
+padding:15px;
+display:flex;
+align-items:center;
+justify-content:space-between;
 }
 
 button{
-  border:0;
-  border-radius:14px;
-  padding:11px 14px;
-  font-weight:800;
-  font-size:15px;
+border:none;
+border-radius:10px;
+padding:10px;
+font-size:16px;
 }
 
 .volver{
-  background:white;
-  color:#17303d;
-}
-
-.contenido{
-  padding:16px;
+background:#ccc;
 }
 
 .nuevo{
-  width:100%;
-  background:#ff9800;
-  color:white;
-  margin-bottom:14px;
-  font-size:17px;
+background:#ff9800;
+color:white;
+margin:15px;
+width:calc(100% - 30px);
 }
 
 .card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:12px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
+background:white;
+margin:10px;
+padding:15px;
+border-radius:15px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
 
-.card.inactivo{
-  opacity:.45;
+.form{
+background:white;
+margin:10px;
+padding:15px;
+border-radius:15px;
+display:none;
 }
 
-.nombre{
-  font-size:22px;
-  font-weight:900;
-}
-
-.detalle{
-  margin-top:6px;
-  color:#4f5f69;
-}
-
-.botones{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-  flex-wrap:wrap;
-}
-
-.editar{
-  background:#2196f3;
-  color:white;
-}
-
-.desactivar{
-  background:#ff0000;
-  color:white;
-}
-
-.reactivar{
-  background:#48a530;
-  color:white;
-}
-
-.ficha{
-  background:white;
-  border-radius:24px;
-  padding:16px;
-  box-shadow:0 10px 22px rgba(0,0,0,.16);
-}
-
-.ficha h3{
-  margin-top:0;
-}
-
-label{
-  display:block;
-  font-weight:800;
-  margin-top:12px;
-}
-
-input, select, textarea{
-  width:100%;
-  padding:12px;
-  border-radius:14px;
-  border:1px solid #b8c2ca;
-  font-size:16px;
-  margin-top:6px;
-}
-
-textarea{
-  min-height:80px;
+input, select{
+width:100%;
+padding:10px;
+margin-top:8px;
+margin-bottom:10px;
+border-radius:8px;
+border:1px solid #ccc;
 }
 
 .guardar{
-  width:100%;
-  background:#48a530;
-  color:white;
-  margin-top:16px;
+background:#4caf50;
+color:white;
+width:100%;
 }
 
-.cancelar{
-  width:100%;
-  background:#dfe6ec;
-  color:#17303d;
-  margin-top:10px;
-}
-
-.oculto{
-  display:none;
+.borrar{
+background:red;
+color:white;
+width:100%;
+margin-top:5px;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">← Volver</button>
-  <h2>🚚 PROVEEDORES</h2>
+<button class="volver" onclick="volver()">← Volver</button>
+<h2>📦 ARTÍCULOS</h2>
 </header>
 
-<div class="contenido">
+<button class="nuevo" onclick="abrirFicha()">+ Nuevo artículo</button>
 
-  <div id="vistaLista">
-    <button class="nuevo" onclick="abrirFichaNuevo()">➕ Nuevo proveedor</button>
-    <div id="lista"></div>
-  </div>
+<div id="lista"></div>
 
-  <div id="vistaFicha" class="oculto">
-    <div class="ficha">
-      <h3 id="tituloFicha">Ficha proveedor</h3>
+<div class="form" id="formulario">
+<h3>Artículo</h3>
 
-      <input type="hidden" id="indiceProveedor">
+<label>Proveedor</label>
+<select id="proveedor">
+<option>SANPEDRO</option>
+<option>MAHOU</option>
+<option>CAFE CANDELAS</option>
+</select>
 
-      <label>Nombre proveedor</label>
-      <input id="nombreProveedor" placeholder="Ej: CANDELAS">
+<label>Nombre</label>
+<input id="nombre">
 
-      <label>Forma de pago</label>
-      <select id="formaPago">
-        <option value="CONTADO">CONTADO</option>
-        <option value="REPOSICION">REPOSICIÓN</option>
-        <option value="BANCO">BANCO</option>
-        <option value="A CUENTA">A CUENTA</option>
-      </select>
+<label>Precio unidad (€)</label>
+<input id="precioUnidad" type="number" step="0.01">
 
-      <label>Contacto</label>
-      <input id="contactoProveedor" placeholder="Persona de contacto">
+<label>Formato (ej: 24, 6, 1)</label>
+<input id="formato" type="number">
 
-      <label>Teléfono</label>
-      <input id="telefonoProveedor" placeholder="Teléfono">
+<label>IVA (%)</label>
+<select id="iva">
+<option value="4">4</option>
+<option value="10">10</option>
+<option value="21" selected>21</option>
+</select>
 
-      <label>Días de pedido / reparto</label>
-      <input id="diasProveedor" placeholder="Ej: pedido lunes · reparto martes">
-
-      <label>Notas</label>
-      <textarea id="notasProveedor" placeholder="Condiciones, acuerdos, observaciones..."></textarea>
-
-      <button class="guardar" onclick="guardarFicha()">💾 Guardar proveedor</button>
-      <button class="cancelar" onclick="cerrarFicha()">Cancelar</button>
-    </div>
-  </div>
+<button class="guardar" onclick="guardar()">Guardar</button>
+<button class="borrar" onclick="borrar()">Eliminar</button>
 
 </div>
 
 <script>
+
+function volver(){
+history.back();
+}
+
+// 🔐 CONTROL USUARIO
 function usuarioActual(){
-  localStorage.setItem("usuario","JAVI");
-  return "JAVI";
+return localStorage.getItem("usuario") || "EMPLEADO";
 }
 
 function puedeEditar(){
-  const u = usuarioActual();
-  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+const u = usuarioActual();
+return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
 }
 
-function proveedoresIniciales(){
-  return [
-    {nombre:"CANDELAS", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
-    {nombre:"TURRADO", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
-    {nombre:"SANPEDRO", formaPago:"CONTADO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
-    {nombre:"DEO", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true}
-  ];
+// 📦 DATOS
+function leer(){
+return JSON.parse(localStorage.getItem("articulos") || "[]");
 }
 
-function leerProveedores(){
-  let datos = JSON.parse(localStorage.getItem("proveedores") || "null");
-
-  if(!datos){
-    datos = proveedoresIniciales();
-    guardarProveedores(datos);
-  }
-
-  return datos;
+function guardarDatos(data){
+localStorage.setItem("articulos", JSON.stringify(data));
 }
 
-function guardarProveedores(data){
-  localStorage.setItem("proveedores", JSON.stringify(data));
+// 🧠 UI
+function render(){
+const lista = document.getElementById("lista");
+lista.innerHTML = "";
+
+leer().forEach((a, i)=>{
+
+const precioCompra = a.precioUnidad * a.formato;
+
+lista.innerHTML += `
+<div class="card">
+<b>${a.nombre}</b><br>
+${a.proveedor}<br>
+Unidad: ${a.precioUnidad} €<br>
+Formato: ${a.formato}<br>
+<b>Compra: ${precioCompra.toFixed(2)} €</b><br>
+IVA: ${a.iva}%
+
+${puedeEditar() ? `<br><button onclick="editar(${i})">Editar</button>` : ""}
+</div>
+`;
+});
 }
 
-function pintar(){
-  const data = leerProveedores();
-  let html = "";
-
-  if(data.length === 0){
-    html = `<div class="card">No hay proveedores todavía.</div>`;
-  }
-
-  data.forEach((p,i)=>{
-    html += `
-      <div class="card ${p.activo === false ? "inactivo" : ""}">
-        <div class="nombre">${p.nombre || "SIN NOMBRE"}</div>
-        <div class="detalle">Forma de pago: <strong>${p.formaPago || "SIN DEFINIR"}</strong></div>
-        ${p.contacto ? `<div class="detalle">Contacto: ${p.contacto}</div>` : ""}
-        ${p.telefono ? `<div class="detalle">Teléfono: ${p.telefono}</div>` : ""}
-        ${p.dias ? `<div class="detalle">Días: ${p.dias}</div>` : ""}
-        ${p.notas ? `<div class="detalle">Notas: ${p.notas}</div>` : ""}
-        <div class="detalle">Estado: <strong>${p.activo === false ? "DESACTIVADO" : "ACTIVO"}</strong></div>
-
-        ${puedeEditar() ? `
-          <div class="botones">
-            <button class="editar" onclick="abrirFichaEditar(${i})">Editar ficha</button>
-            ${
-              p.activo === false
-              ? `<button class="reactivar" onclick="reactivarProveedor(${i})">Reactivar</button>`
-              : `<button class="desactivar" onclick="desactivarProveedor(${i})">Desactivar</button>`
-            }
-          </div>
-        ` : ""}
-      </div>
-    `;
-  });
-
-  document.getElementById("lista").innerHTML = html;
+// ➕ NUEVO
+function abrirFicha(){
+if(!puedeEditar()){
+alert("Modo empleado");
+return;
+}
+document.getElementById("formulario").style.display = "block";
 }
 
-function abrirFichaNuevo(){
-  if(!puedeEditar()) return;
+// 💾 GUARDAR
+function guardar(){
+let data = leer();
 
-  document.getElementById("tituloFicha").textContent = "Nuevo proveedor";
-  document.getElementById("indiceProveedor").value = "";
+const nuevo = {
+proveedor: proveedor.value,
+nombre: nombre.value,
+precioUnidad: parseFloat(precioUnidad.value),
+formato: parseFloat(formato.value),
+iva: parseFloat(iva.value)
+};
 
-  document.getElementById("nombreProveedor").value = "";
-  document.getElementById("formaPago").value = "BANCO";
-  document.getElementById("contactoProveedor").value = "";
-  document.getElementById("telefonoProveedor").value = "";
-  document.getElementById("diasProveedor").value = "";
-  document.getElementById("notasProveedor").value = "";
-
-  document.getElementById("vistaLista").classList.add("oculto");
-  document.getElementById("vistaFicha").classList.remove("oculto");
+data.push(nuevo);
+guardarDatos(data);
+cerrar();
+render();
 }
 
-function abrirFichaEditar(i){
-  if(!puedeEditar()) return;
+// ✏️ EDITAR
+let editando = null;
 
-  const data = leerProveedores();
-  const p = data[i];
+function editar(i){
+if(!puedeEditar()) return;
 
-  document.getElementById("tituloFicha").textContent = "Editar proveedor";
-  document.getElementById("indiceProveedor").value = i;
+const a = leer()[i];
+editando = i;
 
-  document.getElementById("nombreProveedor").value = p.nombre || "";
-  document.getElementById("formaPago").value = p.formaPago || "BANCO";
-  document.getElementById("contactoProveedor").value = p.contacto || "";
-  document.getElementById("telefonoProveedor").value = p.telefono || "";
-  document.getElementById("diasProveedor").value = p.dias || "";
-  document.getElementById("notasProveedor").value = p.notas || "";
+proveedor.value = a.proveedor;
+nombre.value = a.nombre;
+precioUnidad.value = a.precioUnidad;
+formato.value = a.formato;
+iva.value = a.iva;
 
-  document.getElementById("vistaLista").classList.add("oculto");
-  document.getElementById("vistaFicha").classList.remove("oculto");
+abrirFicha();
 }
 
-function guardarFicha(){
-  if(!puedeEditar()) return;
+// 🗑️ BORRAR
+function borrar(){
+if(editando === null) return;
 
-  const nombre = document.getElementById("nombreProveedor").value.trim().toUpperCase();
+let data = leer();
+data.splice(editando,1);
+guardarDatos(data);
 
-  if(!nombre){
-    alert("Falta el nombre del proveedor.");
-    return;
-  }
-
-  const proveedor = {
-    nombre,
-    formaPago: document.getElementById("formaPago").value,
-    contacto: document.getElementById("contactoProveedor").value.trim(),
-    telefono: document.getElementById("telefonoProveedor").value.trim(),
-    dias: document.getElementById("diasProveedor").value.trim(),
-    notas: document.getElementById("notasProveedor").value.trim(),
-    activo:true
-  };
-
-  let data = leerProveedores();
-  const idx = document.getElementById("indiceProveedor").value;
-
-  if(idx === ""){
-    const existe = data.find(p => (p.nombre || "").toUpperCase() === nombre && p.activo !== false);
-    if(existe){
-      alert("Ya existe un proveedor activo con ese nombre.");
-      return;
-    }
-
-    data.unshift(proveedor);
-  }else{
-    const anterior = data[Number(idx)];
-    proveedor.activo = anterior.activo !== false;
-    data[Number(idx)] = proveedor;
-  }
-
-  guardarProveedores(data);
-  cerrarFicha();
+editando = null;
+cerrar();
+render();
 }
 
-function cerrarFicha(){
-  document.getElementById("vistaFicha").classList.add("oculto");
-  document.getElementById("vistaLista").classList.remove("oculto");
-  pintar();
+// ❌ CERRAR
+function cerrar(){
+document.getElementById("formulario").style.display = "none";
+nombre.value = "";
+precioUnidad.value = "";
+formato.value = "";
+editando = null;
 }
 
-function desactivarProveedor(i){
-  if(!puedeEditar()) return;
+// 🚀 INICIO
+render();
 
-  let data = leerProveedores();
-  const nombre = data[i].nombre || "este proveedor";
-
-  if(confirm("¿Desactivar " + nombre + "? No aparecerá en pedidos nuevos.")){
-    data[i].activo = false;
-    guardarProveedores(data);
-    pintar();
-  }
-}
-
-function reactivarProveedor(i){
-  if(!puedeEditar()) return;
-
-  let data = leerProveedores();
-  data[i].activo = true;
-  guardarProveedores(data);
-  pintar();
-}
-
-function volver(){
-  window.location.href = "index.html";
-}
-
-pintar();
 </script>
 
 </body>
