@@ -3,504 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PEDIDOS</title>
+<title>PEDIDOS · MONOLITO</title>
 
 <style>
 body{
   margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#eef3f5;
-  color:#222;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#dfe6ec;
+  color:#17303d;
 }
 
-.barra{
+header{
   background:#17303d;
   color:white;
-  padding:18px;
+  padding:16px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  font-size:28px;
-  font-weight:bold;
-}
-
-.barra span{
-  font-size:40px;
-  cursor:pointer;
-}
-
-.container{
-  padding:16px;
-}
-
-select,input{
-  width:100%;
-  padding:14px;
-  margin:7px 0;
-  font-size:20px;
-  border-radius:12px;
-  border:1px solid #ccc;
-  box-sizing:border-box;
 }
 
 button{
-  width:100%;
-  padding:16px;
-  border-radius:14px;
   border:0;
-  font-size:22px;
-  font-weight:bold;
-  margin-top:10px;
-  cursor:pointer;
-}
-
-.verde{ background:#4b8f36; color:white; }
-.azul{ background:#17303d; color:white; }
-.rojo{ background:#b8332f; color:white; }
-
-.aviso{
-  display:none;
-  padding:14px;
   border-radius:12px;
-  font-weight:bold;
-  margin:8px 0;
-  font-size:18px;
+  padding:12px;
+  font-weight:700;
 }
 
-.aviso-oferta{
-  background:#fff3cd;
-  color:#7a4b00;
-}
+.volver{background:white}
 
-.aviso-incidencia{
-  background:#ffe0e0;
-  color:#9b0000;
-}
+.contenido{padding:16px}
 
-table{
-  width:100%;
-  margin-top:14px;
-  border-collapse:collapse;
-  background:white;
-  border-radius:14px;
-  overflow:hidden;
-}
-
-th{
-  background:#17303d;
-  color:white;
-  padding:10px;
-  font-size:16px;
-}
-
-td{
-  padding:10px;
-  text-align:center;
-  border-bottom:1px solid #eee;
-  font-size:17px;
-}
-
-td:first-child{
-  text-align:left;
-  font-weight:bold;
-}
-
-.resumen{
+.bloque{
   background:white;
   padding:16px;
-  border-radius:16px;
-  margin-top:16px;
+  border-radius:18px;
+  margin-bottom:14px;
+  box-shadow:0 6px 14px rgba(0,0,0,.15);
+}
+
+label{font-weight:700}
+
+select,input{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
+.linea{
+  display:grid;
+  grid-template-columns:1fr 80px 80px;
+  gap:8px;
+  margin-top:10px;
+}
+
+.total{
   font-size:22px;
-  line-height:1.7;
+  font-weight:900;
+  text-align:right;
+  margin-top:10px;
 }
 
-.resumen strong{
-  font-size:25px;
-}
-
-.admin{
-  display:none;
-}
-
-.admin-activo .admin{
-  display:table-cell;
+.guardar{
+  width:100%;
+  background:#48a530;
+  color:white;
+  font-size:18px;
+  margin-top:10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="barra">
-  <span onclick="volver()">←</span>
-  <div>PEDIDOS</div>
-  <span onclick="activarAdmin()">🔒</span>
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  <h2>PEDIDOS</h2>
+</header>
+
+<div class="contenido">
+
+<div class="bloque">
+<label>Proveedor</label>
+<select id="proveedor" onchange="cargarArticulos()"></select>
+
+<label>Forma de pago</label>
+<select id="formaPago">
+  <option value="CONTADO">CONTADO</option>
+  <option value="REPOSICION">REPOSICIÓN</option>
+  <option value="BANCO">BANCO</option>
+  <option value="A CUENTA">A CUENTA</option>
+</select>
 </div>
 
-<div class="container">
-
-<select id="proveedor"></select>
-
-<div id="avisoIncidencia" class="aviso aviso-incidencia"></div>
-
-<select id="articulo"></select>
-
-<div id="avisoOferta" class="aviso aviso-oferta"></div>
-
-<input type="number" id="cantidad" placeholder="Cantidad" min="0" step="1">
-
-<button class="verde" onclick="anadirProducto()">+ AÑADIR PRODUCTO</button>
-
-<table>
-<thead>
-<tr>
-  <th>Artículo</th>
-  <th>Ud</th>
-  <th>Precio</th>
-  <th>IVA</th>
-  <th>Total</th>
-  <th class="admin">X</th>
-</tr>
-</thead>
-<tbody id="lineas"></tbody>
-</table>
-
-<div class="resumen">
-  <div><strong>Subtotal sin IVA:</strong> <span id="subtotal">0,00</span> €</div>
-  <div>IVA 4%: <span id="iva4">0,00</span> €</div>
-  <div>IVA 10%: <span id="iva10">0,00</span> €</div>
-  <div>IVA 21%: <span id="iva21">0,00</span> €</div>
-  <hr>
-  <div><strong>TOTAL PEDIDO:</strong> <span id="total">0,00</span> €</div>
+<div class="bloque">
+<h3>Artículos</h3>
+<div id="lineas"></div>
+<button onclick="nuevaLinea()">+ Añadir</button>
 </div>
 
-<button class="azul" onclick="validarPedido()">VALIDAR PEDIDO</button>
+<div class="bloque">
+<div id="total" class="total">0.00 €</div>
+<button class="guardar" onclick="finalizarPedido()">FINALIZAR</button>
+</div>
 
 </div>
 
 <script>
-const PIN = "1234";
 
-let admin = false;
-let lineasPedido = [];
+/* ================= DATOS ================= */
 
-let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
-let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
+const articulos = [
+  {proveedor:"CANDELAS", nombre:"CAFÉ LATA", precio:17},
+  {proveedor:"CANDELAS", nombre:"AZÚCAR", precio:13.20},
+
+  {proveedor:"TURRADO", nombre:"MAHOU 5 ESTRELLAS", precio:17.96},
+  {proveedor:"TURRADO", nombre:"MAHOU RESERVA", precio:22.46}
+];
+
+/* ================= UI ================= */
 
 function volver(){
-  history.back();
-}
-
-function formato(numero){
-  return Number(numero || 0).toFixed(2).replace(".", ",");
-}
-
-function numero(valor){
-  if(valor === undefined || valor === null || valor === "") return 0;
-
-  return Number(
-    String(valor)
-      .replace("€","")
-      .replace(",", ".")
-      .replace("'", ".")
-      .trim()
-  );
+  window.location.href="index.html";
 }
 
 function cargarProveedores(){
-  const sel = document.getElementById("proveedor");
-  sel.innerHTML = '<option value="">Seleccionar proveedor</option>';
-
-  proveedores.forEach(p=>{
-    if(!p.nombre) return;
-
-    const op = document.createElement("option");
-    op.value = p.nombre;
-    op.textContent = p.nombre;
-    sel.appendChild(op);
+  let provs = [...new Set(articulos.map(a=>a.proveedor))];
+  let html="";
+  provs.forEach(p=>{
+    html+=`<option>${p}</option>`;
   });
-
+  document.getElementById("proveedor").innerHTML=html;
   cargarArticulos();
 }
 
 function cargarArticulos(){
-  const prov = document.getElementById("proveedor").value;
-  const sel = document.getElementById("articulo");
-
-  sel.innerHTML = '<option value="">Seleccionar artículo</option>';
-
-  articulos
-    .filter(a => a.proveedor === prov)
-    .forEach(a=>{
-      const op = document.createElement("option");
-      op.value = a.nombre;
-      op.textContent = a.nombre;
-      sel.appendChild(op);
-    });
-
-  avisarOferta();
+  document.getElementById("lineas").innerHTML="";
+  nuevaLinea();
 }
 
-function buscarArticulo(){
-  const prov = document.getElementById("proveedor").value;
-  const nombre = document.getElementById("articulo").value;
+function nuevaLinea(){
+  let proveedor = document.getElementById("proveedor").value;
+  let arts = articulos.filter(a=>a.proveedor===proveedor);
 
-  return articulos.find(a => a.proveedor === prov && a.nombre === nombre);
+  let div=document.createElement("div");
+  div.className="linea";
+
+  div.innerHTML=`
+  <select class="articulo" onchange="calcular()">
+    ${arts.map(a=>`<option value="${a.precio}">${a.nombre}</option>`).join("")}
+  </select>
+
+  <input type="number" class="cantidad" value="1" oninput="calcular()">
+
+  <input class="lineaTotal" readonly>
+  `;
+
+  document.getElementById("lineas").appendChild(div);
+  calcular();
 }
 
-function avisarOferta(){
-  const art = buscarArticulo();
-  const aviso = document.getElementById("avisoOferta");
+/* ================= CALCULO ================= */
 
-  if(art && art.oferta){
-    aviso.style.display = "block";
-    aviso.innerText = "⚠ OFERTA ACTIVA: " + art.oferta;
-  }else{
-    aviso.style.display = "none";
-    aviso.innerText = "";
-  }
-}
+function calcular(){
+  let filas=document.querySelectorAll(".linea");
+  let total=0;
 
-function comprobarIncidenciaProveedor(){
-  const proveedor = document.getElementById("proveedor").value;
-  const aviso = document.getElementById("avisoIncidencia");
+  filas.forEach(f=>{
+    let precio=parseFloat(f.querySelector(".articulo").value);
+    let cant=parseFloat(f.querySelector(".cantidad").value)||0;
 
-  if(!proveedor){
-    aviso.style.display = "none";
-    aviso.innerText = "";
-    return;
-  }
+    let t=precio*cant;
+    f.querySelector(".lineaTotal").value=t.toFixed(2);
 
-  const incidencias = JSON.parse(localStorage.getItem("incidencias") || "[]");
-
-  const tiene = incidencias.some(i =>
-    i.proveedor === proveedor &&
-    (i.estado === "pendiente" || i.resuelta === false)
-  );
-
-  if(tiene){
-    aviso.style.display = "block";
-    aviso.innerText = "⚠ ESTE PROVEEDOR TIENE UNA INCIDENCIA PENDIENTE";
-  }else{
-    aviso.style.display = "none";
-    aviso.innerText = "";
-  }
-}
-
-function comprobarRevisionProveedor(){
-  const proveedor = document.getElementById("proveedor").value;
-  if(!proveedor) return;
-
-  let revisiones = JSON.parse(localStorage.getItem("revisionesProveedor") || "{}");
-
-  const hoy = new Date();
-  const ultima = revisiones[proveedor]?.fecha;
-
-  if(ultima){
-    const fechaUltima = new Date(ultima);
-    const dias = (hoy - fechaUltima) / (1000 * 60 * 60 * 24);
-
-    if(dias < 21){
-      return;
-    }
-  }
-
-  const hay = prompt("CONTROL CADA 3 SEMANAS\n\n¿Cuántas hay?") || "";
-  revisiones[proveedor] = {
-    fecha: hoy.toISOString(),
-    hay: hay || "",
-  };
-
-  localStorage.setItem("revisionesProveedor", JSON.stringify(revisiones));
-}
-
-function anadirProducto(){
-  const proveedor = document.getElementById("proveedor").value;
-  const nombre = document.getElementById("articulo").value;
-  const cantidad = numero(document.getElementById("cantidad").value);
-
-  if(!proveedor){
-    alert("Selecciona proveedor");
-    return;
-  }
-
-  if(!nombre){
-    alert("Selecciona artículo");
-    return;
-  }
-
-  if(cantidad <= 0){
-    alert("La cantidad tiene que ser mayor que 0");
-    return;
-  }
-
-  const art = buscarArticulo();
-
-  if(!art){
-    alert("No encuentro el artículo");
-    return;
-  }
-
-  lineasPedido.push({
-    nombre: art.nombre,
-    cantidad: cantidad,
-    precio: numero(art.precio),
-    iva: numero(art.iva),
-    oferta: art.oferta || ""
+    total+=t;
   });
 
-  document.getElementById("cantidad").value = "";
-  pintarLineas();
+  document.getElementById("total").innerText=total.toFixed(2)+" €";
 }
 
-function pintarLineas(){
-  const tbody = document.getElementById("lineas");
-  tbody.innerHTML = "";
+/* ================= FINALIZAR ================= */
 
-  lineasPedido.forEach((l,i)=>{
-    const totalLinea = numero(l.cantidad) * numero(l.precio);
+function finalizarPedido(){
 
-    const tr = document.createElement("tr");
+  let proveedor=document.getElementById("proveedor").value;
+  let formaPago=document.getElementById("formaPago").value;
+  let total=parseFloat(document.getElementById("total").innerText);
 
-    tr.innerHTML = `
-      <td>${l.nombre}${l.oferta ? " ⚠" : ""}</td>
-      <td>${l.cantidad}</td>
-      <td>${formato(l.precio)} €</td>
-      <td>${l.iva}%</td>
-      <td>${formato(totalLinea)} €</td>
-      <td class="admin">
-        <button class="rojo" onclick="borrarLinea(${i})">X</button>
-      </td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-
-  calcularTotales();
-}
-
-function calcularTotales(){
-  let subtotal = 0;
-  let iva4 = 0;
-  let iva10 = 0;
-  let iva21 = 0;
-
-  lineasPedido.forEach(l=>{
-    const base = numero(l.cantidad) * numero(l.precio);
-    const iva = numero(l.iva);
-
-    subtotal += base;
-
-    if(iva === 4) iva4 += base * 0.04;
-    if(iva === 10) iva10 += base * 0.10;
-    if(iva === 21) iva21 += base * 0.21;
-  });
-
-  const total = subtotal + iva4 + iva10 + iva21;
-
-  document.getElementById("subtotal").innerText = formato(subtotal);
-  document.getElementById("iva4").innerText = formato(iva4);
-  document.getElementById("iva10").innerText = formato(iva10);
-  document.getElementById("iva21").innerText = formato(iva21);
-  document.getElementById("total").innerText = formato(total);
-}
-
-function borrarLinea(i){
-  if(!admin){
-    alert("Solo administrador");
+  if(!total || total<=0){
+    alert("Pedido vacío");
     return;
   }
 
-  lineasPedido.splice(i,1);
-  pintarLineas();
-}
-
-function validarPedido(){
-  const proveedor = document.getElementById("proveedor").value;
-
-  if(!proveedor){
-    alert("Selecciona proveedor");
-    return;
-  }
-
-  if(lineasPedido.length === 0){
-    alert("No hay productos en el pedido");
-    return;
-  }
-
-  calcularTotales();
-
-  const total = document.getElementById("total").innerText;
-
-  const ok = confirm(
-    "¿Confirmas el pedido?\n\nProveedor: " + proveedor +
-    "\nTotal: " + total + " €"
-  );
-
-  if(!ok) return;
-
-  cerrarPedido();
-}
-
-function cerrarPedido(){
-  const proveedor = document.getElementById("proveedor").value;
-  const total = document.getElementById("total").innerText;
-
-  const pedidos = JSON.parse(localStorage.getItem("pedidos") || "[]");
-  const pagos = JSON.parse(localStorage.getItem("pagos") || "[]");
-
-  pedidos.push({
-    fecha: new Date().toLocaleDateString("es-ES"),
-    proveedor: proveedor,
-    lineas: lineasPedido,
-    total: total,
-    estado: "cerrado"
-  });
+  let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 
   pagos.push({
-    fecha: new Date().toLocaleDateString("es-ES"),
     proveedor: proveedor,
-    importe: total,
-    estado: "pendiente"
+    total: total,
+    formaPago: formaPago,
+    fecha: new Date().toISOString()
   });
 
-  localStorage.setItem("pedidos", JSON.stringify(pedidos));
-  localStorage.setItem("pagos", JSON.stringify(pagos));
+  localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
 
-  alert("Pedido validado y enviado a pagos");
+  alert("Pedido enviado a PAGOS");
 
-  lineasPedido = [];
-  pintarLineas();
+  location.reload();
 }
 
-function activarAdmin(){
-  const pin = prompt("PIN administrador");
-
-  if(pin !== PIN){
-    alert("Código incorrecto");
-    return;
-  }
-
-  admin = !admin;
-
-  if(admin){
-    document.body.classList.add("admin-activo");
-    alert("Administrador activado");
-  }else{
-    document.body.classList.remove("admin-activo");
-    alert("Administrador desactivado");
-  }
-}
-
-document.getElementById("proveedor").addEventListener("change", ()=>{
-  cargarArticulos();
-  comprobarIncidenciaProveedor();
-  comprobarRevisionProveedor();
-});
-
-document.getElementById("articulo").addEventListener("change", avisarOferta);
+/* ================= INIT ================= */
 
 cargarProveedores();
-calcularTotales();
+
 </script>
 
 </body>
