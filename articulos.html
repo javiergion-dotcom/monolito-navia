@@ -12,7 +12,6 @@ body{
   background:#eef2f5;
 }
 
-/* HEADER */
 header{
   background:#17303d;
   color:white;
@@ -22,71 +21,48 @@ header{
   align-items:center;
 }
 
-.titulo{
-  font-size:20px;
-  font-weight:bold;
-}
-
-.add{
-  font-size:28px;
-  cursor:pointer;
-}
-
-/* LISTA */
-.lista{
+.contenido{
   padding:15px;
 }
 
-.articulo{
-  padding:15px;
-  border-radius:15px;
-  margin-bottom:10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-weight:bold;
+.bloque{
   background:white;
-}
-
-.editar{
-  cursor:pointer;
-}
-
-/* MODAL */
-.modal{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.5);
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-
-.modal-box{
-  background:white;
-  padding:20px;
   border-radius:12px;
-  width:90%;
-  max-width:400px;
+  padding:15px;
+  margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 
-input, select{
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
+.nombre{
+  font-weight:800;
+  font-size:18px;
+}
+
+.detalle{
+  color:#555;
+  margin-top:4px;
+}
+
+.botones{
+  margin-top:10px;
+  display:flex;
+  gap:10px;
 }
 
 button{
-  width:100%;
-  padding:12px;
-  background:#17303d;
-  color:white;
   border:none;
+  padding:8px 10px;
   border-radius:8px;
+  font-weight:700;
   cursor:pointer;
+}
+
+.editar{background:#4caf50;color:white}
+.desactivar{background:#ff0000;color:white}
+.reactivar{background:#2196f3;color:white}
+
+.inactivo{
+  opacity:0.4;
 }
 </style>
 </head>
@@ -94,118 +70,104 @@ button{
 <body>
 
 <header>
-  <div class="titulo">ARTÍCULOS</div>
-  <div class="add" onclick="nuevo()">+</div>
+  <div onclick="volver()">← Volver</div>
+  <div>ARTÍCULOS</div>
 </header>
 
-<div class="lista" id="lista"></div>
-
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-box">
-
-    <input id="nombre" placeholder="Nombre del artículo">
-
-    <select id="proveedor"></select>
-
-    <input id="precio" placeholder="Precio sin IVA">
-
-    <select id="iva">
-      <option value="4">IVA 4%</option>
-      <option value="10">IVA 10%</option>
-      <option value="21">IVA 21%</option>
-    </select>
-
-    <button onclick="guardar()">GUARDAR</button>
-
-  </div>
-</div>
+<div class="contenido" id="lista"></div>
 
 <script>
 
-let articulos = JSON.parse(localStorage.getItem("articulos") || "[]");
-let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]");
+/* ================= CONTROL USUARIO ================= */
 
-let editIndex = null;
-
-/* CARGAR PROVEEDORES EN SELECT */
-function cargarProveedores(){
-  let select = document.getElementById("proveedor");
-  select.innerHTML="";
-
-  proveedores.forEach(p=>{
-    select.innerHTML += `<option value="${p.nombre}">${p.nombre}</option>`;
-  });
+function puedeEditar(){
+  const usuario = (localStorage.getItem("usuario") || "").toUpperCase();
+  return usuario === "JAVI" || usuario === "SILVIA";
 }
 
-/* PINTAR */
-function pintar(){
-  let html="";
+/* ================= DATOS ================= */
 
-  articulos.forEach((a,i)=>{
+function leer(){
+  return JSON.parse(localStorage.getItem("articulos") || "[]");
+}
+
+function guardar(data){
+  localStorage.setItem("articulos", JSON.stringify(data));
+}
+
+/* ================= UI ================= */
+
+function pintar(){
+  let data = leer();
+  let html = "";
+
+  data.forEach((a,i)=>{
+
+    let clase = a.activo === false ? "bloque inactivo" : "bloque";
+
     html += `
-    <div class="articulo">
-      <div>
-        ${a.nombre}<br>
-        <small>${a.proveedor} · ${a.precio}€</small>
+    <div class="${clase}">
+      <div class="nombre">${a.articulo}</div>
+      <div class="detalle">${a.proveedor} · ${a.formato}</div>
+      <div class="detalle">${a.precio.toFixed(2)} € · IVA ${a.iva}%</div>
+
+      ${puedeEditar() ? `
+      <div class="botones">
+        <button class="editar" onclick="editar(${i})">Editar</button>
+        ${
+          a.activo === false
+          ? `<button class="reactivar" onclick="reactivar(${i})">Reactivar</button>`
+          : `<button class="desactivar" onclick="desactivar(${i})">Desactivar</button>`
+        }
       </div>
-      <div class="editar" onclick="editar(${i})">✏</div>
-    </div>`;
+      ` : ``}
+
+    </div>
+    `;
   });
 
   document.getElementById("lista").innerHTML = html;
 }
 
-/* NUEVO */
-function nuevo(){
-  editIndex=null;
-  limpiar();
-  modal.style.display="flex";
-}
+/* ================= ACCIONES ================= */
 
-/* EDITAR */
 function editar(i){
-  editIndex=i;
-  let a = articulos[i];
+  let data = leer();
 
-  nombre.value = a.nombre;
-  proveedor.value = a.proveedor;
-  precio.value = a.precio;
-  iva.value = a.iva;
+  let nuevoPrecio = prompt("Nuevo precio:", data[i].precio);
+  if(nuevoPrecio === null) return;
 
-  modal.style.display="flex";
-}
-
-/* LIMPIAR */
-function limpiar(){
-  nombre.value="";
-  precio.value="";
-}
-
-/* GUARDAR */
-function guardar(){
-
-  let a={
-    nombre:nombre.value,
-    proveedor:proveedor.value,
-    precio:precio.value,
-    iva:iva.value
-  };
-
-  if(editIndex===null){
-    articulos.push(a);
-  }else{
-    articulos[editIndex]=a;
-  }
-
-  localStorage.setItem("articulos", JSON.stringify(articulos));
-
-  modal.style.display="none";
+  data[i].precio = parseFloat(nuevoPrecio);
+  guardar(data);
   pintar();
 }
 
-/* INIT */
-cargarProveedores();
+function desactivar(i){
+  let data = leer();
+
+  if(confirm("Desactivar artículo?")){
+    data[i].activo = false;
+    guardar(data);
+    pintar();
+  }
+}
+
+function reactivar(i){
+  let data = leer();
+
+  data[i].activo = true;
+  guardar(data);
+  pintar();
+}
+
+/* ================= VOLVER ================= */
+
+function volver(){
+  window.location.href="index.html";
+}
+
+/* ================= INIT ================= */
+
 pintar();
 
 </script>
