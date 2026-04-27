@@ -3,245 +3,276 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>PEDIDOS</title>
+<title>PEDIDOS · MONOLITO</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#f5f5f5;
-}
-
-header{
-background:#1f3c4c;
-color:white;
-padding:15px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.bloque{
-background:white;
-margin:15px;
-padding:15px;
-border-radius:10px;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
-}
-
-input, select{
-padding:10px;
-margin:5px;
-border-radius:8px;
-border:1px solid #ccc;
-}
-
-button{
-padding:10px 15px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-}
-
-.add{
-background:#ddd;
-}
-
-.finalizar{
-background:#4CAF50;
-color:white;
-width:100%;
-font-size:18px;
-}
-
-.total{
-font-size:22px;
-text-align:right;
-margin-top:10px;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:11px 14px;font-weight:800;font-size:15px}
+.volver{background:white;color:#17303d}
+.contenido{padding:16px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+label{display:block;font-weight:800;margin-bottom:8px}
+select,input{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px}
+.articulo{display:grid;grid-template-columns:1fr 90px 100px;gap:8px;align-items:center;border-bottom:1px solid #dfe6ec;padding:10px 0}
+.nombre{font-weight:900}
+.detalle{font-size:13px;color:#4f5f69;margin-top:3px}
+.totalLinea{text-align:right;font-weight:900}
+.resumen{font-size:18px;line-height:1.7}
+.finalizar{width:100%;background:#48a530;color:white;font-size:18px;margin-top:10px}
+.aviso{background:#fff3cd;border-left:8px solid #d99a00;border-radius:18px;padding:12px;margin-bottom:12px}
+.rojo{background:#ffe1e1;border-left-color:#ff0000}
 </style>
 </head>
 
 <body>
 
 <header>
-<div onclick="history.back()">← Volver</div>
-<div>PEDIDOS</div>
+  <button class="volver" onclick="volver()">← Volver</button>
+  <h2>📝 PEDIDOS</h2>
 </header>
 
-<div class="bloque">
-<label>Proveedor</label>
-<select id="proveedor"></select>
+<div class="contenido">
 
-<label>Forma de pago</label>
-<select id="formaPago">
-<option>CONTADO</option>
-<option>TRANSFERENCIA</option>
-<option>REPOSICION</option>
-</select>
-</div>
+  <div id="avisos"></div>
 
-<div class="bloque">
-<h3>Artículos</h3>
+  <div class="card">
+    <label>Proveedor</label>
+    <select id="proveedor" onchange="cargarArticulos()"></select>
+  </div>
 
-<select id="articulo"></select>
-<input type="number" id="cantidad" value="1">
-<input type="number" id="precio" step="0.01">
+  <div class="card">
+    <h3>Artículos</h3>
+    <div id="listaArticulos"></div>
+  </div>
 
-<button class="add" onclick="añadir()">+ Añadir</button>
+  <div class="card resumen">
+    Subtotal sin IVA: <strong id="subtotal">0,00 €</strong><br>
+    IVA 4%: <strong id="iva4">0,00 €</strong><br>
+    IVA 10%: <strong id="iva10">0,00 €</strong><br>
+    IVA 21%: <strong id="iva21">0,00 €</strong><br>
+    TOTAL: <strong id="total">0,00 €</strong>
 
-<div id="lista"></div>
-</div>
+    <button class="finalizar" onclick="finalizarPedido()">FINALIZAR PEDIDO</button>
+  </div>
 
-<div class="bloque">
-<div>Base: <span id="base">0</span> €</div>
-<div>IVA 4%: <span id="iva4">0</span> €</div>
-<div>IVA 10%: <span id="iva10">0</span> €</div>
-<div>IVA 21%: <span id="iva21">0</span> €</div>
-
-<div class="total">TOTAL: <span id="total">0</span> €</div>
-
-<button class="finalizar" onclick="finalizar()">FINALIZAR</button>
 </div>
 
 <script>
+function volver(){
+  window.location.href = "index.html";
+}
 
-let articulos = JSON.parse(localStorage.getItem("articulos")) || [];
-let proveedores = JSON.parse(localStorage.getItem("proveedores")) || [];
-let lineas = [];
+function leerProveedores(){
+  return JSON.parse(localStorage.getItem("proveedores") || "[]")
+    .filter(p => p.activo !== false);
+}
 
-let selProveedor = document.getElementById("proveedor");
-let selArticulo = document.getElementById("articulo");
+function leerArticulos(){
+  return JSON.parse(localStorage.getItem("articulos") || "[]")
+    .filter(a => a.activo !== false);
+}
 
-// Cargar proveedores
-proveedores.forEach(p=>{
-let op = document.createElement("option");
-op.value = p.nombre;
-op.textContent = p.nombre;
-selProveedor.appendChild(op);
-});
+function nombreArticulo(a){
+  return a.articulo || a.nombre || "SIN NOMBRE";
+}
 
-// Filtrar artículos por proveedor
-selProveedor.addEventListener("change", cargarArticulos);
+function precioCompra(a){
+  if(a.precio !== undefined) return Number(a.precio || 0);
+  return Number(a.precioUnidad || 0) * Number(a.formato || 1);
+}
+
+function cargarProveedores(){
+  const proveedores = leerProveedores();
+  const sel = document.getElementById("proveedor");
+
+  sel.innerHTML = proveedores.map(p =>
+    `<option value="${p.nombre}">${p.nombre}</option>`
+  ).join("");
+
+  cargarArticulos();
+}
 
 function cargarArticulos(){
-selArticulo.innerHTML="";
-let proveedor = selProveedor.value;
+  const proveedor = document.getElementById("proveedor").value;
+  const articulos = leerArticulos().filter(a => a.proveedor === proveedor);
+  const cont = document.getElementById("listaArticulos");
 
-articulos
-.filter(a => a.proveedor === proveedor)
-.forEach(a=>{
-let op = document.createElement("option");
-op.value = JSON.stringify(a);
-op.textContent = a.nombre;
-selArticulo.appendChild(op);
-});
+  cont.innerHTML = "";
+
+  articulos.forEach((a,i)=>{
+    const precio = precioCompra(a);
+    const formatoTexto = a.unidadFormato || a.formato || "FORMATO";
+    const iva = Number(a.iva || 21);
+
+    cont.innerHTML += `
+      <div class="articulo">
+        <div>
+          <div class="nombre">${nombreArticulo(a)}</div>
+          <div class="detalle">${formatoTexto} · ${precio.toFixed(2)} € sin IVA · IVA ${iva}%</div>
+        </div>
+
+        <input type="number" min="0" step="1" value="0"
+          data-precio="${precio}"
+          data-iva="${iva}"
+          data-nombre="${nombreArticulo(a)}"
+          data-formato="${formatoTexto}"
+          oninput="calcular()">
+
+        <div class="totalLinea" id="linea-${i}">0,00 €</div>
+      </div>
+    `;
+  });
+
+  pintarAvisos();
+  calcular();
 }
 
-cargarArticulos();
+function pintarAvisos(){
+  const proveedor = document.getElementById("proveedor").value;
 
-function añadir(){
-let art = JSON.parse(selArticulo.value);
-let cantidad = parseFloat(document.getElementById("cantidad").value);
-let precio = parseFloat(document.getElementById("precio").value);
+  const incidencias = JSON.parse(localStorage.getItem("incidencias_pendientes") || "[]")
+    .filter(i => !i.resuelta && i.proveedor === proveedor);
 
-lineas.push({
-nombre: art.nombre,
-cantidad,
-precio,
-iva: art.iva
-});
+  const tener = JSON.parse(localStorage.getItem("tener_en_cuenta") || "[]");
 
-render();
+  const promociones = JSON.parse(localStorage.getItem("promociones") || "[]")
+    .filter(p => p.activa !== false && (!p.proveedor || p.proveedor === proveedor));
+
+  let html = "";
+
+  if(incidencias.length){
+    html += `<div class="aviso rojo"><strong>🔴 Incidencias abiertas de ${proveedor}</strong><br>`;
+    incidencias.forEach(i => html += `- ${i.motivo || i.texto || "Incidencia pendiente"}<br>`);
+    html += `</div>`;
+  }
+
+  if(tener.length){
+    html += `<div class="aviso"><strong>⭐ Tener en cuenta</strong><br>`;
+    tener.forEach(t => html += `- ${t.texto || t}<br>`);
+    html += `</div>`;
+  }
+
+  if(promociones.length){
+    html += `<div class="aviso"><strong>🎁 Ofertas activas</strong><br>`;
+    promociones.forEach(p => html += `- ${p.texto || p.descripcion || ""}<br>`);
+    html += `</div>`;
+  }
+
+  document.getElementById("avisos").innerHTML = html;
 }
 
-function render(){
-let lista = document.getElementById("lista");
-lista.innerHTML = "";
+function calcular(){
+  const inputs = document.querySelectorAll("#listaArticulos input");
+  let subtotal = 0;
+  let iva4 = 0;
+  let iva10 = 0;
+  let iva21 = 0;
 
-let base = 0;
-let iva4 = 0;
-let iva10 = 0;
-let iva21 = 0;
+  inputs.forEach((inp,i)=>{
+    const cantidad = Number(inp.value || 0);
+    const precio = Number(inp.dataset.precio || 0);
+    const iva = Number(inp.dataset.iva || 21);
 
-lineas.forEach(l=>{
-let subtotal = l.precio * l.cantidad;
-base += subtotal;
+    const base = cantidad * precio;
+    subtotal += base;
 
-let iva = subtotal * (l.iva / 100);
+    if(iva === 4) iva4 += base * 0.04;
+    if(iva === 10) iva10 += base * 0.10;
+    if(iva === 21) iva21 += base * 0.21;
 
-if(l.iva == 4) iva4 += iva;
-if(l.iva == 10) iva10 += iva;
-if(l.iva == 21) iva21 += iva;
+    const linea = document.getElementById("linea-" + i);
+    if(linea) linea.textContent = base.toFixed(2).replace(".", ",") + " €";
+  });
 
-let div = document.createElement("div");
-div.innerHTML = `${l.nombre} - ${l.cantidad} x ${l.precio}€`;
-lista.appendChild(div);
-});
+  const total = subtotal + iva4 + iva10 + iva21;
 
-let total = base + iva4 + iva10 + iva21;
-
-document.getElementById("base").textContent = base.toFixed(2);
-document.getElementById("iva4").textContent = iva4.toFixed(2);
-document.getElementById("iva10").textContent = iva10.toFixed(2);
-document.getElementById("iva21").textContent = iva21.toFixed(2);
-document.getElementById("total").textContent = total.toFixed(2);
+  document.getElementById("subtotal").textContent = subtotal.toFixed(2).replace(".", ",") + " €";
+  document.getElementById("iva4").textContent = iva4.toFixed(2).replace(".", ",") + " €";
+  document.getElementById("iva10").textContent = iva10.toFixed(2).replace(".", ",") + " €";
+  document.getElementById("iva21").textContent = iva21.toFixed(2).replace(".", ",") + " €";
+  document.getElementById("total").textContent = total.toFixed(2).replace(".", ",") + " €";
 }
 
-function finalizar(){
+function obtenerLineas(){
+  const inputs = document.querySelectorAll("#listaArticulos input");
+  let lineas = [];
 
-if(lineas.length === 0){
-alert("Añade artículos");
-return;
+  inputs.forEach(inp=>{
+    const cantidad = Number(inp.value || 0);
+    if(cantidad > 0){
+      const precio = Number(inp.dataset.precio || 0);
+      const iva = Number(inp.dataset.iva || 21);
+      const base = cantidad * precio;
+
+      lineas.push({
+        articulo: inp.dataset.nombre,
+        formato: inp.dataset.formato,
+        cantidad,
+        precioSinIva: precio,
+        iva,
+        base
+      });
+    }
+  });
+
+  return lineas;
 }
 
-let proveedor = selProveedor.value;
-let formaPago = document.getElementById("formaPago").value;
+function finalizarPedido(){
+  const proveedor = document.getElementById("proveedor").value;
+  const proveedores = leerProveedores();
+  const fichaProveedor = proveedores.find(p => p.nombre === proveedor) || {};
 
-let base = parseFloat(document.getElementById("base").textContent);
-let iva4 = parseFloat(document.getElementById("iva4").textContent);
-let iva10 = parseFloat(document.getElementById("iva10").textContent);
-let iva21 = parseFloat(document.getElementById("iva21").textContent);
-let total = parseFloat(document.getElementById("total").textContent);
+  const pagosPendientes = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+  const existe = pagosPendientes.find(p => p.proveedor === proveedor);
 
-// GUARDAR EN PAGOS
-let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+  if(existe){
+    alert("Ya hay un pedido pendiente de este proveedor en PAGOS.");
+    return;
+  }
 
-pagos.push({
-proveedor,
-formaPago,
-base,
-iva4,
-iva10,
-iva21,
-total,
-fecha: new Date().toISOString()
-});
+  const lineas = obtenerLineas();
 
-localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
+  if(lineas.length === 0){
+    alert("No hay artículos con cantidad.");
+    return;
+  }
 
-// GUARDAR EN HISTÓRICO
-let historico = JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
+  const subtotal = lineas.reduce((s,l)=>s + l.base,0);
+  const iva4 = lineas.filter(l=>l.iva===4).reduce((s,l)=>s + l.base*0.04,0);
+  const iva10 = lineas.filter(l=>l.iva===10).reduce((s,l)=>s + l.base*0.10,0);
+  const iva21 = lineas.filter(l=>l.iva===21).reduce((s,l)=>s + l.base*0.21,0);
+  const total = subtotal + iva4 + iva10 + iva21;
 
-historico.push({
-proveedor,
-lineas,
-total,
-fecha: new Date().toISOString()
-});
+  const pedido = {
+    id: Date.now(),
+    fecha: new Date().toLocaleString("es-ES"),
+    proveedor,
+    formaPago: fichaProveedor.formaPago || "BANCO",
+    lineas,
+    subtotal,
+    iva4,
+    iva10,
+    iva21,
+    total,
+    estado:"PENDIENTE",
+    operador: localStorage.getItem("usuario") || "OPERADOR"
+  };
 
-localStorage.setItem("historico_pedidos", JSON.stringify(historico));
+  let pedidos = JSON.parse(localStorage.getItem("pedidos") || "[]");
+  pedidos.unshift(pedido);
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
 
-// LIMPIAR
-lineas = [];
-render();
+  pagosPendientes.unshift(pedido);
+  localStorage.setItem("pagos_pendientes", JSON.stringify(pagosPendientes));
 
-alert("Pedido guardado correctamente");
-
-window.location.href = "pagos.html";
+  alert("Pedido guardado y enviado a PAGOS.");
+  window.location.href = "pagos.html";
 }
 
+cargarProveedores();
 </script>
 
 </body>
