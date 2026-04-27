@@ -7,7 +7,7 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
 
 header{
   background:#17303d;
@@ -23,42 +23,47 @@ button{
   border-radius:14px;
   padding:12px 16px;
   font-weight:800;
-  font-size:16px;
 }
 
 .volver{background:white;color:#17303d}
 
 .contenido{padding:16px}
 
+.mes{
+  margin-top:30px;
+  font-size:22px;
+  border-bottom:2px solid #17303d;
+  padding-bottom:6px;
+}
+
+.resumenMes{
+  background:#ffffff;
+  border-radius:16px;
+  padding:14px;
+  margin:10px 0 16px 0;
+  font-weight:800;
+  line-height:1.8;
+}
+
 .card{
   background:white;
   border-radius:22px;
-  padding:18px;
-  margin-bottom:14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
+  padding:16px;
+  margin-bottom:12px;
+  box-shadow:0 6px 14px rgba(0,0,0,.12);
 }
 
-.nombre{font-size:28px;font-weight:900}
-
-.detalle{
-  margin-top:8px;
-  color:#4f5f69;
-  font-size:18px;
-}
-
-.importe{
-  font-size:30px;
-  font-weight:900;
-  margin-top:10px;
-}
+.nombre{font-size:22px;font-weight:900}
+.detalle{margin-top:6px;color:#4f5f69}
+.importe{font-size:24px;font-weight:900;margin-top:8px}
 
 .sello{
   display:inline-block;
-  margin-top:12px;
-  margin-right:8px;
-  padding:8px 14px;
+  margin-top:10px;
+  margin-right:6px;
+  padding:6px 12px;
   border-radius:999px;
-  font-size:16px;
+  font-size:14px;
   font-weight:900;
 }
 
@@ -69,29 +74,19 @@ button{
   width:100%;
   background:#17303d;
   color:white;
-  margin-top:16px;
-  font-size:18px;
+  margin-top:12px;
 }
 
 .lineas{
   display:none;
-  margin-top:14px;
-  border-top:1px solid #dfe6ec;
-  padding-top:12px;
+  margin-top:10px;
+  border-top:1px solid #ddd;
+  padding-top:10px;
 }
 
 .linea{
-  padding:10px 0;
-  border-bottom:1px solid #edf1f4;
-  font-size:18px;
-  line-height:1.5;
-}
-
-.resumen{
-  margin-top:14px;
-  font-size:20px;
-  font-weight:800;
-  line-height:1.7;
+  padding:6px 0;
+  border-bottom:1px solid #eee;
 }
 
 .vacio{
@@ -107,13 +102,11 @@ button{
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">← Volver</button>
-  <h2>📁 HISTÓRICO</h2>
+<button class="volver" onclick="location.href='index.html'">← Volver</button>
+<h2>📁 HISTÓRICO</h2>
 </header>
 
-<div class="contenido">
-  <div id="lista"></div>
-</div>
+<div class="contenido" id="lista"></div>
 
 <script>
 
@@ -122,89 +115,110 @@ function leerHistorico(){
 }
 
 function euros(n){
-  return Number(n || 0).toFixed(2).replace(".", ",") + " €";
+  return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
 
 function pintar(){
-  const historico = leerHistorico();
-  let html = "";
 
-  if(historico.length === 0){
-    html = `<div class="vacio">Todavía no hay pedidos en histórico.</div>`;
+  const data = leerHistorico();
+  if(data.length===0){
+    document.getElementById("lista").innerHTML =
+      `<div class="vacio">Sin pedidos todavía</div>`;
+    return;
   }
 
-  historico.forEach((p,i)=>{
+  let grupos = {};
 
-    const tieneIncidencia =
-      p.estado === "PAGADO CON INCIDENCIA" ||
-      p.incidenciaAbierta;
+  data.forEach(p=>{
+    let fecha = new Date(p.fechaPago || p.fecha || Date.now());
+    let mes = fecha.toLocaleString("es-ES",{month:"long"});
+    let año = fecha.getFullYear();
+    let clave = mes.toUpperCase()+" "+año;
 
-    let lineasHtml = "";
+    if(!grupos[clave]) grupos[clave]=[];
+    grupos[clave].push(p);
+  });
 
-    if(p.lineas && p.lineas.length){
-      lineasHtml = `<div class="lineas" id="lineas-${i}">`;
+  let html="";
 
-      p.lineas.forEach(l=>{
-        lineasHtml += `
-          <div class="linea">
-            <strong>${l.articulo}</strong><br>
-            Cantidad: ${l.cantidad}<br>
-            Base: ${euros(l.base)}
-          </div>
-        `;
-      });
+  Object.keys(grupos).forEach(mesClave=>{
 
-      lineasHtml += `
-        <div class="resumen">
-          TOTAL: ${euros(p.total)}
-        </div>
-      </div>`;
-    }
+    let pedidos = grupos[mesClave];
+
+    let totalMes=0;
+    let banco=0, contado=0, reposicion=0, cuenta=0;
+
+    pedidos.forEach(p=>{
+      totalMes += Number(p.total||0);
+
+      let tipo = (p.formaPago||"").toUpperCase();
+
+      if(tipo==="BANCO") banco += Number(p.total||0);
+      else if(tipo==="CONTADO") contado += Number(p.total||0);
+      else if(tipo==="REPOSICION") reposicion += Number(p.total||0);
+      else if(tipo==="CUENTA") cuenta += Number(p.total||0);
+    });
+
+    html += `<div class="mes">${mesClave}</div>`;
 
     html += `
-      <div class="card">
-
-        <div class="nombre">${p.proveedor}</div>
-
-        <div class="detalle">Fecha pedido: ${p.fecha}</div>
-        <div class="detalle">Fecha pago: ${p.fechaPago || "-"}</div>
-
-        <div class="importe">${euros(p.total)}</div>
-
-        <span class="sello pagado">PAGADO</span>
-
-        ${
-          tieneIncidencia
-          ? `
-            <span class="sello incidencia">INCIDENCIA</span>
-            <div class="detalle"><b>Motivo:</b> ${p.motivoIncidencia || "-"}</div>
-            <div class="detalle"><b>Solución:</b> ${p.solucionIncidencia || "Pendiente"}</div>
-          `
-          : ""
-        }
-
-        <button class="ver" onclick="verPedido(${i})">
-          Ver pedido completo
-        </button>
-
-        ${lineasHtml}
-
+      <div class="resumenMes">
+        Total mes: ${euros(totalMes)}<br>
+        BANCO: ${euros(banco)}<br>
+        CONTADO: ${euros(contado)}<br>
+        REPOSICIÓN: ${euros(reposicion)}<br>
+        A CUENTA: ${euros(cuenta)}
       </div>
     `;
+
+    pedidos.forEach((p,i)=>{
+
+      let lineasHtml="";
+      if(p.lineas){
+        lineasHtml = `<div class="lineas" id="l-${mesClave}-${i}">`;
+        p.lineas.forEach(l=>{
+          lineasHtml += `
+            <div class="linea">
+              ${l.articulo} · ${l.cantidad} · ${euros(l.base)}
+            </div>`;
+        });
+        lineasHtml += `</div>`;
+      }
+
+      html += `
+        <div class="card">
+          <div class="nombre">${p.proveedor}</div>
+          <div class="detalle">${p.fechaPago||p.fecha}</div>
+          <div class="detalle">${p.formaPago||"-"}</div>
+          <div class="importe">${euros(p.total)}</div>
+
+          <span class="sello pagado">PAGADO</span>
+
+          ${
+            p.estado==="PAGADO CON INCIDENCIA"
+            ? `<span class="sello incidencia">INCIDENCIA</span>
+               <div class="detalle"><b>Motivo:</b> ${p.motivoIncidencia||""}</div>
+               <div class="detalle"><b>Solución:</b> ${p.solucionIncidencia||""}</div>`
+            : ""
+          }
+
+          <button class="ver" onclick="ver('${mesClave}',${i})">
+            Ver pedido
+          </button>
+
+          ${lineasHtml}
+        </div>
+      `;
+    });
+
   });
 
   document.getElementById("lista").innerHTML = html;
 }
 
-function verPedido(i){
-  const div = document.getElementById("lineas-" + i);
-  if(div){
-    div.style.display = div.style.display === "block" ? "none" : "block";
-  }
-}
-
-function volver(){
-  window.location.href = "index.html";
+function ver(m,i){
+  const d = document.getElementById("l-"+m+"-"+i);
+  if(d) d.style.display = d.style.display==="block"?"none":"block";
 }
 
 pintar();
