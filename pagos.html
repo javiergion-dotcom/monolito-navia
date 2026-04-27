@@ -6,101 +6,29 @@
 <title>PAGOS · MONOLITO</title>
 
 <style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#eef2f5;
-  color:#17303d;
-}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:11px 14px;
-  font-weight:800;
-}
-
-.volver{
-  background:white;
-  color:#17303d;
-}
-
-.contenido{
-  padding:16px;
-}
-
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:12px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-
-.nombre{
-  font-size:22px;
-  font-weight:900;
-}
-
-.detalle{
-  margin-top:6px;
-  color:#4f5f69;
-}
-
-.importe{
-  font-size:22px;
-  font-weight:900;
-  margin-top:8px;
-}
-
-.botones{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-  flex-wrap:wrap;
-}
-
-.pagado{
-  background:#48a530;
-  color:white;
-}
-
-.incidencia{
-  background:#ff0000;
-  color:white;
-}
-
-.vacio{
-  background:white;
-  border-radius:22px;
-  padding:20px;
-  text-align:center;
-  font-weight:800;
-}
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:11px 14px;font-weight:800}
+.volver{background:white;color:#17303d}
+.contenido{padding:16px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.nombre{font-size:22px;font-weight:900}
+.detalle{margin-top:6px;color:#4f5f69}
+.importe{font-size:24px;font-weight:900;margin-top:8px}
+.botones{display:flex;gap:10px;margin-top:12px}
+.pagado{background:#48a530;color:white}
+.incidencia{background:#ff0000;color:white}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">← Volver</button>
-  <h2>💳 PAGOS</h2>
+<button class="volver" onclick="location.href='index.html'">← Volver</button>
+<h2>💳 PAGOS</h2>
 </header>
 
-<div class="contenido">
-  <div id="lista"></div>
-</div>
+<div class="contenido" id="lista"></div>
 
 <script>
 
@@ -108,106 +36,98 @@ function leerPagos(){
   return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 }
 
-function guardarPagos(data){
-  localStorage.setItem("pagos_pendientes", JSON.stringify(data));
+function guardarPagos(p){
+  localStorage.setItem("pagos_pendientes", JSON.stringify(p));
 }
 
 function leerHistorico(){
   return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
 }
 
-function guardarHistorico(data){
-  localStorage.setItem("historico_pedidos", JSON.stringify(data));
+function guardarHistorico(h){
+  localStorage.setItem("historico_pedidos", JSON.stringify(h));
 }
 
 function euros(n){
-  return Number(n || 0).toFixed(2).replace(".", ",") + " €";
+  return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
 
 function pintar(){
-
   const pagos = leerPagos();
-  let html = "";
-
-  if(pagos.length === 0){
-    html = `<div class="vacio">No hay pagos pendientes.</div>`;
-  }
+  let html="";
 
   pagos.forEach((p,i)=>{
 
     html += `
-      <div class="card">
+    <div class="card">
+      <div class="nombre">${p.proveedor}</div>
+      <div class="detalle">${p.fecha}</div>
+      <div class="importe">${euros(p.total)}</div>
 
-        <div class="nombre">${p.proveedor}</div>
-
-        <div class="detalle">Fecha: ${p.fecha}</div>
-        <div class="detalle">Forma pago: ${p.formaPago || "-"}</div>
-
-        <div class="importe">${euros(p.total)}</div>
-
-        <div class="botones">
-
-          <button class="pagado" onclick="marcarPagado(${i})">
-            ✔ PAGADO
-          </button>
-
-          <button class="incidencia" onclick="marcarIncidencia(${i})">
-            ⚠ INCIDENCIA
-          </button>
-
-        </div>
-
+      <div class="botones">
+        <button class="pagado" onclick="pagado(${i})">✔ PAGADO</button>
+        <button class="incidencia" onclick="incidencia(${i})">⚠ INCIDENCIA</button>
       </div>
-    `;
+    </div>`;
   });
 
   document.getElementById("lista").innerHTML = html;
 }
 
-function marcarPagado(i){
-
+function pagado(i){
   let pagos = leerPagos();
-  let historico = leerHistorico();
+  let hist = leerHistorico();
 
-  let pedido = pagos[i];
+  let p = pagos[i];
 
-  pedido.estado = "PAGADO";
-  pedido.fechaPago = new Date().toLocaleString();
-  pedido.operadorPago = localStorage.getItem("usuario") || "OPERADOR";
+  // 🔥 AQUÍ ESTÁ LA CLAVE → se guarda TODO el pedido
+  let pedidoCompleto = {
+    proveedor: p.proveedor,
+    fecha: p.fecha,
+    total: p.total,
+    lineas: p.lineas || [],   // 👈 IMPORTANTE
+    estado: "PAGADO",
+    fechaPago: new Date().toLocaleString()
+  };
 
-  historico.unshift(pedido);
+  hist.unshift(pedidoCompleto);
   pagos.splice(i,1);
 
+  guardarHistorico(hist);
   guardarPagos(pagos);
-  guardarHistorico(historico);
 
-  alert("Pedido marcado como PAGADO");
-  pintar();
+  alert("Pagado ✔");
+  location.reload();
 }
 
-function marcarIncidencia(i){
-
+function incidencia(i){
   let pagos = leerPagos();
-  let historico = leerHistorico();
+  let hist = leerHistorico();
 
-  let pedido = pagos[i];
+  let p = pagos[i];
 
-  pedido.estado = "PAGADO CON INCIDENCIA";
-  pedido.fechaPago = new Date().toLocaleString();
-  pedido.operadorPago = localStorage.getItem("usuario") || "OPERADOR";
+  let motivo = prompt("Motivo incidencia:");
+  let solucion = prompt("Solución prevista:");
 
-  historico.unshift(pedido);
+  let pedidoCompleto = {
+    proveedor: p.proveedor,
+    fecha: p.fecha,
+    total: p.total,
+    lineas: p.lineas || [],
+    estado: "INCIDENCIA",
+    motivo: motivo,
+    solucion: solucion,
+    fechaPago: new Date().toLocaleString()
+  };
+
+  hist.unshift(pedidoCompleto);
   pagos.splice(i,1);
 
+  guardarHistorico(hist);
   guardarPagos(pagos);
-  guardarHistorico(historico);
 
-  alert("Pedido marcado con INCIDENCIA");
-  pintar();
-}
-
-function volver(){
-  window.location.href = "index.html";
+  alert("Incidencia registrada ⚠");
+  location.reload();
 }
 
 pintar();
