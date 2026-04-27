@@ -37,7 +37,7 @@ button{
 }
 
 .resumenMes{
-  background:#ffffff;
+  background:white;
   border-radius:16px;
   padding:14px;
   margin:10px 0 16px 0;
@@ -87,6 +87,13 @@ button{
 .linea{
   padding:6px 0;
   border-bottom:1px solid #eee;
+  font-size:16px;
+}
+
+.resumen{
+  margin-top:10px;
+  font-weight:900;
+  font-size:18px;
 }
 
 .vacio{
@@ -121,6 +128,7 @@ function euros(n){
 function pintar(){
 
   const data = leerHistorico();
+
   if(data.length===0){
     document.getElementById("lista").innerHTML =
       `<div class="vacio">Sin pedidos todavía</div>`;
@@ -130,9 +138,13 @@ function pintar(){
   let grupos = {};
 
   data.forEach(p=>{
-    let fecha = new Date(p.fechaPago || p.fecha || Date.now());
+
+    let f = p.fechaPago || p.fecha;
+    let fecha = f ? new Date(f) : new Date();
+
     let mes = fecha.toLocaleString("es-ES",{month:"long"});
     let año = fecha.getFullYear();
+
     let clave = mes.toUpperCase()+" "+año;
 
     if(!grupos[clave]) grupos[clave]=[];
@@ -174,22 +186,34 @@ function pintar(){
     pedidos.forEach((p,i)=>{
 
       let lineasHtml="";
+
       if(p.lineas){
         lineasHtml = `<div class="lineas" id="l-${mesClave}-${i}">`;
+
         p.lineas.forEach(l=>{
           lineasHtml += `
             <div class="linea">
-              ${l.articulo} · ${l.cantidad} · ${euros(l.base)}
-            </div>`;
+              <strong>${l.articulo}</strong><br>
+              Cantidad: ${l.cantidad}<br>
+              Base: ${euros(l.base)}
+            </div>
+          `;
         });
-        lineasHtml += `</div>`;
+
+        lineasHtml += `
+          <div class="resumen">
+            TOTAL: ${euros(p.total)}
+          </div>
+        </div>`;
       }
 
       html += `
         <div class="card">
+
           <div class="nombre">${p.proveedor}</div>
-          <div class="detalle">${p.fechaPago||p.fecha}</div>
-          <div class="detalle">${p.formaPago||"-"}</div>
+          <div class="detalle">${p.fechaPago || p.fecha || "-"}</div>
+          <div class="detalle">${p.formaPago || "-"}</div>
+
           <div class="importe">${euros(p.total)}</div>
 
           <span class="sello pagado">PAGADO</span>
@@ -203,10 +227,11 @@ function pintar(){
           }
 
           <button class="ver" onclick="ver('${mesClave}',${i})">
-            Ver pedido
+            Ver pedido completo
           </button>
 
           ${lineasHtml}
+
         </div>
       `;
     });
