@@ -10,168 +10,83 @@
 
 body{
   margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#dfe6ec;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#eef2f5;
   color:#17303d;
 }
 
 header{
   background:#17303d;
   color:white;
-  padding:18px;
+  padding:16px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
 }
 
 button{
   border:0;
-  border-radius:18px;
-  padding:13px 16px;
+  border-radius:14px;
+  padding:11px 14px;
   font-weight:800;
-  font-size:16px;
-  cursor:pointer;
 }
 
 .volver{
-  background:#eef2f5;
+  background:white;
   color:#17303d;
 }
 
 .contenido{
-  padding:18px;
+  padding:16px;
 }
 
-.resumen{
+.card{
   background:white;
-  border-radius:24px;
+  border-radius:22px;
   padding:16px;
-  margin-bottom:18px;
+  margin-bottom:12px;
   box-shadow:0 8px 18px rgba(0,0,0,.12);
 }
 
-.bloque{
-  background:white;
-  border-radius:26px;
-  padding:18px;
-  margin-bottom:18px;
-  box-shadow:0 10px 22px rgba(0,0,0,.15);
-}
-
-.fila{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:12px;
-}
-
 .nombre{
-  font-size:25px;
+  font-size:22px;
   font-weight:900;
-}
-
-.importe{
-  font-size:25px;
-  font-weight:900;
-  white-space:nowrap;
 }
 
 .detalle{
-  margin-top:9px;
-  font-size:17px;
+  margin-top:6px;
   color:#4f5f69;
 }
 
-.estado{
-  margin-top:9px;
-  font-size:17px;
+.importe{
+  font-size:22px;
+  font-weight:900;
+  margin-top:8px;
 }
 
 .botones{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:16px;
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+  flex-wrap:wrap;
 }
 
-.btn-pagado{
-  background:#3fa72b;
+.pagado{
+  background:#48a530;
   color:white;
 }
 
-.btn-incidencia{
-  background:#ff0000;
-  color:white;
-}
-
-.btn-cuenta{
-  background:#f6ae1b;
-  color:white;
-  grid-column:1 / 3;
-}
-
-.sello{
-  display:inline-block;
-  margin-top:10px;
-  margin-right:6px;
-  padding:7px 12px;
-  border-radius:999px;
-  font-size:14px;
-  font-weight:900;
-}
-
-.sello-pagado{
-  background:#3fa72b;
-  color:white;
-}
-
-.sello-incidencia{
+.incidencia{
   background:#ff0000;
   color:white;
 }
 
 .vacio{
   background:white;
-  padding:24px;
-  border-radius:24px;
+  border-radius:22px;
+  padding:20px;
   text-align:center;
-  font-size:18px;
   font-weight:800;
-}
-
-.lineas{
-  margin-top:12px;
-  padding-top:12px;
-  border-top:1px solid #d8e0e5;
-  font-size:15px;
-  color:#4f5f69;
-}
-
-.linea-articulo{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:5px;
-}
-
-.entregas{
-  margin-top:12px;
-  background:#f6f8f9;
-  border-radius:18px;
-  padding:12px;
-  font-size:15px;
-}
-
-.entrega{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:5px;
-}
-
-@media(max-width:700px){
-  .nombre,.importe{font-size:23px}
-  .botones{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -184,155 +99,64 @@ button{
 </header>
 
 <div class="contenido">
-  <div id="resumen" class="resumen"></div>
   <div id="lista"></div>
 </div>
 
 <script>
+
 function leerPagos(){
   return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 }
 
-function guardarPagos(pagos){
-  localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
+function guardarPagos(data){
+  localStorage.setItem("pagos_pendientes", JSON.stringify(data));
 }
 
 function leerHistorico(){
   return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
 }
 
-function guardarHistorico(historico){
-  localStorage.setItem("historico_pedidos", JSON.stringify(historico));
+function guardarHistorico(data){
+  localStorage.setItem("historico_pedidos", JSON.stringify(data));
 }
 
-function leerIncidencias(){
-  return JSON.parse(localStorage.getItem("incidencias_pendientes") || "[]");
-}
-
-function guardarIncidencias(incidencias){
-  localStorage.setItem("incidencias_pendientes", JSON.stringify(incidencias));
-}
-
-function normalizarFormaPago(p){
-  return String(p.formaPago || p.forma_pago || p.pago || "").toUpperCase();
-}
-
-function textoFormaPago(forma){
-  if(forma === "CONTADO") return "Contado · Último pedido";
-  if(forma === "REPOSICION" || forma === "REPOSICIÓN") return "Reposición · Pedido semana anterior";
-  if(forma === "BANCO") return "Banco · Suma mensual para cotejar";
-  if(forma === "A CUENTA" || forma === "ACUENTA") return "A cuenta · Entregas parciales";
-  return forma || "Sin forma de pago";
-}
-
-function importe(n){
-  return Number(n || 0).toFixed(2) + " €";
-}
-
-function pintarResumen(){
-  const pagos = leerPagos();
-
-  const totalPendiente = pagos.reduce((s,p)=>{
-    const total = Number(p.total || 0);
-    const pagado = Number(p.pagadoCuenta || 0);
-    return s + Math.max(total - pagado, 0);
-  },0);
-
-  const bancoMes = pagos
-    .filter(p => normalizarFormaPago(p) === "BANCO")
-    .reduce((s,p)=>s + Number(p.total || 0),0);
-
-  const incidencias = leerIncidencias().filter(i => !i.resuelta).length;
-
-  document.getElementById("resumen").innerHTML = `
-    <strong>Resumen de pagos</strong><br>
-    Pendiente total: <strong>${importe(totalPendiente)}</strong><br>
-    Banco acumulado actual: <strong>${importe(bancoMes)}</strong><br>
-    Incidencias abiertas: <strong>${incidencias}</strong>
-  `;
+function euros(n){
+  return Number(n || 0).toFixed(2).replace(".", ",") + " €";
 }
 
 function pintar(){
+
   const pagos = leerPagos();
   let html = "";
 
-  pintarResumen();
-
   if(pagos.length === 0){
-    document.getElementById("lista").innerHTML =
-      `<div class="vacio">No hay pedidos pendientes de pago.</div>`;
-    return;
+    html = `<div class="vacio">No hay pagos pendientes.</div>`;
   }
 
   pagos.forEach((p,i)=>{
-    const proveedor = p.proveedor || "SIN PROVEEDOR";
-    const total = Number(p.total || 0);
-    const forma = normalizarFormaPago(p);
-    const estado = p.estado || "PENDIENTE";
-
-    const pagadoCuenta = Number(p.pagadoCuenta || 0);
-    const queda = Math.max(total - pagadoCuenta, 0);
-
-    let extraCuenta = "";
-    if(forma === "A CUENTA" || forma === "ACUENTA"){
-      extraCuenta = `
-        <div class="detalle">Entregado: <strong>${importe(pagadoCuenta)}</strong></div>
-        <div class="detalle">Queda: <strong>${importe(queda)}</strong></div>
-      `;
-    }
-
-    let lineasHtml = "";
-    if(p.lineas && p.lineas.length){
-      lineasHtml = `<div class="lineas">`;
-      p.lineas.forEach(l=>{
-        lineasHtml += `
-          <div class="linea-articulo">
-            <span>${l.articulo || l.nombre || "Artículo"} x ${l.cantidad || 0}</span>
-            <strong>${importe(l.total || ((l.precio || 0) * (l.cantidad || 0)))}</strong>
-          </div>`;
-      });
-      lineasHtml += `</div>`;
-    }
-
-    let entregasHtml = "";
-    if(p.entregas && p.entregas.length){
-      entregasHtml = `<div class="entregas"><strong>Entregas a cuenta</strong>`;
-      p.entregas.forEach(e=>{
-        entregasHtml += `
-          <div class="entrega">
-            <span>${e.fecha}</span>
-            <strong>${importe(e.importe)}</strong>
-          </div>`;
-      });
-      entregasHtml += `</div>`;
-    }
 
     html += `
-      <div class="bloque">
-        <div class="fila">
-          <div class="nombre">${proveedor}</div>
-          <div class="importe">${importe(total)}</div>
-        </div>
+      <div class="card">
 
-        <div class="detalle">${textoFormaPago(forma)}</div>
-        <div class="estado">Estado: <strong>${String(estado).toUpperCase()}</strong></div>
+        <div class="nombre">${p.proveedor}</div>
 
-        ${extraCuenta}
+        <div class="detalle">Fecha: ${p.fecha}</div>
+        <div class="detalle">Forma pago: ${p.formaPago || "-"}</div>
 
-        ${estado === "PAGADO" || estado === "pagado" ? `<span class="sello sello-pagado">PAGADO</span>` : ""}
-        ${estado === "PAGADO_CON_INCIDENCIA" || estado === "pagado_incidencia" ? `
-          <span class="sello sello-pagado">PAGADO</span>
-          <span class="sello sello-incidencia">INCIDENCIA ABIERTA</span>
-        ` : ""}
-
-        ${lineasHtml}
-        ${entregasHtml}
+        <div class="importe">${euros(p.total)}</div>
 
         <div class="botones">
-          <button class="btn-pagado" onclick="marcarPagado(${i})">✔ PAGADO</button>
-          <button class="btn-incidencia" onclick="marcarIncidencia(${i})">⚠ INCIDENCIA</button>
-          ${(forma === "A CUENTA" || forma === "ACUENTA") ? `<button class="btn-cuenta" onclick="anotarEntrega(${i})">💶 ENTREGA A CUENTA</button>` : ""}
+
+          <button class="pagado" onclick="marcarPagado(${i})">
+            ✔ PAGADO
+          </button>
+
+          <button class="incidencia" onclick="marcarIncidencia(${i})">
+            ⚠ INCIDENCIA
+          </button>
+
         </div>
+
       </div>
     `;
   });
@@ -340,126 +164,45 @@ function pintar(){
   document.getElementById("lista").innerHTML = html;
 }
 
-function pasarAHistorico(pedido){
-  const historico = leerHistorico();
-
-  historico.unshift({
-    ...pedido,
-    fechaHistorico: new Date().toLocaleString("es-ES"),
-    operadorCierre: localStorage.getItem("usuario") || "OPERADOR"
-  });
-
-  guardarHistorico(historico);
-}
-
 function marcarPagado(i){
+
   let pagos = leerPagos();
+  let historico = leerHistorico();
+
   let pedido = pagos[i];
 
   pedido.estado = "PAGADO";
-  pedido.sello = "PAGADO";
-  pedido.fechaPago = new Date().toLocaleString("es-ES");
+  pedido.fechaPago = new Date().toLocaleString();
   pedido.operadorPago = localStorage.getItem("usuario") || "OPERADOR";
 
-  pasarAHistorico(pedido);
-
+  historico.unshift(pedido);
   pagos.splice(i,1);
-  guardarPagos(pagos);
 
-  alert("Pedido marcado como PAGADO y enviado a histórico.");
+  guardarPagos(pagos);
+  guardarHistorico(historico);
+
+  alert("Pedido marcado como PAGADO");
   pintar();
 }
 
 function marcarIncidencia(i){
+
   let pagos = leerPagos();
-  let incidencias = leerIncidencias();
+  let historico = leerHistorico();
+
   let pedido = pagos[i];
 
-  const motivo = prompt("Motivo de la incidencia:");
-  if(!motivo) return;
-
-  const solucion = prompt("Solución tomada por el proveedor / pendiente:") || "Pendiente de solución";
-
-  pedido.estado = "PAGADO_CON_INCIDENCIA";
-  pedido.sello = "PAGADO";
-  pedido.incidenciaAbierta = true;
-  pedido.fechaPago = new Date().toLocaleString("es-ES");
+  pedido.estado = "PAGADO CON INCIDENCIA";
+  pedido.fechaPago = new Date().toLocaleString();
   pedido.operadorPago = localStorage.getItem("usuario") || "OPERADOR";
 
-  incidencias.unshift({
-    id: Date.now(),
-    fecha: new Date().toLocaleString("es-ES"),
-    proveedor: pedido.proveedor || "SIN PROVEEDOR",
-    total: Number(pedido.total || 0),
-    motivo: motivo,
-    solucion: solucion,
-    resuelta: false,
-    pedido: pedido,
-    operador: localStorage.getItem("usuario") || "OPERADOR"
-  });
-
-  guardarIncidencias(incidencias);
-  pasarAHistorico(pedido);
-
+  historico.unshift(pedido);
   pagos.splice(i,1);
+
   guardarPagos(pagos);
+  guardarHistorico(historico);
 
-  alert("Pedido pagado con incidencia abierta.");
-  pintar();
-}
-
-function anotarEntrega(i){
-  let pagos = leerPagos();
-  let pedido = pagos[i];
-
-  const total = Number(pedido.total || 0);
-  const pagadoAnterior = Number(pedido.pagadoCuenta || 0);
-  const quedaAnterior = Math.max(total - pagadoAnterior, 0);
-
-  const cantidad = parseFloat(prompt("Queda " + importe(quedaAnterior) + ". ¿Cuánto entregas ahora?") || "0");
-
-  if(!cantidad || cantidad <= 0){
-    return;
-  }
-
-  if(cantidad > quedaAnterior){
-    if(!confirm("La entrega supera lo pendiente. ¿Continuar igualmente?")){
-      return;
-    }
-  }
-
-  if(!pedido.entregas) pedido.entregas = [];
-
-  pedido.entregas.push({
-    fecha: new Date().toLocaleString("es-ES"),
-    importe: cantidad,
-    operador: localStorage.getItem("usuario") || "OPERADOR"
-  });
-
-  pedido.pagadoCuenta = pagadoAnterior + cantidad;
-
-  const quedaNueva = total - pedido.pagadoCuenta;
-
-  if(quedaNueva <= 0){
-    pedido.estado = "PAGADO";
-    pedido.sello = "PAGADO";
-    pedido.fechaPago = new Date().toLocaleString("es-ES");
-    pedido.operadorPago = localStorage.getItem("usuario") || "OPERADOR";
-
-    pasarAHistorico(pedido);
-
-    pagos.splice(i,1);
-    guardarPagos(pagos);
-
-    alert("Pedido A CUENTA cerrado. Queda 0,00 €. Enviado a histórico.");
-  }else{
-    pedido.estado = "A_CUENTA";
-    pagos[i] = pedido;
-    guardarPagos(pagos);
-
-    alert("Entrega guardada. Quedan " + importe(quedaNueva) + ".");
-  }
-
+  alert("Pedido marcado con INCIDENCIA");
   pintar();
 }
 
@@ -468,6 +211,7 @@ function volver(){
 }
 
 pintar();
+
 </script>
 
 </body>
