@@ -7,90 +7,23 @@
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#eef2f5;
-  color:#17303d;
-}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:11px 14px;
-  font-weight:800;
-}
-
-.volver{
-  background:white;
-  color:#17303d;
-}
-
-.contenido{
-  padding:16px;
-}
-
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:12px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-
-.nombre{
-  font-size:22px;
-  font-weight:900;
-}
-
-.detalle{
-  margin-top:6px;
-  color:#4f5f69;
-}
-
-.importe{
-  font-size:22px;
-  font-weight:900;
-  margin-top:8px;
-}
-
-.sello{
-  display:inline-block;
-  margin-top:10px;
-  margin-right:6px;
-  padding:7px 12px;
-  border-radius:999px;
-  font-size:14px;
-  font-weight:900;
-}
-
-.pagado{
-  background:#48a530;
-  color:white;
-}
-
-.incidencia{
-  background:#ff0000;
-  color:white;
-}
-
-.vacio{
-  background:white;
-  border-radius:22px;
-  padding:20px;
-  text-align:center;
-  font-weight:800;
-}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:11px 14px;font-weight:800}
+.volver{background:white;color:#17303d}
+.contenido{padding:16px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.nombre{font-size:22px;font-weight:900}
+.detalle{margin-top:6px;color:#4f5f69}
+.importe{font-size:24px;font-weight:900;margin-top:8px}
+.sello{display:inline-block;margin-top:10px;margin-right:6px;padding:7px 12px;border-radius:999px;font-size:14px;font-weight:900}
+.pagado{background:#48a530;color:white}
+.incidencia{background:#ff0000;color:white}
+.ver{background:#17303d;color:white;width:100%;margin-top:14px}
+.lineas{display:none;margin-top:12px;border-top:1px solid #dfe6ec;padding-top:12px}
+.linea{padding:8px 0;border-bottom:1px solid #edf1f4}
+.resumen{margin-top:12px;font-weight:800;line-height:1.7}
+.vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:800}
 </style>
 </head>
 
@@ -98,63 +31,4 @@ button{
 
 <header>
   <button class="volver" onclick="volver()">← Volver</button>
-  <h2>📁 HISTÓRICO</h2>
-</header>
-
-<div class="contenido">
-  <div id="lista"></div>
-</div>
-
-<script>
-
-function leerHistorico(){
-  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
-}
-
-function euros(n){
-  return Number(n || 0).toFixed(2).replace(".", ",") + " €";
-}
-
-function pintar(){
-  const historico = leerHistorico();
-  let html = "";
-
-  if(historico.length === 0){
-    html = `<div class="vacio">Todavía no hay pedidos en histórico.</div>`;
-  }
-
-  historico.forEach(p=>{
-    html += `
-      <div class="card">
-        <div class="nombre">${p.proveedor || "SIN PROVEEDOR"}</div>
-
-        <div class="detalle">Fecha pedido: ${p.fecha || "-"}</div>
-        <div class="detalle">Fecha pago: ${p.fechaPago || "-"}</div>
-        <div class="detalle">Operador: ${p.operadorPago || "OPERADOR"}</div>
-
-        <div class="importe">${euros(p.total)}</div>
-
-        <span class="sello pagado">PAGADO</span>
-
-        ${
-          p.estado === "PAGADO CON INCIDENCIA"
-          ? `<span class="sello incidencia">INCIDENCIA</span>`
-          : ""
-        }
-      </div>
-    `;
-  });
-
-  document.getElementById("lista").innerHTML = html;
-}
-
-function volver(){
-  window.location.href = "index.html";
-}
-
-pintar();
-
-</script>
-
-</body>
-</html>
+  <h2>📁 HISTÓRICO</
