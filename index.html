@@ -333,7 +333,10 @@ function sonidoClick(){
     osc.stop(ctx.currentTime + 0.08);
   }catch(e){}
 }
-
+function contarIncidencias(){
+  const data = JSON.parse(localStorage.getItem("incidencias") || "[]");
+  return data.filter(x => !x.resuelta).length;
+}
 function vibrar(){
   try{
     if(navigator.vibrate){
@@ -341,7 +344,10 @@ function vibrar(){
     }
   }catch(e){}
 }
-
+function contarIncidencias(){
+  const data = JSON.parse(localStorage.getItem("incidencias") || "[]");
+  return data.filter(x => !x.resuelta).length;
+}
 function abrir(destino){
   vibrar();
   sonidoClick();
