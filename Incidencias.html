@@ -2,28 +2,156 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Incidencias</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INCIDENCIAS · MONOLITO</title>
+
 <style>
-body{font-family:Arial;margin:0;background:#f2f2f2;}
-.header{background:#222;color:white;padding:14px;display:flex;justify-content:space-between;align-items:center;}
-.btn{background:#3c7ec4;color:white;padding:10px 16px;border-radius:8px;text-decoration:none;}
-.contenido{padding:20px;}
-.bloque{background:white;padding:15px;margin-bottom:12px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
-.titulo{font-weight:bold;margin-bottom:8px;}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:11px 14px;font-weight:800;font-size:15px}
+.volver{background:white;color:#17303d}
+.contenido{padding:16px}
+.nuevo{width:100%;background:#ff0000;color:white;margin-bottom:14px;font-size:17px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.resuelta{opacity:.45}
+.proveedor{font-size:22px;font-weight:900}
+.detalle{margin-top:6px;color:#4f5f69}
+.texto{font-size:18px;margin-top:10px;font-weight:700}
+.resolver{background:#48a530;color:white;margin-top:12px}
+.vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:800}
+.sello{display:inline-block;margin-top:10px;padding:7px 12px;border-radius:999px;font-size:14px;font-weight:900}
+.abierta{background:#ff0000;color:white}
+.ok{background:#48a530;color:white}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<div>⚠ Incidencias</div>
-<a href="index.html" class="btn">← Volver</a>
-</div>
+<header>
+  <button class="volver" onclick="volver()">← Volver</button>
+  <h2>🔴 INCIDENCIAS</h2>
+</header>
 
 <div class="contenido">
-<div class="bloque"><div class="titulo">Incidencias abiertas</div></div>
-<div class="bloque"><div class="titulo">Incidencias resueltas</div></div>
+  <button class="nuevo" onclick="nuevaIncidencia()">➕ Nueva incidencia</button>
+  <div id="lista"></div>
 </div>
+
+<script>
+function leerIncidencias(){
+  let a = JSON.parse(localStorage.getItem("incidencias") || "[]");
+  let b = JSON.parse(localStorage.getItem("incidencias_pendientes") || "[]");
+
+  const todas = [...a, ...b];
+
+  return todas;
+}
+
+function guardarIncidencias(data){
+  localStorage.setItem("incidencias", JSON.stringify(data));
+  localStorage.setItem("incidencias_pendientes", JSON.stringify(data.filter(x => !x.resuelta)));
+}
+
+function leerProveedores(){
+  return JSON.parse(localStorage.getItem("proveedores") || "[]")
+    .filter(p => p.activo !== false);
+}
+
+function nuevaIncidencia(){
+  const proveedores = leerProveedores();
+  let proveedor = "";
+
+  if(proveedores.length){
+    proveedor = prompt(
+      "Proveedor:",
+      proveedores[0].nombre || ""
+    );
+  }else{
+    proveedor = prompt("Proveedor:");
+  }
+
+  if(!proveedor) return;
+
+  const texto = prompt("Describe la incidencia:");
+  if(!texto) return;
+
+  const solucion = prompt("Solución prevista / reclamación:", "Pendiente de solución") || "Pendiente de solución";
+
+  let data = leerIncidencias();
+
+  data.unshift({
+    id: Date.now(),
+    proveedor: proveedor.trim().toUpperCase(),
+    texto: texto.trim(),
+    motivo: texto.trim(),
+    solucion: solucion.trim(),
+    fecha: new Date().toLocaleString("es-ES"),
+    operador: localStorage.getItem("usuario") || "OPERADOR",
+    resuelta:false
+  });
+
+  guardarIncidencias(data);
+  pintar();
+}
+
+function resolverIncidencia(i){
+  let data = leerIncidencias();
+
+  const solucion = prompt("Solución final:", data[i].solucion || "Solucionado") || "Solucionado";
+
+  data[i].resuelta = true;
+  data[i].solucion = solucion;
+  data[i].fechaResolucion = new Date().toLocaleString("es-ES");
+  data[i].operadorResolucion = localStorage.getItem("usuario") || "OPERADOR";
+
+  guardarIncidencias(data);
+  pintar();
+}
+
+function pintar(){
+  const data = leerIncidencias();
+  let html = "";
+
+  if(data.length === 0){
+    html = `<div class="vacio">No hay incidencias registradas.</div>`;
+  }
+
+  data.forEach((x,i)=>{
+    html += `
+      <div class="card ${x.resuelta ? "resuelta" : ""}">
+        <div class="proveedor">${x.proveedor || "SIN PROVEEDOR"}</div>
+
+        <div class="texto">${x.texto || x.motivo || "Incidencia sin texto"}</div>
+
+        <div class="detalle">Fecha: ${x.fecha || "-"}</div>
+        <div class="detalle">Operador: ${x.operador || "OPERADOR"}</div>
+        <div class="detalle">Solución: ${x.solucion || "Pendiente"}</div>
+
+        ${
+          x.resuelta
+          ? `
+            <span class="sello ok">RESUELTA</span>
+            <div class="detalle">Resuelta: ${x.fechaResolucion || "-"}</div>
+          `
+          : `
+            <span class="sello abierta">ABIERTA</span><br>
+            <button class="resolver" onclick="resolverIncidencia(${i})">✔ Resolver incidencia</button>
+          `
+        }
+      </div>
+    `;
+  });
+
+  document.getElementById("lista").innerHTML = html;
+}
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+pintar();
+</script>
 
 </body>
 </html>
