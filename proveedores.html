@@ -1,242 +1,381 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>PROVEEDORES</title>
+<title>PROVEEDORES · MONOLITO</title>
 
 <style>
+*{box-sizing:border-box}
 
 body{
-    margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f4f6f8;
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#eef2f5;
+  color:#17303d;
 }
 
-/* HEADER */
 header{
-    background:#1f3c48;
-    color:white;
-    padding:15px;
-    display:flex;
-    align-items:center;
-    gap:10px;
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:11px 14px;
+  font-weight:800;
+  font-size:15px;
 }
 
 .volver{
-    background:white;
-    border:none;
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
+  background:white;
+  color:#17303d;
 }
 
-/* CONTENIDO */
 .contenido{
-    padding:15px;
+  padding:16px;
 }
 
-/* BOTÓN NUEVO */
 .nuevo{
-    width:100%;
-    padding:12px;
-    background:#ff9800; /* 🔥 naranja */
-    color:white;
-    border:none;
-    border-radius:10px;
-    margin-bottom:15px;
-    font-size:16px;
+  width:100%;
+  background:#ff9800;
+  color:white;
+  margin-bottom:14px;
+  font-size:17px;
 }
 
-/* TARJETAS */
 .card{
-    background:white;
-    padding:15px;
-    border-radius:12px;
-    margin-bottom:12px;
-    box-shadow:0 2px 6px rgba(0,0,0,.1);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:12px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
 }
 
-.inactivo{
-    opacity:.4;
+.card.inactivo{
+  opacity:.45;
 }
 
-/* BOTONES */
-.acciones button{
-    margin-left:6px;
-    border:none;
-    padding:6px 10px;
-    border-radius:6px;
-    cursor:pointer;
+.nombre{
+  font-size:22px;
+  font-weight:900;
+}
+
+.detalle{
+  margin-top:6px;
+  color:#4f5f69;
+}
+
+.botones{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+  flex-wrap:wrap;
 }
 
 .editar{
-    background:#2196f3;
-    color:white;
+  background:#2196f3;
+  color:white;
 }
 
-.borrar{
-    background:#f44336;
-    color:white;
+.desactivar{
+  background:#ff0000;
+  color:white;
 }
 
-.aviso{
-    background:#fff3cd;
-    padding:10px;
-    border-radius:8px;
-    margin-bottom:10px;
-    display:none;
+.reactivar{
+  background:#48a530;
+  color:white;
 }
 
+.ficha{
+  background:white;
+  border-radius:24px;
+  padding:16px;
+  box-shadow:0 10px 22px rgba(0,0,0,.16);
+}
+
+.ficha h3{
+  margin-top:0;
+}
+
+label{
+  display:block;
+  font-weight:800;
+  margin-top:12px;
+}
+
+input, select, textarea{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid #b8c2ca;
+  font-size:16px;
+  margin-top:6px;
+}
+
+textarea{
+  min-height:90px;
+}
+
+.guardar{
+  width:100%;
+  background:#48a530;
+  color:white;
+  margin-top:16px;
+}
+
+.cancelar{
+  width:100%;
+  background:#dfe6ec;
+  color:#17303d;
+  margin-top:10px;
+}
+
+.oculto{
+  display:none;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-    <button class="volver" onclick="history.back()">← Volver</button>
-    <h2>🚚 PROVEEDORES</h2>
+  <button class="volver" onclick="volver()">← Volver</button>
+  <h2>🚚 PROVEEDORES</h2>
 </header>
 
 <div class="contenido">
 
-    <div id="avisoPermiso" class="aviso"></div>
-
-    <button class="nuevo" id="btnNuevo" onclick="nuevoProveedor()">+ Nuevo proveedor</button>
-
+  <div id="vistaLista">
+    <button class="nuevo" onclick="abrirFichaNuevo()">➕ Nuevo proveedor</button>
     <div id="lista"></div>
+  </div>
+
+  <div id="vistaFicha" class="oculto">
+    <div class="ficha">
+      <h3 id="tituloFicha">Ficha proveedor</h3>
+
+      <input type="hidden" id="indiceProveedor">
+
+      <label>Nombre proveedor</label>
+      <input id="nombreProveedor" placeholder="Ej: SANPEDRO">
+
+      <label>Forma de pago</label>
+      <select id="formaPago">
+        <option value="CONTADO">CONTADO</option>
+        <option value="REPOSICION">REPOSICIÓN</option>
+        <option value="BANCO">BANCO</option>
+        <option value="A CUENTA">A CUENTA</option>
+      </select>
+
+      <label>Contacto</label>
+      <input id="contactoProveedor" placeholder="Persona de contacto">
+
+      <label>Teléfono</label>
+      <input id="telefonoProveedor" placeholder="Teléfono">
+
+      <label>Días de pedido / reparto</label>
+      <input id="diasProveedor" placeholder="Ej: pedido lunes · reparto martes">
+
+      <label>Notas / condiciones</label>
+      <textarea id="notasProveedor" placeholder="Condiciones, acuerdos, descuentos, observaciones..."></textarea>
+
+      <button class="guardar" onclick="guardarFicha()">💾 Guardar proveedor</button>
+      <button class="cancelar" onclick="cerrarFicha()">Cancelar</button>
+    </div>
+  </div>
 
 </div>
 
 <script>
-
-/* 🔐 USUARIO AUTOMÁTICO (modo desarrollo) */
 function usuarioActual(){
-    localStorage.setItem("usuario", "JAVI");
-    return "JAVI";
+  localStorage.setItem("usuario","JAVI");
+  return "JAVI";
 }
 
-/* 🔒 PERMISOS */
 function puedeEditar(){
-    const u = usuarioActual();
-    return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+  const u = usuarioActual();
+  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
 }
 
-/* 📦 DATOS INICIALES */
 function proveedoresIniciales(){
-    return [
-        {nombre:"CANDELAS", formaPago:"BANCO", activo:true},
-        {nombre:"TURRADO", formaPago:"BANCO", activo:true},
-        {nombre:"SANPEDRO", formaPago:"CONTADO", activo:true},
-        {nombre:"DEO", formaPago:"BANCO", activo:true}
-    ];
+  return [
+    {nombre:"CANDELAS", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
+    {nombre:"TURRADO", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
+    {nombre:"SANPEDRO", formaPago:"CONTADO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
+    {nombre:"DEO", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true}
+  ];
 }
 
-/* 📥 LEER */
 function leerProveedores(){
-    return JSON.parse(localStorage.getItem("proveedores") || "null") || proveedoresIniciales();
+  let datos = JSON.parse(localStorage.getItem("proveedores") || "null");
+
+  if(!datos || datos.length === 0){
+    datos = proveedoresIniciales();
+    guardarProveedores(datos);
+  }
+
+  return datos;
 }
 
-/* 💾 GUARDAR */
 function guardarProveedores(data){
-    localStorage.setItem("proveedores", JSON.stringify(data));
+  localStorage.setItem("proveedores", JSON.stringify(data));
 }
 
-/* 🧱 PINTAR */
 function pintar(){
-    const lista = document.getElementById("lista");
-    lista.innerHTML = "";
+  const data = leerProveedores();
+  let html = "";
 
-    const proveedores = leerProveedores();
+  data.forEach((p,i)=>{
+    html += `
+      <div class="card ${p.activo === false ? "inactivo" : ""}">
+        <div class="nombre">${p.nombre || "SIN NOMBRE"}</div>
+        <div class="detalle">Forma de pago: <strong>${p.formaPago || "SIN DEFINIR"}</strong></div>
+        ${p.contacto ? `<div class="detalle">Contacto: ${p.contacto}</div>` : ""}
+        ${p.telefono ? `<div class="detalle">Teléfono: ${p.telefono}</div>` : ""}
+        ${p.dias ? `<div class="detalle">Días: ${p.dias}</div>` : ""}
+        ${p.notas ? `<div class="detalle">Notas: ${p.notas}</div>` : ""}
+        <div class="detalle">Estado: <strong>${p.activo === false ? "DESACTIVADO" : "ACTIVO"}</strong></div>
 
-    proveedores.forEach((p, i)=>{
-        const div = document.createElement("div");
-        div.className = "card" + (p.activo ? "" : " inactivo");
+        ${puedeEditar() ? `
+          <div class="botones">
+            <button class="editar" onclick="abrirFichaEditar(${i})">Editar ficha</button>
+            ${
+              p.activo === false
+              ? `<button class="reactivar" onclick="reactivarProveedor(${i})">Reactivar</button>`
+              : `<button class="desactivar" onclick="desactivarProveedor(${i})">Desactivar</button>`
+            }
+          </div>
+        ` : ""}
+      </div>
+    `;
+  });
 
-        div.innerHTML = `
-            <div>
-                <b>${p.nombre}</b><br>
-                Pago: ${p.formaPago}
-            </div>
+  document.getElementById("lista").innerHTML = html;
+}
 
-            <div class="acciones">
-                ${puedeEditar() ? `
-                    <button class="editar" onclick="editar(${i})">✏️</button>
-                    <button class="borrar" onclick="borrar(${i})">🗑️</button>
-                ` : ""}
-            </div>
-        `;
+function abrirFichaNuevo(){
+  if(!puedeEditar()) return;
 
-        lista.appendChild(div);
-    });
+  document.getElementById("tituloFicha").textContent = "Nuevo proveedor";
+  document.getElementById("indiceProveedor").value = "";
 
-    /* aviso permisos */
-    if(!puedeEditar()){
-        document.getElementById("avisoPermiso").style.display="block";
-        document.getElementById("avisoPermiso").innerText="Modo empleado (sin permisos)";
-        document.getElementById("btnNuevo").style.display="none";
+  document.getElementById("nombreProveedor").value = "";
+  document.getElementById("formaPago").value = "BANCO";
+  document.getElementById("contactoProveedor").value = "";
+  document.getElementById("telefonoProveedor").value = "";
+  document.getElementById("diasProveedor").value = "";
+  document.getElementById("notasProveedor").value = "";
+
+  document.getElementById("vistaLista").classList.add("oculto");
+  document.getElementById("vistaFicha").classList.remove("oculto");
+}
+
+function abrirFichaEditar(i){
+  if(!puedeEditar()) return;
+
+  const data = leerProveedores();
+  const p = data[i];
+
+  document.getElementById("tituloFicha").textContent = "Editar proveedor";
+  document.getElementById("indiceProveedor").value = i;
+
+  document.getElementById("nombreProveedor").value = p.nombre || "";
+  document.getElementById("formaPago").value = p.formaPago || "BANCO";
+  document.getElementById("contactoProveedor").value = p.contacto || "";
+  document.getElementById("telefonoProveedor").value = p.telefono || "";
+  document.getElementById("diasProveedor").value = p.dias || "";
+  document.getElementById("notasProveedor").value = p.notas || "";
+
+  document.getElementById("vistaLista").classList.add("oculto");
+  document.getElementById("vistaFicha").classList.remove("oculto");
+}
+
+function guardarFicha(){
+  if(!puedeEditar()) return;
+
+  const nombre = document.getElementById("nombreProveedor").value.trim().toUpperCase();
+
+  if(!nombre){
+    alert("Falta el nombre del proveedor.");
+    return;
+  }
+
+  const proveedor = {
+    nombre,
+    formaPago: document.getElementById("formaPago").value,
+    contacto: document.getElementById("contactoProveedor").value.trim(),
+    telefono: document.getElementById("telefonoProveedor").value.trim(),
+    dias: document.getElementById("diasProveedor").value.trim(),
+    notas: document.getElementById("notasProveedor").value.trim(),
+    activo:true
+  };
+
+  let data = leerProveedores();
+  const idx = document.getElementById("indiceProveedor").value;
+
+  if(idx === ""){
+    const existe = data.find(p =>
+      (p.nombre || "").toUpperCase() === nombre &&
+      p.activo !== false
+    );
+
+    if(existe){
+      alert("Ya existe un proveedor activo con ese nombre.");
+      return;
     }
+
+    data.unshift(proveedor);
+  }else{
+    const anterior = data[Number(idx)];
+    proveedor.activo = anterior.activo !== false;
+    data[Number(idx)] = proveedor;
+  }
+
+  guardarProveedores(data);
+  cerrarFicha();
 }
 
-/* ➕ NUEVO */
-function nuevoProveedor(){
-    if(!puedeEditar()) return;
+function cerrarFicha(){
+  document.getElementById("vistaFicha").classList.add("oculto");
+  document.getElementById("vistaLista").classList.remove("oculto");
+  pintar();
+}
 
-    let nombre = prompt("Nombre proveedor");
-    if(!nombre) return;
+function desactivarProveedor(i){
+  if(!puedeEditar()) return;
 
-    nombre = nombre.toUpperCase();
+  let data = leerProveedores();
+  const nombre = data[i].nombre || "este proveedor";
 
-    let formaPago = prompt("Forma de pago (BANCO / CONTADO / REPOSICION)") || "BANCO";
-
-    const proveedores = leerProveedores();
-
-    proveedores.push({
-        nombre,
-        formaPago:formaPago.toUpperCase(),
-        activo:true
-    });
-
-    guardarProveedores(proveedores);
+  if(confirm("¿Desactivar " + nombre + "? No aparecerá en pedidos nuevos.")){
+    data[i].activo = false;
+    guardarProveedores(data);
     pintar();
+  }
 }
 
-/* ✏️ EDITAR */
-function editar(i){
-    if(!puedeEditar()) return;
+function reactivarProveedor(i){
+  if(!puedeEditar()) return;
 
-    const proveedores = leerProveedores();
-
-    let nombre = prompt("Nuevo nombre", proveedores[i].nombre);
-    if(!nombre) return;
-
-    proveedores[i].nombre = nombre.toUpperCase();
-
-    guardarProveedores(proveedores);
-    pintar();
+  let data = leerProveedores();
+  data[i].activo = true;
+  guardarProveedores(data);
+  pintar();
 }
 
-/* 🗑️ BORRAR */
-function borrar(i){
-    if(!puedeEditar()) return;
-
-    if(!confirm("¿Eliminar proveedor?")) return;
-
-    const proveedores = leerProveedores();
-
-    proveedores.splice(i,1);
-
-    guardarProveedores(proveedores);
-    pintar();
+function volver(){
+  window.location.href = "index.html";
 }
 
-/* INIT */
 pintar();
-
 </script>
 
 </body>
