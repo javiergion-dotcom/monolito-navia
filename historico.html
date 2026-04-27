@@ -8,22 +8,99 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
-button{border:0;border-radius:14px;padding:11px 14px;font-weight:800}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:12px 16px;
+  font-weight:800;
+  font-size:16px;
+}
+
 .volver{background:white;color:#17303d}
+
 .contenido{padding:16px}
-.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
-.nombre{font-size:22px;font-weight:900}
-.detalle{margin-top:6px;color:#4f5f69}
-.importe{font-size:24px;font-weight:900;margin-top:8px}
-.sello{display:inline-block;margin-top:10px;margin-right:6px;padding:7px 12px;border-radius:999px;font-size:14px;font-weight:900}
+
+.card{
+  background:white;
+  border-radius:22px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+
+.nombre{font-size:28px;font-weight:900}
+
+.detalle{
+  margin-top:8px;
+  color:#4f5f69;
+  font-size:18px;
+}
+
+.importe{
+  font-size:30px;
+  font-weight:900;
+  margin-top:10px;
+}
+
+.sello{
+  display:inline-block;
+  margin-top:12px;
+  margin-right:8px;
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:16px;
+  font-weight:900;
+}
+
 .pagado{background:#48a530;color:white}
 .incidencia{background:#ff0000;color:white}
-.ver{background:#17303d;color:white;width:100%;margin-top:14px}
-.lineas{display:none;margin-top:12px;border-top:1px solid #dfe6ec;padding-top:12px}
-.linea{padding:8px 0;border-bottom:1px solid #edf1f4}
-.resumen{margin-top:12px;font-weight:800;line-height:1.7}
-.vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:800}
+
+.ver{
+  width:100%;
+  background:#17303d;
+  color:white;
+  margin-top:16px;
+  font-size:18px;
+}
+
+.lineas{
+  display:none;
+  margin-top:14px;
+  border-top:1px solid #dfe6ec;
+  padding-top:12px;
+}
+
+.linea{
+  padding:10px 0;
+  border-bottom:1px solid #edf1f4;
+  font-size:18px;
+  line-height:1.5;
+}
+
+.resumen{
+  margin-top:14px;
+  font-size:20px;
+  font-weight:800;
+  line-height:1.7;
+}
+
+.vacio{
+  background:white;
+  border-radius:22px;
+  padding:20px;
+  text-align:center;
+  font-weight:800;
+}
 </style>
 </head>
 
@@ -31,4 +108,108 @@ button{border:0;border-radius:14px;padding:11px 14px;font-weight:800}
 
 <header>
   <button class="volver" onclick="volver()">← Volver</button>
-  <h2>📁 HISTÓRICO</
+  <h2>📁 HISTÓRICO</h2>
+</header>
+
+<div class="contenido">
+  <div id="lista"></div>
+</div>
+
+<script>
+
+function leerHistorico(){
+  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
+}
+
+function euros(n){
+  return Number(n || 0).toFixed(2).replace(".", ",") + " €";
+}
+
+function pintar(){
+  const historico = leerHistorico();
+  let html = "";
+
+  if(historico.length === 0){
+    html = `<div class="vacio">Todavía no hay pedidos en histórico.</div>`;
+  }
+
+  historico.forEach((p,i)=>{
+
+    const tieneIncidencia =
+      p.estado === "PAGADO CON INCIDENCIA" ||
+      p.incidenciaAbierta;
+
+    let lineasHtml = "";
+
+    if(p.lineas && p.lineas.length){
+      lineasHtml = `<div class="lineas" id="lineas-${i}">`;
+
+      p.lineas.forEach(l=>{
+        lineasHtml += `
+          <div class="linea">
+            <strong>${l.articulo}</strong><br>
+            Cantidad: ${l.cantidad}<br>
+            Base: ${euros(l.base)}
+          </div>
+        `;
+      });
+
+      lineasHtml += `
+        <div class="resumen">
+          TOTAL: ${euros(p.total)}
+        </div>
+      </div>`;
+    }
+
+    html += `
+      <div class="card">
+
+        <div class="nombre">${p.proveedor}</div>
+
+        <div class="detalle">Fecha pedido: ${p.fecha}</div>
+        <div class="detalle">Fecha pago: ${p.fechaPago || "-"}</div>
+
+        <div class="importe">${euros(p.total)}</div>
+
+        <span class="sello pagado">PAGADO</span>
+
+        ${
+          tieneIncidencia
+          ? `
+            <span class="sello incidencia">INCIDENCIA</span>
+            <div class="detalle"><b>Motivo:</b> ${p.motivoIncidencia || "-"}</div>
+            <div class="detalle"><b>Solución:</b> ${p.solucionIncidencia || "Pendiente"}</div>
+          `
+          : ""
+        }
+
+        <button class="ver" onclick="verPedido(${i})">
+          Ver pedido completo
+        </button>
+
+        ${lineasHtml}
+
+      </div>
+    `;
+  });
+
+  document.getElementById("lista").innerHTML = html;
+}
+
+function verPedido(i){
+  const div = document.getElementById("lineas-" + i);
+  if(div){
+    div.style.display = div.style.display === "block" ? "none" : "block";
+  }
+}
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+pintar();
+
+</script>
+
+</body>
+</html>
