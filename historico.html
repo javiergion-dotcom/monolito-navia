@@ -21,7 +21,7 @@ header{
 button{
   border:0;
   border-radius:14px;
-  padding:12px 16px;
+  padding:10px 14px;
   font-weight:800;
 }
 
@@ -69,13 +69,17 @@ button{
 
 .pagado{background:#48a530;color:white}
 .incidencia{background:#ff0000;color:white}
+.revisado{background:#0a7cff;color:white}
 
-.ver{
-  width:100%;
-  background:#17303d;
-  color:white;
-  margin-top:12px;
+.botones{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
 }
+
+.ver{background:#17303d;color:white}
+.btnRevisado{background:#0a7cff;color:white}
 
 .lineas{
   display:none;
@@ -87,13 +91,6 @@ button{
 .linea{
   padding:6px 0;
   border-bottom:1px solid #eee;
-  font-size:16px;
-}
-
-.resumen{
-  margin-top:10px;
-  font-weight:900;
-  font-size:18px;
 }
 
 .vacio{
@@ -121,6 +118,10 @@ function leerHistorico(){
   return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
 }
 
+function guardarHistorico(data){
+  localStorage.setItem("historico_pedidos", JSON.stringify(data));
+}
+
 function euros(n){
   return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
@@ -138,13 +139,11 @@ function pintar(){
   let grupos = {};
 
   data.forEach(p=>{
-
     let f = p.fechaPago || p.fecha;
     let fecha = f ? new Date(f) : new Date();
 
     let mes = fecha.toLocaleString("es-ES",{month:"long"});
     let año = fecha.getFullYear();
-
     let clave = mes.toUpperCase()+" "+año;
 
     if(!grupos[clave]) grupos[clave]=[];
@@ -158,61 +157,56 @@ function pintar(){
     let pedidos = grupos[mesClave];
 
     let totalMes=0;
-    let banco=0, contado=0, reposicion=0, cuenta=0;
+    let banco=0;
+    let bancoRevisado=0;
 
     pedidos.forEach(p=>{
       totalMes += Number(p.total||0);
 
       let tipo = (p.formaPago||"").toUpperCase();
 
-      if(tipo==="BANCO") banco += Number(p.total||0);
-      else if(tipo==="CONTADO") contado += Number(p.total||0);
-      else if(tipo==="REPOSICION") reposicion += Number(p.total||0);
-      else if(tipo==="CUENTA") cuenta += Number(p.total||0);
+      if(tipo==="BANCO"){
+        banco += Number(p.total||0);
+        if(p.revisado){
+          bancoRevisado += Number(p.total||0);
+        }
+      }
     });
+
+    let bancoPendiente = banco - bancoRevisado;
 
     html += `<div class="mes">${mesClave}</div>`;
 
     html += `
       <div class="resumenMes">
-        Total mes: ${euros(totalMes)}<br>
+        Total mes: ${euros(totalMes)}<br><br>
+
         BANCO: ${euros(banco)}<br>
-        CONTADO: ${euros(contado)}<br>
-        REPOSICIÓN: ${euros(reposicion)}<br>
-        A CUENTA: ${euros(cuenta)}
+        ✔ Revisado: ${euros(bancoRevisado)}<br>
+        ⚠ Pendiente: ${euros(bancoPendiente)}
       </div>
     `;
 
     pedidos.forEach((p,i)=>{
 
       let lineasHtml="";
-
       if(p.lineas){
         lineasHtml = `<div class="lineas" id="l-${mesClave}-${i}">`;
-
         p.lineas.forEach(l=>{
           lineasHtml += `
             <div class="linea">
-              <strong>${l.articulo}</strong><br>
-              Cantidad: ${l.cantidad}<br>
-              Base: ${euros(l.base)}
-            </div>
-          `;
+              ${l.articulo} · ${l.cantidad} · ${euros(l.base)}
+            </div>`;
         });
-
-        lineasHtml += `
-          <div class="resumen">
-            TOTAL: ${euros(p.total)}
-          </div>
-        </div>`;
+        lineasHtml += `</div>`;
       }
 
       html += `
         <div class="card">
 
           <div class="nombre">${p.proveedor}</div>
-          <div class="detalle">${p.fechaPago || p.fecha || "-"}</div>
-          <div class="detalle">${p.formaPago || "-"}</div>
+          <div class="detalle">${p.fechaPago || p.fecha}</div>
+          <div class="detalle">${p.formaPago}</div>
 
           <div class="importe">${euros(p.total)}</div>
 
@@ -226,9 +220,19 @@ function pintar(){
             : ""
           }
 
-          <button class="ver" onclick="ver('${mesClave}',${i})">
-            Ver pedido completo
-          </button>
+          ${p.revisado ? `<span class="sello revisado">REVISADO</span>` : ""}
+
+          <div class="botones">
+            <button class="ver" onclick="ver('${mesClave}',${i})">Ver pedido</button>
+
+            ${
+              !p.revisado
+              ? `<button class="btnRevisado" onclick="marcarRevisado('${mesClave}',${i})">
+                   ✔ Revisado
+                 </button>`
+              : ""
+            }
+          </div>
 
           ${lineasHtml}
 
@@ -244,6 +248,34 @@ function pintar(){
 function ver(m,i){
   const d = document.getElementById("l-"+m+"-"+i);
   if(d) d.style.display = d.style.display==="block"?"none":"block";
+}
+
+function marcarRevisado(m,i){
+
+  let data = leerHistorico();
+
+  // encontrar índice real
+  let indexReal = -1;
+  let contador = 0;
+
+  data.forEach((p,idx)=>{
+    let f = p.fechaPago || p.fecha;
+    let fecha = f ? new Date(f) : new Date();
+    let mes = fecha.toLocaleString("es-ES",{month:"long"}).toUpperCase()+" "+fecha.getFullYear();
+
+    if(mes===m){
+      if(contador===i){
+        indexReal = idx;
+      }
+      contador++;
+    }
+  });
+
+  if(indexReal>=0){
+    data[indexReal].revisado = true;
+    guardarHistorico(data);
+    pintar();
+  }
 }
 
 pintar();
