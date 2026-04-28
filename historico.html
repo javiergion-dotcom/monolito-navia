@@ -140,7 +140,11 @@ function pintar(){
 
   data.forEach(p=>{
     let f = p.fechaPago || p.fecha;
-    let fecha = f ? new Date(f) : new Date();
+    let fecha = new Date(f);
+
+if (!f || isNaN(fecha.getTime())) {
+  fecha = new Date();
+}
 
     let mes = fecha.toLocaleString("es-ES",{month:"long"});
     let año = fecha.getFullYear();
