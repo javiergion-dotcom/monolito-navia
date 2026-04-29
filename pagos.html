@@ -3,33 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PAGOS</title>
+<title>PAGOS · MONOLITO</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between}
-button{border:0;border-radius:12px;padding:10px 14px;font-weight:800}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#eef2f5;
+  color:#17303d;
+}
 
-.card{background:white;margin:12px;padding:14px;border-radius:16px}
-.nombre{font-size:22px;font-weight:900}
-.total{font-size:24px;font-weight:900}
-.detalle{color:#4f5f69;margin-top:6px}
+/* HEADER */
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-.botones{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+/* ICONO VERDE (coherente con pedidos/histórico) */
+.icono{
+  font-size:22px;
+  color:#4caf50;
+  font-weight:900;
+}
+
+/* TARJETAS */
+.card{
+  background:white;
+  margin:12px;
+  padding:14px;
+  border-radius:16px;
+}
+
+.nombre{
+  font-size:22px;
+  font-weight:900;
+}
+
+.total{
+  font-size:26px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.detalle{
+  color:#4f5f69;
+  margin-top:4px;
+}
+
+/* BOTONES */
+button{
+  border:0;
+  border-radius:10px;
+  padding:8px 12px;
+  font-weight:800;
+}
+
+.botones{
+  margin-top:10px;
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
 .ver{background:#17303d;color:white}
 .comp{background:#9c27b0;color:white}
 .ok{background:#4caf50;color:white}
-.error{background:#f44336;color:white}
+.errorBtn{background:#f44336;color:white}
 
-.lineas{display:none;margin-top:10px}
-.linea{padding:6px 0;border-bottom:1px solid #ddd}
+/* LÍNEAS */
+.lineas{
+  display:none;
+  margin-top:10px;
+}
+
+.linea{
+  padding:8px 0;
+  border-bottom:1px dashed #ccc;
+}
+
+.lineaError{
+  background:#ffe5e5;
+  color:#c00000;
+  font-weight:900;
+  padding:8px;
+  border-radius:8px;
+  margin-top:4px;
+}
+
+.aviso{
+  margin-top:8px;
+  color:#c00000;
+  font-weight:900;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>💳 PAGOS</h2>
+  <div class="icono">💳 PAGOS</div>
 </header>
 
 <div id="lista"></div>
@@ -40,14 +116,16 @@ function leerPagos(){
   return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 }
 
-function guardarHistorico(p){
-  let hist = JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
-  hist.push(p);
-  localStorage.setItem("historico_pedidos", JSON.stringify(hist));
-}
-
 function guardarPagos(data){
   localStorage.setItem("pagos_pendientes", JSON.stringify(data));
+}
+
+function leerHistorico(){
+  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
+}
+
+function guardarHistorico(data){
+  localStorage.setItem("historico_pedidos", JSON.stringify(data));
 }
 
 function euros(n){
@@ -55,41 +133,56 @@ function euros(n){
 }
 
 function pintar(){
+
   let data = leerPagos();
   let html = "";
 
   data.forEach((p,i)=>{
 
-    let lineasHTML="";
+    let lineasHTML = "";
 
     if(p.lineas){
-      p.lineas.forEach(l=>{
+      p.lineas.forEach((l,idx)=>{
+
         let base = l.base || (l.cantidad*l.precioSinIva);
 
+        let esError = p.erroresLineas && p.erroresLineas.includes(idx);
+
         lineasHTML += `
-        <div class="linea">
-          ${l.articulo} → ${l.cantidad} × ${euros(l.precioSinIva)} = ${euros(base)}
+        <div class="linea ${esError ? "lineaError" : ""}">
+          ${l.articulo}<br>
+          ${l.cantidad} × ${euros(l.precioSinIva)} = ${euros(base)}
+
+          ${esError ? `<div>⚠ Error en esta línea</div>` : ""}
         </div>`;
       });
     }
 
     html += `
     <div class="card">
+
       <div class="nombre">${p.proveedor}</div>
-      <div class="detalle">${p.fecha || "-"}</div>
-      <div class="detalle">${p.formaPago || "-"}</div>
+      <div class="detalle">${p.fecha || ""}</div>
+      <div class="detalle">${p.formaPago || ""}</div>
       <div class="total">${euros(p.total)}</div>
+
+      ${
+        p.erroresLineas && p.erroresLineas.length
+        ? `<div class="aviso">⚠ ESTE PEDIDO TIENE ERRORES</div>`
+        : ""
+      }
 
       <div class="botones">
         <button class="ver" onclick="ver(${i})">Ver</button>
         <button class="comp" onclick="comparar(${i})">Comparar</button>
-        <button class="ok" onclick="pagar(${i},false)">PAGAR OK</button>
-        <button class="error" onclick="pagar(${i},true)">INCIDENCIA</button>
+        <button class="ok" onclick="pagarOK(${i})">PAGAR OK</button>
+        <button class="errorBtn" onclick="incidencia(${i})">INCIDENCIA</button>
       </div>
 
       <div class="lineas" id="l-${i}">
         ${lineasHTML}
       </div>
+
     </div>
     `;
   });
@@ -98,21 +191,23 @@ function pintar(){
 }
 
 function ver(i){
-  let d=document.getElementById("l-"+i);
+  let d = document.getElementById("l-"+i);
   d.style.display = d.style.display==="block"?"none":"block";
 }
 
+/* COMPARADOR */
 function comparar(i){
+
   let data = leerPagos();
   let p = data[i];
 
+  let errores = [];
   let resultado="";
-  let errorTotal=false;
 
-  p.lineas.forEach(l=>{
+  p.lineas.forEach((l,idx)=>{
 
-    let cant = prompt(`Cantidad real ${l.articulo}`, l.cantidad);
-    let precio = prompt(`Precio real ${l.articulo}`, l.precioSinIva);
+    let cant = prompt(`Cantidad real ${l.articulo}`,l.cantidad);
+    let precio = prompt(`Precio real ${l.articulo}`,l.precioSinIva);
 
     let error="";
 
@@ -123,29 +218,58 @@ function comparar(i){
       resultado+=`✔ ${l.articulo}\n`;
     }else{
       resultado+=`🔴 ${l.articulo}: ${error}\n`;
-      errorTotal=true;
+      errores.push(idx);
     }
 
   });
 
-  p.resultadoComparacion = resultado;
-  p.tieneIncidencia = errorTotal;
+  p.erroresLineas = errores;
 
   guardarPagos(data);
+  pintar();
 
   alert(resultado);
 }
 
-function pagar(i,conError){
-  let data = leerPagos();
-  let p = data[i];
+/* PAGAR OK */
+function pagarOK(i){
 
-  p.estado = conError ? "INCIDENCIA" : "OK";
+  let pagos = leerPagos();
+  let historico = leerHistorico();
 
-  guardarHistorico(p);
+  let p = pagos[i];
 
-  data.splice(i,1);
-  guardarPagos(data);
+  if(p.erroresLineas && p.erroresLineas.length){
+    alert("No puedes pagar OK. Hay errores.");
+    return;
+  }
+
+  p.estado="OK";
+
+  historico.unshift(p);
+  pagos.splice(i,1);
+
+  guardarHistorico(historico);
+  guardarPagos(pagos);
+
+  pintar();
+}
+
+/* INCIDENCIA */
+function incidencia(i){
+
+  let pagos = leerPagos();
+  let historico = leerHistorico();
+
+  let p = pagos[i];
+
+  p.estado="INCIDENCIA";
+
+  historico.unshift(p);
+  pagos.splice(i,1);
+
+  guardarHistorico(historico);
+  guardarPagos(pagos);
 
   pintar();
 }
