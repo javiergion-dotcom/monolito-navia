@@ -3,157 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HISTÓRICO · MONOLITO</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<title>HISTÓRICO</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between}
-button{border:0;border-radius:12px;padding:8px 12px;font-weight:800}
+body{font-family:Arial;background:#eef2f5;margin:0;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:12px;padding:10px 14px;font-weight:800}
 .volver{background:white;color:#17303d}
 .card{background:white;margin:12px;padding:14px;border-radius:16px}
-.nombre{font-size:20px;font-weight:900}
-.importe{font-size:22px;font-weight:900}
-.botones{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
-.ver{background:#17303d;color:white}
-.pdf{background:#ff9800;color:white}
-.comp{background:#9c27b0;color:white}
-.lineas{display:none;margin-top:10px}
-.linea{padding:8px 0;border-bottom:1px dashed #ccc}
-.error{color:red;font-weight:900}
+.nombre{font-size:22px;font-weight:900}
+.total{font-size:24px;font-weight:900;margin-top:8px}
+.detalle{color:#4f5f69;margin-top:6px}
+.lineas{display:none;margin-top:10px;border-top:1px solid #ddd;padding-top:8px}
+.linea{padding:8px 0;border-bottom:1px solid #ddd}
 .ok{color:green;font-weight:900}
+.error{color:red;font-weight:900}
+.ver{background:#17303d;color:white;margin-top:10px}
 </style>
 </head>
 
 <body>
 
 <header>
-<button class="volver" onclick="location.href='index.html'">← Volver</button>
-<h2>HISTÓRICO</h2>
+  <button class="volver" onclick="location.href='index.html'">← Volver</button>
+  <h2>📁 HISTÓRICO</h2>
 </header>
 
 <div id="lista"></div>
 
 <script>
-
 function leer(){
-  return JSON.parse(localStorage.getItem("historico_pedidos")||"[]");
+  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
 }
 
 function euros(n){
-  return Number(n||0).toFixed(2).replace(".",",")+"€";
+  return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
 
 function pintar(){
   let data = leer();
-  let html="";
+  let html = "";
+
+  if(data.length===0){
+    html = "<div style='padding:16px'>Sin datos</div>";
+  }
 
   data.forEach((p,i)=>{
 
-    let lineas="";
+    let lineasHTML = "";
 
-    if(p.lineas){
+    if(p.lineas && p.lineas.length){
       p.lineas.forEach(l=>{
-        let base = l.base || (l.cantidad*l.precioSinIva);
+        let precio = Number(l.precioSinIva || 0);
+        let cantidad = Number(l.cantidad || 0);
+        let base = Number(l.base || cantidad * precio);
 
-        lineas+=`
-        <div class="linea">
-          <b>${l.articulo}</b><br>
-          ${l.cantidad} × ${euros(l.precioSinIva)} = ${euros(base)}
-        </div>`;
+        lineasHTML += `
+          <div class="linea">
+            <b>${l.articulo || "Artículo"}</b><br>
+            ${cantidad} × ${euros(precio)} = ${euros(base)}
+          </div>`;
       });
     }
 
-    lineas+=`<b>TOTAL: ${euros(p.total)}</b>`;
+    html += `
+      <div class="card">
+        <div class="nombre">${p.proveedor || "SIN PROVEEDOR"}</div>
+        <div class="detalle">${p.fechaPago || p.fecha || "-"}</div>
+        <div class="detalle">${p.formaPago || "-"}</div>
+        <div class="total">${euros(p.total)}</div>
 
-    html+=`
-    <div class="card">
-      <div class="nombre">${p.proveedor}</div>
-      <div>${p.fecha||""}</div>
-      <div class="importe">${euros(p.total)}</div>
+        ${p.estado==="OK" ? `<div class="ok">✔ OK</div>` : ""}
+        ${p.estado==="INCIDENCIA" || p.estado==="PAGADO CON INCIDENCIA" ? `<div class="error">⚠ INCIDENCIA</div>` : ""}
 
-      ${p.estado==="INCIDENCIA" ? `<div class="error">INCIDENCIA</div>` : ""}
-      ${p.estado==="OK" ? `<div class="ok">OK</div>` : ""}
+        <button class="ver" onclick="ver(${i})">Ver pedido</button>
 
-      <div class="botones">
-        <button class="ver" onclick="ver(${i})">Ver</button>
-        <button class="pdf" onclick="pdf(${i})">PDF</button>
-        <button class="comp" onclick="comparar(${i})">Comparar</button>
+        <div class="lineas" id="l-${i}">
+          ${lineasHTML}
+        </div>
       </div>
-
-      <div class="lineas" id="l-${i}">${lineas}</div>
-    </div>
     `;
   });
 
-  document.getElementById("lista").innerHTML=html;
+  document.getElementById("lista").innerHTML = html;
 }
 
 function ver(i){
-  let d=document.getElementById("l-"+i);
-  d.style.display=d.style.display==="block"?"none":"block";
-}
-
-function pdf(i){
-  const {jsPDF}=window.jspdf;
-  let doc=new jsPDF();
-  let p=leer()[i];
-
-  let y=10;
-  doc.text("Proveedor: "+p.proveedor,10,y); y+=10;
-
-  p.lineas.forEach(l=>{
-    doc.text(`${l.articulo} ${l.cantidad}x${l.precioSinIva}`,10,y);
-    y+=7;
-  });
-
-  doc.text("TOTAL: "+p.total,10,y+10);
-
-  doc.save("pedido_"+i+".pdf");
-}
-
-function comparar(i){
-  let data=leer();
-  let p=data[i];
-
-  let resultado="";
-  let errorTotal=false;
-
-  p.lineas.forEach(l=>{
-
-    let cant=prompt(`Cantidad real ${l.articulo}`,l.cantidad);
-    let precio=prompt(`Precio real ${l.articulo}`,l.precioSinIva);
-
-    let error="";
-
-    if(Number(cant)!=Number(l.cantidad)) error+="UNIDADES ";
-    if(Number(precio)!=Number(l.precioSinIva)) error+="PRECIO ";
-
-    if(error===""){
-      resultado+=`✔ ${l.articulo} OK\n`;
-    }else{
-      resultado+=`🔴 ${l.articulo}: ${error}\n`;
-      errorTotal=true;
-    }
-
-  });
-
-  if(errorTotal){
-    p.estado="INCIDENCIA";
-  }else{
-    p.estado="OK";
-  }
-
-  localStorage.setItem("historico_pedidos",JSON.stringify(data));
-
-  pintar();
-
-  alert(resultado);
+  let d = document.getElementById("l-"+i);
+  d.style.display = d.style.display==="block" ? "none" : "block";
 }
 
 pintar();
-
 </script>
 
 </body>
