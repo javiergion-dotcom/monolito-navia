@@ -3,190 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PAGOS · MONOLITO</title>
+<title>PAGOS</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
-button{border:0;border-radius:14px;padding:11px 14px;font-weight:800}
-.volver{background:white;color:#17303d}
-.contenido{padding:16px}
-.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between}
+button{border:0;border-radius:12px;padding:10px 14px;font-weight:800}
+
+.card{background:white;margin:12px;padding:14px;border-radius:16px}
 .nombre{font-size:22px;font-weight:900}
-.detalle{margin-top:6px;color:#4f5f69}
-.importe{font-size:24px;font-weight:900;margin-top:8px}
-.botones{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.pagado{background:#48a530;color:white}
-.incidencia{background:#ff0000;color:white}
+.total{font-size:24px;font-weight:900}
+.detalle{color:#4f5f69;margin-top:6px}
+
+.botones{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
 .ver{background:#17303d;color:white}
-.lineas{display:none;margin-top:12px;border-top:1px solid #dfe6ec;padding-top:10px;font-size:14px}
-.vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:800}
+.comp{background:#9c27b0;color:white}
+.ok{background:#4caf50;color:white}
+.error{background:#f44336;color:white}
+
+.lineas{display:none;margin-top:10px}
+.linea{padding:6px 0;border-bottom:1px solid #ddd}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">← Volver</button>
-  <h2>💳 PAGOS</h2>
+<h2>💳 PAGOS</h2>
 </header>
 
-<div class="contenido">
-  <div id="lista"></div>
-</div>
+<div id="lista"></div>
 
 <script>
+
 function leerPagos(){
   return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+}
+
+function guardarHistorico(p){
+  let hist = JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
+  hist.push(p);
+  localStorage.setItem("historico_pedidos", JSON.stringify(hist));
 }
 
 function guardarPagos(data){
   localStorage.setItem("pagos_pendientes", JSON.stringify(data));
 }
 
-function leerHistorico(){
-  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
-}
-
-function guardarHistorico(data){
-  localStorage.setItem("historico_pedidos", JSON.stringify(data));
-}
-
-function leerIncidencias(){
-  return JSON.parse(localStorage.getItem("incidencias") || "[]");
-}
-
-function guardarIncidencias(data){
-  localStorage.setItem("incidencias", JSON.stringify(data));
-  localStorage.setItem("incidencias_pendientes", JSON.stringify(data.filter(x => !x.resuelta)));
-}
-
 function euros(n){
-  return Number(n || 0).toFixed(2).replace(".", ",") + " €";
+  return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
 
 function pintar(){
-  const pagos = leerPagos();
+  let data = leerPagos();
   let html = "";
 
-  if(pagos.length === 0){
-    html = `<div class="vacio">No hay pagos pendientes.</div>`;
-  }
+  data.forEach((p,i)=>{
 
-  pagos.forEach((p,i)=>{
-    let lineasHtml = "";
+    let lineasHTML="";
 
-    if(p.lineas && p.lineas.length){
-      lineasHtml = `<div class="lineas" id="lineas-${i}">`;
+    if(p.lineas){
       p.lineas.forEach(l=>{
-        lineasHtml += `
-          <div>
-            <strong>${l.articulo || "Artículo"}</strong><br>
-            Cantidad: ${l.cantidad || 0} · Base: ${euros(l.base || 0)}
-          </div><br>
-        `;
+        let base = l.base || (l.cantidad*l.precioSinIva);
+
+        lineasHTML += `
+        <div class="linea">
+          ${l.articulo} → ${l.cantidad} × ${euros(l.precioSinIva)} = ${euros(base)}
+        </div>`;
       });
-      lineasHtml += `</div>`;
     }
 
     html += `
-      <div class="card">
-        <div class="nombre">${p.proveedor || "SIN PROVEEDOR"}</div>
-        <div class="detalle">Fecha pedido: ${p.fecha || "-"}</div>
-        <div class="detalle">Forma pago: ${p.formaPago || "-"}</div>
-        <div class="importe">${euros(p.total)}</div>
+    <div class="card">
+      <div class="nombre">${p.proveedor}</div>
+      <div class="detalle">${p.fecha || "-"}</div>
+      <div class="detalle">${p.formaPago || "-"}</div>
+      <div class="total">${euros(p.total)}</div>
 
-        <div class="botones">
-          <button class="ver" onclick="verPedido(${i})">Ver pedido</button>
-          <button class="pagado" onclick="marcarPagado(${i})">✔ PAGADO</button>
-          <button class="incidencia" onclick="cerrarConIncidencia(${i})">⚠ INCIDENCIA</button>
-        </div>
-
-        ${lineasHtml}
+      <div class="botones">
+        <button class="ver" onclick="ver(${i})">Ver</button>
+        <button class="comp" onclick="comparar(${i})">Comparar</button>
+        <button class="ok" onclick="pagar(${i},false)">PAGAR OK</button>
+        <button class="error" onclick="pagar(${i},true)">INCIDENCIA</button>
       </div>
+
+      <div class="lineas" id="l-${i}">
+        ${lineasHTML}
+      </div>
+    </div>
     `;
   });
 
   document.getElementById("lista").innerHTML = html;
 }
 
-function verPedido(i){
-  const div = document.getElementById("lineas-" + i);
-  if(div){
-    div.style.display = div.style.display === "block" ? "none" : "block";
-  }
+function ver(i){
+  let d=document.getElementById("l-"+i);
+  d.style.display = d.style.display==="block"?"none":"block";
 }
 
-function marcarPagado(i){
-  let pagos = leerPagos();
-  let historico = leerHistorico();
+function comparar(i){
+  let data = leerPagos();
+  let p = data[i];
 
-  let pedido = pagos[i];
+  let resultado="";
+  let errorTotal=false;
 
-  pedido.estado = "PAGADO";
-  pedido.sello = "PAGADO";
-  pedido.fechaPago = new Date().toLocaleString("es-ES");
-  pedido.operadorPago = localStorage.getItem("usuario") || "OPERADOR";
+  p.lineas.forEach(l=>{
 
-  historico.unshift(pedido);
-  pagos.splice(i,1);
+    let cant = prompt(`Cantidad real ${l.articulo}`, l.cantidad);
+    let precio = prompt(`Precio real ${l.articulo}`, l.precioSinIva);
 
-  guardarHistorico(historico);
-  guardarPagos(pagos);
+    let error="";
 
-  alert("Pedido marcado como PAGADO.");
-  pintar();
-}
+    if(Number(cant)!=Number(l.cantidad)) error+="UNIDADES ";
+    if(Number(precio)!=Number(l.precioSinIva)) error+="PRECIO ";
 
-function cerrarConIncidencia(i){
-  let pagos = leerPagos();
-  let historico = leerHistorico();
-  let incidencias = leerIncidencias();
+    if(error===""){
+      resultado+=`✔ ${l.articulo}\n`;
+    }else{
+      resultado+=`🔴 ${l.articulo}: ${error}\n`;
+      errorTotal=true;
+    }
 
-  let pedido = pagos[i];
-
-  const motivo = prompt("Motivo de la incidencia:");
-  if(!motivo) return;
-
-  const solucion = prompt("Solución / reclamación al proveedor:", "Pendiente de solución") || "Pendiente de solución";
-
-  pedido.estado = "PAGADO CON INCIDENCIA";
-  pedido.sello = "PAGADO";
-  pedido.incidenciaAbierta = true;
-  pedido.motivoIncidencia = motivo;
-  pedido.solucionIncidencia = solucion;
-  pedido.fechaPago = new Date().toLocaleString("es-ES");
-  pedido.operadorPago = localStorage.getItem("usuario") || "OPERADOR";
-
-  incidencias.unshift({
-    id: Date.now(),
-    proveedor: pedido.proveedor || "SIN PROVEEDOR",
-    texto: motivo,
-    motivo: motivo,
-    solucion: solucion,
-    fecha: new Date().toLocaleString("es-ES"),
-    operador: localStorage.getItem("usuario") || "OPERADOR",
-    pedidoId: pedido.id || Date.now(),
-    total: pedido.total || 0,
-    resuelta:false
   });
 
-  historico.unshift(pedido);
-  pagos.splice(i,1);
+  p.resultadoComparacion = resultado;
+  p.tieneIncidencia = errorTotal;
 
-  guardarIncidencias(incidencias);
-  guardarHistorico(historico);
-  guardarPagos(pagos);
+  guardarPagos(data);
 
-  alert("Pedido cerrado como PAGADO CON INCIDENCIA.");
-  pintar();
+  alert(resultado);
 }
 
-function volver(){
-  window.location.href = "index.html";
+function pagar(i,conError){
+  let data = leerPagos();
+  let p = data[i];
+
+  p.estado = conError ? "INCIDENCIA" : "OK";
+
+  guardarHistorico(p);
+
+  data.splice(i,1);
+  guardarPagos(data);
+
+  pintar();
 }
 
 pintar();
+
 </script>
 
 </body>
