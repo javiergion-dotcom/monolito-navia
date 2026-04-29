@@ -171,6 +171,39 @@ function ver(i){
 function descargarPDF(i){
 
   const elemento = document.getElementById("pedido-"+i);
+  const lineas = document.getElementById("l-"+i);
+
+  if(lineas){
+    lineas.style.display = "block";
+  }
+
+  const historico = leer();
+  const p = historico[i] || {};
+
+  const proveedor = (p.proveedor || "pedido")
+    .replaceAll(" ", "_")
+    .replace(/[^\w\-]/g, "");
+
+  const fecha = (p.fechaPago || p.fecha || new Date().toLocaleString("es-ES"))
+    .replaceAll("/", "-")
+    .replaceAll(":", "")
+    .replaceAll(",", "")
+    .replaceAll(" ", "_");
+
+  const nombreArchivo = `pedido_${proveedor}_${fecha}.pdf`;
+
+  const opt = {
+    margin: 10,
+    filename: nombreArchivo,
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(elemento).save();
+}
+
+  const elemento = document.getElementById("pedido-"+i);
 
   const opt = {
     margin: 10,
