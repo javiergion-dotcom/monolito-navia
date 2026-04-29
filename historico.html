@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HISTÓRICO · MONOLITO</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 *{box-sizing:border-box}
@@ -193,7 +193,7 @@ function pintar(){
       `;
 
       html += `
-        <div class="card" id="pedido-${clave}-${i}">
+        <div class="card">
           <div class="nombre">${p.proveedor || "SIN PROVEEDOR"}</div>
           <div class="detalle">${p.fechaPago || p.fecha || "-"}</div>
           <div class="detalle">${p.formaPago || "-"}</div>
@@ -273,27 +273,108 @@ function limpiarNombre(texto){
 }
 
 function descargarPDF(clave,i){
-  verPedido(clave,i);
+  const encontrado = buscarPedido(clave,i);
+  if(!encontrado) return;
 
-  setTimeout(()=>{
-    const elemento = document.getElementById("pedido-" + clave + "-" + i);
-    const encontrado = buscarPedido(clave,i);
-    const p = encontrado ? encontrado.pedido : {};
+  const p = encontrado.pedido;
+  const jsPDF = window.jspdf.jsPDF;
+  const doc = new jsPDF();
 
-    const proveedor = limpiarNombre(p.proveedor || "pedido");
-    const fecha = limpiarNombre(p.fechaPago || p.fecha || new Date().toLocaleString("es-ES"));
-    const nombreArchivo = "pedido_" + proveedor + "_" + fecha + ".pdf";
+  const proveedor = p.proveedor || "SIN PROVEEDOR";
+  const fecha = p.fechaPago || p.fecha || new Date().toLocaleString("es-ES");
+  const formaPago = p.formaPago || "-";
 
-    const opt = {
-      margin:10,
-      filename:nombreArchivo,
-      image:{type:"jpeg",quality:1},
-      html2canvas:{scale:2,useCORS:true},
-      jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}
-    };
+  let y = 15;
 
-    html2pdf().set(opt).from(elemento).save();
-  },300);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(18);
+  doc.text("MONOLITO · PEDIDO", 14, y);
+
+  y += 10;
+  doc.setFontSize(13);
+  doc.text("Proveedor: " + proveedor, 14, y);
+
+  y += 7;
+  doc.setFont("helvetica","normal");
+  doc.text("Fecha: " + fecha, 14, y);
+
+  y += 7;
+  doc.text("Forma de pago: " + formaPago, 14, y);
+
+  y += 10;
+  doc.setFont("helvetica","bold");
+  doc.text("ARTÍCULOS", 14, y);
+
+  y += 7;
+  doc.setFont("helvetica","normal");
+  doc.setFontSize(11);
+
+  if(p.lineas && p.lineas.length){
+    p.lineas.forEach(l=>{
+      const cantidad = Number(l.cantidad || 0);
+      const precio = Number(l.precioSinIva || 0);
+      const base = Number(l.base || (cantidad * precio));
+
+      if(y > 270){
+        doc.addPage();
+        y = 15;
+      }
+
+      doc.setFont("helvetica","bold");
+      doc.text(String(l.articulo || "Artículo"), 14, y);
+
+      y += 6;
+      doc.setFont("helvetica","normal");
+      doc.text(
+        cantidad + " x " + euros(precio) + " = " + euros(base),
+        14,
+        y
+      );
+
+      y += 6;
+      doc.text(
+        "Formato: " + (l.formato || "-") + " · IVA " + (l.iva || "-") + "%",
+        14,
+        y
+      );
+
+      y += 8;
+    });
+  }else{
+    doc.text("Este pedido no tiene líneas guardadas.", 14, y);
+    y += 8;
+  }
+
+  y += 4;
+  doc.setDrawColor(23,48,61);
+  doc.line(14, y, 196, y);
+
+  y += 10;
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(14);
+  doc.text("TOTAL: " + euros(p.total), 14, y);
+
+  if(p.estado === "PAGADO CON INCIDENCIA" || p.incidenciaAbierta || p.motivoIncidencia){
+    y += 12;
+    doc.setFontSize(12);
+    doc.text("INCIDENCIA", 14, y);
+
+    y += 7;
+    doc.setFont("helvetica","normal");
+    doc.text("Motivo: " + (p.motivoIncidencia || p.motivo || "-"), 14, y);
+
+    y += 7;
+    doc.text("Solución: " + (p.solucionIncidencia || p.solucion || "Pendiente"), 14, y);
+  }
+
+  const nombreArchivo =
+    "pedido_" +
+    limpiarNombre(proveedor) +
+    "_" +
+    limpiarNombre(fecha) +
+    ".pdf";
+
+  doc.save(nombreArchivo);
 }
 
 pintar();
