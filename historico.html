@@ -9,377 +9,162 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
 header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
 button{border:0;border-radius:14px;padding:10px 14px;font-weight:800}
 .volver{background:white;color:#17303d}
 .contenido{padding:16px}
-.semana{margin-top:30px;font-size:22px;border-bottom:2px solid #17303d;padding-bottom:6px}
-.resumen{background:white;border-radius:16px;padding:14px;margin:10px 0 16px;font-weight:800;line-height:1.8}
-.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 6px 14px rgba(0,0,0,.12)}
+
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 6px 14px rgba(0,0,0,.12)}
 .nombre{font-size:22px;font-weight:900}
 .detalle{margin-top:6px;color:#4f5f69}
 .importe{font-size:24px;font-weight:900;margin-top:8px}
+
 .sello{display:inline-block;margin-top:10px;margin-right:6px;padding:6px 12px;border-radius:999px;font-size:14px;font-weight:900}
 .pagado{background:#48a530;color:white}
-.incidencia{background:#ff0000;color:white}
 .revisado{background:#0a7cff;color:white}
+
 .botones{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .ver{background:#17303d;color:white}
 .pdf{background:#ff9800;color:white}
-.btnRevisado{background:#0a7cff;color:white}
+.comparar{background:#9c27b0;color:white}
+
 .lineas{display:none;margin-top:14px;border-top:1px solid #ddd;padding-top:12px}
 .lineaAlbaran{padding:12px 0;border-bottom:1px dashed #ccc}
-.articuloLinea{font-weight:900;font-size:17px}
-.detalleLinea{display:flex;justify-content:space-between;gap:8px;font-size:15px;margin-top:5px}
-.totalAlbaran{margin-top:14px;padding-top:12px;border-top:3px solid #17303d;font-weight:900;font-size:20px;display:flex;justify-content:space-between}
-.vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:800}
+.articuloLinea{font-weight:900}
+.detalleLinea{display:flex;justify-content:space-between;font-size:15px;margin-top:5px}
+.totalAlbaran{margin-top:14px;padding-top:12px;border-top:3px solid #17303d;font-weight:900;font-size:18px;display:flex;justify-content:space-between}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="location.href='index.html'">← Volver</button>
-  <h2>📁 HISTÓRICO</h2>
+<button class="volver" onclick="location.href='index.html'">← Volver</button>
+<h2>📁 HISTÓRICO</h2>
 </header>
 
 <div class="contenido" id="lista"></div>
 
 <script>
-function leerHistorico(){
-  try{
-    return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
-  }catch(e){
-    return [];
-  }
-}
 
-function guardarHistorico(data){
-  localStorage.setItem("historico_pedidos", JSON.stringify(data));
+function leer(){
+  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
 }
 
 function euros(n){
-  return Number(n || 0).toFixed(2).replace(".", ",") + " €";
-}
-
-function fechaSegura(p){
-  const f = p.fechaPago || p.fecha || p.fechaHistorico;
-  const d = new Date(f);
-  if(!f || isNaN(d.getTime())) return new Date();
-  return d;
-}
-
-function getSemana(fecha){
-  const d = new Date(fecha);
-  const dia = d.getDay() || 7;
-  d.setDate(d.getDate() + 4 - dia);
-  const inicioAno = new Date(d.getFullYear(),0,1);
-  return Math.ceil((((d - inicioAno) / 86400000) + 1)/7);
-}
-
-function rangoSemana(fecha){
-  const d = new Date(fecha);
-  const dia = d.getDay() || 7;
-
-  const inicio = new Date(d);
-  inicio.setDate(d.getDate() - dia + 1);
-
-  const fin = new Date(inicio);
-  fin.setDate(inicio.getDate() + 6);
-
-  const ini = inicio.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
-  const fi = fin.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
-
-  return ini + " - " + fi;
-}
-
-function claveSemana(p){
-  const fecha = fechaSegura(p);
-  const semana = getSemana(fecha);
-  const rango = rangoSemana(fecha);
-  const ano = fecha.getFullYear();
-  return "SEMANA " + semana + " (" + rango + " " + ano + ")";
+  return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
 
 function pintar(){
-  const data = leerHistorico();
-
-  if(data.length === 0){
-    document.getElementById("lista").innerHTML =
-      `<div class="vacio">No hay pedidos cerrados en histórico todavía.</div>`;
-    return;
-  }
-
-  const grupos = {};
-
-  data.forEach(p=>{
-    const clave = claveSemana(p);
-    if(!grupos[clave]) grupos[clave] = [];
-    grupos[clave].push(p);
-  });
-
+  const data = leer();
   let html = "";
 
-  Object.keys(grupos).forEach(clave=>{
-    const pedidos = grupos[clave];
+  data.forEach((p,i)=>{
 
-    let total = 0;
-    let banco = 0;
-    let revisado = 0;
+    let lineasHtml = `<div class="lineas" id="l-${i}">`;
 
-    pedidos.forEach(p=>{
-      total += Number(p.total || 0);
+    if(p.lineas){
+      p.lineas.forEach(l=>{
+        const cantidad = Number(l.cantidad || 0);
+        const precio = Number(l.precioSinIva || 0);
+        const base = Number(l.base || cantidad * precio);
 
-      const forma = String(p.formaPago || "").toUpperCase();
-      if(forma === "BANCO"){
-        banco += Number(p.total || 0);
-        if(p.revisado) revisado += Number(p.total || 0);
-      }
-    });
+        lineasHtml += `
+          <div class="lineaAlbaran">
+            <div class="articuloLinea">${l.articulo}</div>
+            <div class="detalleLinea">
+              <span>${cantidad} × ${euros(precio)}</span>
+              <strong>${euros(base)}</strong>
+            </div>
+          </div>
+        `;
+      });
+    }
 
-    const pendiente = banco - revisado;
-
-    html += `<div class="semana">${clave}</div>`;
-
-    html += `
-      <div class="resumen">
-        Total semana: ${euros(total)}<br><br>
-        BANCO: ${euros(banco)}<br>
-        ✔ Revisado: ${euros(revisado)}<br>
-        ⚠ Pendiente: ${euros(pendiente)}
+    lineasHtml += `
+      <div class="totalAlbaran">
+        <span>TOTAL</span>
+        <span>${euros(p.total)}</span>
       </div>
+    </div>
     `;
 
-    pedidos.forEach((p,i)=>{
-      const tieneIncidencia =
-        p.estado === "PAGADO CON INCIDENCIA" ||
-        p.incidenciaAbierta ||
-        p.motivoIncidencia;
+    html += `
+      <div class="card" id="pedido-${i}">
+        <div class="nombre">${p.proveedor}</div>
+        <div class="detalle">${p.fecha}</div>
+        <div class="importe">${euros(p.total)}</div>
 
-      let lineasHtml = `<div class="lineas" id="lineas-${clave}-${i}">`;
+        <span class="sello pagado">PAGADO</span>
 
-      if(p.lineas && p.lineas.length){
-        p.lineas.forEach(l=>{
-          const cantidad = Number(l.cantidad || 0);
-          const precio = Number(l.precioSinIva || 0);
-          const base = Number(l.base || (cantidad * precio));
-
-          lineasHtml += `
-            <div class="lineaAlbaran">
-              <div class="articuloLinea">${l.articulo || "Artículo"}</div>
-
-              <div class="detalleLinea">
-                <span>${cantidad} × ${euros(precio)}</span>
-                <strong>${euros(base)}</strong>
-              </div>
-
-              <div class="detalle" style="font-size:14px">
-                Formato: ${l.formato || "-"} · IVA ${l.iva || "-"}%
-              </div>
-            </div>
-          `;
-        });
-      }else{
-        lineasHtml += `<div class="detalle">Este pedido no tiene líneas guardadas.</div>`;
-      }
-
-      lineasHtml += `
-        <div class="totalAlbaran">
-          <span>TOTAL</span>
-          <span>${euros(p.total)}</span>
+        <div class="botones">
+          <button class="ver" onclick="ver(${i})">Ver</button>
+          <button class="pdf" onclick="pdf(${i})">PDF</button>
+          <button class="comparar" onclick="comparar(${i})">Comparar</button>
         </div>
+
+        ${lineasHtml}
       </div>
-      `;
-
-      html += `
-        <div class="card">
-          <div class="nombre">${p.proveedor || "SIN PROVEEDOR"}</div>
-          <div class="detalle">${p.fechaPago || p.fecha || "-"}</div>
-          <div class="detalle">${p.formaPago || "-"}</div>
-
-          <div class="importe">${euros(p.total)}</div>
-
-          <span class="sello pagado">PAGADO</span>
-
-          ${
-            tieneIncidencia
-            ? `<span class="sello incidencia">INCIDENCIA</span>
-               <div class="detalle"><b>Motivo:</b> ${p.motivoIncidencia || p.motivo || "-"}</div>
-               <div class="detalle"><b>Solución:</b> ${p.solucionIncidencia || p.solucion || "Pendiente"}</div>`
-            : ""
-          }
-
-          ${p.revisado ? `<span class="sello revisado">REVISADO</span>` : ""}
-
-          <button onclick="compararPedido('${clave}',${i})" style="background:#9c27b0;color:white;">
-  Comparar factura
-</button>
-            <button class="ver" onclick="verPedido('${clave}',${i})">Ver pedido</button>
-            <button class="pdf" onclick="descargarPDF('${clave}',${i})">PDF</button>
-
-            ${
-              !p.revisado
-              ? `<button class="btnRevisado" onclick="marcarRevisado('${clave}',${i})">✔ Revisado</button>`
-              : ""
-            }
-          </div>
-
-          ${lineasHtml}
-        </div>
-      `;
-    });
+    `;
   });
 
   document.getElementById("lista").innerHTML = html;
 }
 
-function buscarPedido(clave, indiceGrupo){
-  const data = leerHistorico();
-  let contador = 0;
-
-  for(let i=0; i<data.length; i++){
-    if(claveSemana(data[i]) === clave){
-      if(contador === indiceGrupo){
-        return {pedido:data[i], indiceReal:i};
-      }
-      contador++;
-    }
-  }
-
-  return null;
+function ver(i){
+  const d = document.getElementById("l-"+i);
+  d.style.display = d.style.display==="block"?"none":"block";
 }
 
-function verPedido(clave,i){
-  const d = document.getElementById("lineas-" + clave + "-" + i);
-  if(d){
-    d.style.display = d.style.display === "block" ? "none" : "block";
-  }
-}
-
-function marcarRevisado(clave,i){
-  const encontrado = buscarPedido(clave,i);
-  if(!encontrado) return;
-
-  const data = leerHistorico();
-  data[encontrado.indiceReal].revisado = true;
-
-  guardarHistorico(data);
-  pintar();
-}
-
-function limpiarNombre(texto){
-  return String(texto || "")
-    .replace(/\s+/g,"_")
-    .replace(/[^\w\-]/g,"");
-}
-
-function descargarPDF(clave,i){
-  const encontrado = buscarPedido(clave,i);
-  if(!encontrado) return;
-
-  const p = encontrado.pedido;
-  const jsPDF = window.jspdf.jsPDF;
+function pdf(i){
+  const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+  const data = leer();
+  const p = data[i];
 
-  const proveedor = p.proveedor || "SIN PROVEEDOR";
-  const fecha = p.fechaPago || p.fecha || new Date().toLocaleString("es-ES");
-  const formaPago = p.formaPago || "-";
+  let y = 10;
 
-  let y = 15;
+  doc.text("PROVEEDOR: " + p.proveedor,10,y); y+=10;
 
-  doc.setFont("helvetica","bold");
-  doc.setFontSize(18);
-  doc.text("MONOLITO · PEDIDO", 14, y);
+  p.lineas.forEach(l=>{
+    doc.text(`${l.articulo} ${l.cantidad}x${l.precioSinIva}`,10,y);
+    y+=7;
+  });
 
-  y += 10;
-  doc.setFontSize(13);
-  doc.text("Proveedor: " + proveedor, 14, y);
+  y+=5;
+  doc.text("TOTAL: "+p.total,10,y);
 
-  y += 7;
-  doc.setFont("helvetica","normal");
-  doc.text("Fecha: " + fecha, 14, y);
+  doc.save("pedido_"+i+".pdf");
+}
 
-  y += 7;
-  doc.text("Forma de pago: " + formaPago, 14, y);
+function comparar(i){
+  const data = leer();
+  const p = data[i];
 
-  y += 10;
-  doc.setFont("helvetica","bold");
-  doc.text("ARTÍCULOS", 14, y);
+  let resultado="";
 
-  y += 7;
-  doc.setFont("helvetica","normal");
-  doc.setFontSize(11);
+  p.lineas.forEach(l=>{
+    let cant = prompt(`Cantidad real ${l.articulo}`,l.cantidad);
+    let precio = prompt(`Precio real ${l.articulo}`,l.precioSinIva);
 
-  if(p.lineas && p.lineas.length){
-    p.lineas.forEach(l=>{
-      const cantidad = Number(l.cantidad || 0);
-      const precio = Number(l.precioSinIva || 0);
-      const base = Number(l.base || (cantidad * precio));
+    let error="";
 
-      if(y > 270){
-        doc.addPage();
-        y = 15;
-      }
+    if(Number(cant)!=Number(l.cantidad)) error+="UNIDADES ";
+    if(Number(precio)!=Number(l.precioSinIva)) error+="PRECIO ";
 
-      doc.setFont("helvetica","bold");
-      doc.text(String(l.articulo || "Artículo"), 14, y);
+    if(error==""){
+      resultado+=`✔ ${l.articulo}\n`;
+    }else{
+      resultado+=`🔴 ${l.articulo}: ${error}\n`;
+    }
+  });
 
-      y += 6;
-      doc.setFont("helvetica","normal");
-      doc.text(
-        cantidad + " x " + euros(precio) + " = " + euros(base),
-        14,
-        y
-      );
-
-      y += 6;
-      doc.text(
-        "Formato: " + (l.formato || "-") + " · IVA " + (l.iva || "-") + "%",
-        14,
-        y
-      );
-
-      y += 8;
-    });
-  }else{
-    doc.text("Este pedido no tiene líneas guardadas.", 14, y);
-    y += 8;
-  }
-
-  y += 4;
-  doc.setDrawColor(23,48,61);
-  doc.line(14, y, 196, y);
-
-  y += 10;
-  doc.setFont("helvetica","bold");
-  doc.setFontSize(14);
-  doc.text("TOTAL: " + euros(p.total), 14, y);
-
-  if(p.estado === "PAGADO CON INCIDENCIA" || p.incidenciaAbierta || p.motivoIncidencia){
-    y += 12;
-    doc.setFontSize(12);
-    doc.text("INCIDENCIA", 14, y);
-
-    y += 7;
-    doc.setFont("helvetica","normal");
-    doc.text("Motivo: " + (p.motivoIncidencia || p.motivo || "-"), 14, y);
-
-    y += 7;
-    doc.text("Solución: " + (p.solucionIncidencia || p.solucion || "Pendiente"), 14, y);
-  }
-
-  const nombreArchivo =
-    "pedido_" +
-    limpiarNombre(proveedor) +
-    "_" +
-    limpiarNombre(fecha) +
-    ".pdf";
-
-  doc.save(nombreArchivo);
+  alert(resultado);
 }
 
 pintar();
+
 </script>
 
 </body>
