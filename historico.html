@@ -212,7 +212,9 @@ function pintar(){
 
           ${p.revisado ? `<span class="sello revisado">REVISADO</span>` : ""}
 
-          <div class="botones">
+          <button onclick="compararPedido('${clave}',${i})" style="background:#9c27b0;color:white;">
+  Comparar factura
+</button>
             <button class="ver" onclick="verPedido('${clave}',${i})">Ver pedido</button>
             <button class="pdf" onclick="descargarPDF('${clave}',${i})">PDF</button>
 
