@@ -26,17 +26,16 @@ button{
 }
 
 .volver{background:white;color:#17303d}
-
 .contenido{padding:16px}
 
-.mes{
+.semana{
   margin-top:30px;
   font-size:22px;
   border-bottom:2px solid #17303d;
   padding-bottom:6px;
 }
 
-.resumenMes{
+.resumen{
   background:white;
   border-radius:16px;
   padding:14px;
@@ -71,13 +70,7 @@ button{
 .incidencia{background:#ff0000;color:white}
 .revisado{background:#0a7cff;color:white}
 
-.botones{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:10px;
-}
-
+.botones{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .ver{background:#17303d;color:white}
 .btnRevisado{background:#0a7cff;color:white}
 
@@ -114,6 +107,8 @@ button{
 
 <script>
 
+// ===== UTILIDADES =====
+
 function leerHistorico(){
   return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
 }
@@ -125,6 +120,41 @@ function guardarHistorico(data){
 function euros(n){
   return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
+
+function fechaSegura(p){
+  let f = p.fechaPago || p.fecha;
+  let d = new Date(f);
+  if(!f || isNaN(d.getTime())) d = new Date();
+  return d;
+}
+
+// ===== SEMANA =====
+
+function getSemana(fecha){
+  let d = new Date(fecha);
+  let dia = d.getDay() || 7;
+  d.setDate(d.getDate() + 4 - dia);
+  let inicioAño = new Date(d.getFullYear(),0,1);
+  return Math.ceil((((d - inicioAño) / 86400000) + 1)/7);
+}
+
+function rangoSemana(fecha){
+  let d = new Date(fecha);
+  let dia = d.getDay() || 7;
+
+  let inicio = new Date(d);
+  inicio.setDate(d.getDate() - dia + 1);
+
+  let fin = new Date(inicio);
+  fin.setDate(inicio.getDate() + 6);
+
+  let ini = inicio.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
+  let fi = fin.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
+
+  return `${ini} - ${fi}`;
+}
+
+// ===== PINTAR =====
 
 function pintar(){
 
@@ -139,16 +169,13 @@ function pintar(){
   let grupos = {};
 
   data.forEach(p=>{
-    let f = p.fechaPago || p.fecha;
-    let fecha = new Date(f);
 
-if (!f || isNaN(fecha.getTime())) {
-  fecha = new Date();
-}
-
-    let mes = fecha.toLocaleString("es-ES",{month:"long"});
+    let fecha = fechaSegura(p);
+    let semana = getSemana(fecha);
+    let rango = rangoSemana(fecha);
     let año = fecha.getFullYear();
-    let clave = mes.toUpperCase()+" "+año;
+
+    let clave = `SEMANA ${semana} (${rango} ${año})`;
 
     if(!grupos[clave]) grupos[clave]=[];
     grupos[clave].push(p);
@@ -156,38 +183,33 @@ if (!f || isNaN(fecha.getTime())) {
 
   let html="";
 
-  Object.keys(grupos).forEach(mesClave=>{
+  Object.keys(grupos).forEach(clave=>{
 
-    let pedidos = grupos[mesClave];
+    let pedidos = grupos[clave];
 
-    let totalMes=0;
+    let total=0;
     let banco=0;
-    let bancoRevisado=0;
+    let revisado=0;
 
     pedidos.forEach(p=>{
-      totalMes += Number(p.total||0);
+      total += Number(p.total||0);
 
-      let tipo = (p.formaPago||"").toUpperCase();
-
-      if(tipo==="BANCO"){
+      if((p.formaPago||"").toUpperCase()==="BANCO"){
         banco += Number(p.total||0);
-        if(p.revisado){
-          bancoRevisado += Number(p.total||0);
-        }
+        if(p.revisado) revisado += Number(p.total||0);
       }
     });
 
-    let bancoPendiente = banco - bancoRevisado;
+    let pendiente = banco - revisado;
 
-    html += `<div class="mes">${mesClave}</div>`;
+    html += `<div class="semana">${clave}</div>`;
 
     html += `
-      <div class="resumenMes">
-        Total mes: ${euros(totalMes)}<br><br>
-
+      <div class="resumen">
+        Total semana: ${euros(total)}<br><br>
         BANCO: ${euros(banco)}<br>
-        ✔ Revisado: ${euros(bancoRevisado)}<br>
-        ⚠ Pendiente: ${euros(bancoPendiente)}
+        ✔ Revisado: ${euros(revisado)}<br>
+        ⚠ Pendiente: ${euros(pendiente)}
       </div>
     `;
 
@@ -195,7 +217,7 @@ if (!f || isNaN(fecha.getTime())) {
 
       let lineasHtml="";
       if(p.lineas){
-        lineasHtml = `<div class="lineas" id="l-${mesClave}-${i}">`;
+        lineasHtml = `<div class="lineas" id="l-${clave}-${i}">`;
         p.lineas.forEach(l=>{
           lineasHtml += `
             <div class="linea">
@@ -209,8 +231,8 @@ if (!f || isNaN(fecha.getTime())) {
         <div class="card">
 
           <div class="nombre">${p.proveedor}</div>
-          <div class="detalle">${p.fechaPago || p.fecha}</div>
-          <div class="detalle">${p.formaPago}</div>
+          <div class="detalle">${p.fechaPago || p.fecha || "-"}</div>
+          <div class="detalle">${p.formaPago || "-"}</div>
 
           <div class="importe">${euros(p.total)}</div>
 
@@ -227,11 +249,11 @@ if (!f || isNaN(fecha.getTime())) {
           ${p.revisado ? `<span class="sello revisado">REVISADO</span>` : ""}
 
           <div class="botones">
-            <button class="ver" onclick="ver('${mesClave}',${i})">Ver pedido</button>
+            <button class="ver" onclick="ver('${clave}',${i})">Ver pedido</button>
 
             ${
               !p.revisado
-              ? `<button class="btnRevisado" onclick="marcarRevisado('${mesClave}',${i})">
+              ? `<button class="btnRevisado" onclick="marcar('${clave}',${i})">
                    ✔ Revisado
                  </button>`
               : ""
@@ -249,37 +271,36 @@ if (!f || isNaN(fecha.getTime())) {
   document.getElementById("lista").innerHTML = html;
 }
 
-function ver(m,i){
-  const d = document.getElementById("l-"+m+"-"+i);
+// ===== ACCIONES =====
+
+function ver(c,i){
+  const d = document.getElementById("l-"+c+"-"+i);
   if(d) d.style.display = d.style.display==="block"?"none":"block";
 }
 
-function marcarRevisado(m,i){
+function marcar(c,i){
 
   let data = leerHistorico();
-
-  // encontrar índice real
-  let indexReal = -1;
-  let contador = 0;
+  let contador=0;
 
   data.forEach((p,idx)=>{
-    let f = p.fechaPago || p.fecha;
-    let fecha = f ? new Date(f) : new Date();
-    let mes = fecha.toLocaleString("es-ES",{month:"long"}).toUpperCase()+" "+fecha.getFullYear();
+    let fecha = fechaSegura(p);
+    let semana = getSemana(fecha);
+    let rango = rangoSemana(fecha);
+    let año = fecha.getFullYear();
 
-    if(mes===m){
+    let clave = `SEMANA ${semana} (${rango} ${año})`;
+
+    if(clave===c){
       if(contador===i){
-        indexReal = idx;
+        data[idx].revisado = true;
       }
       contador++;
     }
   });
 
-  if(indexReal>=0){
-    data[indexReal].revisado = true;
-    guardarHistorico(data);
-    pintar();
-  }
+  guardarHistorico(data);
+  pintar();
 }
 
 pintar();
