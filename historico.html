@@ -8,86 +8,29 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:10px 14px;
-  font-weight:800;
-}
-
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:10px 14px;font-weight:800}
 .volver{background:white;color:#17303d}
 .contenido{padding:16px}
-
-.semana{
-  margin-top:30px;
-  font-size:22px;
-  border-bottom:2px solid #17303d;
-  padding-bottom:6px;
-}
-
-.resumen{
-  background:white;
-  border-radius:16px;
-  padding:14px;
-  margin:10px 0 16px 0;
-  font-weight:800;
-  line-height:1.8;
-}
-
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:12px;
-  box-shadow:0 6px 14px rgba(0,0,0,.12);
-}
-
+.semana{margin-top:30px;font-size:22px;border-bottom:2px solid #17303d;padding-bottom:6px}
+.resumen{background:white;border-radius:16px;padding:14px;margin:10px 0 16px 0;font-weight:800;line-height:1.8}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 6px 14px rgba(0,0,0,.12)}
 .nombre{font-size:22px;font-weight:900}
 .detalle{margin-top:6px;color:#4f5f69}
 .importe{font-size:24px;font-weight:900;margin-top:8px}
-
-.sello{
-  display:inline-block;
-  margin-top:10px;
-  margin-right:6px;
-  padding:6px 12px;
-  border-radius:999px;
-  font-size:14px;
-  font-weight:900;
-}
-
+.sello{display:inline-block;margin-top:10px;margin-right:6px;padding:6px 12px;border-radius:999px;font-size:14px;font-weight:900}
 .pagado{background:#48a530;color:white}
 .incidencia{background:#ff0000;color:white}
 .revisado{background:#0a7cff;color:white}
-
 .botones{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .ver{background:#17303d;color:white}
 .btnRevisado{background:#0a7cff;color:white}
-
-.lineas{
-  display:none;
-  margin-top:10px;
-  border-top:1px solid #ddd;
-  padding-top:10px;
-}
-
-.vacio{
-  background:white;
-  border-radius:22px;
-  padding:20px;
-  text-align:center;
-  font-weight:800;
-}
+.lineas{display:none;margin-top:14px;border-top:1px solid #ddd;padding-top:12px}
+.lineaAlbaran{padding:12px 0;border-bottom:1px dashed #ccc}
+.articuloLinea{font-weight:900;font-size:17px}
+.detalleLinea{display:flex;justify-content:space-between;gap:8px;font-size:15px;margin-top:5px}
+.totalAlbaran{margin-top:14px;padding-top:12px;border-top:3px solid #17303d;font-weight:900;font-size:20px;display:flex;justify-content:space-between}
+.vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:800}
 </style>
 </head>
 
@@ -101,8 +44,6 @@ button{
 <div class="contenido" id="lista"></div>
 
 <script>
-
-// ===== UTIL =====
 function leerHistorico(){
   return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
 }
@@ -122,7 +63,6 @@ function fechaSegura(p){
   return d;
 }
 
-// ===== SEMANA =====
 function getSemana(fecha){
   let d = new Date(fecha);
   let dia = d.getDay() || 7;
@@ -147,9 +87,7 @@ function rangoSemana(fecha){
   return `${ini} - ${fi}`;
 }
 
-// ===== PINTAR =====
 function pintar(){
-
   const data = leerHistorico();
 
   if(data.length===0){
@@ -165,7 +103,6 @@ function pintar(){
     let semana = getSemana(fecha);
     let rango = rangoSemana(fecha);
     let año = fecha.getFullYear();
-
     let clave = `SEMANA ${semana} (${rango} ${año})`;
 
     if(!grupos[clave]) grupos[clave]=[];
@@ -175,7 +112,6 @@ function pintar(){
   let html="";
 
   Object.keys(grupos).forEach(clave=>{
-
     let pedidos = grupos[clave];
 
     let total=0;
@@ -205,36 +141,35 @@ function pintar(){
     `;
 
     pedidos.forEach((p,i)=>{
-
       let lineasHtml = `<div class="lineas" id="l-${clave}-${i}">`;
 
-      if(p.lineas){
+      if(p.lineas && p.lineas.length){
         p.lineas.forEach(l=>{
+          const cantidad = Number(l.cantidad || 0);
+          const precio = Number(l.precioSinIva || 0);
+          const base = Number(l.base || (cantidad * precio));
+
           lineasHtml += `
-            <div style="padding:10px 0; border-bottom:1px dashed #ccc">
-              <div style="font-weight:900; font-size:16px;">
-                ${l.articulo}
+            <div class="lineaAlbaran">
+              <div class="articuloLinea">${l.articulo || "Artículo"}</div>
+
+              <div class="detalleLinea">
+                <span>${cantidad} unidades × ${euros(precio)}</span>
+                <strong>${euros(base)}</strong>
               </div>
 
-              <div style="display:flex; justify-content:space-between; font-size:14px; margin-top:4px;">
-                <span>${l.cantidad} unidades</span>
-                <span>${euros(l.base)}</span>
+              <div class="detalle" style="font-size:14px">
+                Formato: ${l.formato || "-"} · IVA ${l.iva || "-"}%
               </div>
             </div>
           `;
         });
+      }else{
+        lineasHtml += `<div class="detalle">Este pedido no tiene líneas guardadas.</div>`;
       }
 
       lineasHtml += `
-        <div style="
-          margin-top:12px;
-          padding-top:10px;
-          border-top:2px solid #000;
-          font-weight:900;
-          font-size:18px;
-          display:flex;
-          justify-content:space-between;
-        ">
+        <div class="totalAlbaran">
           <span>TOTAL</span>
           <span>${euros(p.total)}</span>
         </div>
@@ -244,7 +179,7 @@ function pintar(){
       html += `
         <div class="card">
 
-          <div class="nombre">${p.proveedor}</div>
+          <div class="nombre">${p.proveedor || "SIN PROVEEDOR"}</div>
           <div class="detalle">${p.fechaPago || p.fecha || "-"}</div>
           <div class="detalle">${p.formaPago || "-"}</div>
 
@@ -267,9 +202,7 @@ function pintar(){
 
             ${
               !p.revisado
-              ? `<button class="btnRevisado" onclick="marcar('${clave}',${i})">
-                   ✔ Revisado
-                 </button>`
+              ? `<button class="btnRevisado" onclick="marcar('${clave}',${i})">✔ Revisado</button>`
               : ""
             }
           </div>
@@ -279,13 +212,11 @@ function pintar(){
         </div>
       `;
     });
-
   });
 
   document.getElementById("lista").innerHTML = html;
 }
 
-// ===== ACCIONES =====
 function ver(c,i){
   const d = document.getElementById("l-"+c+"-"+i);
   if(d) d.style.display = d.style.display==="block"?"none":"block";
@@ -315,7 +246,6 @@ function marcar(c,i){
 }
 
 pintar();
-
 </script>
 
 </body>
