@@ -81,11 +81,6 @@ button{
   padding-top:10px;
 }
 
-.linea{
-  padding:6px 0;
-  border-bottom:1px solid #eee;
-}
-
 .vacio{
   background:white;
   border-radius:22px;
@@ -107,8 +102,7 @@ button{
 
 <script>
 
-// ===== UTILIDADES =====
-
+// ===== UTIL =====
 function leerHistorico(){
   return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
 }
@@ -129,7 +123,6 @@ function fechaSegura(p){
 }
 
 // ===== SEMANA =====
-
 function getSemana(fecha){
   let d = new Date(fecha);
   let dia = d.getDay() || 7;
@@ -155,7 +148,6 @@ function rangoSemana(fecha){
 }
 
 // ===== PINTAR =====
-
 function pintar(){
 
   const data = leerHistorico();
@@ -169,7 +161,6 @@ function pintar(){
   let grupos = {};
 
   data.forEach(p=>{
-
     let fecha = fechaSegura(p);
     let semana = getSemana(fecha);
     let rango = rangoSemana(fecha);
@@ -215,17 +206,40 @@ function pintar(){
 
     pedidos.forEach((p,i)=>{
 
-      let lineasHtml="";
+      let lineasHtml = `<div class="lineas" id="l-${clave}-${i}">`;
+
       if(p.lineas){
-        lineasHtml = `<div class="lineas" id="l-${clave}-${i}">`;
         p.lineas.forEach(l=>{
           lineasHtml += `
-            <div class="linea">
-              ${l.articulo} · ${l.cantidad} · ${euros(l.base)}
-            </div>`;
+            <div style="padding:10px 0; border-bottom:1px dashed #ccc">
+              <div style="font-weight:900; font-size:16px;">
+                ${l.articulo}
+              </div>
+
+              <div style="display:flex; justify-content:space-between; font-size:14px; margin-top:4px;">
+                <span>${l.cantidad} unidades</span>
+                <span>${euros(l.base)}</span>
+              </div>
+            </div>
+          `;
         });
-        lineasHtml += `</div>`;
       }
+
+      lineasHtml += `
+        <div style="
+          margin-top:12px;
+          padding-top:10px;
+          border-top:2px solid #000;
+          font-weight:900;
+          font-size:18px;
+          display:flex;
+          justify-content:space-between;
+        ">
+          <span>TOTAL</span>
+          <span>${euros(p.total)}</span>
+        </div>
+      </div>
+      `;
 
       html += `
         <div class="card">
@@ -272,14 +286,12 @@ function pintar(){
 }
 
 // ===== ACCIONES =====
-
 function ver(c,i){
   const d = document.getElementById("l-"+c+"-"+i);
   if(d) d.style.display = d.style.display==="block"?"none":"block";
 }
 
 function marcar(c,i){
-
   let data = leerHistorico();
   let contador=0;
 
@@ -288,7 +300,6 @@ function marcar(c,i){
     let semana = getSemana(fecha);
     let rango = rangoSemana(fecha);
     let año = fecha.getFullYear();
-
     let clave = `SEMANA ${semana} (${rango} ${año})`;
 
     if(clave===c){
