@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HISTÓRICO · MONOLITO</title>
 
+<!-- LIBRERÍA PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
@@ -12,25 +15,66 @@ header{background:#17303d;color:white;padding:16px;display:flex;justify-content:
 button{border:0;border-radius:14px;padding:10px 14px;font-weight:800}
 .volver{background:white;color:#17303d}
 .contenido{padding:16px}
-.semana{margin-top:30px;font-size:22px;border-bottom:2px solid #17303d;padding-bottom:6px}
-.resumen{background:white;border-radius:16px;padding:14px;margin:10px 0 16px 0;font-weight:800;line-height:1.8}
-.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 6px 14px rgba(0,0,0,.12)}
+
+.card{
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 6px 14px rgba(0,0,0,.12);
+}
+
 .nombre{font-size:22px;font-weight:900}
 .detalle{margin-top:6px;color:#4f5f69}
 .importe{font-size:24px;font-weight:900;margin-top:8px}
-.sello{display:inline-block;margin-top:10px;margin-right:6px;padding:6px 12px;border-radius:999px;font-size:14px;font-weight:900}
+
+.sello{
+  display:inline-block;
+  margin-top:10px;
+  margin-right:6px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:900;
+}
+
 .pagado{background:#48a530;color:white}
-.incidencia{background:#ff0000;color:white}
 .revisado{background:#0a7cff;color:white}
+
 .botones{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .ver{background:#17303d;color:white}
-.btnRevisado{background:#0a7cff;color:white}
-.lineas{display:none;margin-top:14px;border-top:1px solid #ddd;padding-top:12px}
-.lineaAlbaran{padding:12px 0;border-bottom:1px dashed #ccc}
+.pdf{background:#ff9800;color:white}
+
+.lineas{
+  display:none;
+  margin-top:14px;
+  border-top:1px solid #ddd;
+  padding-top:12px;
+}
+
+.lineaAlbaran{
+  padding:12px 0;
+  border-bottom:1px dashed #ccc;
+}
+
 .articuloLinea{font-weight:900;font-size:17px}
-.detalleLinea{display:flex;justify-content:space-between;gap:8px;font-size:15px;margin-top:5px}
-.totalAlbaran{margin-top:14px;padding-top:12px;border-top:3px solid #17303d;font-weight:900;font-size:20px;display:flex;justify-content:space-between}
-.vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:800}
+
+.detalleLinea{
+  display:flex;
+  justify-content:space-between;
+  font-size:15px;
+  margin-top:5px;
+}
+
+.totalAlbaran{
+  margin-top:14px;
+  padding-top:12px;
+  border-top:3px solid #17303d;
+  font-weight:900;
+  font-size:20px;
+  display:flex;
+  justify-content:space-between;
+}
 </style>
 </head>
 
@@ -44,208 +88,103 @@ button{border:0;border-radius:14px;padding:10px 14px;font-weight:800}
 <div class="contenido" id="lista"></div>
 
 <script>
-function leerHistorico(){
-  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
-}
 
-function guardarHistorico(data){
-  localStorage.setItem("historico_pedidos", JSON.stringify(data));
+function leer(){
+  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
 }
 
 function euros(n){
   return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
 
-function fechaSegura(p){
-  let f = p.fechaPago || p.fecha;
-  let d = new Date(f);
-  if(!f || isNaN(d.getTime())) d = new Date();
-  return d;
-}
-
-function getSemana(fecha){
-  let d = new Date(fecha);
-  let dia = d.getDay() || 7;
-  d.setDate(d.getDate() + 4 - dia);
-  let inicioAño = new Date(d.getFullYear(),0,1);
-  return Math.ceil((((d - inicioAño) / 86400000) + 1)/7);
-}
-
-function rangoSemana(fecha){
-  let d = new Date(fecha);
-  let dia = d.getDay() || 7;
-
-  let inicio = new Date(d);
-  inicio.setDate(d.getDate() - dia + 1);
-
-  let fin = new Date(inicio);
-  fin.setDate(inicio.getDate() + 6);
-
-  let ini = inicio.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
-  let fi = fin.toLocaleDateString("es-ES",{day:"numeric",month:"short"});
-
-  return `${ini} - ${fi}`;
-}
-
 function pintar(){
-  const data = leerHistorico();
 
-  if(data.length===0){
-    document.getElementById("lista").innerHTML =
-      `<div class="vacio">Sin pedidos todavía</div>`;
-    return;
-  }
+  const data = leer();
+  let html = "";
 
-  let grupos = {};
+  data.forEach((p,i)=>{
 
-  data.forEach(p=>{
-    let fecha = fechaSegura(p);
-    let semana = getSemana(fecha);
-    let rango = rangoSemana(fecha);
-    let año = fecha.getFullYear();
-    let clave = `SEMANA ${semana} (${rango} ${año})`;
+    let lineasHtml = `<div class="lineas" id="l-${i}">`;
 
-    if(!grupos[clave]) grupos[clave]=[];
-    grupos[clave].push(p);
-  });
+    if(p.lineas){
+      p.lineas.forEach(l=>{
+        const cantidad = Number(l.cantidad || 0);
+        const precio = Number(l.precioSinIva || 0);
+        const base = Number(l.base || cantidad * precio);
 
-  let html="";
+        lineasHtml += `
+          <div class="lineaAlbaran">
+            <div class="articuloLinea">${l.articulo}</div>
 
-  Object.keys(grupos).forEach(clave=>{
-    let pedidos = grupos[clave];
+            <div class="detalleLinea">
+              <span>${cantidad} × ${euros(precio)}</span>
+              <strong>${euros(base)}</strong>
+            </div>
 
-    let total=0;
-    let banco=0;
-    let revisado=0;
+            <div class="detalle" style="font-size:14px">
+              Formato: ${l.formato || "-"} · IVA ${l.iva || "-"}%
+            </div>
+          </div>
+        `;
+      });
+    }
 
-    pedidos.forEach(p=>{
-      total += Number(p.total||0);
-
-      if((p.formaPago||"").toUpperCase()==="BANCO"){
-        banco += Number(p.total||0);
-        if(p.revisado) revisado += Number(p.total||0);
-      }
-    });
-
-    let pendiente = banco - revisado;
-
-    html += `<div class="semana">${clave}</div>`;
-
-    html += `
-      <div class="resumen">
-        Total semana: ${euros(total)}<br><br>
-        BANCO: ${euros(banco)}<br>
-        ✔ Revisado: ${euros(revisado)}<br>
-        ⚠ Pendiente: ${euros(pendiente)}
+    lineasHtml += `
+      <div class="totalAlbaran">
+        <span>TOTAL</span>
+        <span>${euros(p.total)}</span>
       </div>
+    </div>
     `;
 
-    pedidos.forEach((p,i)=>{
-      let lineasHtml = `<div class="lineas" id="l-${clave}-${i}">`;
+    html += `
+      <div class="card" id="pedido-${i}">
 
-      if(p.lineas && p.lineas.length){
-        p.lineas.forEach(l=>{
-          const cantidad = Number(l.cantidad || 0);
-          const precio = Number(l.precioSinIva || 0);
-          const base = Number(l.base || (cantidad * precio));
+        <div class="nombre">${p.proveedor}</div>
+        <div class="detalle">${p.fecha || "-"}</div>
+        <div class="detalle">${p.formaPago || "-"}</div>
 
-          lineasHtml += `
-            <div class="lineaAlbaran">
-              <div class="articuloLinea">${l.articulo || "Artículo"}</div>
+        <div class="importe">${euros(p.total)}</div>
 
-              <div class="detalleLinea">
-                <span>${cantidad} × ${euros(precio)}</span>
-                <strong>${euros(base)}</strong>
-              </div>
+        <span class="sello pagado">PAGADO</span>
+        ${p.revisado ? `<span class="sello revisado">REVISADO</span>` : ""}
 
-              <div class="detalle" style="font-size:14px">
-                Formato: ${l.formato || "-"} · IVA ${l.iva || "-"}%
-              </div>
-            </div>
-          `;
-        });
-      }else{
-        lineasHtml += `<div class="detalle">Este pedido no tiene líneas guardadas.</div>`;
-      }
-
-      lineasHtml += `
-        <div class="totalAlbaran">
-          <span>TOTAL</span>
-          <span>${euros(p.total)}</span>
+        <div class="botones">
+          <button class="ver" onclick="ver(${i})">Ver pedido</button>
+          <button class="pdf" onclick="descargarPDF(${i})">PDF</button>
         </div>
+
+        ${lineasHtml}
+
       </div>
-      `;
-
-      html += `
-        <div class="card">
-
-          <div class="nombre">${p.proveedor || "SIN PROVEEDOR"}</div>
-          <div class="detalle">${p.fechaPago || p.fecha || "-"}</div>
-          <div class="detalle">${p.formaPago || "-"}</div>
-
-          <div class="importe">${euros(p.total)}</div>
-
-          <span class="sello pagado">PAGADO</span>
-
-          ${
-            p.estado==="PAGADO CON INCIDENCIA"
-            ? `<span class="sello incidencia">INCIDENCIA</span>
-               <div class="detalle"><b>Motivo:</b> ${p.motivoIncidencia||""}</div>
-               <div class="detalle"><b>Solución:</b> ${p.solucionIncidencia||""}</div>`
-            : ""
-          }
-
-          ${p.revisado ? `<span class="sello revisado">REVISADO</span>` : ""}
-
-          <div class="botones">
-            <button class="ver" onclick="ver('${clave}',${i})">Ver pedido</button>
-
-            ${
-              !p.revisado
-              ? `<button class="btnRevisado" onclick="marcar('${clave}',${i})">✔ Revisado</button>`
-              : ""
-            }
-          </div>
-
-          ${lineasHtml}
-
-        </div>
-      `;
-    });
+    `;
   });
 
   document.getElementById("lista").innerHTML = html;
 }
 
-function ver(c,i){
-  const d = document.getElementById("l-"+c+"-"+i);
-  if(d) d.style.display = d.style.display==="block"?"none":"block";
+function ver(i){
+  const d = document.getElementById("l-"+i);
+  d.style.display = d.style.display==="block"?"none":"block";
 }
 
-function marcar(c,i){
-  let data = leerHistorico();
-  let contador=0;
+function descargarPDF(i){
 
-  data.forEach((p,idx)=>{
-    let fecha = fechaSegura(p);
-    let semana = getSemana(fecha);
-    let rango = rangoSemana(fecha);
-    let año = fecha.getFullYear();
-    let clave = `SEMANA ${semana} (${rango} ${año})`;
+  const elemento = document.getElementById("pedido-"+i);
 
-    if(clave===c){
-      if(contador===i){
-        data[idx].revisado = true;
-      }
-      contador++;
-    }
-  });
+  const opt = {
+    margin: 10,
+    filename: 'pedido.pdf',
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
 
-  guardarHistorico(data);
-  pintar();
+  html2pdf().set(opt).from(elemento).save();
 }
 
 pintar();
+
 </script>
 
 </body>
