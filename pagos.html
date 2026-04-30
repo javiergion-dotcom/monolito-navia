@@ -6,29 +6,18 @@
 <title>PAGOS · MONOLITO</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#eef2f5;
-  color:#17303d;
-}
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
 
-/* HEADER */
 header{
   background:#17303d;
   color:white;
   padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  font-weight:900;
+  font-size:20px;
 }
 
-/* ICONO VERDE (coherente con pedidos/histórico) */
-.icono{
-  font-size:22px;
-  color:#4caf50;
-  font-weight:900;
-}
+/* ICONO VERDE */
+.icono{color:#4caf50}
 
 /* TARJETAS */
 .card{
@@ -38,21 +27,9 @@ header{
   border-radius:16px;
 }
 
-.nombre{
-  font-size:22px;
-  font-weight:900;
-}
-
-.total{
-  font-size:26px;
-  font-weight:900;
-  margin-top:6px;
-}
-
-.detalle{
-  color:#4f5f69;
-  margin-top:4px;
-}
+.nombre{font-size:22px;font-weight:900}
+.total{font-size:26px;font-weight:900;margin-top:6px}
+.detalle{color:#4f5f69;margin-top:4px}
 
 /* BOTONES */
 button{
@@ -60,14 +37,10 @@ button{
   border-radius:10px;
   padding:8px 12px;
   font-weight:800;
+  margin-top:6px;
 }
 
-.botones{
-  margin-top:10px;
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-}
+.botones{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 
 .ver{background:#17303d;color:white}
 .comp{background:#9c27b0;color:white}
@@ -75,10 +48,7 @@ button{
 .errorBtn{background:#f44336;color:white}
 
 /* LÍNEAS */
-.lineas{
-  display:none;
-  margin-top:10px;
-}
+.lineas{display:none;margin-top:10px}
 
 .linea{
   padding:8px 0;
@@ -91,13 +61,12 @@ button{
   font-weight:900;
   padding:8px;
   border-radius:8px;
-  margin-top:4px;
 }
 
 .aviso{
-  margin-top:8px;
   color:#c00000;
   font-weight:900;
+  margin-top:6px;
 }
 </style>
 </head>
@@ -105,12 +74,14 @@ button{
 <body>
 
 <header>
-  <div class="icono">💳 PAGOS</div>
+  <span class="icono">💳 PAGOS</span>
 </header>
 
 <div id="lista"></div>
 
 <script>
+
+/* ==== STORAGE ==== */
 
 function leerPagos(){
   return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
@@ -128,9 +99,21 @@ function guardarHistorico(data){
   localStorage.setItem("historico_pedidos", JSON.stringify(data));
 }
 
+function leerIncidencias(){
+  return JSON.parse(localStorage.getItem("incidencias") || "[]");
+}
+
+function guardarIncidencias(data){
+  localStorage.setItem("incidencias", JSON.stringify(data));
+}
+
+/* ==== UTIL ==== */
+
 function euros(n){
   return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
+
+/* ==== PINTAR ==== */
 
 function pintar(){
 
@@ -145,14 +128,12 @@ function pintar(){
       p.lineas.forEach((l,idx)=>{
 
         let base = l.base || (l.cantidad*l.precioSinIva);
-
         let esError = p.erroresLineas && p.erroresLineas.includes(idx);
 
         lineasHTML += `
         <div class="linea ${esError ? "lineaError" : ""}">
           ${l.articulo}<br>
           ${l.cantidad} × ${euros(l.precioSinIva)} = ${euros(base)}
-
           ${esError ? `<div>⚠ Error en esta línea</div>` : ""}
         </div>`;
       });
@@ -163,14 +144,10 @@ function pintar(){
 
       <div class="nombre">${p.proveedor}</div>
       <div class="detalle">${p.fecha || ""}</div>
-      <div class="detalle">${p.formaPago || ""}</div>
       <div class="total">${euros(p.total)}</div>
 
-      ${
-        p.erroresLineas && p.erroresLineas.length
-        ? `<div class="aviso">⚠ ESTE PEDIDO TIENE ERRORES</div>`
-        : ""
-      }
+      ${p.erroresLineas && p.erroresLineas.length ? 
+        `<div class="aviso">⚠ ESTE PEDIDO TIENE ERRORES</div>` : ""}
 
       <div class="botones">
         <button class="ver" onclick="ver(${i})">Ver</button>
@@ -190,12 +167,15 @@ function pintar(){
   document.getElementById("lista").innerHTML = html;
 }
 
+/* ==== VER ==== */
+
 function ver(i){
   let d = document.getElementById("l-"+i);
   d.style.display = d.style.display==="block"?"none":"block";
 }
 
-/* COMPARADOR */
+/* ==== COMPARAR ==== */
+
 function comparar(i){
 
   let data = leerPagos();
@@ -231,12 +211,12 @@ function comparar(i){
   alert(resultado);
 }
 
-/* PAGAR OK */
+/* ==== PAGAR OK ==== */
+
 function pagarOK(i){
 
   let pagos = leerPagos();
   let historico = leerHistorico();
-
   let p = pagos[i];
 
   if(p.erroresLineas && p.erroresLineas.length){
@@ -255,13 +235,36 @@ function pagarOK(i){
   pintar();
 }
 
-/* INCIDENCIA */
+/* ==== INCIDENCIA ==== */
+
 function incidencia(i){
 
   let pagos = leerPagos();
   let historico = leerHistorico();
+  let incidencias = leerIncidencias();
 
   let p = pagos[i];
+
+  let motivo = prompt("Motivo de la incidencia:");
+  if(!motivo) return;
+
+  let solucion = prompt("Solución esperada del proveedor:");
+  if(!solucion) return;
+
+  let operador = localStorage.getItem("usuario") || "CAMARERO";
+
+  let nueva = {
+    id: Date.now(),
+    proveedor: p.proveedor,
+    motivo: motivo,
+    solucion: solucion,
+    fecha: new Date().toLocaleString(),
+    creadaPor: operador,
+    resuelta: false
+  };
+
+  incidencias.unshift(nueva);
+  guardarIncidencias(incidencias);
 
   p.estado="INCIDENCIA";
 
@@ -273,6 +276,8 @@ function incidencia(i){
 
   pintar();
 }
+
+/* ==== INIT ==== */
 
 pintar();
 
