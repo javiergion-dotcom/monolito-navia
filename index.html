@@ -380,15 +380,8 @@ function actualizarFranja(){
   let texto = saludo();
 
   if(inc > 0){
-    texto += " · 🔴 " + inc + " incidencia" + (inc === 1 ? "" : "s") + " abierta" + (inc === 1 ? "" : "s");
-  }else{
-    texto += " · Sin incidencias";
-  }
-
-  if(com > 0){
-    texto += " · 🟠 " + com + " comunicación" + (com === 1 ? "" : "es") + " pendiente" + (com === 1 ? "" : "s");
-  }else{
-    texto += " · Sin comunicaciones";
+    texto += " [INC] " + inc + " incidencia" + (inc === 1 ? "" : "s");
+texto += " [COM] " + com + " comunicación" + (com === 1 ? "" : "es");
   }
 
   document.getElementById("franjaEstado").textContent = texto;
