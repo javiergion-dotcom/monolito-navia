@@ -20,9 +20,7 @@ html, body{
   background:#dfe6ec;
 }
 
-body{
-  overflow-x:hidden;
-}
+body{overflow-x:hidden}
 
 /* CABECERA */
 header{
@@ -35,10 +33,7 @@ header{
   box-shadow:0 4px 12px rgba(0,0,0,0.25);
 }
 
-.header-left{
-  display:flex;
-  flex-direction:column;
-}
+.header-left{display:flex;flex-direction:column}
 
 .title{
   font-size:22px;
@@ -80,6 +75,7 @@ header{
   padding:11px 24px;
   font-size:15px;
   border-bottom:1px solid rgba(0,0,0,0.05);
+  font-weight:700;
 }
 
 /* PANEL */
@@ -108,14 +104,11 @@ header{
   user-select:none;
   padding:20px 14px;
   touch-action:manipulation;
-
   background:linear-gradient(180deg,#8fb1c7 0%, #4f6f82 100%);
-
   box-shadow:
     inset 0 3px 6px rgba(255,255,255,0.24),
     inset 0 -8px 16px rgba(0,0,0,0.12),
     0 16px 30px rgba(0,0,0,0.30);
-
   transition:transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
 }
 
@@ -127,17 +120,10 @@ header{
   filter:brightness(0.96);
 }
 
-.azul{
-  background:linear-gradient(180deg,#8fb1c7 0%, #4f6f82 100%);
-}
-
-.naranja{
-  background:linear-gradient(180deg,#f6ae1b 0%, #df8b00 100%);
-}
-
-.verde{
-  background:linear-gradient(180deg,#78cc4b 0%, #48a530 100%);
-}
+.azul{background:linear-gradient(180deg,#8fb1c7 0%, #4f6f82 100%)}
+.naranja{background:linear-gradient(180deg,#f6ae1b 0%, #df8b00 100%)}
+.verde{background:linear-gradient(180deg,#78cc4b 0%, #48a530 100%)}
+.rojoBoton{background:linear-gradient(180deg,#ff4b4b 0%, #c40000 100%)}
 
 .icono{
   font-size:46px;
@@ -153,7 +139,7 @@ header{
   height:30px;
   padding:0 8px;
   border-radius:999px;
-  display:flex;
+  display:none;
   align-items:center;
   justify-content:center;
   font-size:14px;
@@ -162,28 +148,14 @@ header{
   box-shadow:0 3px 7px rgba(0,0,0,0.22);
 }
 
-.rojo{
-  background:#ff0000;
-}
-
-.amarillo{
-  background:#d99a00;
-}
+.rojo{background:#ff0000}
+.amarillo{background:#d99a00}
 
 /* TABLET */
 @media (max-width:1200px){
-  .panel{
-    gap:24px;
-  }
-
-  .boton{
-    min-height:126px;
-    font-size:20px;
-  }
-
-  .icono{
-    font-size:42px;
-  }
+  .panel{gap:24px}
+  .boton{min-height:126px;font-size:20px}
+  .icono{font-size:42px}
 }
 
 /* MÓVIL */
@@ -205,18 +177,14 @@ header{
     margin-bottom:10px;
   }
 
-  header{
-    padding:14px 16px;
-  }
+  header{padding:14px 16px}
 
   .franja{
     padding:10px 16px;
     font-size:14px;
   }
 
-  #hora{
-    font-size:15px;
-  }
+  #hora{font-size:15px}
 
   #usuario{
     font-size:13px;
@@ -241,7 +209,7 @@ header{
 </header>
 
 <div class="franja" id="franjaEstado">
-  Buenas tardes · Sin incidencias · Sin comunicaciones
+  Cargando estado...
 </div>
 
 <div class="panel">
@@ -249,7 +217,6 @@ header{
   <div class="boton azul" onclick="abrir('proveedores.html')">
     <div class="icono">🚚</div>
     <div>PROVEEDORES</div>
-    <div class="contador rojo">1</div>
   </div>
 
   <div class="boton azul" onclick="abrir('articulos.html')">
@@ -262,24 +229,28 @@ header{
     <div>COMPARADOR</div>
   </div>
 
-  <div class="boton azul" onclick="abrir('pedidos.html')">
+  <div class="boton verde" onclick="abrir('pedidos.html')">
     <div class="icono">📝</div>
     <div>PEDIDOS</div>
-    <div class="contador rojo">2</div>
   </div>
 
-  <div class="boton azul" onclick="abrir('pagos.html')">
+  <div class="boton verde" onclick="abrir('pagos.html')">
     <div class="icono">💳</div>
     <div>PAGOS</div>
+  </div>
+
+  <div class="boton rojoBoton" onclick="abrir('incidencias.html')">
+    <div class="icono">⚠️</div>
+    <div>INCIDENCIAS</div>
+    <div class="contador rojo" id="contadorIncidencias">0</div>
   </div>
 
   <div class="boton naranja" onclick="abrir('revision.html')">
     <div class="icono">🔎</div>
     <div>REVISIÓN</div>
-    <div class="contador rojo">1</div>
   </div>
 
-  <div class="boton verde" onclick="abrir('historico.html')">
+  <div class="boton azul" onclick="abrir('historico.html')">
     <div class="icono">📁</div>
     <div>HISTÓRICO</div>
   </div>
@@ -297,7 +268,7 @@ header{
   <div class="boton naranja" onclick="abrir('comunicacion.html')">
     <div class="icono">✉️</div>
     <div>COMUNICACIÓN</div>
-    <div class="contador amarillo">3</div>
+    <div class="contador amarillo" id="contadorComunicacion">0</div>
   </div>
 
   <div class="boton naranja" onclick="abrir('ayuda.html')">
@@ -333,10 +304,7 @@ function sonidoClick(){
     osc.stop(ctx.currentTime + 0.08);
   }catch(e){}
 }
-function contarIncidencias(){
-  const data = JSON.parse(localStorage.getItem("incidencias") || "[]");
-  return data.filter(x => !x.resuelta).length;
-}
+
 function vibrar(){
   try{
     if(navigator.vibrate){
@@ -344,10 +312,7 @@ function vibrar(){
     }
   }catch(e){}
 }
-function contarIncidencias(){
-  const data = JSON.parse(localStorage.getItem("incidencias") || "[]");
-  return data.filter(x => !x.resuelta).length;
-}
+
 function abrir(destino){
   vibrar();
   sonidoClick();
@@ -376,21 +341,70 @@ function cargarUsuario(){
   document.getElementById("usuario").textContent = usuario;
 }
 
+function contarIncidencias(){
+  const data = JSON.parse(localStorage.getItem("incidencias") || "[]");
+  return data.filter(x => !x.resuelta).length;
+}
+
+function contarComunicaciones(){
+  const data = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
+  return data.filter(x => !x.resuelta && !x.hecha).length;
+}
+
+function actualizarContadores(){
+  const inc = contarIncidencias();
+  const com = contarComunicaciones();
+
+  const contadorInc = document.getElementById("contadorIncidencias");
+  const contadorCom = document.getElementById("contadorComunicacion");
+
+  if(inc > 0){
+    contadorInc.textContent = inc;
+    contadorInc.style.display = "flex";
+  }else{
+    contadorInc.style.display = "none";
+  }
+
+  if(com > 0){
+    contadorCom.textContent = com;
+    contadorCom.style.display = "flex";
+  }else{
+    contadorCom.style.display = "none";
+  }
+}
+
 function actualizarFranja(){
-  document.getElementById("franjaEstado").textContent =
-    saludo() + " · Sin incidencias · Sin comunicaciones";
+  const inc = contarIncidencias();
+  const com = contarComunicaciones();
+
+  let texto = saludo();
+
+  if(inc > 0){
+    texto += " · 🔴 " + inc + " incidencia" + (inc === 1 ? "" : "s") + " abierta" + (inc === 1 ? "" : "s");
+  }else{
+    texto += " · Sin incidencias";
+  }
+
+  if(com > 0){
+    texto += " · 🟠 " + com + " comunicación" + (com === 1 ? "" : "es") + " pendiente" + (com === 1 ? "" : "s");
+  }else{
+    texto += " · Sin comunicaciones";
+  }
+
+  document.getElementById("franjaEstado").textContent = texto;
 }
 
 setInterval(function(){
   reloj();
   actualizarFranja();
+  actualizarContadores();
 }, 1000);
 
 cargarUsuario();
 reloj();
 actualizarFranja();
+actualizarContadores();
 </script>
-<script>
 
 </body>
 </html>
