@@ -19,6 +19,7 @@ button{border:0;border-radius:10px;padding:8px 12px;font-weight:800;margin-top:6
 .comp{background:#9c27b0;color:white}
 .ok{background:#4caf50;color:white}
 .errorBtn{background:#f44336;color:white}
+.pdf{background:#ff9800;color:white}
 .lineas{display:none;margin-top:10px}
 .linea{padding:8px 0;border-bottom:1px dashed #ccc}
 .lineaError{background:#ffe5e5;color:#c00000;font-weight:900;padding:8px;border-radius:8px}
@@ -65,7 +66,6 @@ function numero(n){
   return Number(n || 0);
 }
 
-/* CLAVE: precio robusto */
 function precioLinea(l){
   if(numero(l.precioSinIva) > 0) return numero(l.precioSinIva);
   if(numero(l.precioUnidad) > 0) return numero(l.precioUnidad) * numero(l.formato || 1);
@@ -122,6 +122,7 @@ function pintar(){
         <button class="comp" onclick="comparar(${i})">Comparar</button>
         <button class="ok" onclick="pagarOK(${i})">PAGAR OK</button>
         <button class="errorBtn" onclick="incidencia(${i})">INCIDENCIA</button>
+        <button class="pdf" onclick="generarPDF(${i})">PDF</button>
       </div>
 
       <div class="lineas" id="l-${i}">
@@ -233,6 +234,98 @@ function incidencia(i){
   guardarPagos(pagos);
 
   pintar();
+}
+
+function generarPDF(i){
+  let data = leerPagos();
+  let p = data[i];
+
+  let lineas = "";
+
+  if(p.lineas){
+    p.lineas.forEach(l=>{
+      let precio = precioLinea(l);
+      let base = baseLinea(l);
+
+      lineas += `
+        <div class="lineaPDF">
+          <b>${l.articulo}</b><br>
+          ${l.cantidad} × ${euros(precio)} = ${euros(base)}
+          ${l.unidadFormato ? `<br><span>${l.unidadFormato}</span>` : ""}
+        </div>
+      `;
+    });
+  }
+
+  let html = `
+  <!DOCTYPE html>
+  <html lang="es">
+  <head>
+  <meta charset="UTF-8">
+  <title>Pedido ${p.proveedor}</title>
+  <style>
+    body{
+      font-family:Arial;
+      padding:28px;
+      color:#17303d;
+    }
+    h1{
+      font-size:22px;
+      margin-bottom:18px;
+    }
+    .dato{
+      margin:4px 0;
+      font-size:14px;
+    }
+    h2{
+      font-size:16px;
+      margin-top:22px;
+      border-bottom:1px solid #ccc;
+      padding-bottom:8px;
+    }
+    .lineaPDF{
+      margin:10px 0;
+      font-size:14px;
+    }
+    .lineaPDF span{
+      color:#555;
+      font-size:13px;
+    }
+    .totalPDF{
+      margin-top:26px;
+      border-top:2px solid #17303d;
+      padding-top:12px;
+      font-size:20px;
+      font-weight:900;
+    }
+  </style>
+  </head>
+  <body>
+
+    <h1>MONOLITO · PEDIDO</h1>
+
+    <div class="dato"><b>Proveedor:</b> ${p.proveedor}</div>
+    <div class="dato"><b>Fecha:</b> ${p.fecha || ""}</div>
+    <div class="dato"><b>Estado:</b> ${p.estado || "PENDIENTE"}</div>
+
+    <h2>ARTÍCULOS</h2>
+
+    ${lineas}
+
+    <div class="totalPDF">TOTAL: ${euros(p.total)}</div>
+
+  </body>
+  </html>
+  `;
+
+  let w = window.open("", "_blank");
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+
+  setTimeout(()=>{
+    w.print();
+  },500);
 }
 
 pintar();
