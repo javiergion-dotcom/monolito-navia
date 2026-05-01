@@ -7,82 +7,32 @@
 
 <style>
 body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  font-weight:900;
-  font-size:20px;
-}
-
-/* ICONO VERDE */
+header{background:#17303d;color:white;padding:16px;font-weight:900;font-size:20px}
 .icono{color:#4caf50}
-
-/* TARJETAS */
-.card{
-  background:white;
-  margin:12px;
-  padding:14px;
-  border-radius:16px;
-}
-
+.card{background:white;margin:12px;padding:14px;border-radius:16px}
 .nombre{font-size:22px;font-weight:900}
 .total{font-size:26px;font-weight:900;margin-top:6px}
 .detalle{color:#4f5f69;margin-top:4px}
-
-/* BOTONES */
-button{
-  border:0;
-  border-radius:10px;
-  padding:8px 12px;
-  font-weight:800;
-  margin-top:6px;
-}
-
+button{border:0;border-radius:10px;padding:8px 12px;font-weight:800;margin-top:6px}
 .botones{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-
 .ver{background:#17303d;color:white}
 .comp{background:#9c27b0;color:white}
 .ok{background:#4caf50;color:white}
 .errorBtn{background:#f44336;color:white}
-
-/* LÍNEAS */
 .lineas{display:none;margin-top:10px}
-
-.linea{
-  padding:8px 0;
-  border-bottom:1px dashed #ccc;
-}
-
-.lineaError{
-  background:#ffe5e5;
-  color:#c00000;
-  font-weight:900;
-  padding:8px;
-  border-radius:8px;
-}
-
-.aviso{
-  color:#c00000;
-  font-weight:900;
-  margin-top:6px;
-}
+.linea{padding:8px 0;border-bottom:1px dashed #ccc}
+.lineaError{background:#ffe5e5;color:#c00000;font-weight:900;padding:8px;border-radius:8px}
+.aviso{color:#c00000;font-weight:900;margin-top:6px}
 </style>
 </head>
 
 <body>
 
-<header>
-  <span class="icono">💳 PAGOS</span>
-</header>
+<header><span class="icono">💳 PAGOS</span></header>
 
 <div id="lista"></div>
 
 <script>
-
-/* ==== STORAGE ==== */
-
 function leerPagos(){
   return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 }
@@ -107,18 +57,35 @@ function guardarIncidencias(data){
   localStorage.setItem("incidencias", JSON.stringify(data));
 }
 
-/* ==== UTIL ==== */
-
 function euros(n){
   return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
 
-/* ==== PINTAR ==== */
+function numero(n){
+  return Number(n || 0);
+}
+
+/* CLAVE: precio robusto */
+function precioLinea(l){
+  if(numero(l.precioSinIva) > 0) return numero(l.precioSinIva);
+  if(numero(l.precioUnidad) > 0) return numero(l.precioUnidad) * numero(l.formato || 1);
+  if(numero(l.precio) > 0) return numero(l.precio);
+  if(numero(l.base) > 0 && numero(l.cantidad) > 0) return numero(l.base) / numero(l.cantidad);
+  return 0;
+}
+
+function baseLinea(l){
+  if(numero(l.base) > 0) return numero(l.base);
+  return numero(l.cantidad) * precioLinea(l);
+}
 
 function pintar(){
-
   let data = leerPagos();
   let html = "";
+
+  if(data.length === 0){
+    html = `<div class="card"><b>No hay pagos pendientes.</b></div>`;
+  }
 
   data.forEach((p,i)=>{
 
@@ -127,13 +94,15 @@ function pintar(){
     if(p.lineas){
       p.lineas.forEach((l,idx)=>{
 
-        let base = l.base || (l.cantidad*l.precioSinIva);
+        let precio = precioLinea(l);
+        let base = baseLinea(l);
         let esError = p.erroresLineas && p.erroresLineas.includes(idx);
 
         lineasHTML += `
         <div class="linea ${esError ? "lineaError" : ""}">
-          ${l.articulo}<br>
-          ${l.cantidad} × ${euros(l.precioSinIva)} = ${euros(base)}
+          <b>${l.articulo}</b><br>
+          ${l.cantidad} × ${euros(precio)} = ${euros(base)}
+          ${l.unidadFormato ? `<div class="detalle">${l.unidadFormato}</div>` : ""}
           ${esError ? `<div>⚠ Error en esta línea</div>` : ""}
         </div>`;
       });
@@ -141,7 +110,6 @@ function pintar(){
 
     html += `
     <div class="card">
-
       <div class="nombre">${p.proveedor}</div>
       <div class="detalle">${p.fecha || ""}</div>
       <div class="total">${euros(p.total)}</div>
@@ -159,62 +127,51 @@ function pintar(){
       <div class="lineas" id="l-${i}">
         ${lineasHTML}
       </div>
-
-    </div>
-    `;
+    </div>`;
   });
 
   document.getElementById("lista").innerHTML = html;
 }
 
-/* ==== VER ==== */
-
 function ver(i){
   let d = document.getElementById("l-"+i);
-  d.style.display = d.style.display==="block"?"none":"block";
+  d.style.display = d.style.display==="block" ? "none" : "block";
 }
 
-/* ==== COMPARAR ==== */
-
 function comparar(i){
-
   let data = leerPagos();
   let p = data[i];
 
   let errores = [];
-  let resultado="";
+  let resultado = "";
 
   p.lineas.forEach((l,idx)=>{
+    let precioEsperado = precioLinea(l);
 
-    let cant = prompt(`Cantidad real ${l.articulo}`,l.cantidad);
-    let precio = prompt(`Precio real ${l.articulo}`,l.precioSinIva);
+    let cant = prompt(`Cantidad real ${l.articulo}`, l.cantidad);
+    let precio = prompt(`Precio real ${l.articulo}`, precioEsperado);
 
-    let error="";
+    let error = "";
 
-    if(Number(cant)!=Number(l.cantidad)) error+="UNIDADES ";
-    if(Number(precio)!=Number(l.precioSinIva)) error+="PRECIO ";
+    if(Number(cant) !== Number(l.cantidad)) error += "UNIDADES ";
+    if(Number(precio) !== Number(precioEsperado)) error += "PRECIO ";
 
-    if(error===""){
-      resultado+=`✔ ${l.articulo}\n`;
+    if(error === ""){
+      resultado += `✔ ${l.articulo}\n`;
     }else{
-      resultado+=`🔴 ${l.articulo}: ${error}\n`;
+      resultado += `🔴 ${l.articulo}: ${error}\n`;
       errores.push(idx);
     }
-
   });
 
   p.erroresLineas = errores;
 
   guardarPagos(data);
   pintar();
-
   alert(resultado);
 }
 
-/* ==== PAGAR OK ==== */
-
 function pagarOK(i){
-
   let pagos = leerPagos();
   let historico = leerHistorico();
   let p = pagos[i];
@@ -224,7 +181,8 @@ function pagarOK(i){
     return;
   }
 
-  p.estado="OK";
+  p.estado = "OK";
+  p.fechaPago = new Date().toLocaleString("es-ES");
 
   historico.unshift(p);
   pagos.splice(i,1);
@@ -235,10 +193,7 @@ function pagarOK(i){
   pintar();
 }
 
-/* ==== INCIDENCIA ==== */
-
 function incidencia(i){
-
   let pagos = leerPagos();
   let historico = leerHistorico();
   let incidencias = leerIncidencias();
@@ -258,7 +213,7 @@ function incidencia(i){
     proveedor: p.proveedor,
     motivo: motivo,
     solucion: solucion,
-    fecha: new Date().toLocaleString(),
+    fecha: new Date().toLocaleString("es-ES"),
     creadaPor: operador,
     resuelta: false
   };
@@ -266,7 +221,10 @@ function incidencia(i){
   incidencias.unshift(nueva);
   guardarIncidencias(incidencias);
 
-  p.estado="INCIDENCIA";
+  p.estado = "INCIDENCIA";
+  p.motivoIncidencia = motivo;
+  p.solucionIncidencia = solucion;
+  p.fechaPago = new Date().toLocaleString("es-ES");
 
   historico.unshift(p);
   pagos.splice(i,1);
@@ -277,10 +235,7 @@ function incidencia(i){
   pintar();
 }
 
-/* ==== INIT ==== */
-
 pintar();
-
 </script>
 
 </body>
