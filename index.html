@@ -7,58 +7,49 @@
 
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{
-  margin:0;padding:0;width:100%;min-height:100%;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#dfe6ec;
-}
+html,body{margin:0;padding:0;width:100%;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#dfe6ec}
 body{overflow-x:hidden}
 
-header{
-  background:#17303d;color:white;padding:16px 24px;
-  display:flex;justify-content:space-between;align-items:center;
+header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.header-left{display:flex;flex-direction:column}
+.title{font-size:22px;font-weight:700;letter-spacing:.3px}
+.sub{font-size:13px;opacity:.85;margin-top:3px}
+.header-right{display:flex;align-items:center;gap:16px}
+#usuario{background:rgba(255,255,255,.14);padding:9px 14px;border-radius:999px;font-size:15px;font-weight:700;white-space:nowrap}
+#hora{font-size:18px;font-weight:600;white-space:nowrap}
+
+.franja{background:#eef2f5;color:#4f5f69;padding:11px 24px;font-size:15px;border-bottom:1px solid rgba(0,0,0,.05);font-weight:700}
+
+.panel{padding:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+
+.boton{position:relative;min-height:132px;border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:white;font-size:22px;font-weight:700;letter-spacing:.4px;cursor:pointer;user-select:none;padding:20px 14px;touch-action:manipulation;background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%);box-shadow:inset 0 3px 6px rgba(255,255,255,.24),inset 0 -8px 16px rgba(0,0,0,.12),0 16px 30px rgba(0,0,0,.30);transition:transform .08s ease,box-shadow .08s ease,filter .08s ease}
+.boton:active{transform:translateY(10px) scale(.96);box-shadow:inset 0 10px 18px rgba(0,0,0,.26),0 6px 12px rgba(0,0,0,.28);filter:brightness(.96)}
+
+.azul{background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%)}
+.naranja{background:linear-gradient(180deg,#f6ae1b 0%,#df8b00 100%)}
+.verde{background:linear-gradient(180deg,#78cc4b 0%,#48a530 100%)}
+.rojoBoton{background:linear-gradient(180deg,#ff4b4b 0%,#c40000 100%)}
+
+.icono{font-size:46px;line-height:1;margin-bottom:12px}
+
+.contador{position:absolute;top:11px;right:13px;min-width:30px;height:30px;padding:0 8px;border-radius:999px;display:none;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;box-shadow:0 3px 7px rgba(0,0,0,.22)}
+.rojo{background:#ff0000}
+.amarillo{background:#d99a00}
+
+@media (max-width:1200px){
+  .panel{gap:24px}
+  .boton{min-height:126px;font-size:20px}
+  .icono{font-size:42px}
 }
-.title{font-size:22px;font-weight:700}
-.sub{font-size:13px;opacity:.85}
-.header-right{display:flex;gap:16px;align-items:center}
-#usuario{background:rgba(255,255,255,.15);padding:8px 12px;border-radius:999px;font-weight:700}
-#hora{font-weight:700}
 
-.franja{
-  background:#eef2f5;padding:10px 20px;
-  font-weight:700;color:#4f5f69;
-}
-
-.panel{
-  padding:20px;
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:20px;
-}
-
-.boton{
-  border-radius:24px;
-  min-height:130px;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  font-weight:700;color:white;
-  position:relative;
-}
-
-.azul{background:linear-gradient(#8fb1c7,#4f6f82)}
-.verde{background:linear-gradient(#78cc4b,#48a530)}
-.naranja{background:linear-gradient(#f6ae1b,#df8b00)}
-.rojoBoton{background:linear-gradient(#ff4b4b,#c40000)}
-
-.icono{font-size:40px;margin-bottom:10px}
-
-.contador{
-  position:absolute;top:10px;right:10px;
-  background:red;color:white;
-  border-radius:999px;
-  padding:5px 10px;
-  font-size:14px;
-  display:none;
+@media (max-width:900px){
+  .panel{grid-template-columns:repeat(2,1fr);gap:20px;padding:18px}
+  .boton{min-height:130px;font-size:19px;border-radius:24px}
+  .icono{font-size:40px;margin-bottom:10px}
+  header{padding:14px 16px}
+  .franja{padding:10px 16px;font-size:14px}
+  #hora{font-size:15px}
+  #usuario{font-size:13px;padding:8px 11px}
 }
 </style>
 </head>
@@ -66,48 +57,121 @@ header{
 <body>
 
 <header>
-  <div>
+  <div class="header-left">
     <div class="title">MONOLITO</div>
     <div class="sub">Sistema de control · El Monolito</div>
   </div>
+
   <div class="header-right">
     <div id="usuario">OPERADOR</div>
     <div id="hora"></div>
   </div>
 </header>
 
-<div class="franja" id="franjaEstado"></div>
+<div class="franja" id="franjaEstado">Cargando estado...</div>
 
 <div class="panel">
 
-<div class="boton azul"><div class="icono">🚚</div>PROVEEDORES</div>
-<div class="boton azul"><div class="icono">📦</div>ARTÍCULOS</div>
-<div class="boton azul"><div class="icono">📊</div>COMPARADOR</div>
-<div class="boton verde"><div class="icono">📝</div>PEDIDOS</div>
-<div class="boton verde"><div class="icono">💳</div>PAGOS</div>
+  <div class="boton azul" onclick="abrir('proveedores.html')">
+    <div class="icono">🚚</div>
+    <div>PROVEEDORES</div>
+  </div>
 
-<div class="boton rojoBoton" onclick="location.href='incidencias.html'">
-  <div class="icono">⚠️</div>INCIDENCIAS
-  <div class="contador" id="contadorIncidencias">0</div>
-</div>
+  <div class="boton azul" onclick="abrir('articulos.html')">
+    <div class="icono">📦</div>
+    <div>ARTÍCULOS</div>
+  </div>
 
-<div class="boton naranja"><div class="icono">🔎</div>REVISIÓN</div>
-<div class="boton azul"><div class="icono">📁</div>HISTÓRICO</div>
-<div class="boton azul"><div class="icono">💰</div>VENTAS</div>
+  <div class="boton azul" onclick="abrir('comparador.html')">
+    <div class="icono">📊</div>
+    <div>COMPARADOR</div>
+  </div>
 
-<div class="boton azul" onclick="location.href='calendario.html'">
-  <div class="icono">📅</div>CALENDARIO
-</div>
+  <div class="boton verde" onclick="abrir('pedidos.html')">
+    <div class="icono">📝</div>
+    <div>PEDIDOS</div>
+  </div>
 
-<div class="boton naranja"><div class="icono">✉️</div>COMUNICACIÓN</div>
-<div class="boton naranja"><div class="icono">🤖</div>AYUDA</div>
-<div class="boton azul"><div class="icono">⚙️</div>CONFIGURACIÓN</div>
+  <div class="boton verde" onclick="abrir('pagos.html')">
+    <div class="icono">💳</div>
+    <div>PAGOS</div>
+  </div>
+
+  <div class="boton rojoBoton" onclick="abrir('incidencias.html')">
+    <div class="icono">⚠️</div>
+    <div>INCIDENCIAS</div>
+    <div class="contador rojo" id="contadorIncidencias">0</div>
+  </div>
+
+  <div class="boton naranja" onclick="abrir('revision.html')">
+    <div class="icono">🔎</div>
+    <div>REVISIÓN</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('historico.html')">
+    <div class="icono">📁</div>
+    <div>HISTÓRICO</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('ventas.html')">
+    <div class="icono">💰</div>
+    <div>VENTAS</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('calendario.html')">
+    <div class="icono">📅</div>
+    <div>CALENDARIO</div>
+  </div>
+
+  <div class="boton naranja" onclick="abrir('comunicacion.html')">
+    <div class="icono">✉️</div>
+    <div>COMUNICACIÓN</div>
+    <div class="contador amarillo" id="contadorComunicacion">0</div>
+  </div>
+
+  <div class="boton naranja" onclick="abrir('ayuda.html')">
+    <div class="icono">🤖</div>
+    <div>AYUDA</div>
+  </div>
+
+  <div class="boton azul" onclick="abrir('configuracion.html')">
+    <div class="icono">⚙️</div>
+    <div>CONFIGURACIÓN</div>
+  </div>
 
 </div>
 
 <script>
+function sonidoClick(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(240, ctx.currentTime);
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.08);
+  }catch(e){}
+}
 
-/* ==== DATOS ==== */
+function vibrar(){
+  try{
+    if(navigator.vibrate){navigator.vibrate(20)}
+  }catch(e){}
+}
+
+function abrir(destino){
+  vibrar();
+  sonidoClick();
+  setTimeout(function(){
+    window.location.href = destino;
+  },70);
+}
 
 function leerIncidencias(){
   return JSON.parse(localStorage.getItem("incidencias") || "[]");
@@ -121,31 +185,28 @@ function leerCalendario(){
   return JSON.parse(localStorage.getItem("calendario") || "{}");
 }
 
-/* ==== CONTADORES ==== */
-
 function contarIncidencias(){
-  return leerIncidencias().filter(x=>!x.resuelta).length;
+  return leerIncidencias().filter(x => !x.resuelta).length;
 }
 
 function contarComunicaciones(){
-  return leerComunicaciones().filter(x=>!x.resuelta && !x.hecha).length;
+  return leerComunicaciones().filter(x => !x.resuelta && !x.hecha).length;
 }
 
 function contarCalendario(){
-
   const data = leerCalendario();
-
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
 
   const limite = new Date(hoy);
-  limite.setDate(hoy.getDate()+7);
+  limite.setDate(hoy.getDate() + 7);
 
   let total = 0;
 
   Object.values(data).forEach(r=>{
-    const f = new Date(r.fecha+"T12:00:00");
-    if(f>=hoy && f<=limite){
+    if(!r.fecha) return;
+    const f = new Date(r.fecha + "T12:00:00");
+    if(f >= hoy && f <= limite){
       total++;
     }
   });
@@ -153,69 +214,75 @@ function contarCalendario(){
   return total;
 }
 
-/* ==== UI ==== */
+function reloj(){
+  const d = new Date();
+  document.getElementById("hora").innerHTML =
+    d.toLocaleDateString("es-ES") + " · " +
+    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+}
+
+function saludo(){
+  const h = new Date().getHours();
+  if(h < 6) return "Buenas noches";
+  if(h < 12) return "Buenos días";
+  if(h < 21) return "Buenas tardes";
+  return "Buenas noches";
+}
+
+function cargarUsuario(){
+  const usuario = localStorage.getItem("usuario") || "OPERADOR";
+  document.getElementById("usuario").textContent = usuario;
+}
+
+function actualizarContadores(){
+  const inc = contarIncidencias();
+  const com = contarComunicaciones();
+
+  const contadorInc = document.getElementById("contadorIncidencias");
+  const contadorCom = document.getElementById("contadorComunicacion");
+
+  if(inc > 0){
+    contadorInc.textContent = inc;
+    contadorInc.style.display = "flex";
+  }else{
+    contadorInc.style.display = "none";
+  }
+
+  if(com > 0){
+    contadorCom.textContent = com;
+    contadorCom.style.display = "flex";
+  }else{
+    contadorCom.style.display = "none";
+  }
+}
 
 function actualizarFranja(){
-
-  let texto = saludo();
-
   const inc = contarIncidencias();
   const com = contarComunicaciones();
   const cal = contarCalendario();
 
-  if(inc>0){
-    texto += " · [INC] "+inc;
+  let texto = saludo();
+
+  if(inc > 0){
+    texto += " · [INC] " + inc;
   }
 
-  if(com>0){
-    texto += " · [COM] "+com;
+  if(com > 0){
+    texto += " · [COM] " + com;
   }
 
-  if(cal>0){
-    texto += " · 📅 "+cal+" recordatorio"+(cal===1?"":"s");
+  if(cal > 0){
+    texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s");
   }
 
-  if(inc===0 && com===0 && cal===0){
+  if(inc === 0 && com === 0 && cal === 0){
     texto += " · Sin avisos";
   }
 
   document.getElementById("franjaEstado").textContent = texto;
 }
 
-function actualizarContadores(){
-  const inc = contarIncidencias();
-  const el = document.getElementById("contadorIncidencias");
-
-  if(inc>0){
-    el.textContent = inc;
-    el.style.display="block";
-  }else{
-    el.style.display="none";
-  }
-}
-
-function saludo(){
-  const h=new Date().getHours();
-  if(h<12) return "Buenos días";
-  if(h<21) return "Buenas tardes";
-  return "Buenas noches";
-}
-
-function reloj(){
-  const d=new Date();
-  document.getElementById("hora").innerHTML =
-    d.toLocaleDateString("es-ES")+" · "+
-    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
-}
-
-function cargarUsuario(){
-  document.getElementById("usuario").textContent =
-    localStorage.getItem("usuario")||"OPERADOR";
-}
-
-/* ==== LOOP ==== */
-
-setInterval(()=>{
+setInterval(function(){
   reloj();
   actualizarFranja();
   actualizarContadores();
@@ -225,7 +292,6 @@ cargarUsuario();
 reloj();
 actualizarFranja();
 actualizarContadores();
-
 </script>
 
 </body>
