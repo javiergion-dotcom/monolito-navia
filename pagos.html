@@ -79,66 +79,85 @@ function baseLinea(l){
   return numero(l.cantidad) * precioLinea(l);
 }
 
-function pintar(){
-  let data = leerPagos();
-  let html = "";
 
-  if(data.length === 0){
-    html = `<div class="card"><b>No hay pagos pendientes.</b></div>`;
-  }
-
-  data.forEach((p,i)=>{
-
-    let lineasHTML = "";
-
-    if(p.lineas){
-      p.lineas.forEach((l,idx)=>{
-
-        let precio = precioLinea(l);
-        let base = baseLinea(l);
-        let esError = p.erroresLineas && p.erroresLineas.includes(idx);
-
-        lineasHTML += `
-        <div class="linea ${esError ? "lineaError" : ""}">
-          <b>${l.articulo}</b><br>
-          ${l.cantidad} × ${euros(precio)} = ${euros(base)}
-          ${l.unidadFormato ? `<div class="detalle">${l.unidadFormato}</div>` : ""}
-          ${esError ? `<div>⚠ Error en esta línea</div>` : ""}
-        </div>`;
-      });
-    }
-
-    html += `
-    <div class="card">
-      <div class="nombre">${p.proveedor}</div>
-      <div class="detalle">${p.fecha || ""}</div>
-      <div class="total">${euros(p.total)}</div>
-
-      ${p.erroresLineas && p.erroresLineas.length ? 
-        `<div class="aviso">⚠ ESTE PEDIDO TIENE ERRORES</div>` : ""}
-
-      <div class="botones">
-        <button class="ver" onclick="ver(${i})">Ver</button>
-        <button class="comp" onclick="comparar(${i})">Comparar</button>
-        <button class="ok" onclick="pagarOK(${i})">PAGAR OK</button>
-        <button class="errorBtn" onclick="incidencia(${i})">INCIDENCIA</button>
-        <button class="pdf" onclick="generarPDF(${i})">PDF</button>
-      </div>
-
-      <div class="lineas" id="l-${i}">
-        ${lineasHTML}
-      </div>
-    </div>`;
-  });
-
-  document.getElementById("lista").innerHTML = html;
-}
 
 function ver(i){
   let d = document.getElementById("l-"+i);
   d.style.display = d.style.display==="block" ? "none" : "block";
 }
+function pintar(){
 
+  let data = leerPagos();
+
+  // ORDENAR POR FECHA DESC
+  data.sort((a,b)=> new Date(b.fecha) - new Date(a.fecha));
+
+  let grupos = {};
+
+  data.forEach(p=>{
+    let semana = obtenerSemana(p.fecha);
+    let year = new Date(p.fecha).getFullYear();
+    let key = `SEMANA ${semana} · ${year}`;
+
+    if(!grupos[key]) grupos[key] = [];
+    grupos[key].push(p);
+  });
+
+  let html = "";
+
+  Object.keys(grupos).forEach(semana=>{
+
+    html += `
+      <div style="padding:10px;font-weight:900;font-size:18px">
+        ${semana}
+      </div>
+    `;
+
+    grupos[semana].forEach((p,i)=>{
+
+      let idx = data.indexOf(p);
+
+      let lineasHTML = "";
+
+      if(p.lineas){
+        p.lineas.forEach(l=>{
+          let precio = precioLinea(l);
+          let base = baseLinea(l);
+
+          lineasHTML += `
+            <div class="linea">
+              ${l.articulo}<br>
+              ${l.cantidad} × ${euros(precio)} = ${euros(base)}
+            </div>
+          `;
+        });
+      }
+
+      html += `
+      <div class="card">
+        <div class="nombre">${p.proveedor}</div>
+        <div class="detalle">${p.fecha}</div>
+        <div class="total">${euros(p.total)}</div>
+
+        <div class="botones">
+          <button class="ver" onclick="ver(${idx})">Ver</button>
+          <button class="comp" onclick="comparar(${idx})">Comparar</button>
+          <button class="ok" onclick="pagarOK(${idx})">PAGAR OK</button>
+          <button class="errorBtn" onclick="incidencia(${idx})">INCIDENCIA</button>
+          <button class="pdf" onclick="generarPDF(${idx})">PDF</button>
+        </div>
+
+        <div class="lineas" id="l-${idx}">
+          ${lineasHTML}
+        </div>
+      </div>
+      `;
+    });
+
+  });
+
+  document.getElementById("lista").innerHTML = html;
+}
 function comparar(i){
   let data = leerPagos();
   let p = data[i];
