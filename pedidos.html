@@ -21,9 +21,7 @@ header{
   font-size:20px;
 }
 
-.contenedor{
-  padding:16px;
-}
+.contenedor{padding:16px;}
 
 select{
   width:100%;
@@ -40,15 +38,8 @@ select{
   margin-bottom:10px;
 }
 
-.nombre{
-  font-weight:900;
-  font-size:17px;
-}
-
-.detalle{
-  color:#4f5f69;
-  font-size:14px;
-}
+.nombre{font-weight:900;font-size:17px;}
+.detalle{color:#4f5f69;font-size:14px;}
 
 .fila{
   display:flex;
@@ -135,10 +126,9 @@ function leerProveedores(){
   return p;
 }
 
-/* ===== INICIO ===== */
+/* ===== INIT ===== */
 
 function cargarProveedores(){
-
   const proveedores = leerProveedores();
 
   document.getElementById("proveedor").innerHTML =
@@ -180,7 +170,7 @@ function pintar(){
       <div class="nombre">${a.articulo}</div>
 
       <div class="detalle">
-        ${a.unidadFormato} · ${a.precioUnidad.toFixed(2)} € sin IVA · IVA ${a.iva}%
+        ${a.unidadFormato} · ${a.precioUnidad.toFixed(2)} € · IVA ${a.iva}%
       </div>
 
       <div class="fila">
@@ -199,7 +189,7 @@ function pintar(){
   calcular();
 }
 
-/* ===== CAMBIO ===== */
+/* ===== CAMBIOS ===== */
 
 function cambiar(i, valor){
   pedido[i].cantidad = Number(valor);
@@ -214,16 +204,13 @@ function calcular(){
 
   pedido.forEach((a,i)=>{
 
-    let precio = Number(a.precioUnidad) * Number(a.formato);
-    let linea = a.cantidad * precio;
+    let precioCaja = a.precioUnidad * a.formato;
+    let linea = a.cantidad * precioCaja;
 
     total += linea;
 
-    let el = document.getElementById("t"+i);
-    if(el){
-      el.textContent = linea.toFixed(2) + " €";
-    }
-
+    document.getElementById("t"+i).textContent =
+      linea.toFixed(2) + " €";
   });
 
   document.getElementById("totalFinal").textContent =
@@ -248,8 +235,14 @@ function guardarPedido(){
     return;
   }
 
-  const total = lineas.reduce((t,a)=>
-    t + (a.cantidad * a.precioUnidad * a.formato)
+  const lineasFinal = lineas.map(a => ({
+    articulo: a.articulo,
+    cantidad: a.cantidad,
+    precioSinIva: a.precioUnidad * a.formato   // 🔥 CLAVE
+  }));
+
+  const total = lineasFinal.reduce((t,l)=>
+    t + (l.cantidad * l.precioSinIva)
   ,0);
 
   let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
@@ -258,17 +251,17 @@ function guardarPedido(){
     proveedor,
     fecha: new Date().toLocaleString(),
     total,
-    lineas
+    lineas: lineasFinal
   });
 
   localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
 
-  alert("Pedido guardado");
+  alert("Pedido guardado correctamente");
 
   location.reload();
 }
 
-/* ===== INIT ===== */
+/* ===== START ===== */
 
 cargarProveedores();
 
