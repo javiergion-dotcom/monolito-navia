@@ -6,214 +6,280 @@
 <title>PEDIDOS · MONOLITO</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#eef2f5;
-  color:#17303d;
-}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  font-weight:900;
-  font-size:20px;
-}
-
-.contenedor{
-  padding:16px;
-}
-
-select, input{
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  font-size:16px;
-}
-
-button{
-  padding:10px;
-  border:0;
-  border-radius:10px;
-  font-weight:800;
-  margin-top:10px;
-}
-
-.add{background:#17303d;color:white}
-.guardar{background:#4caf50;color:white}
-
-.linea{
-  background:white;
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:10px;
-}
-
-.aviso{
-  background:#ffe5e5;
-  color:#c00000;
-  padding:10px;
-  border-radius:10px;
-  font-weight:900;
-  margin-bottom:10px;
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:10px 14px;font-weight:900}
+.volver{background:white;color:#17303d}
+.contenido{padding:16px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+label{font-weight:900;display:block;margin-bottom:8px}
+select,input{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:17px}
+.aviso{background:#ffe1e1;border-left:14px solid #ff0000;color:#17303d;border-radius:18px;padding:14px;margin-bottom:14px;font-size:18px}
+.articulo{display:grid;grid-template-columns:1fr 110px 120px;gap:10px;align-items:center;border-bottom:1px solid #dfe6ec;padding:14px 0}
+.nombre{font-weight:900;font-size:18px}
+.detalle{color:#4f5f69;margin-top:4px}
+.cantidad{text-align:center;font-size:20px;font-weight:900}
+.importe{text-align:right;font-size:20px;font-weight:900}
+.total{font-size:28px;font-weight:900;text-align:right;margin-top:14px}
+.guardar{background:#48a530;color:white;width:100%;font-size:20px;margin-top:14px}
+.vacio{font-weight:900;text-align:center;padding:20px}
+@media(max-width:700px){
+  .articulo{grid-template-columns:1fr 95px 100px}
 }
 </style>
 </head>
 
 <body>
 
-<header>📝 PEDIDOS</header>
+<header>
+  <button class="volver" onclick="location.href='index.html'">← Volver</button>
+  <h2>📝 PEDIDOS</h2>
+</header>
 
-<div class="contenedor">
+<div class="contenido">
 
-<select id="proveedor" onchange="cambioProveedor()">
-  <option value="">Selecciona proveedor</option>
-  <option value="MAHOU">MAHOU</option>
-  <option value="COCA_COLA">COCA_COLA</option>
-  <option value="PANADERIA">PANADERIA</option>
-</select>
+  <div id="avisoIncidencias"></div>
 
-<div id="avisoIncidencias"></div>
+  <div class="card">
+    <label>Proveedor</label>
+    <select id="proveedor" onchange="cambioProveedor()"></select>
+  </div>
 
-<div id="lineas"></div>
-
-<button class="add" onclick="agregarLinea()">+ Añadir línea</button>
-
-<div style="margin-top:15px;font-weight:900" id="total"></div>
-
-<button class="guardar" onclick="guardarPedido()">Guardar pedido</button>
+  <div class="card">
+    <h2>Artículos</h2>
+    <div id="listaArticulos"></div>
+    <div class="total" id="total">TOTAL: 0,00 €</div>
+    <button class="guardar" onclick="guardarPedido()">Guardar pedido</button>
+  </div>
 
 </div>
 
 <script>
+let articulosFiltrados = [];
 
-let lineas = [];
+function euros(n){
+  return Number(n || 0).toFixed(2).replace(".",",") + " €";
+}
 
-/* ==== INCIDENCIAS ==== */
+function leerProveedores(){
+  return JSON.parse(localStorage.getItem("proveedores") || "[]");
+}
+
+function leerArticulos(){
+  return JSON.parse(localStorage.getItem("articulos") || "[]");
+}
 
 function leerIncidencias(){
   return JSON.parse(localStorage.getItem("incidencias") || "[]");
 }
 
+function nombreProveedor(p){
+  return (p.nombre || p.proveedor || p.alias || p.id || "").toString().trim();
+}
+
+function proveedorArticulo(a){
+  return (a.proveedor || a.proveedorId || a.proveedor_id || "").toString().trim();
+}
+
+function nombreArticulo(a){
+  return a.nombre || a.articulo || a.descripcion || "Artículo";
+}
+
+function precioArticulo(a){
+  return Number(a.precioSinIva ?? a.precio ?? a.precioCompra ?? a.precioBase ?? 0);
+}
+
+function ivaArticulo(a){
+  return Number(a.iva ?? 0);
+}
+
+function formatoArticulo(a){
+  return a.formato || a.unidad || "";
+}
+
+function cargarProveedores(){
+  const select = document.getElementById("proveedor");
+  const proveedores = leerProveedores().filter(p => p.activo !== false);
+
+  let html = `<option value="">Selecciona proveedor</option>`;
+
+  proveedores.forEach(p=>{
+    const nombre = nombreProveedor(p);
+    if(nombre){
+      html += `<option value="${nombre}">${nombre}</option>`;
+    }
+  });
+
+  select.innerHTML = html;
+}
+
 function cambioProveedor(){
+  const proveedor = document.getElementById("proveedor").value;
+  localStorage.setItem("proveedorActivo", proveedor);
 
-  let proveedor = document.getElementById("proveedor").value;
-  let incidencias = leerIncidencias();
+  pintarIncidencias(proveedor);
+  pintarArticulos(proveedor);
+}
 
-  let abiertas = incidencias.filter(i =>
+function pintarIncidencias(proveedor){
+  const cont = document.getElementById("avisoIncidencias");
+  if(!proveedor){
+    cont.innerHTML = "";
+    return;
+  }
+
+  const abiertas = leerIncidencias().filter(i =>
     i.proveedor === proveedor && !i.resuelta
   );
 
-  let aviso = document.getElementById("avisoIncidencias");
-
-  if(abiertas.length){
-    aviso.innerHTML = `
-      <div class="aviso">
-        ⚠ ${proveedor} tiene ${abiertas.length} incidencia${abiertas.length===1?"":"s"} abierta${abiertas.length===1?"":"s"}
-      </div>`;
-  }else{
-    aviso.innerHTML = "";
+  if(!abiertas.length){
+    cont.innerHTML = "";
+    return;
   }
 
-}
-
-/* ==== LINEAS ==== */
-
-function agregarLinea(){
-
-  lineas.push({
-    articulo:"",
-    cantidad:0,
-    precio:0
+  let html = `<div class="aviso">🔴 <b>Incidencias abiertas de ${proveedor}</b><br>`;
+  abiertas.forEach(i=>{
+    html += `- ${i.motivo || i.texto || "Incidencia"}<br>`;
   });
+  html += `</div>`;
 
-  pintarLineas();
+  cont.innerHTML = html;
 }
 
-function pintarLineas(){
+function pintarArticulos(proveedor){
+  const cont = document.getElementById("listaArticulos");
+
+  if(!proveedor){
+    cont.innerHTML = `<div class="vacio">Selecciona proveedor.</div>`;
+    articulosFiltrados = [];
+    calcularTotal();
+    return;
+  }
+
+  articulosFiltrados = leerArticulos().filter(a =>
+    a.activo !== false && proveedorArticulo(a) === proveedor
+  );
+
+  if(!articulosFiltrados.length){
+    cont.innerHTML = `<div class="vacio">No hay artículos activos para este proveedor.</div>`;
+    calcularTotal();
+    return;
+  }
 
   let html = "";
 
-  lineas.forEach((l,i)=>{
+  articulosFiltrados.forEach((a,i)=>{
+    const precio = precioArticulo(a);
+    const iva = ivaArticulo(a);
+    const formato = formatoArticulo(a);
 
     html += `
-    <div class="linea">
+      <div class="articulo">
+        <div>
+          <div class="nombre">${nombreArticulo(a)}</div>
+          <div class="detalle">${formato} · ${euros(precio)} sin IVA · IVA ${iva}%</div>
+        </div>
 
-      <input placeholder="Artículo"
-        value="${l.articulo}"
-        onchange="cambiar(${i},'articulo',this.value)">
+        <input class="cantidad" type="number" min="0" value="0" id="cant-${i}" oninput="calcularTotal()">
 
-      <input type="number" placeholder="Cantidad"
-        value="${l.cantidad}"
-        onchange="cambiar(${i},'cantidad',this.value)">
-
-      <input type="number" placeholder="Precio sin IVA"
-        value="${l.precio}"
-        onchange="cambiar(${i},'precio',this.value)">
-
-    </div>
+        <div class="importe" id="imp-${i}">0,00 €</div>
+      </div>
     `;
   });
 
-  document.getElementById("lineas").innerHTML = html;
-
-  calcular();
+  cont.innerHTML = html;
+  calcularTotal();
 }
 
-function cambiar(i,campo,valor){
-  lineas[i][campo] = campo === "articulo" ? valor : Number(valor);
-  calcular();
-}
-
-/* ==== TOTAL ==== */
-
-function calcular(){
-
+function calcularTotal(){
   let total = 0;
 
-  lineas.forEach(l=>{
-    total += l.cantidad * l.precio;
+  articulosFiltrados.forEach((a,i)=>{
+    const input = document.getElementById("cant-" + i);
+    const cantidad = Number(input ? input.value : 0);
+    const precio = precioArticulo(a);
+    const importe = cantidad * precio;
+
+    total += importe;
+
+    const celda = document.getElementById("imp-" + i);
+    if(celda) celda.textContent = euros(importe);
   });
 
-  document.getElementById("total").innerHTML =
-    "TOTAL (sin IVA): " + total.toFixed(2) + " €";
+  document.getElementById("total").textContent = "TOTAL: " + euros(total);
 }
 
-/* ==== GUARDAR ==== */
+function formaPagoProveedor(proveedor){
+  const p = leerProveedores().find(x => nombreProveedor(x) === proveedor);
+  return p?.formaPago || p?.pago || "BANCO";
+}
 
 function guardarPedido(){
-
-  let proveedor = document.getElementById("proveedor").value;
+  const proveedor = document.getElementById("proveedor").value;
 
   if(!proveedor){
-    alert("Selecciona proveedor");
+    alert("Selecciona proveedor.");
     return;
   }
+
+  let lineas = [];
+
+  articulosFiltrados.forEach((a,i)=>{
+    const cantidad = Number(document.getElementById("cant-" + i)?.value || 0);
+    const precio = precioArticulo(a);
+
+    if(cantidad > 0){
+      lineas.push({
+        articulo: nombreArticulo(a),
+        cantidad: cantidad,
+        precioSinIva: precio,
+        base: cantidad * precio,
+        formato: formatoArticulo(a),
+        iva: ivaArticulo(a),
+        proveedor: proveedor
+      });
+    }
+  });
 
   if(!lineas.length){
-    alert("Añade líneas");
+    alert("No hay cantidades en el pedido.");
     return;
   }
 
-  let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+  const total = lineas.reduce((s,l)=>s + Number(l.base || 0), 0);
 
-  let pedido = {
+  const pedido = {
+    id: Date.now(),
     proveedor: proveedor,
-    fecha: new Date().toLocaleString(),
+    fecha: new Date().toLocaleString("es-ES"),
+    formaPago: formaPagoProveedor(proveedor),
     lineas: lineas,
-    total: lineas.reduce((t,l)=>t+(l.cantidad*l.precio),0)
+    total: total,
+    estado: "PENDIENTE PAGO",
+    creadoPor: localStorage.getItem("usuario") || "OPERADOR"
   };
 
+  let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
   pagos.unshift(pedido);
-
   localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
 
-  alert("Pedido guardado en pagos");
-
-  location.reload();
+  alert("Pedido guardado en pagos.");
+  location.href = "pagos.html";
 }
 
+function iniciar(){
+  cargarProveedores();
+
+  const proveedorActivo = localStorage.getItem("proveedorActivo");
+  if(proveedorActivo){
+    document.getElementById("proveedor").value = proveedorActivo;
+  }
+
+  cambioProveedor();
+}
+
+iniciar();
 </script>
 
 </body>
