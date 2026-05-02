@@ -6,18 +6,121 @@
 <title>VENTAS · MONOLITO</title>
 
 <style>
+*{box-sizing:border-box}
 body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;font-weight:900;font-size:20px;display:flex;align-items:center;gap:10px}
-.volver,.mes{background:white;color:#17303d;border:0;border-radius:10px;padding:6px 10px;font-weight:900}
-.mes{margin-left:auto;background:#ff9800;color:white}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  font-weight:900;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.volver,.mes{
+  background:white;
+  color:#17303d;
+  border:0;
+  border-radius:10px;
+  padding:7px 11px;
+  font-weight:900;
+}
+
+.mes{
+  margin-left:auto;
+  background:#ff9800;
+  color:white;
+}
+
 .contenedor{padding:16px}
-.fecha{font-size:18px;font-weight:900;margin-bottom:10px}
-input{width:100%;padding:12px;border-radius:12px;border:1px solid #ccc;margin-bottom:10px;font-size:16px}
-.bloque{background:white;padding:14px;border-radius:16px;margin-bottom:14px}
-.titulo{font-weight:900;margin-bottom:6px}
-.total{font-size:18px;font-weight:900;margin-top:6px}
-.info{font-size:13px;color:#4f5f69;margin-top:10px}
-.aviso{color:#b00000;font-weight:900;font-size:13px;margin-top:8px}
+
+.fecha{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+input,textarea{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  margin-bottom:10px;
+  font-size:16px;
+}
+
+textarea{
+  min-height:80px;
+  resize:vertical;
+}
+
+.bloque{
+  padding:14px;
+  border-radius:18px;
+  margin-bottom:14px;
+  box-shadow:0 6px 14px rgba(0,0,0,.08);
+}
+
+.manana{
+  background:linear-gradient(#f7fbff,#eaf5ff);
+}
+
+.tarde{
+  background:linear-gradient(#fffaf0,#fff1d6);
+}
+
+.totalDia{
+  background:white;
+}
+
+.titulo{
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.total{
+  font-size:18px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.info{
+  font-size:13px;
+  color:#4f5f69;
+  margin-top:10px;
+}
+
+.aviso{
+  color:#b00000;
+  font-weight:900;
+  font-size:13px;
+  margin-top:8px;
+}
+
+.errorNota{
+  background:#fff8e8;
+  border:1px solid #ffd58a;
+}
+
+.borrar{
+  width:100%;
+  background:#c00000;
+  color:white;
+  border:0;
+  border-radius:12px;
+  padding:12px;
+  font-weight:900;
+  margin-top:10px;
+}
+
+.bloqueado{
+  background:#f2f2f2;
+  color:#666;
+}
+
 </style>
 </head>
 
@@ -35,27 +138,35 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #ccc;margin-bo
 
 <input type="date" id="selectorFecha" onchange="cambiarFecha()">
 
-<div class="bloque">
-  <div class="titulo">MAÑANA</div>
+<div class="bloque manana">
+  <div class="titulo">☀️ MAÑANA</div>
   <input id="maA" placeholder="Ventas A mañana" type="number" oninput="calcular()">
   <input id="maB" placeholder="Ventas B mañana" type="number" oninput="calcular()">
-  <div class="total" id="totalMa">TOTAL: 0 €</div>
+  <div class="total" id="totalMa">TOTAL MAÑANA: 0,00 €</div>
   <div class="aviso" id="avisoMa"></div>
 </div>
 
-<div class="bloque">
-  <div class="titulo">TARDE</div>
+<div class="bloque tarde">
+  <div class="titulo">🌇 TARDE</div>
   <input id="taA" placeholder="Ventas A tarde" type="number" oninput="calcular()">
   <input id="taB" placeholder="Ventas B tarde" type="number" oninput="calcular()">
-  <div class="total" id="totalTa">TOTAL: 0 €</div>
+  <div class="total" id="totalTa">TOTAL TARDE: 0,00 €</div>
   <div class="aviso" id="avisoTa"></div>
 </div>
 
-<div class="bloque">
+<div class="bloque totalDia">
   <div class="titulo">TOTAL DÍA</div>
-  <div class="total" id="totalDia">0 €</div>
+  <div class="total" id="totalDia">0,00 €</div>
   <div class="info" id="infoRegistro"></div>
 </div>
+
+<div class="bloque errorNota">
+  <div class="titulo">⚠ Aviso de error / corrección</div>
+  <textarea id="notaError" placeholder="Si hubo un error, escribe aquí qué pasó. No modifica las ventas registradas." oninput="guardarNotaError()"></textarea>
+  <div class="info" id="infoNota"></div>
+</div>
+
+<button class="borrar" id="btnBorrar" onclick="borrarDia()">🗑 Borrar registro del día</button>
 
 </div>
 
@@ -63,17 +174,31 @@ input{width:100%;padding:12px;border-radius:12px;border:1px solid #ccc;margin-bo
 function volver(){window.location.href="index.html"}
 function verMes(){window.location.href="ventas_resumen.html"}
 
+function usuarioActual(){
+  return localStorage.getItem("usuario") || "OPERADOR";
+}
+
+function puedeAdministrar(){
+  const u = usuarioActual().toUpperCase();
+  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+}
+
 function hoyISO(){
   return new Date().toISOString().split("T")[0];
 }
 
 function formatoFechaBonita(fecha){
-  let d = new Date(fecha);
-  return d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  let d = new Date(fecha + "T12:00:00");
+  return d.toLocaleDateString("es-ES",{
+    weekday:"long",
+    day:"numeric",
+    month:"long",
+    year:"numeric"
+  });
 }
 
 function claveFecha(fecha){
-  let d = new Date(fecha);
+  let d = new Date(fecha + "T12:00:00");
   return d.toLocaleDateString("es-ES");
 }
 
@@ -85,7 +210,13 @@ function euros(n){
   return Number(n || 0).toFixed(2).replace(".",",") + " €";
 }
 
+function maAInput(){return document.getElementById("maA")}
+function maBInput(){return document.getElementById("maB")}
+function taAInput(){return document.getElementById("taA")}
+function taBInput(){return document.getElementById("taB")}
+
 let fechaActual = hoyISO();
+let cargando = false;
 
 document.getElementById("selectorFecha").value = fechaActual;
 actualizarFechaTexto();
@@ -98,15 +229,13 @@ function cambiarFecha(){
 }
 
 function actualizarFechaTexto(){
-  document.getElementById("fechaTexto").textContent = "📅 " + formatoFechaBonita(fechaActual);
+  document.getElementById("fechaTexto").textContent =
+    "📅 " + formatoFechaBonita(fechaActual);
 }
 
-function maAInput(){return document.getElementById("maA")}
-function maBInput(){return document.getElementById("maB")}
-function taAInput(){return document.getElementById("taA")}
-function taBInput(){return document.getElementById("taB")}
-
 function calcular(){
+  if(cargando) return;
+
   let maA = numero(maAInput().value);
   let maB = numero(maBInput().value);
   let taA = numero(taAInput().value);
@@ -121,7 +250,10 @@ function calcular(){
   document.getElementById("totalDia").textContent = euros(totalDia);
 
   pintarAvisos(maA,maB,taA,taB);
-  guardar(maA,maB,taA,taB,totalMa,totalTa,totalDia);
+
+  if(totalDia > 0){
+    guardar(maA,maB,taA,taB,totalMa,totalTa,totalDia);
+  }
 }
 
 function pintarAvisos(maA,maB,taA,taB){
@@ -138,51 +270,139 @@ function pintarAvisos(maA,maB,taA,taB){
 
 function guardar(maA,maB,taA,taB,totalMa,totalTa,totalDia){
   let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  let operador = localStorage.getItem("usuario") || "OPERADOR";
+  let operador = usuarioActual();
   let ahora = new Date();
   let clave = claveFecha(fechaActual);
 
+  let anterior = data[clave] || {};
+
   data[clave] = {
-    operador,
-    hora: ahora.toLocaleTimeString("es-ES"),
+    operador: anterior.operador || operador,
+    hora: anterior.hora || ahora.toLocaleTimeString("es-ES"),
+    fechaRegistro: anterior.fechaRegistro || ahora.toLocaleDateString("es-ES"),
     mañanaA: maA,
     mañanaB: maB,
     tardeA: taA,
     tardeB: taB,
     mañana: totalMa,
     tarde: totalTa,
-    total: totalDia
+    total: totalDia,
+    notaError: anterior.notaError || "",
+    notaPor: anterior.notaPor || "",
+    notaHora: anterior.notaHora || ""
   };
 
   localStorage.setItem("ventas", JSON.stringify(data));
 
   document.getElementById("infoRegistro").textContent =
-    "Guardado por " + operador + " · " + ahora.toLocaleTimeString("es-ES");
+    "Guardado por " + data[clave].operador + " · " + data[clave].hora;
+
+  aplicarBloqueo();
 }
 
 function cargar(){
+  cargando = true;
+
   let data = JSON.parse(localStorage.getItem("ventas") || "{}");
   let d = data[claveFecha(fechaActual)];
 
-  if(!d){
-    maAInput().value = "";
-    maBInput().value = "";
-    taAInput().value = "";
-    taBInput().value = "";
-    document.getElementById("infoRegistro").textContent = "";
-    calcular();
+  maAInput().value = "";
+  maBInput().value = "";
+  taAInput().value = "";
+  taBInput().value = "";
+  document.getElementById("notaError").value = "";
+  document.getElementById("infoNota").textContent = "";
+  document.getElementById("infoRegistro").textContent = "";
+
+  if(d){
+    maAInput().value = d.mañanaA || "";
+    maBInput().value = d.mañanaB || "";
+    taAInput().value = d.tardeA || "";
+    taBInput().value = d.tardeB || "";
+    document.getElementById("notaError").value = d.notaError || "";
+
+    document.getElementById("infoRegistro").textContent =
+      "Último registro: " + (d.operador || "OPERADOR") + " · " + (d.hora || "");
+
+    if(d.notaError){
+      document.getElementById("infoNota").textContent =
+        "Nota registrada por " + (d.notaPor || "OPERADOR") + " · " + (d.notaHora || "");
+    }
+  }
+
+  cargando = false;
+  recalcularSoloPantalla();
+  aplicarBloqueo();
+}
+
+function recalcularSoloPantalla(){
+  let maA = numero(maAInput().value);
+  let maB = numero(maBInput().value);
+  let taA = numero(taAInput().value);
+  let taB = numero(taBInput().value);
+
+  let totalMa = maA + maB;
+  let totalTa = taA + taB;
+  let totalDia = totalMa + totalTa;
+
+  document.getElementById("totalMa").textContent = "TOTAL MAÑANA: " + euros(totalMa);
+  document.getElementById("totalTa").textContent = "TOTAL TARDE: " + euros(totalTa);
+  document.getElementById("totalDia").textContent = euros(totalDia);
+
+  pintarAvisos(maA,maB,taA,taB);
+}
+
+function aplicarBloqueo(){
+  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
+  let existe = !!data[claveFecha(fechaActual)];
+  let admin = puedeAdministrar();
+
+  [maAInput(),maBInput(),taAInput(),taBInput()].forEach(input=>{
+    input.disabled = existe && !admin;
+    input.classList.toggle("bloqueado", existe && !admin);
+  });
+
+  document.getElementById("btnBorrar").style.display = admin ? "block" : "none";
+}
+
+function guardarNotaError(){
+  let texto = document.getElementById("notaError").value.trim();
+  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
+  let clave = claveFecha(fechaActual);
+
+  if(!data[clave]){
+    data[clave] = {
+      operador: usuarioActual(),
+      hora: new Date().toLocaleTimeString("es-ES"),
+      fechaRegistro: new Date().toLocaleDateString("es-ES"),
+      mañanaA:0, mañanaB:0, tardeA:0, tardeB:0,
+      mañana:0, tarde:0, total:0
+    };
+  }
+
+  data[clave].notaError = texto;
+  data[clave].notaPor = usuarioActual();
+  data[clave].notaHora = new Date().toLocaleTimeString("es-ES");
+
+  localStorage.setItem("ventas", JSON.stringify(data));
+
+  document.getElementById("infoNota").textContent =
+    texto ? "Nota registrada por " + data[clave].notaPor + " · " + data[clave].notaHora : "";
+}
+
+function borrarDia(){
+  if(!puedeAdministrar()){
+    alert("Solo Javi o Silvia pueden borrar.");
     return;
   }
 
-  maAInput().value = d.mañanaA || "";
-  maBInput().value = d.mañanaB || "";
-  taAInput().value = d.tardeA || "";
-  taBInput().value = d.tardeB || "";
+  if(!confirm("¿Borrar las ventas de este día?")) return;
 
-  document.getElementById("infoRegistro").textContent =
-    "Último registro: " + d.operador + " · " + d.hora;
+  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
+  delete data[claveFecha(fechaActual)];
+  localStorage.setItem("ventas", JSON.stringify(data));
 
-  calcular();
+  cargar();
 }
 </script>
 
