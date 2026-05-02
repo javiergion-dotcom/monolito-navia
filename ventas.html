@@ -7,67 +7,16 @@
 
 <style>
 body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  font-weight:900;
-  font-size:20px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.volver{
-  background:white;
-  color:#17303d;
-  border:0;
-  border-radius:10px;
-  padding:6px 10px;
-  font-weight:900;
-}
-
+header{background:#17303d;color:white;padding:16px;font-weight:900;font-size:20px;display:flex;align-items:center;gap:10px}
+.volver,.mes{background:white;color:#17303d;border:0;border-radius:10px;padding:6px 10px;font-weight:900}
+.mes{margin-left:auto;background:#ff9800;color:white}
 .contenedor{padding:16px}
-
-.fecha{
-  font-size:18px;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #ccc;
-  margin-bottom:10px;
-  font-size:16px;
-}
-
-.bloque{
-  background:white;
-  padding:14px;
-  border-radius:16px;
-  margin-bottom:14px;
-}
-
-.titulo{
-  font-weight:900;
-  margin-bottom:6px;
-}
-
-.total{
-  font-size:18px;
-  font-weight:900;
-  margin-top:6px;
-}
-
-.info{
-  font-size:13px;
-  color:#4f5f69;
-  margin-top:10px;
-}
+.fecha{font-size:18px;font-weight:900;margin-bottom:10px}
+input{width:100%;padding:12px;border-radius:12px;border:1px solid #ccc;margin-bottom:10px;font-size:16px}
+.bloque{background:white;padding:14px;border-radius:16px;margin-bottom:14px}
+.titulo{font-weight:900;margin-bottom:6px}
+.total{font-size:18px;font-weight:900;margin-top:6px}
+.info{font-size:13px;color:#4f5f69;margin-top:10px}
 </style>
 </head>
 
@@ -76,6 +25,7 @@ input{
 <header>
   <button class="volver" onclick="volver()">←</button>
   💰 VENTAS
+  <button class="mes" onclick="verMes()">📊 Mes</button>
 </header>
 
 <div class="contenedor">
@@ -107,10 +57,8 @@ input{
 </div>
 
 <script>
-
-function volver(){
-  window.location.href="index.html";
-}
+function volver(){window.location.href="index.html"}
+function verMes(){window.location.href="ventas_resumen.html"}
 
 function hoyISO(){
   return new Date().toISOString().split("T")[0];
@@ -118,12 +66,7 @@ function hoyISO(){
 
 function formatoFechaBonita(fecha){
   let d = new Date(fecha);
-  return d.toLocaleDateString("es-ES", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  });
+  return d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 }
 
 function claveFecha(fecha){
@@ -133,13 +76,9 @@ function claveFecha(fecha){
 
 let fechaActual = hoyISO();
 
-/* ===== INIT ===== */
-
 document.getElementById("selectorFecha").value = fechaActual;
 actualizarFechaTexto();
 cargar();
-
-/* ===== CAMBIO FECHA ===== */
 
 function cambiarFecha(){
   fechaActual = document.getElementById("selectorFecha").value;
@@ -148,14 +87,15 @@ function cambiarFecha(){
 }
 
 function actualizarFechaTexto(){
-  document.getElementById("fechaTexto").textContent =
-    "📅 " + formatoFechaBonita(fechaActual);
+  document.getElementById("fechaTexto").textContent = "📅 " + formatoFechaBonita(fechaActual);
 }
 
-/* ===== CALCULO ===== */
+function maAInput(){return document.getElementById("maA")}
+function maBInput(){return document.getElementById("maB")}
+function taAInput(){return document.getElementById("taA")}
+function taBInput(){return document.getElementById("taB")}
 
 function calcular(){
-
   let maA = Number(maAInput().value || 0);
   let maB = Number(maBInput().value || 0);
   let taA = Number(taAInput().value || 0);
@@ -172,22 +112,10 @@ function calcular(){
   guardar(totalMa,totalTa,totalDia);
 }
 
-/* ===== HELPERS ===== */
-
-function maAInput(){ return document.getElementById("maA"); }
-function maBInput(){ return document.getElementById("maB"); }
-function taAInput(){ return document.getElementById("taA"); }
-function taBInput(){ return document.getElementById("taB"); }
-
-/* ===== GUARDAR ===== */
-
 function guardar(ma,ta,total){
-
   let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-
   let operador = localStorage.getItem("usuario") || "OPERADOR";
   let ahora = new Date();
-
   let clave = claveFecha(fechaActual);
 
   data[clave] = {
@@ -204,10 +132,7 @@ function guardar(ma,ta,total){
     "Guardado por " + operador + " · " + ahora.toLocaleTimeString("es-ES");
 }
 
-/* ===== CARGAR ===== */
-
 function cargar(){
-
   let data = JSON.parse(localStorage.getItem("ventas") || "{}");
   let d = data[claveFecha(fechaActual)];
 
@@ -231,7 +156,6 @@ function cargar(){
 
   calcular();
 }
-
 </script>
 
 </body>
