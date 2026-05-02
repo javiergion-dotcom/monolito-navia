@@ -9,6 +9,7 @@
 body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
 header{background:#17303d;color:white;padding:16px;font-weight:900;font-size:20px}
 .icono{color:#4caf50}
+.semana{margin:18px 12px 8px;padding:10px;font-size:20px;font-weight:900;border-bottom:3px solid #17303d}
 .card{background:white;margin:12px;padding:14px;border-radius:16px}
 .nombre{font-size:22px;font-weight:900}
 .total{font-size:26px;font-weight:900;margin-top:6px}
@@ -66,6 +67,52 @@ function numero(n){
   return Number(n || 0);
 }
 
+function fechaObjeto(fechaStr){
+  if(!fechaStr) return new Date();
+
+  let partes = String(fechaStr).split(",");
+  let fecha = partes[0].trim();
+  let trozos = fecha.split("/");
+
+  if(trozos.length === 3){
+    let dia = Number(trozos[0]);
+    let mes = Number(trozos[1]) - 1;
+    let ano = Number(trozos[2]);
+
+    let hora = 0, min = 0, seg = 0;
+
+    if(partes[1]){
+      let h = partes[1].trim().split(":");
+      hora = Number(h[0] || 0);
+      min = Number(h[1] || 0);
+      seg = Number(h[2] || 0);
+    }
+
+    return new Date(ano, mes, dia, hora, min, seg);
+  }
+
+  return new Date(fechaStr);
+}
+
+function obtenerSemana(fechaStr){
+  let d = fechaObjeto(fechaStr);
+  d.setHours(0,0,0,0);
+
+  let jueves = new Date(d);
+  jueves.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+
+  let semana1 = new Date(jueves.getFullYear(),0,4);
+  let semana = 1 + Math.round(((jueves - semana1) / 86400000 - 3 + ((semana1.getDay()+6)%7)) / 7);
+
+  return semana;
+}
+
+function anoSemana(fechaStr){
+  let d = fechaObjeto(fechaStr);
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  return d.getFullYear();
+}
+
 function precioLinea(l){
   if(numero(l.precioSinIva) > 0) return numero(l.precioSinIva);
   if(numero(l.precioUnidad) > 0) return numero(l.precioUnidad) * numero(l.formato || 1);
@@ -79,85 +126,84 @@ function baseLinea(l){
   return numero(l.cantidad) * precioLinea(l);
 }
 
-
-
-function ver(i){
-  let d = document.getElementById("l-"+i);
-  d.style.display = d.style.display==="block" ? "none" : "block";
-}
 function pintar(){
-
   let data = leerPagos();
+  let html = "";
 
-  // ORDENAR POR FECHA DESC
-  data.sort((a,b)=> new Date(b.fecha) - new Date(a.fecha));
+  data.sort((a,b)=> fechaObjeto(b.fecha) - fechaObjeto(a.fecha));
+
+  if(data.length === 0){
+    document.getElementById("lista").innerHTML =
+      `<div class="card"><b>No hay pagos pendientes.</b></div>`;
+    return;
+  }
 
   let grupos = {};
 
   data.forEach(p=>{
     let semana = obtenerSemana(p.fecha);
-    let year = new Date(p.fecha).getFullYear();
-    let key = `SEMANA ${semana} · ${year}`;
+    let ano = anoSemana(p.fecha);
+    let key = "SEMANA " + semana + " · " + ano;
 
     if(!grupos[key]) grupos[key] = [];
     grupos[key].push(p);
   });
 
-  let html = "";
-
   Object.keys(grupos).forEach(semana=>{
+    html += `<div class="semana">${semana}</div>`;
 
-    html += `
-      <div style="padding:10px;font-weight:900;font-size:18px">
-        ${semana}
-      </div>
-    `;
-
-    grupos[semana].forEach((p,i)=>{
-
-      let idx = data.indexOf(p);
-
+    grupos[semana].forEach(p=>{
+      let i = data.indexOf(p);
       let lineasHTML = "";
 
       if(p.lineas){
-        p.lineas.forEach(l=>{
+        p.lineas.forEach((l,idx)=>{
           let precio = precioLinea(l);
           let base = baseLinea(l);
+          let esError = p.erroresLineas && p.erroresLineas.includes(idx);
 
           lineasHTML += `
-            <div class="linea">
-              ${l.articulo}<br>
-              ${l.cantidad} × ${euros(precio)} = ${euros(base)}
-            </div>
-          `;
+          <div class="linea ${esError ? "lineaError" : ""}">
+            <b>${l.articulo}</b><br>
+            ${l.cantidad} × ${euros(precio)} = ${euros(base)}
+            ${l.unidadFormato ? `<div class="detalle">${l.unidadFormato}</div>` : ""}
+            ${esError ? `<div>⚠ Error en esta línea</div>` : ""}
+          </div>`;
         });
       }
 
       html += `
       <div class="card">
         <div class="nombre">${p.proveedor}</div>
-        <div class="detalle">${p.fecha}</div>
+        <div class="detalle">${p.fecha || ""}</div>
         <div class="total">${euros(p.total)}</div>
 
+        ${p.erroresLineas && p.erroresLineas.length ? 
+          `<div class="aviso">⚠ ESTE PEDIDO TIENE ERRORES</div>` : ""}
+
         <div class="botones">
-          <button class="ver" onclick="ver(${idx})">Ver</button>
-          <button class="comp" onclick="comparar(${idx})">Comparar</button>
-          <button class="ok" onclick="pagarOK(${idx})">PAGAR OK</button>
-          <button class="errorBtn" onclick="incidencia(${idx})">INCIDENCIA</button>
-          <button class="pdf" onclick="generarPDF(${idx})">PDF</button>
+          <button class="ver" onclick="ver(${i})">Ver</button>
+          <button class="comp" onclick="comparar(${i})">Comparar</button>
+          <button class="ok" onclick="pagarOK(${i})">PAGAR OK</button>
+          <button class="errorBtn" onclick="incidencia(${i})">INCIDENCIA</button>
+          <button class="pdf" onclick="generarPDF(${i})">PDF</button>
         </div>
 
-        <div class="lineas" id="l-${idx}">
+        <div class="lineas" id="l-${i}">
           ${lineasHTML}
         </div>
-      </div>
-      `;
+      </div>`;
     });
-
   });
 
   document.getElementById("lista").innerHTML = html;
 }
+
+function ver(i){
+  let d = document.getElementById("l-"+i);
+  d.style.display = d.style.display==="block" ? "none" : "block";
+}
+
 function comparar(i){
   let data = leerPagos();
   let p = data[i];
@@ -185,7 +231,6 @@ function comparar(i){
   });
 
   p.erroresLineas = errores;
-
   guardarPagos(data);
   pintar();
   alert(resultado);
@@ -283,59 +328,27 @@ function generarPDF(i){
   <meta charset="UTF-8">
   <title>Pedido ${p.proveedor}</title>
   <style>
-    body{
-      font-family:Arial;
-      padding:28px;
-      color:#17303d;
-    }
-    h1{
-      font-size:22px;
-      margin-bottom:18px;
-    }
-    .dato{
-      margin:4px 0;
-      font-size:14px;
-    }
-    h2{
-      font-size:16px;
-      margin-top:22px;
-      border-bottom:1px solid #ccc;
-      padding-bottom:8px;
-    }
-    .lineaPDF{
-      margin:10px 0;
-      font-size:14px;
-    }
-    .lineaPDF span{
-      color:#555;
-      font-size:13px;
-    }
-    .totalPDF{
-      margin-top:26px;
-      border-top:2px solid #17303d;
-      padding-top:12px;
-      font-size:20px;
-      font-weight:900;
-    }
+    body{font-family:Arial;padding:28px;color:#17303d}
+    h1{font-size:22px;margin-bottom:18px}
+    .dato{margin:4px 0;font-size:14px}
+    h2{font-size:16px;margin-top:22px;border-bottom:1px solid #ccc;padding-bottom:8px}
+    .lineaPDF{margin:10px 0;font-size:14px}
+    .lineaPDF span{color:#555;font-size:13px}
+    .totalPDF{margin-top:26px;border-top:2px solid #17303d;padding-top:12px;font-size:20px;font-weight:900}
   </style>
   </head>
   <body>
-
     <h1>MONOLITO · PEDIDO</h1>
-
     <div class="dato"><b>Proveedor:</b> ${p.proveedor}</div>
     <div class="dato"><b>Fecha:</b> ${p.fecha || ""}</div>
     <div class="dato"><b>Estado:</b> ${p.estado || "PENDIENTE"}</div>
 
     <h2>ARTÍCULOS</h2>
-
     ${lineas}
 
     <div class="totalPDF">TOTAL: ${euros(p.total)}</div>
-
   </body>
-  </html>
-  `;
+  </html>`;
 
   let w = window.open("", "_blank");
   w.document.open();
