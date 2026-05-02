@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -31,12 +30,13 @@ header{
 
 .contenedor{padding:16px}
 
-select{
+.selector{
   width:100%;
   padding:12px;
   border-radius:12px;
   margin-bottom:14px;
   font-size:16px;
+  border:1px solid #ccc;
 }
 
 .linea{
@@ -58,6 +58,33 @@ select{
   font-weight:900;
   margin-top:12px;
 }
+
+.media{
+  background:#ffffff;
+  padding:12px;
+  border-radius:12px;
+  font-weight:900;
+  margin-top:10px;
+  text-align:center;
+}
+
+.estado{
+  margin-top:10px;
+  padding:12px;
+  border-radius:12px;
+  font-weight:900;
+  text-align:center;
+}
+
+.flojo{background:#ffe5e5;color:#c00000}
+.normal{background:#fff5cc;color:#b38f00}
+.fuerte{background:#e5ffe5;color:#1a7f1a}
+
+.vacio{
+  text-align:center;
+  font-weight:900;
+  margin-top:20px;
+}
 </style>
 </head>
 
@@ -70,24 +97,15 @@ select{
 
 <div class="contenedor">
 
-<select id="mes" onchange="pintar()">
-  <option value="0">ENERO</option>
-  <option value="1">FEBRERO</option>
-  <option value="2">MARZO</option>
-  <option value="3">ABRIL</option>
-  <option value="4">MAYO</option>
-  <option value="5">JUNIO</option>
-  <option value="6">JULIO</option>
-  <option value="7">AGOSTO</option>
-  <option value="8">SEPTIEMBRE</option>
-  <option value="9">OCTUBRE</option>
-  <option value="10">NOVIEMBRE</option>
-  <option value="11">DICIEMBRE</option>
-</select>
+<input type="month" id="selectorMes" class="selector" onchange="pintar()">
 
 <div id="lista"></div>
 
 <div class="total" id="totalMes">TOTAL: 0 €</div>
+
+<div class="media" id="mediaMes"></div>
+
+<div class="estado" id="estadoMes"></div>
 
 </div>
 
@@ -101,23 +119,35 @@ function euros(n){
   return Number(n||0).toFixed(2).replace(".",",")+" €";
 }
 
+function parseFecha(fechaStr){
+  let partes = fechaStr.split("/");
+  return new Date(partes[2], partes[1]-1, partes[0]);
+}
+
 function pintar(){
 
   let data = JSON.parse(localStorage.getItem("ventas") || "{}");
 
-  let mes = Number(document.getElementById("mes").value);
+  let valor = document.getElementById("selectorMes").value;
+  if(!valor) return;
+
+  let [year, mes] = valor.split("-");
+  mes = Number(mes) - 1;
 
   let totalMes = 0;
+  let dias = 0;
   let html = "";
 
   Object.keys(data).forEach(fecha => {
 
-    let d = new Date(fecha.split("/").reverse().join("-"));
+    let d = parseFecha(fecha);
 
-    if(d.getMonth() === mes){
+    if(d.getFullYear() == year && d.getMonth() == mes){
 
       let total = Number(data[fecha].total || 0);
+
       totalMes += total;
+      dias++;
 
       html += `
         <div class="linea">
@@ -130,16 +160,39 @@ function pintar(){
   });
 
   if(html === ""){
-    html = `<div style="text-align:center;font-weight:900">No hay datos</div>`;
+    html = `<div class="vacio">No hay datos</div>`;
   }
 
   document.getElementById("lista").innerHTML = html;
-  document.getElementById("totalMes").textContent = "TOTAL: " + euros(totalMes);
+
+  document.getElementById("totalMes").textContent =
+    "TOTAL: " + euros(totalMes);
+
+  let media = dias ? totalMes / dias : 0;
+
+  document.getElementById("mediaMes").textContent =
+    "MEDIA DÍA: " + euros(media);
+
+  let estado = document.getElementById("estadoMes");
+
+  if(media < 200){
+    estado.textContent = "🔴 MES FLOJO";
+    estado.className = "estado flojo";
+  }else if(media < 400){
+    estado.textContent = "🟡 MES NORMAL";
+    estado.className = "estado normal";
+  }else{
+    estado.textContent = "🟢 MES FUERTE";
+    estado.className = "estado fuerte";
+  }
 }
 
 /* INIT */
 
-document.getElementById("mes").value = new Date().getMonth();
+let hoy = new Date();
+let mesActual = hoy.toISOString().slice(0,7);
+document.getElementById("selectorMes").value = mesActual;
+
 pintar();
 
 </script>
