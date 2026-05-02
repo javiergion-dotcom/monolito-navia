@@ -1,1 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VENTAS · MONOLITO</title>
 
+<style>
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  font-weight:900;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.volver{
+  background:white;
+  color:#17303d;
+  border:0;
+  border-radius:10px;
+  padding:6px 10px;
+  font-weight:900;
+}
+
+.contenedor{padding:16px}
+
+.fecha{
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  margin-bottom:10px;
+  font-size:16px;
+}
+
+.bloque{
+  background:white;
+  padding:14px;
+  border-radius:16px;
+  margin-bottom:14px;
+}
+
+.titulo{
+  font-weight:900;
+  margin-bottom:6px;
+}
+
+.total{
+  font-size:18px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.info{
+  font-size:13px;
+  color:#4f5f69;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  💰 VENTAS
+</header>
+
+<div class="contenedor">
+
+<div class="fecha" id="fechaTexto"></div>
+
+<input type="date" id="selectorFecha" onchange="cambiarFecha()">
+
+<div class="bloque">
+  <div class="titulo">MAÑANA</div>
+  <input id="maA" placeholder="Ventas A" type="number" oninput="calcular()">
+  <input id="maB" placeholder="Ventas B" type="number" oninput="calcular()">
+  <div class="total" id="totalMa">TOTAL: 0 €</div>
+</div>
+
+<div class="bloque">
+  <div class="titulo">TARDE</div>
+  <input id="taA" placeholder="Ventas A" type="number" oninput="calcular()">
+  <input id="taB" placeholder="Ventas B" type="number" oninput="calcular()">
+  <div class="total" id="totalTa">TOTAL: 0 €</div>
+</div>
+
+<div class="bloque">
+  <div class="titulo">TOTAL DÍA</div>
+  <div class="total" id="totalDia">0 €</div>
+  <div class="info" id="infoRegistro"></div>
+</div>
+
+</div>
+
+<script>
+
+function volver(){
+  window.location.href="index.html";
+}
+
+function hoyISO(){
+  return new Date().toISOString().split("T")[0];
+}
+
+function formatoFechaBonita(fecha){
+  let d = new Date(fecha);
+  return d.toLocaleDateString("es-ES", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function claveFecha(fecha){
+  let d = new Date(fecha);
+  return d.toLocaleDateString("es-ES");
+}
+
+let fechaActual = hoyISO();
+
+/* ===== INIT ===== */
+
+document.getElementById("selectorFecha").value = fechaActual;
+actualizarFechaTexto();
+cargar();
+
+/* ===== CAMBIO FECHA ===== */
+
+function cambiarFecha(){
+  fechaActual = document.getElementById("selectorFecha").value;
+  actualizarFechaTexto();
+  cargar();
+}
+
+function actualizarFechaTexto(){
+  document.getElementById("fechaTexto").textContent =
+    "📅 " + formatoFechaBonita(fechaActual);
+}
+
+/* ===== CALCULO ===== */
+
+function calcular(){
+
+  let maA = Number(maAInput().value || 0);
+  let maB = Number(maBInput().value || 0);
+  let taA = Number(taAInput().value || 0);
+  let taB = Number(taBInput().value || 0);
+
+  let totalMa = maA + maB;
+  let totalTa = taA + taB;
+  let totalDia = totalMa + totalTa;
+
+  document.getElementById("totalMa").textContent = "TOTAL: " + totalMa.toFixed(2) + " €";
+  document.getElementById("totalTa").textContent = "TOTAL: " + totalTa.toFixed(2) + " €";
+  document.getElementById("totalDia").textContent = totalDia.toFixed(2) + " €";
+
+  guardar(totalMa,totalTa,totalDia);
+}
+
+/* ===== HELPERS ===== */
+
+function maAInput(){ return document.getElementById("maA"); }
+function maBInput(){ return document.getElementById("maB"); }
+function taAInput(){ return document.getElementById("taA"); }
+function taBInput(){ return document.getElementById("taB"); }
+
+/* ===== GUARDAR ===== */
+
+function guardar(ma,ta,total){
+
+  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
+
+  let operador = localStorage.getItem("usuario") || "OPERADOR";
+  let ahora = new Date();
+
+  let clave = claveFecha(fechaActual);
+
+  data[clave] = {
+    operador,
+    hora: ahora.toLocaleTimeString("es-ES"),
+    mañana: ma,
+    tarde: ta,
+    total: total
+  };
+
+  localStorage.setItem("ventas", JSON.stringify(data));
+
+  document.getElementById("infoRegistro").textContent =
+    "Guardado por " + operador + " · " + ahora.toLocaleTimeString("es-ES");
+}
+
+/* ===== CARGAR ===== */
+
+function cargar(){
+
+  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
+  let d = data[claveFecha(fechaActual)];
+
+  if(!d){
+    maAInput().value = "";
+    maBInput().value = "";
+    taAInput().value = "";
+    taBInput().value = "";
+    document.getElementById("infoRegistro").textContent = "";
+    calcular();
+    return;
+  }
+
+  maAInput().value = "";
+  maBInput().value = d.mañana || 0;
+  taAInput().value = "";
+  taBInput().value = d.tarde || 0;
+
+  document.getElementById("infoRegistro").textContent =
+    "Último registro: " + d.operador + " · " + d.hora;
+
+  calcular();
+}
+
+</script>
+
+</body>
+</html>
