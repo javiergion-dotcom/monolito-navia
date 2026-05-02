@@ -1,1 +1,148 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RESUMEN VENTAS · MONOLITO</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  font-weight:900;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.volver{
+  background:white;
+  color:#17303d;
+  border:0;
+  border-radius:10px;
+  padding:6px 10px;
+  font-weight:900;
+}
+
+.contenedor{padding:16px}
+
+select{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:14px;
+  font-size:16px;
+}
+
+.linea{
+  background:white;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  font-weight:900;
+}
+
+.total{
+  background:#17303d;
+  color:white;
+  padding:14px;
+  border-radius:14px;
+  font-size:20px;
+  font-weight:900;
+  margin-top:12px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  📊 RESUMEN MES
+</header>
+
+<div class="contenedor">
+
+<select id="mes" onchange="pintar()">
+  <option value="0">ENERO</option>
+  <option value="1">FEBRERO</option>
+  <option value="2">MARZO</option>
+  <option value="3">ABRIL</option>
+  <option value="4">MAYO</option>
+  <option value="5">JUNIO</option>
+  <option value="6">JULIO</option>
+  <option value="7">AGOSTO</option>
+  <option value="8">SEPTIEMBRE</option>
+  <option value="9">OCTUBRE</option>
+  <option value="10">NOVIEMBRE</option>
+  <option value="11">DICIEMBRE</option>
+</select>
+
+<div id="lista"></div>
+
+<div class="total" id="totalMes">TOTAL: 0 €</div>
+
+</div>
+
+<script>
+
+function volver(){
+  window.location.href="ventas.html";
+}
+
+function euros(n){
+  return Number(n||0).toFixed(2).replace(".",",")+" €";
+}
+
+function pintar(){
+
+  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
+
+  let mes = Number(document.getElementById("mes").value);
+
+  let totalMes = 0;
+  let html = "";
+
+  Object.keys(data).forEach(fecha => {
+
+    let d = new Date(fecha.split("/").reverse().join("-"));
+
+    if(d.getMonth() === mes){
+
+      let total = Number(data[fecha].total || 0);
+      totalMes += total;
+
+      html += `
+        <div class="linea">
+          <div>${fecha}</div>
+          <div>${euros(total)}</div>
+        </div>
+      `;
+    }
+
+  });
+
+  if(html === ""){
+    html = `<div style="text-align:center;font-weight:900">No hay datos</div>`;
+  }
+
+  document.getElementById("lista").innerHTML = html;
+  document.getElementById("totalMes").textContent = "TOTAL: " + euros(totalMes);
+}
+
+/* INIT */
+
+document.getElementById("mes").value = new Date().getMonth();
+pintar();
+
+</script>
+
+</body>
+</html>
