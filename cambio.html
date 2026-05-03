@@ -42,19 +42,11 @@ header{
 }
 
 input{
-  width:80px;
+  width:90px;
   padding:8px;
   border-radius:8px;
   border:1px solid #ccc;
   text-align:center;
-}
-
-textarea{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  margin-top:10px;
 }
 
 .total{
@@ -97,6 +89,14 @@ textarea{
   font-size:13px;
   color:#4f5f69;
 }
+
+textarea{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
 </style>
 </head>
 
@@ -106,6 +106,15 @@ textarea{
   <button class="volver" onclick="volver()">←</button>
   💰 CAMBIO
 </header>
+
+<div class="contenedor">
+
+<div class="linea">
+  <div>CAMBIO ESPERADO</div>
+  <input id="esperado" type="number" onfocus="this.select()" onclick="this.select()" onchange="guardarEsperado()">
+</div>
+
+</div>
 
 <div class="contenedor" id="lista"></div>
 
@@ -123,9 +132,7 @@ textarea{
 
 <script>
 
-function volver(){
-  window.location.href="index.html";
-}
+function volver(){window.location.href="index.html"}
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
@@ -171,9 +178,24 @@ function calcular(){
   valores.forEach(v=>{
     total += (cantidades[v]||0)*v;
   });
-
   document.getElementById("total").textContent =
     total.toFixed(2).replace(".",",")+" €";
+}
+
+/* ===== ESPERADO ===== */
+
+function cargarEsperado(){
+  let e = Number(localStorage.getItem("cambio_esperado") || 0);
+  document.getElementById("esperado").value = e;
+  if(!esAdmin()){
+    document.getElementById("esperado").disabled = true;
+  }
+}
+
+function guardarEsperado(){
+  if(!esAdmin()) return;
+  let v = Number(document.getElementById("esperado").value || 0);
+  localStorage.setItem("cambio_esperado", v);
 }
 
 /* ===== TOTALIZAR ===== */
@@ -184,6 +206,11 @@ function totalizar(){
   valores.forEach(v=>{
     total += (cantidades[v]||0)*v;
   });
+
+  if(total <= 0){
+    alert("Introduce el cambio antes de totalizar");
+    return;
+  }
 
   let esperado = Number(localStorage.getItem("cambio_esperado") || 0);
   let diferencia = total - esperado;
@@ -201,9 +228,12 @@ function totalizar(){
     clase="error";
   }
 
-  let res = document.getElementById("resultado");
-  res.textContent = texto;
-  res.className = "resultado " + clase;
+  document.getElementById("resultado").textContent = texto;
+  document.getElementById("resultado").className = "resultado " + clase;
+
+  let nuevoEsperado = esperado + diferencia;
+  localStorage.setItem("cambio_esperado", nuevoEsperado);
+  document.getElementById("esperado").value = nuevoEsperado;
 
   guardar(total,diferencia);
 
@@ -222,6 +252,7 @@ function guardar(total,diferencia){
   data[clave]={
     total,
     diferencia,
+    esperado: Number(localStorage.getItem("cambio_esperado") || 0),
     nota:document.getElementById("nota").value,
     usuario:usuarioActual(),
     hora:ahora.toLocaleTimeString("es-ES")
@@ -239,9 +270,10 @@ function guardar(total,diferencia){
 function bloquear(){
   bloqueado=true;
   document.querySelectorAll("input").forEach(i=>{
-    i.disabled=true;
+    if(i.id !== "esperado"){
+      i.disabled=true;
+    }
   });
-  document.getElementById("nota").disabled=false;
 }
 
 /* ===== BORRAR ===== */
@@ -267,6 +299,7 @@ function borrar(){
 /* INIT */
 
 pintar();
+cargarEsperado();
 
 document.getElementById("btnBorrar").style.display =
   esAdmin() ? "block" : "none";
