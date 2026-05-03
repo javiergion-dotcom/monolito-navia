@@ -1,1 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAMBIO · MONOLITO</title>
 
+<style>
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  font-weight:900;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.volver{
+  background:white;
+  color:#17303d;
+  border:0;
+  border-radius:10px;
+  padding:6px 10px;
+  font-weight:900;
+}
+
+.contenedor{padding:16px}
+
+.linea{
+  background:white;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:900;
+}
+
+input{
+  width:80px;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  text-align:center;
+}
+
+.total{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  border-radius:16px;
+  font-size:22px;
+  font-weight:900;
+  margin-top:15px;
+  text-align:center;
+}
+
+.info{
+  margin-top:10px;
+  font-size:13px;
+  color:#4f5f69;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  💰 CAMBIO
+</header>
+
+<div class="contenedor" id="lista"></div>
+
+<div class="contenedor">
+  <div class="total" id="total">0 €</div>
+  <div class="info" id="info"></div>
+</div>
+
+<script>
+
+function volver(){
+  window.location.href="index.html";
+}
+
+function usuarioActual(){
+  return localStorage.getItem("usuario") || "OPERADOR";
+}
+
+const valores = [
+  50,20,10,5,2,1,0.50,0.20,0.10,0.05,0.02,0.01
+];
+
+let cantidades = {};
+
+/* ===== PINTAR ===== */
+
+function pintar(){
+
+  let html = "";
+
+  valores.forEach(v=>{
+    html += `
+      <div class="linea">
+        <div>${v} €</div>
+        <input type="number" min="0" value="0"
+          onchange="cambiar(${v},this.value)">
+      </div>
+    `;
+  });
+
+  document.getElementById("lista").innerHTML = html;
+}
+
+/* ===== CAMBIO ===== */
+
+function cambiar(valor,cant){
+  cantidades[valor] = Number(cant || 0);
+  calcular();
+}
+
+/* ===== CALCULAR ===== */
+
+function calcular(){
+
+  let total = 0;
+
+  valores.forEach(v=>{
+    total += (cantidades[v] || 0) * v;
+  });
+
+  document.getElementById("total").textContent =
+    total.toFixed(2).replace(".",",") + " €";
+
+  guardar(total);
+}
+
+/* ===== GUARDAR ===== */
+
+function guardar(total){
+
+  let data = JSON.parse(localStorage.getItem("cambio") || "{}");
+
+  let ahora = new Date();
+  let clave = ahora.toLocaleDateString("es-ES");
+
+  data[clave] = {
+    total: total,
+    usuario: usuarioActual(),
+    hora: ahora.toLocaleTimeString("es-ES")
+  };
+
+  localStorage.setItem("cambio", JSON.stringify(data));
+
+  document.getElementById("info").textContent =
+    "Guardado por " + usuarioActual() + " · " + ahora.toLocaleTimeString("es-ES");
+}
+
+/* INIT */
+
+pintar();
+
+</script>
+
+</body>
+</html>
