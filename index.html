@@ -118,6 +118,12 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
     <div>VENTAS</div>
   </div>
 
+  <!-- 🔥 NUEVO BOTÓN CAMBIO -->
+  <div class="boton verde" onclick="irCambio()">
+    <div class="icono">💵</div>
+    <div>CAMBIO</div>
+  </div>
+
   <div class="boton azul" onclick="abrir('calendario.html')">
     <div class="icono">📅</div>
     <div>CALENDARIO</div>
@@ -142,6 +148,11 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
 </div>
 
 <script>
+
+function irCambio(){
+  abrir('cambio.html');
+}
+
 function sonidoClick(){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -173,54 +184,42 @@ function abrir(destino){
   },70);
 }
 
+/* resto sin tocar */
 function leerIncidencias(){
   return JSON.parse(localStorage.getItem("incidencias") || "[]");
 }
-
 function leerComunicaciones(){
   return JSON.parse(localStorage.getItem("comunicaciones") || "[]");
 }
-
 function leerCalendario(){
   return JSON.parse(localStorage.getItem("calendario") || "{}");
 }
-
 function contarIncidencias(){
   return leerIncidencias().filter(x => !x.resuelta).length;
 }
-
 function contarComunicaciones(){
   return leerComunicaciones().filter(x => !x.resuelta && !x.hecha).length;
 }
-
 function contarCalendario(){
   const data = leerCalendario();
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
-
   const limite = new Date(hoy);
   limite.setDate(hoy.getDate() + 7);
-
   let total = 0;
-
   Object.values(data).forEach(r=>{
     if(!r.fecha) return;
     const f = new Date(r.fecha + "T12:00:00");
-    if(f >= hoy && f <= limite){
-      total++;
-    }
+    if(f >= hoy && f <= limite){ total++; }
   });
-
   return total;
 }
-
 function reloj(){
   const d = new Date();
   document.getElementById("hora").innerHTML =
     d.toLocaleDateString("es-ES") + " · " +
     d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 }
-
 function saludo(){
   const h = new Date().getHours();
   if(h < 6) return "Buenas noches";
@@ -228,56 +227,36 @@ function saludo(){
   if(h < 21) return "Buenas tardes";
   return "Buenas noches";
 }
-
 function cargarUsuario(){
   const usuario = localStorage.getItem("usuario") || "OPERADOR";
   document.getElementById("usuario").textContent = usuario;
 }
-
 function actualizarContadores(){
   const inc = contarIncidencias();
   const com = contarComunicaciones();
-
   const contadorInc = document.getElementById("contadorIncidencias");
   const contadorCom = document.getElementById("contadorComunicacion");
 
   if(inc > 0){
     contadorInc.textContent = inc;
     contadorInc.style.display = "flex";
-  }else{
-    contadorInc.style.display = "none";
-  }
+  }else{ contadorInc.style.display = "none"; }
 
   if(com > 0){
     contadorCom.textContent = com;
     contadorCom.style.display = "flex";
-  }else{
-    contadorCom.style.display = "none";
-  }
+  }else{ contadorCom.style.display = "none"; }
 }
-
 function actualizarFranja(){
   const inc = contarIncidencias();
   const com = contarComunicaciones();
   const cal = contarCalendario();
-
   let texto = saludo();
 
-  if(inc > 0){
-    texto += " · [INC] " + inc;
-  }
-
-  if(com > 0){
-    texto += " · [COM] " + com;
-  }
-
-  if(cal > 0){
-    texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s");
-  }
-
-  if(inc === 0 && com === 0 && cal === 0){
-    texto += " · Sin avisos";
-  }
+  if(inc > 0){ texto += " · [INC] " + inc; }
+  if(com > 0){ texto += " · [COM] " + com; }
+  if(cal > 0){ texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s"); }
+  if(inc === 0 && com === 0 && cal === 0){ texto += " · Sin avisos"; }
 
   document.getElementById("franjaEstado").textContent = texto;
 }
@@ -292,6 +271,7 @@ cargarUsuario();
 reloj();
 actualizarFranja();
 actualizarContadores();
+
 </script>
 
 </body>
