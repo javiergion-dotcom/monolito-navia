@@ -60,6 +60,30 @@ input{
   text-align:center;
 }
 
+.resultado{
+  margin-top:12px;
+  padding:14px;
+  border-radius:12px;
+  font-weight:900;
+  text-align:center;
+}
+
+.ok{background:#e8f5e9;color:#2e7d32}
+.error{background:#ffe5e5;color:#c00000}
+
+.boton{
+  width:100%;
+  margin-top:14px;
+  padding:14px;
+  border:0;
+  border-radius:14px;
+  font-weight:900;
+  font-size:16px;
+}
+
+.totalizar{background:#4caf50;color:white}
+.borrar{background:#c00000;color:white}
+
 .info{
   margin-top:10px;
   font-size:13px;
@@ -78,7 +102,12 @@ input{
 <div class="contenedor" id="lista"></div>
 
 <div class="contenedor">
-  <div class="total" id="total">0 €</div>
+  <div class="total" id="total">0,00 €</div>
+  <div class="resultado" id="resultado"></div>
+
+  <button class="boton totalizar" onclick="totalizar()">TOTALIZAR</button>
+  <button class="boton borrar" id="btnBorrar" onclick="borrar()">BORRAR</button>
+
   <div class="info" id="info"></div>
 </div>
 
@@ -92,78 +121,141 @@ function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
 }
 
-const valores = [
-  50,20,10,5,2,1,0.50,0.20,0.10,0.05,0.02,0.01
-];
+function esAdmin(){
+  let u = usuarioActual().toUpperCase();
+  return u==="JAVI" || u==="JAVIER" || u==="SILVIA";
+}
 
+const valores = [50,20,10,5,2,1,0.50,0.20,0.10,0.05,0.02,0.01];
 let cantidades = {};
+let bloqueado = false;
 
 /* ===== PINTAR ===== */
 
 function pintar(){
-
-  let html = "";
-
+  let html="";
   valores.forEach(v=>{
-    html += `
-      <div class="linea">
-        <div>${v} €</div>
-        <input type="number" min="0" value="0"
-          onchange="cambiar(${v},this.value)">
-      </div>
-    `;
+    html+=`
+    <div class="linea">
+      <div>${v} €</div>
+      <input type="number" min="0" value="0"
+        onchange="cambiar(${v},this.value)">
+    </div>`;
   });
-
-  document.getElementById("lista").innerHTML = html;
+  document.getElementById("lista").innerHTML=html;
 }
 
 /* ===== CAMBIO ===== */
 
 function cambiar(valor,cant){
-  cantidades[valor] = Number(cant || 0);
+  if(bloqueado) return;
+  cantidades[valor]=Number(cant||0);
   calcular();
 }
 
 /* ===== CALCULAR ===== */
 
 function calcular(){
-
-  let total = 0;
-
+  let total=0;
   valores.forEach(v=>{
-    total += (cantidades[v] || 0) * v;
+    total += (cantidades[v]||0)*v;
+  });
+  document.getElementById("total").textContent =
+    total.toFixed(2).replace(".",",")+" €";
+}
+
+/* ===== TOTALIZAR ===== */
+
+function totalizar(){
+
+  let total=0;
+  valores.forEach(v=>{
+    total += (cantidades[v]||0)*v;
   });
 
-  document.getElementById("total").textContent =
-    total.toFixed(2).replace(".",",") + " €";
+  let esperado = Number(localStorage.getItem("cambio_esperado") || 0);
+  let diferencia = total - esperado;
 
-  guardar(total);
+  let texto="";
+  let clase="ok";
+
+  if(diferencia === 0){
+    texto="✅ CAMBIO CORRECTO";
+  }else if(diferencia > 0){
+    texto="⚠ SOBRAN " + diferencia.toFixed(2) + " €";
+    clase="error";
+  }else{
+    texto="⚠ FALTAN " + Math.abs(diferencia).toFixed(2) + " €";
+    clase="error";
+  }
+
+  let res = document.getElementById("resultado");
+  res.textContent = texto;
+  res.className = "resultado " + clase;
+
+  guardar(total,diferencia);
+
+  bloquear();
 }
 
 /* ===== GUARDAR ===== */
 
-function guardar(total){
+function guardar(total,diferencia){
 
   let data = JSON.parse(localStorage.getItem("cambio") || "{}");
 
   let ahora = new Date();
   let clave = ahora.toLocaleDateString("es-ES");
 
-  data[clave] = {
-    total: total,
-    usuario: usuarioActual(),
-    hora: ahora.toLocaleTimeString("es-ES")
+  data[clave]={
+    total,
+    diferencia,
+    usuario:usuarioActual(),
+    hora:ahora.toLocaleTimeString("es-ES")
   };
 
   localStorage.setItem("cambio", JSON.stringify(data));
 
   document.getElementById("info").textContent =
-    "Guardado por " + usuarioActual() + " · " + ahora.toLocaleTimeString("es-ES");
+    "Guardado por " + usuarioActual() + " · " +
+    ahora.toLocaleTimeString("es-ES");
+}
+
+/* ===== BLOQUEAR ===== */
+
+function bloquear(){
+  bloqueado=true;
+  document.querySelectorAll("input").forEach(i=>{
+    i.disabled=true;
+  });
+}
+
+/* ===== BORRAR ===== */
+
+function borrar(){
+  if(!esAdmin()){
+    alert("Solo Javi o Silvia pueden borrar");
+    return;
+  }
+
+  if(!confirm("¿Borrar registro de hoy?")) return;
+
+  let data = JSON.parse(localStorage.getItem("cambio") || "{}");
+  let clave = new Date().toLocaleDateString("es-ES");
+
+  delete data[clave];
+
+  localStorage.setItem("cambio", JSON.stringify(data));
+
+  location.reload();
 }
 
 /* INIT */
 
 pintar();
+
+document.getElementById("btnBorrar").style.display =
+  esAdmin() ? "block" : "none";
 
 </script>
 
