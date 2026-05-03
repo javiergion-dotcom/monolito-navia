@@ -49,6 +49,14 @@ input{
   text-align:center;
 }
 
+textarea{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+}
+
 .total{
   background:#17303d;
   color:white;
@@ -73,7 +81,7 @@ input{
 
 .boton{
   width:100%;
-  margin-top:14px;
+  margin-top:12px;
   padding:14px;
   border:0;
   border-radius:14px;
@@ -83,6 +91,7 @@ input{
 
 .totalizar{background:#4caf50;color:white}
 .borrar{background:#c00000;color:white}
+.ajustar{background:#ff9800;color:white}
 
 .info{
   margin-top:10px;
@@ -90,12 +99,18 @@ input{
   color:#4f5f69;
 }
 
-textarea{
-  width:100%;
-  margin-top:10px;
+.historial{
+  margin-top:20px;
+}
+
+.itemHist{
+  background:white;
   padding:10px;
   border-radius:10px;
-  border:1px solid #ccc;
+  margin-bottom:8px;
+  font-size:14px;
+  display:flex;
+  justify-content:space-between;
 }
 </style>
 </head>
@@ -125,9 +140,16 @@ textarea{
   <textarea id="nota" placeholder="Explicación (si falta o sobra)"></textarea>
 
   <button class="boton totalizar" onclick="totalizar()">TOTALIZAR</button>
+  <button class="boton ajustar" id="btnAjuste" onclick="ajustarCaja()">AJUSTAR CAJA</button>
   <button class="boton borrar" id="btnBorrar" onclick="borrar()">BORRAR</button>
 
   <div class="info" id="info"></div>
+
+  <div class="historial">
+    <div class="info"><b>Histórico de ajustes</b></div>
+    <div id="historial"></div>
+  </div>
+
 </div>
 
 <script>
@@ -170,8 +192,6 @@ function cambiar(valor,cant){
   cantidades[valor]=Number(cant||0);
   calcular();
 }
-
-/* ===== CALCULAR ===== */
 
 function calcular(){
   let total=0;
@@ -236,24 +256,67 @@ function totalizar(){
   document.getElementById("esperado").value = nuevoEsperado;
 
   guardar(total,diferencia);
-
   bloquear();
+}
+
+/* ===== AJUSTE ===== */
+
+function ajustarCaja(){
+  if(!esAdmin()){
+    alert("Solo Javi o Silvia pueden ajustar");
+    return;
+  }
+
+  if(!confirm("¿Seguro que quieres ajustar la caja a 0?")) return;
+
+  let esperado = Number(localStorage.getItem("cambio_esperado") || 0);
+
+  let historial = JSON.parse(localStorage.getItem("cambio_ajustes") || "[]");
+
+  let ahora = new Date();
+
+  historial.unshift({
+    fecha: ahora.toLocaleDateString("es-ES"),
+    hora: ahora.toLocaleTimeString("es-ES"),
+    usuario: usuarioActual(),
+    importe: esperado
+  });
+
+  localStorage.setItem("cambio_ajustes", JSON.stringify(historial));
+
+  localStorage.setItem("cambio_esperado", 0);
+  document.getElementById("esperado").value = 0;
+
+  cargarHistorial();
+}
+
+/* ===== HISTORIAL ===== */
+
+function cargarHistorial(){
+  let data = JSON.parse(localStorage.getItem("cambio_ajustes") || "[]");
+
+  let html="";
+  data.forEach(d=>{
+    html+=`
+    <div class="itemHist">
+      <div>${d.fecha} ${d.hora}</div>
+      <div>${d.importe} €</div>
+    </div>`;
+  });
+
+  document.getElementById("historial").innerHTML = html;
 }
 
 /* ===== GUARDAR ===== */
 
 function guardar(total,diferencia){
-
   let data = JSON.parse(localStorage.getItem("cambio") || "{}");
-
   let ahora = new Date();
   let clave = ahora.toLocaleDateString("es-ES");
 
   data[clave]={
     total,
     diferencia,
-    esperado: Number(localStorage.getItem("cambio_esperado") || 0),
-    nota:document.getElementById("nota").value,
     usuario:usuarioActual(),
     hora:ahora.toLocaleTimeString("es-ES")
   };
@@ -300,8 +363,12 @@ function borrar(){
 
 pintar();
 cargarEsperado();
+cargarHistorial();
 
 document.getElementById("btnBorrar").style.display =
+  esAdmin() ? "block" : "none";
+
+document.getElementById("btnAjuste").style.display =
   esAdmin() ? "block" : "none";
 
 </script>
