@@ -49,6 +49,14 @@ input{
   text-align:center;
 }
 
+textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  margin-top:10px;
+}
+
 .total{
   background:#17303d;
   color:white;
@@ -105,6 +113,8 @@ input{
   <div class="total" id="total">0,00 €</div>
   <div class="resultado" id="resultado"></div>
 
+  <textarea id="nota" placeholder="Explicación (si falta o sobra)"></textarea>
+
   <button class="boton totalizar" onclick="totalizar()">TOTALIZAR</button>
   <button class="boton borrar" id="btnBorrar" onclick="borrar()">BORRAR</button>
 
@@ -139,6 +149,7 @@ function pintar(){
     <div class="linea">
       <div>${v} €</div>
       <input type="number" min="0" value="0"
+        onfocus="this.select()" onclick="this.select()"
         onchange="cambiar(${v},this.value)">
     </div>`;
   });
@@ -160,6 +171,7 @@ function calcular(){
   valores.forEach(v=>{
     total += (cantidades[v]||0)*v;
   });
+
   document.getElementById("total").textContent =
     total.toFixed(2).replace(".",",")+" €";
 }
@@ -210,6 +222,7 @@ function guardar(total,diferencia){
   data[clave]={
     total,
     diferencia,
+    nota:document.getElementById("nota").value,
     usuario:usuarioActual(),
     hora:ahora.toLocaleTimeString("es-ES")
   };
@@ -228,6 +241,7 @@ function bloquear(){
   document.querySelectorAll("input").forEach(i=>{
     i.disabled=true;
   });
+  document.getElementById("nota").disabled=false;
 }
 
 /* ===== BORRAR ===== */
