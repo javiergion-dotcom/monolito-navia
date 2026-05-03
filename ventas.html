@@ -64,17 +64,9 @@ textarea{
   box-shadow:0 6px 14px rgba(0,0,0,.08);
 }
 
-.manana{
-  background:linear-gradient(#f7fbff,#eaf5ff);
-}
-
-.tarde{
-  background:linear-gradient(#fffaf0,#fff1d6);
-}
-
-.totalDia{
-  background:white;
-}
+.manana{background:linear-gradient(#f7fbff,#eaf5ff)}
+.tarde{background:linear-gradient(#fffaf0,#fff1d6)}
+.totalDia{background:white}
 
 .titulo{
   font-weight:900;
@@ -105,6 +97,18 @@ textarea{
   border:1px solid #ffd58a;
 }
 
+.guardar{
+  width:100%;
+  background:#48a530;
+  color:white;
+  border:0;
+  border-radius:14px;
+  padding:14px;
+  font-weight:900;
+  font-size:17px;
+  margin-bottom:12px;
+}
+
 .borrar{
   width:100%;
   background:#c00000;
@@ -120,7 +124,6 @@ textarea{
   background:#f2f2f2;
   color:#666;
 }
-
 </style>
 </head>
 
@@ -140,16 +143,16 @@ textarea{
 
 <div class="bloque manana">
   <div class="titulo">☀️ MAÑANA</div>
-  <input id="maA" placeholder="Ventas A mañana" type="number" oninput="calcular()">
-  <input id="maB" placeholder="Ventas B mañana" type="number" oninput="calcular()">
+  <input id="maA" placeholder="Ventas A mañana" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
+  <input id="maB" placeholder="Ventas B mañana" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
   <div class="total" id="totalMa">TOTAL MAÑANA: 0,00 €</div>
   <div class="aviso" id="avisoMa"></div>
 </div>
 
 <div class="bloque tarde">
   <div class="titulo">🌇 TARDE</div>
-  <input id="taA" placeholder="Ventas A tarde" type="number" oninput="calcular()">
-  <input id="taB" placeholder="Ventas B tarde" type="number" oninput="calcular()">
+  <input id="taA" placeholder="Ventas A tarde" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
+  <input id="taB" placeholder="Ventas B tarde" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
   <div class="total" id="totalTa">TOTAL TARDE: 0,00 €</div>
   <div class="aviso" id="avisoTa"></div>
 </div>
@@ -159,6 +162,8 @@ textarea{
   <div class="total" id="totalDia">0,00 €</div>
   <div class="info" id="infoRegistro"></div>
 </div>
+
+<button class="guardar" id="btnGuardar" onclick="guardarVentas()">💾 GUARDAR VENTAS</button>
 
 <div class="bloque errorNota">
   <div class="titulo">⚠ Aviso de error / corrección</div>
@@ -250,10 +255,6 @@ function calcular(){
   document.getElementById("totalDia").textContent = euros(totalDia);
 
   pintarAvisos(maA,maB,taA,taB);
-
-  if(totalDia > 0){
-    guardar(maA,maB,taA,taB,totalMa,totalTa,totalDia);
-  }
 }
 
 function pintarAvisos(maA,maB,taA,taB){
@@ -268,7 +269,21 @@ function pintarAvisos(maA,maB,taA,taB){
     : "";
 }
 
-function guardar(maA,maB,taA,taB,totalMa,totalTa,totalDia){
+function guardarVentas(){
+  let maA = numero(maAInput().value);
+  let maB = numero(maBInput().value);
+  let taA = numero(taAInput().value);
+  let taB = numero(taBInput().value);
+
+  let totalMa = maA + maB;
+  let totalTa = taA + taB;
+  let totalDia = totalMa + totalTa;
+
+  if(totalDia <= 0){
+    alert("No hay ventas para guardar.");
+    return;
+  }
+
   let data = JSON.parse(localStorage.getItem("ventas") || "{}");
   let operador = usuarioActual();
   let ahora = new Date();
@@ -298,6 +313,8 @@ function guardar(maA,maB,taA,taB,totalMa,totalTa,totalDia){
     "Guardado por " + data[clave].operador + " · " + data[clave].hora;
 
   aplicarBloqueo();
+
+  alert("Ventas guardadas.");
 }
 
 function cargar(){
@@ -331,25 +348,8 @@ function cargar(){
   }
 
   cargando = false;
-  recalcularSoloPantalla();
+  calcular();
   aplicarBloqueo();
-}
-
-function recalcularSoloPantalla(){
-  let maA = numero(maAInput().value);
-  let maB = numero(maBInput().value);
-  let taA = numero(taAInput().value);
-  let taB = numero(taBInput().value);
-
-  let totalMa = maA + maB;
-  let totalTa = taA + taB;
-  let totalDia = totalMa + totalTa;
-
-  document.getElementById("totalMa").textContent = "TOTAL MAÑANA: " + euros(totalMa);
-  document.getElementById("totalTa").textContent = "TOTAL TARDE: " + euros(totalTa);
-  document.getElementById("totalDia").textContent = euros(totalDia);
-
-  pintarAvisos(maA,maB,taA,taB);
 }
 
 function aplicarBloqueo(){
@@ -362,7 +362,11 @@ function aplicarBloqueo(){
     input.classList.toggle("bloqueado", existe && !admin);
   });
 
-  document.getElementById("btnBorrar").style.display = admin ? "block" : "none";
+  document.getElementById("btnGuardar").style.display =
+    existe && !admin ? "none" : "block";
+
+  document.getElementById("btnBorrar").style.display =
+    admin ? "block" : "none";
 }
 
 function guardarNotaError(){
@@ -388,6 +392,8 @@ function guardarNotaError(){
 
   document.getElementById("infoNota").textContent =
     texto ? "Nota registrada por " + data[clave].notaPor + " · " + data[clave].notaHora : "";
+
+  aplicarBloqueo();
 }
 
 function borrarDia(){
