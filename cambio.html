@@ -90,7 +90,6 @@ textarea{
 }
 
 .totalizar{background:#4caf50;color:white}
-.ajustar{background:#ff9800;color:white}
 .borrar{background:#c00000;color:white}
 .historial{background:#17303d;color:white}
 
@@ -128,12 +127,9 @@ textarea{
 
   <button class="boton totalizar" onclick="totalizar()">TOTALIZAR</button>
 
-  <button class="boton historial"
-    onclick="window.location.href='cambio_historial.html'">
+  <button class="boton historial" onclick="window.location.href='cambio_historial.html'">
     📊 VER HISTORIAL
   </button>
-
-  <button class="boton ajustar" id="btnAjuste" onclick="ajustarCaja()">AJUSTAR CAJA</button>
 
   <button class="boton borrar" id="btnBorrar" onclick="borrar()">BORRAR</button>
 
@@ -259,18 +255,6 @@ function guardar(total,diferencia){
     ahora.toLocaleTimeString("es-ES");
 }
 
-function ajustarCaja(){
-  if(!esAdmin()){
-    alert("Solo Javi o Silvia pueden ajustar");
-    return;
-  }
-
-  if(!confirm("¿Seguro que quieres poner el cambio a 0?")) return;
-
-  localStorage.setItem("cambio_esperado", 0);
-  document.getElementById("esperado").value = 0;
-}
-
 function bloquear(){
   bloqueado=true;
   document.querySelectorAll("input").forEach(i=>{
@@ -302,9 +286,6 @@ pintar();
 cargarEsperado();
 
 document.getElementById("btnBorrar").style.display =
-  esAdmin() ? "block" : "none";
-
-document.getElementById("btnAjuste").style.display =
   esAdmin() ? "block" : "none";
 
 </script>
