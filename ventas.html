@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,7 +7,6 @@
 <title>VENTAS · MONOLITO</title>
 
 <style>
-*{box-sizing:border-box}
 body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
 
 header{
@@ -15,401 +15,171 @@ header{
   padding:16px;
   font-weight:900;
   font-size:20px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.volver,.mes{
-  background:white;
-  color:#17303d;
-  border:0;
-  border-radius:10px;
-  padding:7px 11px;
-  font-weight:900;
-}
-
-.mes{
-  margin-left:auto;
-  background:#ff9800;
-  color:white;
 }
 
 .contenedor{padding:16px}
 
-.fecha{
-  font-size:18px;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
-input,textarea{
+input{
   width:100%;
   padding:12px;
-  border-radius:12px;
-  border:1px solid #ccc;
   margin-bottom:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
   font-size:16px;
 }
 
-textarea{
-  min-height:80px;
-  resize:vertical;
-}
-
-.bloque{
-  padding:14px;
-  border-radius:18px;
-  margin-bottom:14px;
-  box-shadow:0 6px 14px rgba(0,0,0,.08);
-}
-
-.manana{background:linear-gradient(#f7fbff,#eaf5ff)}
-.tarde{background:linear-gradient(#fffaf0,#fff1d6)}
-.totalDia{background:white}
-
-.titulo{
-  font-weight:900;
-  margin-bottom:8px;
-}
-
-.total{
-  font-size:18px;
-  font-weight:900;
-  margin-top:6px;
-}
-
-.info{
-  font-size:13px;
-  color:#4f5f69;
-  margin-top:10px;
-}
-
-.aviso{
-  color:#b00000;
-  font-weight:900;
-  font-size:13px;
-  margin-top:8px;
-}
-
-.errorNota{
-  background:#fff8e8;
-  border:1px solid #ffd58a;
-}
-
-.guardar{
+.boton{
   width:100%;
-  background:#48a530;
-  color:white;
+  padding:14px;
   border:0;
   border-radius:14px;
-  padding:14px;
-  font-weight:900;
-  font-size:17px;
-  margin-bottom:12px;
-}
-
-.borrar{
-  width:100%;
-  background:#c00000;
-  color:white;
-  border:0;
-  border-radius:12px;
-  padding:12px;
   font-weight:900;
   margin-top:10px;
 }
 
-.bloqueado{
-  background:#f2f2f2;
-  color:#666;
+.guardar{background:#4caf50;color:white}
+
+.bloqueo{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,.75);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
 }
+
+.modal{
+  background:white;
+  padding:20px;
+  border-radius:14px;
+  width:90%;
+  max-width:400px;
+  text-align:center;
+}
+
+.modal p{
+  font-size:15px;
+  line-height:1.4;
+}
+
+.modal button{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border:0;
+  border-radius:10px;
+  font-weight:900;
+}
+
+.irCambio{background:#17303d;color:white}
+.continuar{background:#c00000;color:white}
 </style>
 </head>
 
 <body>
 
-<header>
-  <button class="volver" onclick="volver()">←</button>
-  💰 VENTAS
-  <button class="mes" onclick="verMes()">📊 Mes</button>
-</header>
+<header>💰 VENTAS</header>
 
 <div class="contenedor">
 
-<div class="fecha" id="fechaTexto"></div>
+<input id="ventasDia" type="number" placeholder="Ventas del día"
+onfocus="this.select()" onclick="this.select()">
 
-<input type="date" id="selectorFecha" onchange="cambiarFecha()">
+<button class="boton guardar" onclick="guardarVentas()">GUARDAR</button>
 
-<div class="bloque manana">
-  <div class="titulo">☀️ MAÑANA</div>
-  <input id="maA" placeholder="Ventas A mañana" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
-  <input id="maB" placeholder="Ventas B mañana" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
-  <div class="total" id="totalMa">TOTAL MAÑANA: 0,00 €</div>
-  <div class="aviso" id="avisoMa"></div>
 </div>
 
-<div class="bloque tarde">
-  <div class="titulo">🌇 TARDE</div>
-  <input id="taA" placeholder="Ventas A tarde" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
-  <input id="taB" placeholder="Ventas B tarde" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
-  <div class="total" id="totalTa">TOTAL TARDE: 0,00 €</div>
-  <div class="aviso" id="avisoTa"></div>
-</div>
+<!-- BLOQUEO / AVISO -->
+<div class="bloqueo" id="bloqueo">
+  <div class="modal">
 
-<div class="bloque totalDia">
-  <div class="titulo">TOTAL DÍA</div>
-  <div class="total" id="totalDia">0,00 €</div>
-  <div class="info" id="infoRegistro"></div>
-</div>
+    <p>
+    ⚠ CONTROL DE CAMBIO OBLIGATORIO<br><br>
 
-<button class="guardar" id="btnGuardar" onclick="guardarVentas()">💾 GUARDAR VENTAS</button>
+    Debes realizar el control de cambio antes de registrar ventas.<br><br>
 
-<div class="bloque errorNota">
-  <div class="titulo">⚠ Aviso de error / corrección</div>
-  <textarea id="notaError" placeholder="Si hubo un error, escribe aquí qué pasó. No modifica las ventas registradas." oninput="guardarNotaError()"></textarea>
-  <div class="info" id="infoNota"></div>
-</div>
+    Si continúas sin hacerlo, quedará registrado con tu usuario, fecha y hora, y el sistema podrá bloquearse.
+    </p>
 
-<button class="borrar" id="btnBorrar" onclick="borrarDia()">🗑 Borrar registro del día</button>
+    <button class="irCambio" onclick="irCambio()">IR A CAMBIO</button>
+    <button class="continuar" onclick="continuar()">CONTINUAR BAJO RESPONSABILIDAD</button>
 
+  </div>
 </div>
 
 <script>
-function volver(){window.location.href="index.html"}
-function verMes(){window.location.href="ventas_resumen.html"}
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
 }
 
-function puedeAdministrar(){
-  const u = usuarioActual().toUpperCase();
-  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+/* ===== COMPROBAR CAMBIO ===== */
+
+function hayCambioHoy(){
+  let data = JSON.parse(localStorage.getItem("cambio") || "{}");
+  let hoy = new Date().toLocaleDateString("es-ES");
+  return data[hoy];
 }
 
-function hoyISO(){
-  return new Date().toISOString().split("T")[0];
-}
-
-function formatoFechaBonita(fecha){
-  let d = new Date(fecha + "T12:00:00");
-  return d.toLocaleDateString("es-ES",{
-    weekday:"long",
-    day:"numeric",
-    month:"long",
-    year:"numeric"
-  });
-}
-
-function claveFecha(fecha){
-  let d = new Date(fecha + "T12:00:00");
-  return d.toLocaleDateString("es-ES");
-}
-
-function numero(v){
-  return Number(v || 0);
-}
-
-function euros(n){
-  return Number(n || 0).toFixed(2).replace(".",",") + " €";
-}
-
-function maAInput(){return document.getElementById("maA")}
-function maBInput(){return document.getElementById("maB")}
-function taAInput(){return document.getElementById("taA")}
-function taBInput(){return document.getElementById("taB")}
-
-let fechaActual = hoyISO();
-let cargando = false;
-
-document.getElementById("selectorFecha").value = fechaActual;
-actualizarFechaTexto();
-cargar();
-
-function cambiarFecha(){
-  fechaActual = document.getElementById("selectorFecha").value;
-  actualizarFechaTexto();
-  cargar();
-}
-
-function actualizarFechaTexto(){
-  document.getElementById("fechaTexto").textContent =
-    "📅 " + formatoFechaBonita(fechaActual);
-}
-
-function calcular(){
-  if(cargando) return;
-
-  let maA = numero(maAInput().value);
-  let maB = numero(maBInput().value);
-  let taA = numero(taAInput().value);
-  let taB = numero(taBInput().value);
-
-  let totalMa = maA + maB;
-  let totalTa = taA + taB;
-  let totalDia = totalMa + totalTa;
-
-  document.getElementById("totalMa").textContent = "TOTAL MAÑANA: " + euros(totalMa);
-  document.getElementById("totalTa").textContent = "TOTAL TARDE: " + euros(totalTa);
-  document.getElementById("totalDia").textContent = euros(totalDia);
-
-  pintarAvisos(maA,maB,taA,taB);
-}
-
-function pintarAvisos(maA,maB,taA,taB){
-  document.getElementById("avisoMa").textContent =
-    ((maA === 0 && maB > 0) || (maA > 0 && maB === 0))
-    ? "⚠ Revisa si falta cubrir una de las ventas de mañana."
-    : "";
-
-  document.getElementById("avisoTa").textContent =
-    ((taA === 0 && taB > 0) || (taA > 0 && taB === 0))
-    ? "⚠ Revisa si falta cubrir una de las ventas de tarde."
-    : "";
-}
+/* ===== GUARDAR ===== */
 
 function guardarVentas(){
-  let maA = numero(maAInput().value);
-  let maB = numero(maBInput().value);
-  let taA = numero(taAInput().value);
-  let taB = numero(taBInput().value);
 
-  let totalMa = maA + maB;
-  let totalTa = taA + taB;
-  let totalDia = totalMa + totalTa;
+  if(!hayCambioHoy()){
+    document.getElementById("bloqueo").style.display="flex";
+    return;
+  }
 
-  if(totalDia <= 0){
-    alert("No hay ventas para guardar.");
+  guardarFinal(false);
+}
+
+/* ===== CONTINUAR SIN CAMBIO ===== */
+
+function continuar(){
+  document.getElementById("bloqueo").style.display="none";
+  guardarFinal(true);
+}
+
+/* ===== IR A CAMBIO ===== */
+
+function irCambio(){
+  window.location.href="cambio.html";
+}
+
+/* ===== GUARDADO REAL ===== */
+
+function guardarFinal(sinCambio){
+
+  let ventas = Number(document.getElementById("ventasDia").value || 0);
+
+  if(ventas <= 0){
+    alert("Introduce ventas");
     return;
   }
 
   let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  let operador = usuarioActual();
+
   let ahora = new Date();
-  let clave = claveFecha(fechaActual);
+  let clave = ahora.toLocaleDateString("es-ES");
 
-  let anterior = data[clave] || {};
-
-  data[clave] = {
-    operador: anterior.operador || operador,
-    hora: anterior.hora || ahora.toLocaleTimeString("es-ES"),
-    fechaRegistro: anterior.fechaRegistro || ahora.toLocaleDateString("es-ES"),
-    mañanaA: maA,
-    mañanaB: maB,
-    tardeA: taA,
-    tardeB: taB,
-    mañana: totalMa,
-    tarde: totalTa,
-    total: totalDia,
-    notaError: anterior.notaError || "",
-    notaPor: anterior.notaPor || "",
-    notaHora: anterior.notaHora || ""
+  data[clave]={
+    ventas,
+    usuario:usuarioActual(),
+    hora:ahora.toLocaleTimeString("es-ES"),
+    sinCambio:sinCambio
   };
 
   localStorage.setItem("ventas", JSON.stringify(data));
 
-  document.getElementById("infoRegistro").textContent =
-    "Guardado por " + data[clave].operador + " · " + data[clave].hora;
+  alert("Ventas guardadas");
 
-  aplicarBloqueo();
-
-  alert("Ventas guardadas.");
+  document.getElementById("ventasDia").value="";
 }
 
-function cargar(){
-  cargando = true;
-
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  let d = data[claveFecha(fechaActual)];
-
-  maAInput().value = "";
-  maBInput().value = "";
-  taAInput().value = "";
-  taBInput().value = "";
-  document.getElementById("notaError").value = "";
-  document.getElementById("infoNota").textContent = "";
-  document.getElementById("infoRegistro").textContent = "";
-
-  if(d){
-    maAInput().value = d.mañanaA || "";
-    maBInput().value = d.mañanaB || "";
-    taAInput().value = d.tardeA || "";
-    taBInput().value = d.tardeB || "";
-    document.getElementById("notaError").value = d.notaError || "";
-
-    document.getElementById("infoRegistro").textContent =
-      "Último registro: " + (d.operador || "OPERADOR") + " · " + (d.hora || "");
-
-    if(d.notaError){
-      document.getElementById("infoNota").textContent =
-        "Nota registrada por " + (d.notaPor || "OPERADOR") + " · " + (d.notaHora || "");
-    }
-  }
-
-  cargando = false;
-  calcular();
-  aplicarBloqueo();
-}
-
-function aplicarBloqueo(){
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  let existe = !!data[claveFecha(fechaActual)];
-  let admin = puedeAdministrar();
-
-  [maAInput(),maBInput(),taAInput(),taBInput()].forEach(input=>{
-    input.disabled = existe && !admin;
-    input.classList.toggle("bloqueado", existe && !admin);
-  });
-
-  document.getElementById("btnGuardar").style.display =
-    existe && !admin ? "none" : "block";
-
-  document.getElementById("btnBorrar").style.display =
-    admin ? "block" : "none";
-}
-
-function guardarNotaError(){
-  let texto = document.getElementById("notaError").value.trim();
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  let clave = claveFecha(fechaActual);
-
-  if(!data[clave]){
-    data[clave] = {
-      operador: usuarioActual(),
-      hora: new Date().toLocaleTimeString("es-ES"),
-      fechaRegistro: new Date().toLocaleDateString("es-ES"),
-      mañanaA:0, mañanaB:0, tardeA:0, tardeB:0,
-      mañana:0, tarde:0, total:0
-    };
-  }
-
-  data[clave].notaError = texto;
-  data[clave].notaPor = usuarioActual();
-  data[clave].notaHora = new Date().toLocaleTimeString("es-ES");
-
-  localStorage.setItem("ventas", JSON.stringify(data));
-
-  document.getElementById("infoNota").textContent =
-    texto ? "Nota registrada por " + data[clave].notaPor + " · " + data[clave].notaHora : "";
-
-  aplicarBloqueo();
-}
-
-function borrarDia(){
-  if(!puedeAdministrar()){
-    alert("Solo Javi o Silvia pueden borrar.");
-    return;
-  }
-
-  if(!confirm("¿Borrar las ventas de este día?")) return;
-
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  delete data[claveFecha(fechaActual)];
-  localStorage.setItem("ventas", JSON.stringify(data));
-
-  cargar();
-}
 </script>
 
 </body>
