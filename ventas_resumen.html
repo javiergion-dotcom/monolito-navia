@@ -46,6 +46,25 @@ header{
   margin-bottom:8px;
   display:flex;
   justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-weight:900;
+}
+
+.linea.alerta{
+  border:2px solid #c00000;
+  background:#fff0f0;
+}
+
+.fechaBox{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.avisoCambio{
+  color:#c00000;
+  font-size:12px;
   font-weight:900;
 }
 
@@ -144,14 +163,19 @@ function pintar(){
 
     if(d.getFullYear() == year && d.getMonth() == mes){
 
-      let total = Number(data[fecha].total || 0);
+      let registro = data[fecha];
+      let total = Number(registro.total || 0);
+      let sinCambio = registro.sinCambioPrevio === true;
 
       totalMes += total;
       dias++;
 
       html += `
-        <div class="linea">
-          <div>${fecha}</div>
+        <div class="linea ${sinCambio ? "alerta" : ""}">
+          <div class="fechaBox">
+            <div>${fecha}</div>
+            ${sinCambio ? `<div class="avisoCambio">⚠ SIN CONTROL DE CAMBIO</div>` : ""}
+          </div>
           <div>${euros(total)}</div>
         </div>
       `;
