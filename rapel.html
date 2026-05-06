@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAPEL · MONOLITO</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px}
+.volver{background:white;color:#17303d;border:0;border-radius:10px;padding:7px 11px;font-weight:900}
+.contenedor{padding:16px}
+.card{background:white;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 6px 14px rgba(0,0,0,.08)}
+label{font-weight:900;font-size:13px}
+input{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;margin:5px 0 10px;font-size:16px}
+button{border:0;border-radius:12px;padding:12px;font-weight:900}
+.guardar{width:100%;background:#48a530;color:white;margin-top:8px}
+.borrar{background:#c00000;color:white}
+.nuevo{width:100%;background:#ff9800;color:white;margin-bottom:14px}
+.totalLinea{font-weight:900;font-size:18px}
+.totalGeneral{background:#17303d;color:white;padding:16px;border-radius:16px;font-size:22px;font-weight:900;text-align:center;margin-top:14px}
+.botones{display:flex;gap:8px;margin-top:10px}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  💶 RAPEL
+</header>
+
+<div class="contenedor">
+
+<button class="nuevo" onclick="nuevoArticulo()">➕ Añadir artículo</button>
+
+<div id="lista"></div>
+
+<div class="totalGeneral" id="totalGeneral">TOTAL GENERAL: 0,00 €</div>
+
+</div>
+
+<script>
+function usuarioActual(){
+  return localStorage.getItem("usuario") || "OPERADOR";
+}
+
+function esHostelero(){
+  const u = usuarioActual().toUpperCase();
+  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+}
+
+function protegerAcceso(){
+  if(!esHostelero()){
+    alert("⚠ ACCESO SOLO HOSTELERÍA");
+    window.location.href = "index.html";
+  }
+}
+
+protegerAcceso();
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+function euros(n){
+  return Number(n||0).toFixed(2).replace(".",",") + " €";
+}
+
+function leerRapel(){
+  return JSON.parse(localStorage.getItem("rapel") || "[]");
+}
+
+function guardarRapel(data){
+  localStorage.setItem("rapel", JSON.stringify(data));
+}
+
+function nuevoArticulo(){
+  let data = leerRapel();
+  data.push({
+    articulo:"",
+    unidades:0,
+    precio:0,
+    porcentaje:0
+  });
+  guardarRapel(data);
+  pintar();
+}
+
+function calcularLinea(r){
+  return Number(r.unidades||0) * Number(r.precio||0) * (Number(r.porcentaje||0) / 100);
+}
+
+function pintar(){
+  let data = leerRapel();
+  let html = "";
+  let totalGeneral = 0;
+
+  data.forEach((r,i)=>{
+    let totalLinea = calcularLinea(r);
+    totalGeneral += totalLinea;
+
+    html += `
+      <div class="card">
+        <label>Artículo</label>
+        <input value="${r.articulo || ""}" oninput="actualizar(${i},'articulo',this.value)" placeholder="Ej: MAHOU 5 ESTRELLAS">
+
+        <label>Unidades / litros que vienen de pedidos</label>
+        <input type="number" value="${r.unidades || ""}" onfocus="this.select()" onclick="this.select()" oninput="actualizar(${i},'unidades',this.value)">
+
+        <label>Precio</label>
+        <input type="number" step="0.0001" value="${r.precio || ""}" onfocus="this.select()" onclick="this.select()" oninput="actualizar(${i},'precio',this.value)">
+
+        <label>Porcentaje rápel</label>
+        <input type="number" step="0.01" value="${r.porcentaje || ""}" onfocus="this.select()" onclick="this.select()" oninput="actualizar(${i},'porcentaje',this.value)">
+
+        <div class="totalLinea">TOTAL: ${euros(totalLinea)}</div>
+
+        <div class="botones">
+          <button class="borrar" onclick="borrarLinea(${i})">🗑 Borrar</button>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("lista").innerHTML = html;
+  document.getElementById("totalGeneral").textContent = "TOTAL GENERAL: " + euros(totalGeneral);
+}
+
+function actualizar(i,campo,valor){
+  let data = leerRapel();
+
+  if(campo === "articulo"){
+    data[i][campo] = valor.toUpperCase();
+  }else{
+    data[i][campo] = Number(valor || 0);
+  }
+
+  guardarRapel(data);
+  pintar();
+}
+
+function borrarLinea(i){
+  if(!confirm("¿Borrar esta línea de rápel?")) return;
+
+  let data = leerRapel();
+  data.splice(i,1);
+  guardarRapel(data);
+  pintar();
+}
+
+pintar();
+</script>
+
+</body>
+</html>
