@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -30,45 +30,163 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
   display:none;
   z-index:9999;
 }
+
 .selector div{
   padding:12px 18px;
   font-weight:900;
   border-bottom:1px solid #eef2f5;
 }
-.selector div:active{background:#eef2f5}
 
-.franja{background:#eef2f5;color:#4f5f69;padding:11px 24px;font-size:15px;border-bottom:1px solid rgba(0,0,0,.05);font-weight:700}
+.selector div:active{
+  background:#eef2f5;
+}
 
-.panel{padding:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+.franja{
+  background:#eef2f5;
+  color:#4f5f69;
+  padding:11px 24px;
+  font-size:15px;
+  border-bottom:1px solid rgba(0,0,0,.05);
+  font-weight:700;
+}
 
-.boton{position:relative;min-height:132px;border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:white;font-size:22px;font-weight:700;letter-spacing:.4px;cursor:pointer;user-select:none;padding:20px 14px;touch-action:manipulation;background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%);box-shadow:inset 0 3px 6px rgba(255,255,255,.24),inset 0 -8px 16px rgba(0,0,0,.12),0 16px 30px rgba(0,0,0,.30);transition:transform .08s ease,box-shadow .08s ease,filter .08s ease}
-.boton:active{transform:translateY(10px) scale(.96);box-shadow:inset 0 10px 18px rgba(0,0,0,.26),0 6px 12px rgba(0,0,0,.28);filter:brightness(.96)}
+.panel{
+  padding:24px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+}
 
-.azul{background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%)}
-.naranja{background:linear-gradient(180deg,#f6ae1b 0%,#df8b00 100%)}
-.verde{background:linear-gradient(180deg,#78cc4b 0%,#48a530 100%)}
-.rojoBoton{background:linear-gradient(180deg,#ff4b4b 0%,#c40000 100%)}
+.boton{
+  position:relative;
+  min-height:132px;
+  border-radius:28px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:white;
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:.4px;
+  cursor:pointer;
+  user-select:none;
+  padding:20px 14px;
+  touch-action:manipulation;
+  background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(255,255,255,.24),
+    inset 0 -8px 16px rgba(0,0,0,.12),
+    0 16px 30px rgba(0,0,0,.30);
+  transition:transform .08s ease,box-shadow .08s ease,filter .08s ease;
+}
 
-.icono{font-size:46px;line-height:1;margin-bottom:12px}
+.boton:active{
+  transform:translateY(10px) scale(.96);
+  box-shadow:
+    inset 0 10px 18px rgba(0,0,0,.26),
+    0 6px 12px rgba(0,0,0,.28);
+  filter:brightness(.96);
+}
 
-.contador{position:absolute;top:11px;right:13px;min-width:30px;height:30px;padding:0 8px;border-radius:999px;display:none;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;box-shadow:0 3px 7px rgba(0,0,0,.22)}
-.rojo{background:#ff0000}
-.amarillo{background:#d99a00}
+.azul{
+  background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%);
+}
+
+.naranja{
+  background:linear-gradient(180deg,#f6ae1b 0%,#df8b00 100%);
+}
+
+.verde{
+  background:linear-gradient(180deg,#78cc4b 0%,#48a530 100%);
+}
+
+.rojoBoton{
+  background:linear-gradient(180deg,#ff4b4b 0%,#c40000 100%);
+}
+
+.icono{
+  font-size:46px;
+  line-height:1;
+  margin-bottom:12px;
+}
+
+.contador{
+  position:absolute;
+  top:11px;
+  right:13px;
+  min-width:30px;
+  height:30px;
+  padding:0 8px;
+  border-radius:999px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:700;
+  color:white;
+  box-shadow:0 3px 7px rgba(0,0,0,.22);
+}
+
+.rojo{
+  background:#ff0000;
+}
+
+.amarillo{
+  background:#d99a00;
+}
 
 @media (max-width:1200px){
-  .panel{gap:24px}
-  .boton{min-height:126px;font-size:20px}
-  .icono{font-size:42px}
+  .panel{
+    gap:24px;
+  }
+
+  .boton{
+    min-height:126px;
+    font-size:20px;
+  }
+
+  .icono{
+    font-size:42px;
+  }
 }
 
 @media (max-width:900px){
-  .panel{grid-template-columns:repeat(2,1fr);gap:20px;padding:18px}
-  .boton{min-height:130px;font-size:19px;border-radius:24px}
-  .icono{font-size:40px;margin-bottom:10px}
-  header{padding:14px 16px}
-  .franja{padding:10px 16px;font-size:14px}
-  #hora{font-size:15px}
-  #usuario{font-size:13px;padding:8px 11px}
+  .panel{
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    padding:18px;
+  }
+
+  .boton{
+    min-height:130px;
+    font-size:19px;
+    border-radius:24px;
+  }
+
+  .icono{
+    font-size:40px;
+    margin-bottom:10px;
+  }
+
+  header{
+    padding:14px 16px;
+  }
+
+  .franja{
+    padding:10px 16px;
+    font-size:14px;
+  }
+
+  #hora{
+    font-size:15px;
+  }
+
+  #usuario{
+    font-size:13px;
+    padding:8px 11px;
+  }
 }
 </style>
 </head>
@@ -148,6 +266,11 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
     <div>CAMBIO</div>
   </div>
 
+  <div class="boton verde" onclick="abrir('rapel.html')">
+    <div class="icono">💶</div>
+    <div>RAPPEL</div>
+  </div>
+
   <div class="boton azul" onclick="abrir('calendario.html')">
     <div class="icono">📅</div>
     <div>CALENDARIO</div>
@@ -188,13 +311,17 @@ function sonidoClick(){
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+
     osc.type = "sine";
     osc.frequency.setValueAtTime(240, ctx.currentTime);
+
     gain.gain.setValueAtTime(0.0001, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+
     osc.connect(gain);
     gain.connect(ctx.destination);
+
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.08);
   }catch(e){}
@@ -202,13 +329,16 @@ function sonidoClick(){
 
 function vibrar(){
   try{
-    if(navigator.vibrate){navigator.vibrate(20)}
+    if(navigator.vibrate){
+      navigator.vibrate(20);
+    }
   }catch(e){}
 }
 
 function abrir(destino){
   vibrar();
   sonidoClick();
+
   setTimeout(function(){
     window.location.href = destino;
   },70);
@@ -236,6 +366,7 @@ function contarComunicaciones(){
 
 function contarCalendario(){
   const data = leerCalendario();
+
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
 
@@ -246,7 +377,9 @@ function contarCalendario(){
 
   Object.values(data).forEach(r=>{
     if(!r.fecha) return;
+
     const f = new Date(r.fecha + "T12:00:00");
+
     if(f >= hoy && f <= limite){
       total++;
     }
@@ -257,16 +390,20 @@ function contarCalendario(){
 
 function reloj(){
   const d = new Date();
+
   document.getElementById("hora").innerHTML =
-    d.toLocaleDateString("es-ES") + " · " +
+    d.toLocaleDateString("es-ES") +
+    " · " +
     d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 }
 
 function saludo(){
   const h = new Date().getHours();
+
   if(h < 6) return "Buenas noches";
   if(h < 12) return "Buenos días";
   if(h < 21) return "Buenas tardes";
+
   return "Buenas noches";
 }
 
