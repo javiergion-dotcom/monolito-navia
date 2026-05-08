@@ -38,14 +38,20 @@ select{
   margin-bottom:10px;
 }
 
+.card.costeCero{
+  border:3px solid #ff9800;
+  background:#fff8ea;
+}
+
 .nombre{font-weight:900;font-size:17px;}
-.detalle{color:#4f5f69;font-size:14px;}
+.detalle{color:#4f5f69;font-size:14px;margin-top:4px;}
 
 .fila{
   display:flex;
   justify-content:space-between;
   align-items:center;
   margin-top:8px;
+  gap:10px;
 }
 
 input{
@@ -60,6 +66,30 @@ input{
 .totalLinea{
   font-weight:900;
   font-size:16px;
+}
+
+.avisoCero{
+  margin-top:8px;
+  color:#c06b00;
+  font-weight:900;
+  font-size:13px;
+}
+
+.botonCero{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border:0;
+  border-radius:12px;
+  font-weight:900;
+  font-size:14px;
+  background:#17303d;
+  color:white;
+}
+
+.botonCero.activo{
+  background:#ff9800;
+  color:white;
 }
 
 .totalFinal{
@@ -82,12 +112,23 @@ button{
   background:#48a530;
   color:white;
 }
+
+.volver{
+  background:white;
+  color:#17303d;
+  width:auto;
+  margin:0 10px 0 0;
+  padding:7px 11px;
+}
 </style>
 </head>
 
 <body>
 
-<header>📝 PEDIDOS</header>
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  📝 PEDIDOS
+</header>
 
 <div class="contenedor">
 
@@ -95,13 +136,28 @@ button{
 
 <div id="articulos"></div>
 
-<div class="totalFinal" id="totalFinal">TOTAL: 0,00 €</div>
+<div class="totalFinal" id="totalFinal">TOTAL PAGO: 0,00 €</div>
 
 <button class="guardar" onclick="guardarPedido()">Guardar pedido</button>
 
 </div>
 
 <script>
+
+/* ===== USUARIO ===== */
+
+function usuarioActual(){
+  return localStorage.getItem("usuario") || "OPERADOR";
+}
+
+function esHostelero(){
+  const u = usuarioActual().toUpperCase();
+  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+}
+
+function volver(){
+  window.location.href = "index.html";
+}
 
 /* ===== DATOS ===== */
 
@@ -152,7 +208,9 @@ function cargarArticulos(){
 
   pedido = articulos.map(a => ({
     ...a,
-    cantidad:0
+    cantidad:0,
+    costeCero:false,
+    excluirRappel:false
   }));
 
   pintar();
@@ -164,21 +222,43 @@ function pintar(){
 
   pedido.forEach((a,i)=>{
 
+    const precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
+    const lineaPago = a.costeCero ? 0 : Number(a.cantidad || 0) * precioCaja;
+
     html += `
-    <div class="card">
+    <div class="card ${a.costeCero ? "costeCero" : ""}">
 
       <div class="nombre">${a.articulo}</div>
 
       <div class="detalle">
-        ${a.unidadFormato} · ${a.precioUnidad.toFixed(2)} € · IVA ${a.iva}%
+        ${a.unidadFormato} · ${Number(a.precioUnidad || 0).toFixed(2)} € · IVA ${a.iva}%
       </div>
 
       <div class="fila">
         <input type="number" value="${a.cantidad}"
+          onfocus="this.select()" onclick="this.select()"
           onchange="cambiar(${i}, this.value)">
 
-        <div class="totalLinea" id="t${i}">0,00 €</div>
+        <div class="totalLinea" id="t${i}">
+          ${lineaPago.toFixed(2)} €
+        </div>
       </div>
+
+      ${
+        esHostelero() ? `
+          <button class="botonCero ${a.costeCero ? "activo" : ""}" onclick="toggleCosteCero(${i})">
+            ${a.costeCero ? "✅ COSTE 0 € ACTIVADO" : "Marcar COSTE 0 €"}
+          </button>
+        ` : ""
+      }
+
+      ${
+        a.costeCero ? `
+          <div class="avisoCero">
+            COSTE 0 € · Cuenta en consumo/histórico · No suma pagos · No suma RAPPEL
+          </div>
+        ` : ""
+      }
 
     </div>
     `;
@@ -192,29 +272,46 @@ function pintar(){
 /* ===== CAMBIOS ===== */
 
 function cambiar(i, valor){
-  pedido[i].cantidad = Number(valor);
+  pedido[i].cantidad = Number(valor || 0);
   calcular();
+}
+
+function toggleCosteCero(i){
+  if(!esHostelero()){
+    alert("Solo hostelería puede marcar coste 0 €");
+    return;
+  }
+
+  pedido[i].costeCero = !pedido[i].costeCero;
+  pedido[i].excluirRappel = pedido[i].costeCero;
+
+  pintar();
 }
 
 /* ===== CALCULO ===== */
 
 function calcular(){
 
-  let total = 0;
+  let totalPago = 0;
 
   pedido.forEach((a,i)=>{
 
-    let precioCaja = a.precioUnidad * a.formato;
-    let linea = a.cantidad * precioCaja;
+    let precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
+    let linea = Number(a.cantidad || 0) * precioCaja;
 
-    total += linea;
+    let lineaPago = a.costeCero ? 0 : linea;
 
-    document.getElementById("t"+i).textContent =
-      linea.toFixed(2) + " €";
+    totalPago += lineaPago;
+
+    const celda = document.getElementById("t"+i);
+
+    if(celda){
+      celda.textContent = lineaPago.toFixed(2) + " €";
+    }
   });
 
   document.getElementById("totalFinal").textContent =
-    "TOTAL: " + total.toFixed(2) + " €";
+    "TOTAL PAGO: " + totalPago.toFixed(2) + " €";
 }
 
 /* ===== GUARDAR ===== */
@@ -228,35 +325,71 @@ function guardarPedido(){
     return;
   }
 
-  const lineas = pedido.filter(a => a.cantidad > 0);
+  const lineas = pedido.filter(a => Number(a.cantidad || 0) > 0);
 
   if(lineas.length === 0){
     alert("Sin cantidades");
     return;
   }
 
-  const lineasFinal = lineas.map(a => ({
-    articulo: a.articulo,
-    cantidad: a.cantidad,
-    precioSinIva: a.precioUnidad * a.formato   // 🔥 CLAVE
-  }));
+  const ahora = new Date();
 
-  const total = lineasFinal.reduce((t,l)=>
+  const lineasFinal = lineas.map(a => {
+
+    const precioOriginalSinIva = Number(a.precioUnidad || 0) * Number(a.formato || 1);
+    const costeCero = a.costeCero === true;
+
+    return {
+      articulo: a.articulo,
+      proveedor: proveedor,
+      cantidad: Number(a.cantidad || 0),
+      unidadFormato: a.unidadFormato || "",
+      formato: Number(a.formato || 1),
+      iva: Number(a.iva || 21),
+
+      precioOriginalSinIva: precioOriginalSinIva,
+
+      precioSinIva: costeCero ? 0 : precioOriginalSinIva,
+
+      costeCero: costeCero,
+      excluirRappel: costeCero,
+      cuentaConsumo: true
+    };
+  });
+
+  const totalPago = lineasFinal.reduce((t,l)=>
     t + (l.cantidad * l.precioSinIva)
   ,0);
 
-  let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
-
-  pagos.unshift({
+  const pedidoGuardado = {
     proveedor,
-    fecha: new Date().toLocaleString(),
-    total,
+    fecha: ahora.toLocaleString("es-ES"),
+    usuario: usuarioActual(),
+    totalPago,
     lineas: lineasFinal
-  });
+  };
 
-  localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
+  let historico = JSON.parse(localStorage.getItem("pedidos_historico") || "[]");
+  historico.unshift(pedidoGuardado);
+  localStorage.setItem("pedidos_historico", JSON.stringify(historico));
 
-  alert("Pedido guardado correctamente");
+  if(totalPago > 0){
+    let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+    pagos.unshift({
+      proveedor,
+      fecha: ahora.toLocaleString("es-ES"),
+      total: totalPago,
+      lineas: lineasFinal.filter(l => !l.costeCero)
+    });
+
+    localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
+  }
+
+  if(totalPago === 0){
+    alert("Pedido COSTE 0 € guardado en histórico. No genera pago pendiente.");
+  }else{
+    alert("Pedido guardado correctamente");
+  }
 
   location.reload();
 }
