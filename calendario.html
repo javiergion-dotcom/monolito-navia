@@ -8,27 +8,149 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
-button{border:0;border-radius:14px;padding:10px 14px;font-weight:800}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:10px 14px;
+  font-weight:800;
+  font-size:15px;
+}
+
 .volver{background:white;color:#17303d}
+
 .contenido{padding:16px}
-.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
-label{display:block;font-weight:900;margin-bottom:8px}
-input,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px}
-textarea{min-height:150px;margin-top:10px}
-.guardar{background:#48a530;color:white;width:100%;margin-top:12px;font-size:17px}
-.eliminar{background:#ff0000;color:white;margin-top:10px}
-.fechaTitulo{font-size:22px;font-weight:900;margin-bottom:8px}
-.detalle{color:#4f5f69;margin-top:6px}
-.recordatorio{border-top:1px solid #dfe6ec;padding-top:12px;margin-top:12px}
-.vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:800}
+
+.card{
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+
+label{
+  display:block;
+  font-weight:900;
+  margin-top:12px;
+  margin-bottom:8px;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid #b8c2ca;
+  font-size:16px;
+}
+
+textarea{
+  min-height:120px;
+  margin-top:6px;
+}
+
+.guardar{
+  background:#48a530;
+  color:white;
+  width:100%;
+  margin-top:14px;
+  font-size:17px;
+}
+
+.limpiar{
+  background:#ff9800;
+  color:white;
+  width:100%;
+  margin-top:10px;
+}
+
+.eliminar{
+  background:#ff0000;
+  color:white;
+  width:100%;
+  margin-top:10px;
+}
+
+.fechaTitulo{
+  font-size:21px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.detalle{
+  color:#4f5f69;
+  margin-top:6px;
+  font-size:14px;
+}
+
+.recordatorio{
+  border-top:1px solid #dfe6ec;
+  padding-top:12px;
+  margin-top:12px;
+}
+
+.recordatorio.hecho{
+  opacity:.55;
+}
+
+.etiqueta{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  margin-top:8px;
+}
+
+.alta{background:#ffe0e0;color:#c00000}
+.media{background:#fff3c4;color:#9a7300}
+.baja{background:#e4f5ff;color:#17627f}
+.hecha{background:#e5ffe5;color:#1a7f1a}
+
+.acciones{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.acciones button{
+  flex:1;
+  margin-top:0;
+}
+
+.ok{
+  background:#48a530;
+  color:white;
+}
+
+.rojo{
+  background:#c00000;
+  color:white;
+}
+
+.vacio{
+  background:white;
+  border-radius:22px;
+  padding:20px;
+  text-align:center;
+  font-weight:800;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="location.href='index.html'">← Volver</button>
+  <button class="volver" onclick="volver()">← Volver</button>
   <h2>📅 CALENDARIO</h2>
 </header>
 
@@ -38,10 +160,22 @@ textarea{min-height:150px;margin-top:10px}
     <label>Elegir día</label>
     <input type="date" id="fecha" onchange="cargarDia()">
 
+    <label>Título</label>
+    <input id="titulo" placeholder="Ej: Revisar cambio / Proveedor especial / Evento">
+
+    <label>Prioridad</label>
+    <select id="prioridad">
+      <option value="MEDIA">MEDIA</option>
+      <option value="ALTA">ALTA</option>
+      <option value="BAJA">BAJA</option>
+    </select>
+
+    <label>Nota</label>
     <textarea id="nota" placeholder="Escribe aquí lo importante de ese día: abrir a las 9, refuerzo de personal, comprobar cambio, proveedor especial..."></textarea>
 
     <button class="guardar" onclick="guardarNota()">💾 Guardar recordatorio</button>
-    <button class="eliminar" onclick="eliminarNota()">Eliminar recordatorio de este día</button>
+    <button class="limpiar" onclick="nuevoRecordatorio()">➕ Nuevo / limpiar pantalla</button>
+    <button class="eliminar" onclick="eliminarNota()">🗑 Eliminar recordatorio de este día</button>
   </div>
 
   <div class="card">
@@ -52,12 +186,20 @@ textarea{min-height:150px;margin-top:10px}
 </div>
 
 <script>
+function volver(){
+  window.location.href = "index.html";
+}
+
 function leerCalendario(){
   return JSON.parse(localStorage.getItem("calendario") || "{}");
 }
 
 function guardarCalendario(data){
   localStorage.setItem("calendario", JSON.stringify(data));
+}
+
+function usuarioActual(){
+  return localStorage.getItem("usuario") || "OPERADOR";
 }
 
 function hoyISO(){
@@ -76,32 +218,58 @@ function fechaBonita(iso){
   });
 }
 
+function clasePrioridad(p){
+  if(p === "ALTA") return "alta";
+  if(p === "BAJA") return "baja";
+  return "media";
+}
+
 function cargarDia(){
   const fecha = document.getElementById("fecha").value;
   const data = leerCalendario();
-  document.getElementById("nota").value = data[fecha]?.texto || "";
+  const r = data[fecha];
+
+  document.getElementById("titulo").value = r?.titulo || "";
+  document.getElementById("prioridad").value = r?.prioridad || "MEDIA";
+  document.getElementById("nota").value = r?.texto || "";
+}
+
+function nuevoRecordatorio(){
+  document.getElementById("fecha").value = hoyISO();
+  document.getElementById("titulo").value = "";
+  document.getElementById("prioridad").value = "MEDIA";
+  document.getElementById("nota").value = "";
 }
 
 function guardarNota(){
   const fecha = document.getElementById("fecha").value;
+  const titulo = document.getElementById("titulo").value.trim();
   const texto = document.getElementById("nota").value.trim();
+  const prioridad = document.getElementById("prioridad").value;
 
   if(!fecha){
     alert("Elige una fecha.");
     return;
   }
 
-  if(!texto){
-    alert("Escribe un recordatorio.");
+  if(!titulo && !texto){
+    alert("Escribe título o nota.");
     return;
   }
 
   let data = leerCalendario();
 
+  const anterior = data[fecha] || {};
+
   data[fecha] = {
-    texto,
     fecha,
-    creadaPor: localStorage.getItem("usuario") || "OPERADOR",
+    titulo: titulo || "Recordatorio",
+    texto,
+    prioridad,
+    hecha: anterior.hecha || false,
+    creadaPor: anterior.creadaPor || usuarioActual(),
+    fechaCreacion: anterior.fechaCreacion || new Date().toLocaleString("es-ES"),
+    actualizadaPor: usuarioActual(),
     fechaGuardado: new Date().toLocaleString("es-ES")
   };
 
@@ -114,7 +282,10 @@ function guardarNota(){
 function eliminarNota(){
   const fecha = document.getElementById("fecha").value;
 
-  if(!fecha) return;
+  if(!fecha){
+    alert("Elige una fecha.");
+    return;
+  }
 
   if(!confirm("¿Eliminar el recordatorio de este día?")) return;
 
@@ -122,7 +293,47 @@ function eliminarNota(){
   delete data[fecha];
 
   guardarCalendario(data);
-  document.getElementById("nota").value = "";
+
+  nuevoRecordatorio();
+  pintarProximos();
+}
+
+function marcarHecho(fecha){
+  let data = leerCalendario();
+
+  if(!data[fecha]) return;
+
+  data[fecha].hecha = true;
+  data[fecha].hechaPor = usuarioActual();
+  data[fecha].fechaHecha = new Date().toLocaleString("es-ES");
+
+  guardarCalendario(data);
+  cargarDia();
+  pintarProximos();
+}
+
+function reabrir(fecha){
+  let data = leerCalendario();
+
+  if(!data[fecha]) return;
+
+  data[fecha].hecha = false;
+  data[fecha].reabiertaPor = usuarioActual();
+  data[fecha].fechaReabierta = new Date().toLocaleString("es-ES");
+
+  guardarCalendario(data);
+  cargarDia();
+  pintarProximos();
+}
+
+function borrarDesdeLista(fecha){
+  if(!confirm("¿Borrar este recordatorio?")) return;
+
+  let data = leerCalendario();
+  delete data[fecha];
+
+  guardarCalendario(data);
+  cargarDia();
   pintarProximos();
 }
 
@@ -137,6 +348,7 @@ function pintarProximos(){
   limite.setDate(hoy.getDate() + 7);
 
   let items = Object.values(data).filter(r=>{
+    if(!r.fecha || r.hecha) return false;
     const f = new Date(r.fecha + "T12:00:00");
     return f >= hoy && f <= limite;
   });
@@ -144,7 +356,7 @@ function pintarProximos(){
   items.sort((a,b)=>a.fecha.localeCompare(b.fecha));
 
   if(items.length === 0){
-    cont.innerHTML = `<div class="vacio">No hay recordatorios en los próximos 7 días.</div>`;
+    cont.innerHTML = `<div class="vacio">No hay recordatorios pendientes en los próximos 7 días.</div>`;
     return;
   }
 
@@ -152,10 +364,21 @@ function pintarProximos(){
 
   items.forEach(r=>{
     html += `
-      <div class="recordatorio">
+      <div class="recordatorio ${r.hecha ? "hecho" : ""}">
         <div class="fechaTitulo">${fechaBonita(r.fecha)}</div>
-        <div>${r.texto.replace(/\n/g,"<br>")}</div>
-        <div class="detalle">Guardado por: ${r.creadaPor || "OPERADOR"} · ${r.fechaGuardado || "-"}</div>
+        <div><strong>${r.titulo || "Recordatorio"}</strong></div>
+        ${r.texto ? `<div style="margin-top:8px">${r.texto.replace(/\n/g,"<br>")}</div>` : ""}
+
+        <div class="etiqueta ${clasePrioridad(r.prioridad)}">${r.prioridad || "MEDIA"}</div>
+
+        <div class="detalle">
+          Guardado por: ${r.creadaPor || "OPERADOR"} · ${r.fechaGuardado || "-"}
+        </div>
+
+        <div class="acciones">
+          <button class="ok" onclick="marcarHecho('${r.fecha}')">Hecho</button>
+          <button class="rojo" onclick="borrarDesdeLista('${r.fecha}')">Borrar</button>
+        </div>
       </div>
     `;
   });
