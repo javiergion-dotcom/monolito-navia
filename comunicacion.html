@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMUNICACIÓN · MONOLITO</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#eef2f5;
+  color:#17303d;
+}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:20px;
+  font-weight:900;
+}
+
+.volver{
+  background:white;
+  color:#17303d;
+  border:0;
+  border-radius:12px;
+  padding:8px 12px;
+  font-weight:900;
+}
+
+.contenido{
+  padding:16px;
+}
+
+.card{
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+
+.titulo{
+  font-size:22px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+label{
+  display:block;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+textarea{
+  width:100%;
+  min-height:120px;
+  border-radius:14px;
+  border:1px solid #b8c2ca;
+  padding:12px;
+  font-size:16px;
+  resize:vertical;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:12px;
+  font-size:15px;
+  font-weight:900;
+}
+
+.guardar{
+  width:100%;
+  background:#17303d;
+  color:white;
+  margin-top:12px;
+}
+
+.hecho{
+  width:100%;
+  background:#48a530;
+  color:white;
+  margin-top:10px;
+}
+
+.borrar{
+  width:100%;
+  background:#c00000;
+  color:white;
+  margin-top:10px;
+}
+
+.detalle{
+  margin-top:8px;
+  color:#4f5f69;
+  font-size:14px;
+}
+
+.estado{
+  display:inline-block;
+  margin-top:10px;
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:12px;
+  font-weight:900;
+}
+
+.pendiente{
+  background:#fff3cd;
+  color:#7a4d00;
+}
+
+.realizado{
+  background:#d4edda;
+  color:#155724;
+}
+
+.vacio{
+  background:white;
+  border-radius:22px;
+  padding:20px;
+  text-align:center;
+  font-weight:900;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  📢 COMUNICACIÓN
+</header>
+
+<div class="contenido">
+
+  <div class="card">
+
+    <div class="titulo">Nueva comunicación</div>
+
+    <label>Mensaje</label>
+
+    <textarea id="mensaje" placeholder="Ejemplo:
+• Falta hielo
+• Revisar almacén
+• Pedido llega a las 10
+• Cliente dejó una chaqueta"></textarea>
+
+    <button class="guardar" onclick="guardarComunicacion()">
+      💾 Guardar comunicación
+    </button>
+
+  </div>
+
+  <div id="lista"></div>
+
+</div>
+
+<script>
+function volver(){
+  window.location.href="index.html";
+}
+
+function usuarioActual(){
+  return localStorage.getItem("usuario") || "OPERADOR";
+}
+
+function leer(){
+  return JSON.parse(localStorage.getItem("comunicaciones_monolito") || "[]");
+}
+
+function guardar(data){
+  localStorage.setItem("comunicaciones_monolito", JSON.stringify(data));
+}
+
+function guardarComunicacion(){
+
+  const mensaje = document.getElementById("mensaje").value.trim();
+
+  if(!mensaje){
+    alert("Escribe una comunicación.");
+    return;
+  }
+
+  let data = leer();
+
+  data.unshift({
+    id:Date.now(),
+    mensaje,
+    usuario:usuarioActual(),
+    fecha:new Date().toLocaleString("es-ES"),
+    hecha:false
+  });
+
+  guardar(data);
+
+  document.getElementById("mensaje").value="";
+
+  pintar();
+
+  alert("Comunicación guardada.");
+}
+
+function marcarHecha(id){
+
+  let data = leer();
+
+  data = data.map(c=>{
+
+    if(c.id===id){
+      c.hecha=true;
+      c.fechaHecha=new Date().toLocaleString("es-ES");
+      c.usuarioHecha=usuarioActual();
+    }
+
+    return c;
+  });
+
+  guardar(data);
+
+  pintar();
+}
+
+function borrarComunicacion(id){
+
+  const doc = leer().find(c=>c.id===id);
+
+  if(!doc.hecha){
+    alert("Primero debes marcar la comunicación como hecha.");
+    return;
+  }
+
+  if(!confirm(
+    "Vas a eliminar esta comunicación.\n\n¿Estás seguro?"
+  )){
+    return;
+  }
+
+  let data = leer().filter(c=>c.id!==id);
+
+  guardar(data);
+
+  pintar();
+}
+
+function pintar(){
+
+  const data = leer();
+
+  let html="";
+
+  if(data.length===0){
+
+    html=`
+      <div class="vacio">
+        No hay comunicaciones.
+      </div>
+    `;
+
+    document.getElementById("lista").innerHTML=html;
+    return;
+  }
+
+  data.forEach(c=>{
+
+    html+=`
+
+      <div class="card">
+
+        <div class="titulo">
+          ${c.mensaje.replace(/\n/g,"<br>")}
+        </div>
+
+        <div class="detalle">
+          Creado por: ${c.usuario}
+        </div>
+
+        <div class="detalle">
+          ${c.fecha}
+        </div>
+
+        ${
+          c.hecha
+          ?
+          `
+            <div class="estado realizado">
+              ✅ REALIZADA
+            </div>
+
+            <div class="detalle">
+              Cerrada por: ${c.usuarioHecha || "-"}
+            </div>
+
+            <div class="detalle">
+              ${c.fechaHecha || "-"}
+            </div>
+          `
+          :
+          `
+            <div class="estado pendiente">
+              🟡 PENDIENTE
+            </div>
+
+            <button class="hecho" onclick="marcarHecha(${c.id})">
+              ✅ Marcar realizada
+            </button>
+          `
+        }
+
+        <button class="borrar" onclick="borrarComunicacion(${c.id})">
+          🗑 Eliminar comunicación
+        </button>
+
+      </div>
+
+    `;
+  });
+
+  document.getElementById("lista").innerHTML=html;
+}
+
+pintar();
+</script>
+
+</body>
+</html>
