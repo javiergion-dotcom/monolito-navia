@@ -3,77 +3,102 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO · ACCESO</title>
+<title>LOGIN · MONOLITO</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color: transparent;
-}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
 body{
   margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:linear-gradient(180deg,#17303d 0%, #0f1f28 100%);
-  color:white;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#dfe6ec;
+  color:#17303d;
+  min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  height:100vh;
+  padding:18px;
 }
 
-.contenedor{
+.card{
   width:100%;
-  max-width:380px;
-  padding:30px 20px;
-  text-align:center;
+  max-width:430px;
+  background:white;
+  border-radius:28px;
+  padding:26px;
+  box-shadow:0 18px 36px rgba(0,0,0,.25);
 }
 
 .logo{
-  font-size:36px;
-  font-weight:700;
-  letter-spacing:2px;
-  margin-bottom:10px;
+  text-align:center;
+  font-size:30px;
+  font-weight:900;
+  margin-bottom:6px;
 }
 
 .sub{
-  font-size:14px;
-  opacity:0.75;
-  margin-bottom:30px;
+  text-align:center;
+  color:#4f5f69;
+  font-weight:800;
+  margin-bottom:22px;
 }
 
 input{
   width:100%;
   padding:18px;
-  font-size:22px;
-  text-align:center;
-  border:none;
-  border-radius:14px;
-  outline:none;
-  margin-bottom:20px;
-}
-
-.boton{
-  background:linear-gradient(180deg,#8fb1c7 0%, #4f6f82 100%);
-  padding:18px;
   border-radius:18px;
-  font-size:20px;
-  font-weight:700;
-  cursor:pointer;
-  box-shadow:
-    inset 0 3px 6px rgba(255,255,255,0.25),
-    inset 0 -8px 16px rgba(0,0,0,0.15),
-    0 16px 30px rgba(0,0,0,0.30);
+  border:1px solid #b8c2ca;
+  font-size:26px;
+  text-align:center;
+  letter-spacing:6px;
+  font-weight:900;
 }
 
-.boton:active{
-  transform:translateY(8px) scale(0.96);
+.teclado{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:18px;
 }
 
-.mensaje{
+button{
+  border:0;
+  border-radius:18px;
+  padding:18px;
+  font-size:22px;
+  font-weight:900;
+  background:#17303d;
+  color:white;
+  box-shadow:0 8px 16px rgba(0,0,0,.18);
+}
+
+button:active{
+  transform:translateY(4px) scale(.97);
+}
+
+.borrar{
+  background:#c00000;
+}
+
+.entrar{
+  background:#48a530;
+}
+
+.aviso{
+  margin-top:18px;
+  background:#eef2f5;
+  border-radius:16px;
+  padding:13px;
+  text-align:center;
+  font-weight:800;
+  color:#4f5f69;
+}
+
+.error{
   margin-top:14px;
-  font-size:14px;
-  color:#ffd7d7;
+  color:#c00000;
+  text-align:center;
+  font-weight:900;
   min-height:20px;
 }
 </style>
@@ -81,64 +106,119 @@ input{
 
 <body>
 
-<div class="contenedor">
+<div class="card">
+
   <div class="logo">MONOLITO</div>
-  <div class="sub">Acceso por código</div>
+  <div class="sub">Acceso por PIN · Sistema de control</div>
 
-  <input type="number" id="codigo" placeholder="Código" autofocus>
+  <input id="pin" type="password" maxlength="8" readonly placeholder="PIN">
 
-  <div class="boton" onclick="entrar()">ENTRAR</div>
+  <div class="teclado">
+    <button onclick="num('1')">1</button>
+    <button onclick="num('2')">2</button>
+    <button onclick="num('3')">3</button>
 
-  <div class="mensaje" id="mensaje"></div>
+    <button onclick="num('4')">4</button>
+    <button onclick="num('5')">5</button>
+    <button onclick="num('6')">6</button>
+
+    <button onclick="num('7')">7</button>
+    <button onclick="num('8')">8</button>
+    <button onclick="num('9')">9</button>
+
+    <button class="borrar" onclick="limpiar()">C</button>
+    <button onclick="num('0')">0</button>
+    <button class="entrar" onclick="entrar()">OK</button>
+  </div>
+
+  <div class="error" id="error"></div>
+
+  <div class="aviso">
+    El PIN identifica al usuario y su nivel de autoridad.
+  </div>
+
 </div>
 
 <script>
-const CODIGO_PERMITIDO = "2580";
-
-function entrar(){
-  const codigo = document.getElementById("codigo").value.trim();
-
-  if(codigo === ""){
-    document.getElementById("mensaje").textContent = "Introduce código";
-    return;
-  }
-
-  if(codigo !== CODIGO_PERMITIDO){
-    document.getElementById("mensaje").textContent = "Código incorrecto";
-    return;
-  }
-
-  localStorage.setItem("usuario", codigo);
-  sessionStorage.setItem("loginOK", "SI");
-
-  try{
-    if(navigator.vibrate){
-      navigator.vibrate(20);
-    }
-  }catch(e){}
-
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = "sine";
-    osc.frequency.value = 240;
-    gain.gain.value = 0.03;
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start();
-    osc.stop(ctx.currentTime + 0.08);
-  }catch(e){}
-
-  setTimeout(function(){
-    window.location.href = "index.html";
-  },100);
+function usuariosBase(){
+  return [
+    {nombre:"HOSTELERO", pin:"0000", nivel:"HOSTELERIA", activo:true, fijo:true},
+    {nombre:"CAMARERO", pin:"1111", nivel:"CAMARERO", activo:true, fijo:true}
+  ];
 }
 
-document.getElementById("codigo").addEventListener("keydown", function(e){
+function leerUsuarios(){
+  let data = JSON.parse(localStorage.getItem("usuarios_monolito") || "null");
+
+  if(!data || data.length === 0){
+    data = usuariosBase();
+    localStorage.setItem("usuarios_monolito", JSON.stringify(data));
+  }
+
+  return data;
+}
+
+function nivelUsuario(u){
+  const nombre = String(u.nombre || "").toUpperCase();
+
+  if(u.nivel) return u.nivel;
+
+  if(nombre === "JAVI" || nombre === "JAVIER" || nombre === "SILVIA" || nombre === "HOSTELERO"){
+    return "HOSTELERIA";
+  }
+
+  return "CAMARERO";
+}
+
+function num(n){
+  const p = document.getElementById("pin");
+
+  if(p.value.length >= 8) return;
+
+  p.value += n;
+  document.getElementById("error").textContent = "";
+}
+
+function limpiar(){
+  document.getElementById("pin").value = "";
+  document.getElementById("error").textContent = "";
+}
+
+function entrar(){
+  const pin = document.getElementById("pin").value;
+  const usuarios = leerUsuarios();
+
+  const usuario = usuarios.find(u =>
+    String(u.pin) === String(pin) &&
+    u.activo !== false
+  );
+
+  if(!usuario){
+    document.getElementById("error").textContent = "PIN incorrecto";
+    limpiar();
+    return;
+  }
+
+  const nivel = nivelUsuario(usuario);
+
+  localStorage.setItem("usuario", usuario.nombre);
+  localStorage.setItem("nivel", nivel);
+  localStorage.setItem("loginActivo", "SI");
+  localStorage.setItem("ultimoLogin", new Date().toLocaleString("es-ES"));
+
+  window.location.href = "index.html";
+}
+
+document.addEventListener("keydown", function(e){
+  if(e.key >= "0" && e.key <= "9"){
+    num(e.key);
+  }
+
+  if(e.key === "Backspace"){
+    const p = document.getElementById("pin");
+    p.value = p.value.slice(0,-1);
+  }
+
   if(e.key === "Enter"){
     entrar();
   }
