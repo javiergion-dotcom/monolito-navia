@@ -15,30 +15,18 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
 .title{font-size:22px;font-weight:700;letter-spacing:.3px}
 .sub{font-size:13px;opacity:.85;margin-top:3px}
 .header-right{display:flex;align-items:center;gap:16px}
-#usuario{background:rgba(255,255,255,.14);padding:9px 14px;border-radius:999px;font-size:15px;font-weight:700;white-space:nowrap;cursor:pointer}
+#usuario{background:rgba(255,255,255,.14);padding:9px 14px;border-radius:999px;font-size:15px;font-weight:700;white-space:nowrap}
 #hora{font-size:18px;font-weight:600;white-space:nowrap}
 
-.selector{
-  position:absolute;
-  top:76px;
-  right:24px;
+.cerrarSesion{
   background:white;
   color:#17303d;
-  border-radius:14px;
-  box-shadow:0 10px 22px rgba(0,0,0,.22);
-  overflow:hidden;
-  display:none;
-  z-index:9999;
-}
-
-.selector div{
-  padding:12px 18px;
+  border:0;
+  border-radius:999px;
+  padding:9px 13px;
   font-weight:900;
-  border-bottom:1px solid #eef2f5;
-}
-
-.selector div:active{
-  background:#eef2f5;
+  cursor:pointer;
+  white-space:nowrap;
 }
 
 .franja{
@@ -187,6 +175,11 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
     font-size:13px;
     padding:8px 11px;
   }
+
+  .cerrarSesion{
+    font-size:12px;
+    padding:8px 10px;
+  }
 }
 </style>
 </head>
@@ -200,16 +193,11 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
   </div>
 
   <div class="header-right">
-    <div id="usuario" onclick="toggleSelector()">OPERADOR</div>
+    <div id="usuario">OPERADOR</div>
+    <button class="cerrarSesion" onclick="cerrarSesion()">Salir</button>
     <div id="hora"></div>
   </div>
 </header>
-
-<div class="selector" id="selectorUsuario">
-  <div onclick="setUsuario('CAMARERO')">CAMARERO</div>
-  <div onclick="setUsuario('JAVI')">JAVI</div>
-  <div onclick="setUsuario('SILVIA')">SILVIA</div>
-</div>
 
 <div class="franja" id="franjaEstado">Cargando estado...</div>
 
@@ -295,15 +283,30 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
 </div>
 
 <script>
-function toggleSelector(){
-  const s = document.getElementById("selectorUsuario");
-  s.style.display = s.style.display === "block" ? "none" : "block";
+function comprobarLogin(){
+  const activo = localStorage.getItem("loginActivo");
+  const usuario = localStorage.getItem("usuario");
+  const nivel = localStorage.getItem("nivel");
+
+  if(activo !== "SI" || !usuario || !nivel){
+    window.location.href = "login.html";
+  }
 }
 
-function setUsuario(u){
-  localStorage.setItem("usuario",u);
-  document.getElementById("usuario").textContent = u;
-  document.getElementById("selectorUsuario").style.display = "none";
+comprobarLogin();
+
+function cerrarSesion(){
+  vibrar();
+  sonidoClick();
+
+  if(!confirm("¿Cerrar sesión en MONOLITO?")) return;
+
+  localStorage.removeItem("loginActivo");
+  localStorage.removeItem("usuario");
+  localStorage.removeItem("nivel");
+  localStorage.removeItem("ultimoLogin");
+
+  window.location.href = "login.html";
 }
 
 function sonidoClick(){
@@ -349,7 +352,9 @@ function leerIncidencias(){
 }
 
 function leerComunicaciones(){
-  return JSON.parse(localStorage.getItem("comunicaciones") || "[]");
+  const nuevas = JSON.parse(localStorage.getItem("comunicaciones_monolito") || "[]");
+  const antiguas = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
+  return nuevas.concat(antiguas);
 }
 
 function leerCalendario(){
@@ -376,7 +381,7 @@ function contarCalendario(){
   let total = 0;
 
   Object.values(data).forEach(r=>{
-    if(!r.fecha) return;
+    if(!r.fecha || r.hecha) return;
 
     const f = new Date(r.fecha + "T12:00:00");
 
@@ -409,7 +414,15 @@ function saludo(){
 
 function cargarUsuario(){
   const usuario = localStorage.getItem("usuario") || "OPERADOR";
-  document.getElementById("usuario").textContent = usuario;
+  const nivel = localStorage.getItem("nivel") || "";
+
+  let texto = usuario;
+
+  if(nivel){
+    texto += " · " + nivel;
+  }
+
+  document.getElementById("usuario").textContent = texto;
 }
 
 function actualizarContadores(){
@@ -438,8 +451,9 @@ function actualizarFranja(){
   const inc = contarIncidencias();
   const com = contarComunicaciones();
   const cal = contarCalendario();
+  const usuario = localStorage.getItem("usuario") || "OPERADOR";
 
-  let texto = saludo();
+  let texto = saludo() + ", " + usuario;
 
   if(inc > 0){
     texto += " · [INC] " + inc;
