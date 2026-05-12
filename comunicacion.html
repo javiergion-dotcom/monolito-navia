@@ -8,127 +8,49 @@
 <style>
 *{box-sizing:border-box}
 
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#eef2f5;
-  color:#17303d;
-}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
 
 header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:20px;
-  font-weight:900;
+  background:#17303d;color:white;padding:16px;display:flex;
+  align-items:center;gap:10px;font-size:20px;font-weight:900;
 }
 
-.volver{
-  background:white;
-  color:#17303d;
-  border:0;
-  border-radius:12px;
-  padding:8px 12px;
-  font-weight:900;
-}
-
-.contenido{
-  padding:16px;
-}
-
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-
-.titulo{
-  font-size:22px;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
-label{
-  display:block;
-  font-weight:900;
-  margin-bottom:8px;
-}
+.volver{background:white;color:#17303d;border:0;border-radius:12px;padding:8px 12px;font-weight:900}
+.contenido{padding:16px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.titulo{font-size:22px;font-weight:900;margin-bottom:10px}
+label{display:block;font-weight:900;margin-bottom:8px}
 
 textarea{
-  width:100%;
-  min-height:120px;
-  border-radius:14px;
-  border:1px solid #b8c2ca;
-  padding:12px;
-  font-size:16px;
-  resize:vertical;
+  width:100%;min-height:120px;border-radius:14px;border:1px solid #b8c2ca;
+  padding:12px;font-size:16px;resize:vertical;
 }
 
-button{
-  border:0;
-  border-radius:14px;
-  padding:12px;
-  font-size:15px;
-  font-weight:900;
-}
-
-.guardar{
-  width:100%;
-  background:#17303d;
-  color:white;
-  margin-top:12px;
-}
-
-.hecho{
-  width:100%;
-  background:#48a530;
-  color:white;
-  margin-top:10px;
-}
-
-.borrar{
-  width:100%;
-  background:#c00000;
-  color:white;
-  margin-top:10px;
-}
-
-.detalle{
-  margin-top:8px;
-  color:#4f5f69;
-  font-size:14px;
-}
+button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900}
+.guardar{width:100%;background:#17303d;color:white;margin-top:12px}
+.hecho{width:100%;background:#48a530;color:white;margin-top:10px}
+.borrar{width:100%;background:#c00000;color:white;margin-top:10px}
+.historialBtn{width:100%;background:#ff9800;color:white;margin-top:10px}
+.detalle{margin-top:8px;color:#4f5f69;font-size:14px}
 
 .estado{
-  display:inline-block;
-  margin-top:10px;
-  border-radius:999px;
-  padding:6px 12px;
-  font-size:12px;
-  font-weight:900;
+  display:inline-block;margin-top:10px;border-radius:999px;
+  padding:6px 12px;font-size:12px;font-weight:900;
 }
 
-.pendiente{
-  background:#fff3cd;
-  color:#7a4d00;
-}
-
-.realizado{
-  background:#d4edda;
-  color:#155724;
-}
+.pendiente{background:#fff3cd;color:#7a4d00}
+.realizado{background:#d4edda;color:#155724}
+.historico{background:#eef2f5;color:#17303d}
 
 .vacio{
-  background:white;
-  border-radius:22px;
-  padding:20px;
-  text-align:center;
+  background:white;border-radius:22px;padding:20px;text-align:center;
+  font-weight:900;margin-bottom:14px;
+}
+
+.seccion{
+  font-size:20px;
   font-weight:900;
+  margin:22px 0 10px;
 }
 </style>
 </head>
@@ -143,7 +65,6 @@ button{
 <div class="contenido">
 
   <div class="card">
-
     <div class="titulo">Nueva comunicación</div>
 
     <label>Mensaje</label>
@@ -154,13 +75,14 @@ button{
 • Pedido llega a las 10
 • Cliente dejó una chaqueta"></textarea>
 
-    <button class="guardar" onclick="guardarComunicacion()">
-      💾 Guardar comunicación
-    </button>
-
+    <button class="guardar" onclick="guardarComunicacion()">💾 Guardar comunicación</button>
   </div>
 
+  <div class="seccion">Comunicaciones activas</div>
   <div id="lista"></div>
+
+  <div class="seccion">Histórico de comunicaciones</div>
+  <div id="historico"></div>
 
 </div>
 
@@ -173,6 +95,25 @@ function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
 }
 
+function nivelActual(){
+  return localStorage.getItem("nivel") || "";
+}
+
+function esHostelero(){
+  const u = usuarioActual().toUpperCase();
+  const n = nivelActual().toUpperCase();
+  return n === "HOSTELERIA" || u === "HOSTELERO" || u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+}
+
+function esc(t){
+  return String(t || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
 function leer(){
   return JSON.parse(localStorage.getItem("comunicaciones_monolito") || "[]");
 }
@@ -181,8 +122,15 @@ function guardar(data){
   localStorage.setItem("comunicaciones_monolito", JSON.stringify(data));
 }
 
-function guardarComunicacion(){
+function leerHistorico(){
+  return JSON.parse(localStorage.getItem("historico_comunicaciones_monolito") || "[]");
+}
 
+function guardarHistorico(data){
+  localStorage.setItem("historico_comunicaciones_monolito", JSON.stringify(data));
+}
+
+function guardarComunicacion(){
   const mensaje = document.getElementById("mensaje").value.trim();
 
   if(!mensaje){
@@ -203,128 +151,160 @@ function guardarComunicacion(){
   guardar(data);
 
   document.getElementById("mensaje").value="";
-
   pintar();
 
   alert("Comunicación guardada.");
 }
 
 function marcarHecha(id){
-
   let data = leer();
 
   data = data.map(c=>{
-
     if(c.id===id){
       c.hecha=true;
       c.fechaHecha=new Date().toLocaleString("es-ES");
       c.usuarioHecha=usuarioActual();
     }
-
     return c;
   });
 
   guardar(data);
-
   pintar();
 }
 
 function borrarComunicacion(id){
+  let data = leer();
+  const doc = data.find(c=>c.id===id);
 
-  const doc = leer().find(c=>c.id===id);
+  if(!doc) return;
 
   if(!doc.hecha){
     alert("Primero debes marcar la comunicación como hecha.");
     return;
   }
 
-  if(!confirm(
-    "Vas a eliminar esta comunicación.\n\n¿Estás seguro?"
-  )){
+  if(!confirm("Vas a pasar esta comunicación al histórico:\n\n" + doc.mensaje + "\n\n¿Estás seguro?")){
     return;
   }
 
-  let data = leer().filter(c=>c.id!==id);
+  let historico = leerHistorico();
+
+  historico.unshift({
+    ...doc,
+    eliminadaPor:usuarioActual(),
+    fechaEliminada:new Date().toLocaleString("es-ES")
+  });
+
+  data = data.filter(c=>c.id!==id);
 
   guardar(data);
+  guardarHistorico(historico);
 
   pintar();
 }
 
+function borrarDefinitivo(id){
+  if(!esHostelero()){
+    alert("Solo HOSTELERÍA puede borrar definitivamente del histórico.");
+    return;
+  }
+
+  const doc = leerHistorico().find(c=>c.id===id);
+
+  if(!doc) return;
+
+  if(!confirm("Vas a eliminar definitivamente del histórico:\n\n" + doc.mensaje + "\n\n¿Estás seguro?")){
+    return;
+  }
+
+  let historico = leerHistorico().filter(c=>c.id!==id);
+
+  guardarHistorico(historico);
+  pintar();
+}
+
 function pintar(){
+  pintarActivas();
+  pintarHistorico();
+}
 
+function pintarActivas(){
   const data = leer();
-
   let html="";
 
   if(data.length===0){
-
-    html=`
-      <div class="vacio">
-        No hay comunicaciones.
-      </div>
-    `;
-
+    html=`<div class="vacio">No hay comunicaciones activas.</div>`;
     document.getElementById("lista").innerHTML=html;
     return;
   }
 
   data.forEach(c=>{
-
     html+=`
-
       <div class="card">
+        <div class="titulo">${esc(c.mensaje).replace(/\n/g,"<br>")}</div>
 
-        <div class="titulo">
-          ${c.mensaje.replace(/\n/g,"<br>")}
-        </div>
-
-        <div class="detalle">
-          Creado por: ${c.usuario}
-        </div>
-
-        <div class="detalle">
-          ${c.fecha}
-        </div>
+        <div class="detalle">Creado por: ${esc(c.usuario)}</div>
+        <div class="detalle">${esc(c.fecha)}</div>
 
         ${
           c.hecha
-          ?
+          ? `
+            <div class="estado realizado">✅ REALIZADA</div>
+            <div class="detalle">Cerrada por: ${esc(c.usuarioHecha || "-")}</div>
+            <div class="detalle">${esc(c.fechaHecha || "-")}</div>
           `
-            <div class="estado realizado">
-              ✅ REALIZADA
-            </div>
-
-            <div class="detalle">
-              Cerrada por: ${c.usuarioHecha || "-"}
-            </div>
-
-            <div class="detalle">
-              ${c.fechaHecha || "-"}
-            </div>
-          `
-          :
-          `
-            <div class="estado pendiente">
-              🟡 PENDIENTE
-            </div>
-
-            <button class="hecho" onclick="marcarHecha(${c.id})">
-              ✅ Marcar realizada
-            </button>
+          : `
+            <div class="estado pendiente">🟡 PENDIENTE</div>
+            <button class="hecho" onclick="marcarHecha(${c.id})">✅ Marcar realizada</button>
           `
         }
 
         <button class="borrar" onclick="borrarComunicacion(${c.id})">
-          🗑 Eliminar comunicación
+          🗑 Pasar al histórico
         </button>
-
       </div>
-
     `;
   });
 
   document.getElementById("lista").innerHTML=html;
+}
+
+function pintarHistorico(){
+  const historico = leerHistorico();
+  let html="";
+
+  if(historico.length===0){
+    html=`<div class="vacio">No hay histórico de comunicaciones.</div>`;
+    document.getElementById("historico").innerHTML=html;
+    return;
+  }
+
+  historico.forEach(c=>{
+    html+=`
+      <div class="card">
+        <div class="titulo">${esc(c.mensaje).replace(/\n/g,"<br>")}</div>
+
+        <div class="estado historico">📁 HISTÓRICO</div>
+
+        <div class="detalle">Creado por: ${esc(c.usuario || "-")}</div>
+        <div class="detalle">Creada: ${esc(c.fecha || "-")}</div>
+
+        <div class="detalle">Realizada por: ${esc(c.usuarioHecha || "-")}</div>
+        <div class="detalle">Realizada: ${esc(c.fechaHecha || "-")}</div>
+
+        <div class="detalle">Pasada a histórico por: ${esc(c.eliminadaPor || "-")}</div>
+        <div class="detalle">Fecha histórico: ${esc(c.fechaEliminada || "-")}</div>
+
+        ${
+          esHostelero()
+          ? `<button class="borrar" onclick="borrarDefinitivo(${c.id})">🗑 Borrar definitivamente</button>`
+          : `<div class="detalle">Solo HOSTELERÍA puede limpiar el histórico.</div>`
+        }
+      </div>
+    `;
+  });
+
+  document.getElementById("historico").innerHTML=html;
 }
 
 pintar();
