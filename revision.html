@@ -21,6 +21,16 @@ header{background:#17303d;color:white;padding:16px;display:flex;align-items:cent
 .azul{background:#eef2f5;color:#17303d}
 button{width:100%;border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;margin-top:10px;background:#17303d;color:white}
 .hecho{background:#48a530}
+.borrar{background:#c00000}
+.crear{background:#17303d}
+input{
+  width:100%;
+  padding:13px;
+  border-radius:14px;
+  border:1px solid #b8c2ca;
+  font-size:16px;
+  margin-top:8px;
+}
 .vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:900}
 </style>
 </head>
@@ -37,12 +47,18 @@ button{width:100%;border:0;border-radius:14px;padding:12px;font-size:15px;font-w
   <div class="card">
     <div class="titulo">Centro de control</div>
     <div class="detalle">
-      Aquí MONOLITO reúne lo que necesita atención:
-      incidencias, comunicaciones, recordatorios y tareas.
+      MONOLITO reúne aquí avisos importantes y tareas operativas del negocio.
     </div>
   </div>
 
   <div id="resumen"></div>
+
+  <div class="card">
+    <div class="titulo">➕ Nueva tarea</div>
+    <input id="nuevaTarea" placeholder="Ejemplo: limpiar neveras">
+    <button class="crear" onclick="crearTarea()">Crear tarea</button>
+  </div>
+
   <div id="tareas"></div>
 
 </div>
@@ -54,6 +70,17 @@ function volver(){
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
+}
+
+function nivelActual(){
+  return localStorage.getItem("nivel") || "";
+}
+
+function esHosteleria(){
+  const u = usuarioActual().toUpperCase();
+  const n = nivelActual().toUpperCase();
+
+  return n === "HOSTELERIA" || u === "JAVI" || u === "JAVIER" || u === "SILVIA" || u === "HOSTELERO";
 }
 
 function leerIncidencias(){
@@ -76,35 +103,6 @@ function leerTareas(){
 
 function guardarTareas(data){
   localStorage.setItem("tareas_revision_monolito", JSON.stringify(data));
-}
-
-function tareasBase(){
-  return [
-    "Revisar comunicaciones pendientes",
-    "Revisar incidencias abiertas",
-    "Revisar pagos pendientes",
-    "Comprobar recordatorios de calendario",
-    "Revisar documentación importante",
-    "Comprobar tareas semanales"
-  ];
-}
-
-function prepararTareas(){
-  let data = leerTareas();
-
-  if(data.length === 0){
-    data = tareasBase().map(t=>({
-      id:Date.now() + Math.random(),
-      texto:t,
-      hecha:false,
-      usuarioHecha:"",
-      fechaHecha:""
-    }));
-
-    guardarTareas(data);
-  }
-
-  return data;
 }
 
 function contarIncidencias(){
@@ -139,15 +137,63 @@ function contarCalendario(){
   return total;
 }
 
+function diasDesde(fechaTexto){
+  if(!fechaTexto) return null;
+
+  const partes = fechaTexto.split(",");
+  const fecha = partes[0];
+
+  const trozos = fecha.split("/");
+  if(trozos.length !== 3) return null;
+
+  const d = new Date(
+    Number(trozos[2]),
+    Number(trozos[1]) - 1,
+    Number(trozos[0])
+  );
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+  d.setHours(0,0,0,0);
+
+  return Math.floor((hoy - d) / (1000*60*60*24));
+}
+
+function crearTarea(){
+  const input = document.getElementById("nuevaTarea");
+  const texto = input.value.trim();
+
+  if(!texto){
+    alert("Escribe una tarea.");
+    return;
+  }
+
+  let data = leerTareas();
+
+  data.unshift({
+    id:Date.now(),
+    texto:texto,
+    pendiente:true,
+    ultimaFecha:"",
+    ultimoUsuario:""
+  });
+
+  guardarTareas(data);
+
+  input.value="";
+  pintar();
+}
+
 function marcarTarea(id){
   let data = leerTareas();
 
   data = data.map(t=>{
     if(t.id === id){
-      t.hecha = true;
-      t.usuarioHecha = usuarioActual();
-      t.fechaHecha = new Date().toLocaleString("es-ES");
+      t.pendiente = false;
+      t.ultimaFecha = new Date().toLocaleString("es-ES");
+      t.ultimoUsuario = usuarioActual();
     }
+
     return t;
   });
 
@@ -155,86 +201,29 @@ function marcarTarea(id){
   pintar();
 }
 
-function reiniciarTareas(){
-  if(!confirm("¿Reiniciar tareas de revisión?")) return;
+function volverPendiente(id){
+  let data = leerTareas();
 
-  localStorage.removeItem("tareas_revision_monolito");
-  prepararTareas();
+  data = data.map(t=>{
+    if(t.id === id){
+      t.pendiente = true;
+    }
+
+    return t;
+  });
+
+  guardarTareas(data);
   pintar();
 }
 
-function pintarResumen(){
-  const inc = contarIncidencias();
-  const com = contarComunicaciones();
-  const cal = contarCalendario();
+function borrarTarea(id){
+  if(!esHosteleria()){
+    alert("Solo HOSTELERÍA puede borrar tareas.");
+    return;
+  }
 
-  let html = "";
+  const tarea = leerTareas().find(t=>t.id===id);
 
-  html += `
-    <div class="card">
-      <div class="titulo">Estado actual</div>
+  if(!tarea) return;
 
-      <div class="estado ${inc>0 ? "rojo" : "verde"}">
-        ${inc>0 ? "🔴" : "🟢"} Incidencias: ${inc}
-      </div>
-
-      <div class="estado ${com>0 ? "amarillo" : "verde"}">
-        ${com>0 ? "🟡" : "🟢"} Comunicaciones: ${com}
-      </div>
-
-      <div class="estado ${cal>0 ? "amarillo" : "verde"}">
-        ${cal>0 ? "🟡" : "🟢"} Calendario 7 días: ${cal}
-      </div>
-    </div>
-  `;
-
-  document.getElementById("resumen").innerHTML = html;
-}
-
-function pintarTareas(){
-  const data = prepararTareas();
-
-  let html = `
-    <div class="card">
-      <div class="titulo">Tareas de revisión</div>
-      <div class="detalle">
-        Cada tarea marcada guarda usuario y hora automáticamente.
-      </div>
-      <button onclick="reiniciarTareas()">↻ Reiniciar revisión</button>
-    </div>
-  `;
-
-  data.forEach(t=>{
-    html += `
-      <div class="card">
-        <div class="titulo">${t.texto}</div>
-
-        ${
-          t.hecha
-          ? `
-            <div class="estado verde">✅ REALIZADA</div>
-            <div class="detalle">Hecha por: ${t.usuarioHecha}</div>
-            <div class="detalle">${t.fechaHecha}</div>
-          `
-          : `
-            <div class="estado amarillo">🟡 PENDIENTE</div>
-            <button class="hecho" onclick="marcarTarea(${t.id})">✅ Marcar hecha</button>
-          `
-        }
-      </div>
-    `;
-  });
-
-  document.getElementById("tareas").innerHTML = html;
-}
-
-function pintar(){
-  pintarResumen();
-  pintarTareas();
-}
-
-pintar();
-</script>
-
-</body>
-</html>
+  if(!confirm("Vas a borrar esta tarea:\n\n"
