@@ -3,12 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>INCIDENCIAS · MONOLITO</title>
 
 <style>
+
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial,Helvetica,sans-serif;
   background:#eef2f5;
   color:#17303d;
 }
@@ -17,144 +23,262 @@ header{
   background:#17303d;
   color:white;
   padding:16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:22px;
   font-weight:900;
-  font-size:20px;
 }
 
-.proveedor{
-  margin-top:25px;
-  padding:10px;
-  border-top:2px solid #17303d;
+.volver{
+  background:white;
+  color:#17303d;
+  border:0;
+  border-radius:14px;
+  padding:10px 14px;
+  font-size:16px;
   font-weight:900;
+}
+
+.contenido{
+  padding:16px;
 }
 
 .card{
   background:white;
-  margin:10px;
-  padding:12px;
-  border-radius:14px;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.10);
+}
+
+.titulo{
+  font-size:22px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.detalle{
+  color:#56656e;
+  margin-top:6px;
+  line-height:1.4;
+}
+
+.estado{
+  display:inline-block;
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:900;
+  margin-top:10px;
 }
 
 .rojo{
-  color:#c00000;
-  font-weight:900;
+  background:#ffd6d6;
+  color:#9b0000;
 }
 
 .verde{
-  color:#4caf50;
-  font-weight:900;
+  background:#d4edda;
+  color:#155724;
 }
 
 button{
+  width:100%;
   border:0;
-  border-radius:10px;
-  padding:8px 12px;
-  font-weight:800;
-  margin-top:8px;
+  border-radius:14px;
+  padding:13px;
+  margin-top:10px;
+  font-size:15px;
+  font-weight:900;
+  background:#17303d;
+  color:white;
 }
 
 .resolver{
-  background:#4caf50;
-  color:white;
+  background:#48a530;
 }
+
+.vacio{
+  background:white;
+  border-radius:22px;
+  padding:24px;
+  text-align:center;
+  font-weight:900;
+}
+
 </style>
 </head>
 
 <body>
+
 <header>
+
 <button class="volver" onclick="volver()">←</button>
 
 ⚠️ INCIDENCIAS
 
 </header>
 
+<div class="contenido">
+
+<div class="card">
+
+<div class="titulo">
+Centro de incidencias
+</div>
+
+<div class="detalle">
+Aquí aparecen incidencias pendientes de pedidos,
+pagos o revisiones del negocio.
+</div>
+
+</div>
+
 <div id="lista"></div>
+
+</div>
 
 <script>
 
+function vibrar(){
+  if(navigator.vibrate){
+    navigator.vibrate(40);
+  }
+}
+
+function sonidoClick(){
+  try{
+    const audio = new Audio(
+      "https://actions.google.com/sounds/v1/cartoon/pop.ogg"
+    );
+    audio.volume = 0.2;
+    audio.play();
+  }catch(e){}
+}
+
+function volver(){
+
+  vibrar();
+  sonidoClick();
+
+  window.location.href="index.html";
+}
+
 function leerIncidencias(){
-  return JSON.parse(localStorage.getItem("incidencias") || "[]");
+  return JSON.parse(
+    localStorage.getItem("incidencias") || "[]"
+  );
 }
 
 function guardarIncidencias(data){
-  localStorage.setItem("incidencias", JSON.stringify(data));
+  localStorage.setItem(
+    "incidencias",
+    JSON.stringify(data)
+  );
 }
 
-function pintar(){
+function resolverIncidencia(id){
+
+  vibrar();
+  sonidoClick();
 
   let data = leerIncidencias();
-
-  // Agrupar por proveedor
-  let grupos = {};
-
-  data.forEach(i=>{
-    if(!grupos[i.proveedor]) grupos[i.proveedor] = [];
-    grupos[i.proveedor].push(i);
-  });
-
-  let html = "";
-
-  for(let prov in grupos){
-
-    html += `<div class="proveedor">${prov}</div>`;
-
-    grupos[prov].forEach((i,idx)=>{
-
-      html += `
-      <div class="card">
-
-        <div class="${i.resuelta ? 'verde' : 'rojo'}">
-          ${i.resuelta ? '✔ RESUELTA' : '⚠ ABIERTA'}
-        </div>
-
-        <div><b>Motivo:</b> ${i.motivo}</div>
-        <div><b>Solución:</b> ${i.solucion}</div>
-
-        <div style="margin-top:6px;font-size:12px;">
-          Creada por: ${i.creadaPor} · ${i.fecha}
-        </div>
-
-        ${i.resuelta ? `
-          <div style="margin-top:6px;font-size:12px;">
-            Resuelta por: ${i.resueltaPor} · ${i.fechaResolucion}
-          </div>
-        ` : `
-          <button class="resolver" onclick="resolver(${i.id})">
-            ✔ Marcar resuelta
-          </button>
-        `}
-
-      </div>
-      `;
-    });
-  }
-
-  document.getElementById("lista").innerHTML = html;
-}
-
-function resolver(id){
-
-  let data = leerIncidencias();
-  let operador = localStorage.getItem("usuario") || "CAMARERO";
 
   data = data.map(i=>{
+
     if(i.id === id){
+
       i.resuelta = true;
-      i.resueltaPor = operador;
-      i.fechaResolucion = new Date().toLocaleString();
+
+      i.fechaResolucion =
+        new Date().toLocaleString("es-ES");
     }
+
     return i;
   });
 
   guardarIncidencias(data);
+
   pintar();
+}
+
+function pintar(){
+
+  const lista =
+    document.getElementById("lista");
+
+  const incidencias =
+    leerIncidencias();
+
+  if(incidencias.length === 0){
+
+    lista.innerHTML = `
+      <div class="vacio">
+        ✅ No hay incidencias registradas.
+      </div>
+    `;
+
+    return;
+  }
+
+  let html = "";
+
+  incidencias.forEach(i=>{
+
+    html += `
+
+      <div class="card">
+
+        <div class="titulo">
+          ${i.titulo || "Incidencia"}
+        </div>
+
+        <div class="detalle">
+          ${i.texto || ""}
+        </div>
+
+        <div class="detalle">
+          ${i.fecha || ""}
+        </div>
+
+        ${
+          i.resuelta
+          ?
+          `
+            <div class="estado verde">
+              ✅ RESUELTA
+            </div>
+
+            <div class="detalle">
+              ${i.fechaResolucion || ""}
+            </div>
+          `
+          :
+          `
+            <div class="estado rojo">
+              ⚠️ PENDIENTE
+            </div>
+
+            <button
+              class="resolver"
+              onclick="resolverIncidencia(${i.id})"
+            >
+              ✅ Marcar resuelta
+            </button>
+          `
+        }
+
+      </div>
+    `;
+  });
+
+  lista.innerHTML = html;
 }
 
 pintar();
 
 </script>
-function volver(){
-  window.location.href="index.html";
-}
+
 </body>
 </html>
