@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPARADOR · MONOLITO</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#eef2f5;
+  color:#17303d;
+}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:22px;
+  font-weight:900;
+}
+
+.volver{
+  background:white;
+  color:#17303d;
+  border:0;
+  border-radius:14px;
+  padding:10px 14px;
+  font-weight:900;
+  font-size:16px;
+}
+
+.contenido{
+  padding:16px;
+}
+
+.card{
+  background:white;
+  border-radius:24px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,.10);
+}
+
+.titulo{
+  font-size:24px;
+  font-weight:900;
+  margin-bottom:12px;
+}
+
+.detalle{
+  color:#5a6872;
+  margin-top:6px;
+  line-height:1.4;
+}
+
+select,input{
+  width:100%;
+  border:1px solid #c8d0d6;
+  border-radius:14px;
+  padding:14px;
+  font-size:16px;
+  margin-top:10px;
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:16px;
+  padding:14px;
+  font-size:16px;
+  font-weight:900;
+  margin-top:12px;
+}
+
+.crear{
+  background:#17303d;
+  color:white;
+}
+
+.proveedor{
+  border-left:8px solid #17303d;
+}
+
+.mejor{
+  border-left:8px solid #2ea043;
+  background:#f1fff4;
+}
+
+.precioFinal{
+  font-size:34px;
+  font-weight:900;
+  color:#2ea043;
+  margin-top:12px;
+}
+
+.estado{
+  display:inline-block;
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:900;
+  margin-top:10px;
+}
+
+.verde{
+  background:#d4edda;
+  color:#155724;
+}
+
+.amarillo{
+  background:#fff3cd;
+  color:#7a4d00;
+}
+
+.rojo{
+  background:#ffd6d6;
+  color:#9b0000;
+}
+
+.linea{
+  margin-top:8px;
+  font-size:15px;
+}
+
+.ganador{
+  margin-top:14px;
+  background:#17303d;
+  color:white;
+  padding:14px;
+  border-radius:16px;
+  text-align:center;
+  font-weight:900;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  💰 COMPARADOR
+</header>
+
+<div class="contenido">
+
+  <div class="card">
+    <div class="titulo">Comparador inteligente</div>
+
+    <div class="detalle">
+      MONOLITO compara precios reales teniendo en cuenta promociones,
+      rappel y coste final por unidad.
+    </div>
+
+    <select id="articulo">
+      <option>Coca-Cola lata 33cl</option>
+      <option>Cerveza tercio</option>
+      <option>Café</option>
+      <option>Agua pequeña</option>
+    </select>
+  </div>
+
+  <div id="comparaciones"></div>
+
+</div>
+
+<script>
+
+function volver(){
+  window.location.href="index.html";
+}
+
+const proveedores = [
+
+{
+  nombre:"Makro",
+  precio:15.80,
+  unidades:24,
+  promo:"5 + 1",
+  rappel:3
+},
+
+{
+  nombre:"Coca-Cola",
+  precio:16.40,
+  unidades:24,
+  promo:"Sin promoción",
+  rappel:5
+},
+
+{
+  nombre:"Distribuciones Navia",
+  precio:17.20,
+  unidades:24,
+  promo:"10%",
+  rappel:0
+}
+
+];
+
+function calcularFinal(p){
+
+  let totalUnidades = p.unidades;
+  let precio = p.precio;
+
+  if(p.promo === "5 + 1"){
+    totalUnidades += Math.floor(p.unidades / 5);
+  }
+
+  if(p.promo === "10%"){
+    precio = precio - (precio * 0.10);
+  }
+
+  precio = precio - (precio * (p.rappel / 100));
+
+  return (precio / totalUnidades);
+}
+
+function pintar(){
+
+  let html = "";
+
+  let mejor = null;
+  let mejorPrecio = 999;
+
+  proveedores.forEach(p=>{
+
+    const final = calcularFinal(p);
+
+    if(final < mejorPrecio){
+      mejorPrecio = final;
+      mejor = p.nombre;
+    }
+
+  });
+
+  proveedores.forEach(p=>{
+
+    const final = calcularFinal(p);
+
+    let estado = "";
+    let clase = "proveedor";
+
+    if(final === mejorPrecio){
+      estado = "🏆 MEJOR COMPRA";
+      clase = "mejor";
+    }
+    else if(final <= mejorPrecio + 0.03){
+      estado = "🟡 PRECIO SIMILAR";
+    }
+    else{
+      estado = "🔴 MÁS CARO";
+    }
+
+    html += `
+      <div class="card ${clase}">
+
+        <div class="titulo">${p.nombre}</div>
+
+        <div class="linea">
+          💶 Precio base: ${p.precio.toFixed(2)} €
+        </div>
+
+        <div class="linea">
+          📦 Unidades: ${p.unidades}
+        </div>
+
+        <div class="linea">
+          🎁 Promo: ${p.promo}
+        </div>
+
+        <div class="linea">
+          💸 Rappel: ${p.rappel}%
+        </div>
+
+        <div class="precioFinal">
+          ${final.toFixed(2)} €/unidad
+        </div>
+
+        <div class="estado ${
+          estado.includes("MEJOR")
+          ? "verde"
+          : estado.includes("SIMILAR")
+          ? "amarillo"
+          : "rojo"
+        }">
+          ${estado}
+        </div>
+
+      </div>
+    `;
+  });
+
+  html += `
+    <div class="ganador">
+      🏆 MONOLITO recomienda comprar actualmente a:
+      <br><br>
+      ${mejor}
+    </div>
+  `;
+
+  document.getElementById("comparaciones").innerHTML = html;
+}
+
+pintar();
+
+</script>
+
+</body>
+</html>
