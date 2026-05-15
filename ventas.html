@@ -2,63 +2,79 @@
 <html lang="es">
 <head>
 <title>VENTAS · MONOLITO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#eef2f5;
+  color:#17303d;
+}
 
 header{
   background:#17303d;
   color:white;
-  padding:16px;
+  padding:20px 18px;
   font-weight:900;
-  font-size:20px;
+  font-size:28px;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:14px;
 }
 
-.volver,.mes{
+.volver{
   background:white;
   color:#17303d;
   border:0;
-  border-radius:10px;
-  padding:7px 11px;
+  border-radius:14px;
+  padding:12px 18px;
   font-weight:900;
+  font-size:22px;
 }
 
 .mes{
   margin-left:auto;
   background:#ff9800;
   color:white;
+  border:0;
+  border-radius:12px;
+  padding:11px 16px;
+  font-weight:900;
+  font-size:18px;
 }
 
-.contenedor{padding:16px}
+.contenedor{
+  padding:22px;
+}
 
 .fecha{
-  font-size:18px;
+  font-size:24px;
   font-weight:900;
-  margin-bottom:10px;
+  margin-bottom:14px;
 }
 
 input,textarea{
   width:100%;
-  padding:12px;
-  border-radius:12px;
+  padding:18px;
+  border-radius:14px;
   border:1px solid #ccc;
-  margin-bottom:10px;
-  font-size:16px;
+  margin-bottom:16px;
+  font-size:22px;
 }
 
 textarea{
-  min-height:80px;
+  min-height:110px;
   resize:vertical;
 }
 
 .bloque{
-  padding:14px;
-  border-radius:18px;
-  margin-bottom:14px;
-  box-shadow:0 6px 14px rgba(0,0,0,.08);
+  padding:22px;
+  border-radius:22px;
+  margin-bottom:18px;
+  box-shadow:0 8px 18px rgba(0,0,0,.10);
 }
 
 .manana{background:linear-gradient(#f7fbff,#eaf5ff)}
@@ -67,26 +83,28 @@ textarea{
 
 .titulo{
   font-weight:900;
-  margin-bottom:8px;
+  font-size:24px;
+  margin-bottom:14px;
 }
 
 .total{
-  font-size:18px;
+  font-size:24px;
   font-weight:900;
-  margin-top:6px;
+  margin-top:8px;
 }
 
 .info{
-  font-size:13px;
+  font-size:17px;
   color:#4f5f69;
-  margin-top:10px;
+  margin-top:12px;
+  font-weight:700;
 }
 
 .aviso{
   color:#b00000;
   font-weight:900;
-  font-size:13px;
-  margin-top:8px;
+  font-size:17px;
+  margin-top:10px;
 }
 
 .errorNota{
@@ -99,11 +117,11 @@ textarea{
   background:#48a530;
   color:white;
   border:0;
-  border-radius:14px;
-  padding:14px;
+  border-radius:16px;
+  padding:20px;
   font-weight:900;
-  font-size:17px;
-  margin-bottom:12px;
+  font-size:22px;
+  margin-bottom:18px;
 }
 
 .borrar{
@@ -111,10 +129,11 @@ textarea{
   background:#c00000;
   color:white;
   border:0;
-  border-radius:12px;
-  padding:12px;
+  border-radius:16px;
+  padding:18px;
   font-weight:900;
-  margin-top:10px;
+  font-size:20px;
+  margin-top:14px;
 }
 
 .bloqueado{
@@ -130,14 +149,14 @@ textarea{
   align-items:center;
   justify-content:center;
   z-index:9999;
-  padding:18px;
+  padding:22px;
 }
 
 .modal{
   background:white;
-  border-radius:18px;
-  padding:18px;
-  max-width:420px;
+  border-radius:22px;
+  padding:24px;
+  max-width:520px;
   width:100%;
   text-align:center;
 }
@@ -145,11 +164,13 @@ textarea{
 .modal h3{
   margin-top:0;
   color:#c00000;
+  font-size:26px;
 }
 
 .modal p{
-  line-height:1.45;
+  line-height:1.5;
   font-weight:700;
+  font-size:20px;
 }
 
 .irCambio{
@@ -157,10 +178,11 @@ textarea{
   background:#17303d;
   color:white;
   border:0;
-  border-radius:12px;
-  padding:13px;
+  border-radius:14px;
+  padding:17px;
   font-weight:900;
-  margin-top:10px;
+  font-size:20px;
+  margin-top:12px;
 }
 
 .continuar{
@@ -168,10 +190,11 @@ textarea{
   background:#c00000;
   color:white;
   border:0;
-  border-radius:12px;
-  padding:13px;
+  border-radius:14px;
+  padding:17px;
   font-weight:900;
-  margin-top:10px;
+  font-size:20px;
+  margin-top:12px;
 }
 </style>
 </head>
@@ -179,7 +202,7 @@ textarea{
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">‹</button>
+  <button class="volver" onclick="volver()">‹ Volver</button>
   💰 VENTAS
   <button class="mes" onclick="verMes()">📊 Mes</button>
 </header>
@@ -193,19 +216,8 @@ textarea{
   <div class="bloque manana">
     <div class="titulo">☀️ MAÑANA</div>
 
-    <input id="maA"
-      placeholder="Operador 1 mañana"
-      type="number"
-      onfocus="this.select()"
-      onclick="this.select()"
-      oninput="calcular()">
-
-    <input id="maB"
-      placeholder="Operador 2 mañana"
-      type="number"
-      onfocus="this.select()"
-      onclick="this.select()"
-      oninput="calcular()">
+    <input id="maA" placeholder="Operador 1 mañana" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
+    <input id="maB" placeholder="Operador 2 mañana" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
 
     <div class="total" id="totalMa">TOTAL MAÑANA: 0,00 €</div>
     <div class="aviso" id="avisoMa"></div>
@@ -214,19 +226,8 @@ textarea{
   <div class="bloque tarde">
     <div class="titulo">🌆 TARDE</div>
 
-    <input id="taA"
-      placeholder="Operador 1 tarde"
-      type="number"
-      onfocus="this.select()"
-      onclick="this.select()"
-      oninput="calcular()">
-
-    <input id="taB"
-      placeholder="Operador 2 tarde"
-      type="number"
-      onfocus="this.select()"
-      onclick="this.select()"
-      oninput="calcular()">
+    <input id="taA" placeholder="Operador 1 tarde" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
+    <input id="taB" placeholder="Operador 2 tarde" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
 
     <div class="total" id="totalTa">TOTAL TARDE: 0,00 €</div>
     <div class="aviso" id="avisoTa"></div>
@@ -242,9 +243,7 @@ textarea{
 
   <div class="bloque errorNota">
     <div class="titulo">⚠ Aviso de error / corrección</div>
-    <textarea id="notaError"
-      placeholder="Si hubo un error, escribe aquí qué pasó. No modifica las ventas registradas."
-      oninput="guardarNotaError()"></textarea>
+    <textarea id="notaError" placeholder="Si hubo un error, escribe aquí qué pasó. No modifica las ventas registradas." oninput="guardarNotaError()"></textarea>
     <div class="info" id="infoNota"></div>
   </div>
 
@@ -255,7 +254,6 @@ textarea{
 <div class="modalFondo" id="modalCambio">
   <div class="modal">
     <h3>⚠ CONTROL DE CAMBIO OBLIGATORIO</h3>
-
     <p>
       Debes realizar el control de cambio antes de registrar ventas.
       <br><br>
@@ -352,14 +350,9 @@ function calcular(){
   let totalTa = taA + taB;
   let totalDia = totalMa + totalTa;
 
-  document.getElementById("totalMa").textContent =
-    "TOTAL MAÑANA: " + euros(totalMa);
-
-  document.getElementById("totalTa").textContent =
-    "TOTAL TARDE: " + euros(totalTa);
-
-  document.getElementById("totalDia").textContent =
-    euros(totalDia);
+  document.getElementById("totalMa").textContent = "TOTAL MAÑANA: " + euros(totalMa);
+  document.getElementById("totalTa").textContent = "TOTAL TARDE: " + euros(totalTa);
+  document.getElementById("totalDia").textContent = euros(totalDia);
 
   pintarAvisos(maA,maB,taA,taB);
 }
@@ -436,13 +429,8 @@ function guardarVentas(){
     total: totalDia,
 
     sinCambioPrevio: !hayCambioDelDia(),
-    sinCambioUsuario: !hayCambioDelDia()
-      ? operador
-      : (anterior.sinCambioUsuario || ""),
-
-    sinCambioHora: !hayCambioDelDia()
-      ? ahora.toLocaleTimeString("es-ES")
-      : (anterior.sinCambioHora || ""),
+    sinCambioUsuario: !hayCambioDelDia() ? operador : (anterior.sinCambioUsuario || ""),
+    sinCambioHora: !hayCambioDelDia() ? ahora.toLocaleTimeString("es-ES") : (anterior.sinCambioHora || ""),
 
     notaError: anterior.notaError || "",
     notaPor: anterior.notaPor || "",
