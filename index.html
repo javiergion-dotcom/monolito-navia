@@ -41,57 +41,16 @@ transition:transform .08s ease,box-shadow .08s ease,filter .08s ease;
 .rojo{background:#ff0000}
 .amarillo{background:#d99a00}
 
-/* BLOQUE IA PRO */
+/* BLOQUE IA */
 .bloqueIA{
 width:92%;
 max-width:1050px;
 margin:26px auto 46px auto;
 background:white;
 border-radius:36px;
-padding:38px 26px 42px 26px;
+padding:34px 26px 42px 26px;
 box-shadow:0 14px 38px rgba(0,0,0,.18);
 text-align:center;
-}
-
-.logoMonolito{
-width:310px;
-max-width:88%;
-object-fit:contain;
-display:block;
-margin:0 auto 20px auto;
-}
-
-.lineaIA{
-width:72%;
-height:1px;
-background:#d8c08a;
-margin:20px auto;
-}
-
-.logoGPT{
-width:88px;
-height:88px;
-object-fit:contain;
-display:block;
-margin:8px auto 22px auto;
-}
-
-.textoIA{
-max-width:850px;
-margin:0 auto 24px auto;
-color:#111;
-font-size:19px;
-line-height:1.65;
-font-weight:700;
-}
-
-.textoIAsecundario{
-max-width:760px;
-margin:0 auto 34px auto;
-color:#222;
-font-size:17px;
-line-height:1.5;
-font-weight:500;
 }
 
 .botonIA{
@@ -107,8 +66,56 @@ font-weight:800;
 cursor:pointer;
 box-shadow:0 10px 25px rgba(0,0,0,.25);
 transition:.08s;
+margin:0 auto 28px auto;
 }
 .botonIA:active{transform:translateY(5px) scale(.97)}
+
+.logosIA{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:46px;
+flex-wrap:wrap;
+margin:4px auto 22px auto;
+}
+
+.logoMonolito{
+height:105px;
+object-fit:contain;
+display:block;
+}
+
+.logoGPT{
+width:82px;
+height:82px;
+object-fit:contain;
+display:block;
+}
+
+.lineaIA{
+width:72%;
+height:1px;
+background:#d8c08a;
+margin:20px auto;
+}
+
+.textoIA{
+max-width:850px;
+margin:0 auto 24px auto;
+color:#111;
+font-size:19px;
+line-height:1.65;
+font-weight:700;
+}
+
+.textoIAsecundario{
+max-width:760px;
+margin:0 auto;
+color:#222;
+font-size:17px;
+line-height:1.5;
+font-weight:500;
+}
 
 @media (max-width:1200px){.panel{gap:24px}.boton{min-height:126px;font-size:20px}.icono{font-size:42px}}
 
@@ -121,12 +128,13 @@ header{padding:14px 16px}
 #hora{font-size:15px}
 #usuario{font-size:13px;padding:8px 11px}
 
-.bloqueIA{width:92%;padding:30px 18px 34px 18px;border-radius:30px}
-.logoMonolito{width:250px}
+.bloqueIA{width:92%;padding:28px 18px 34px 18px;border-radius:30px}
+.botonIA{width:100%;font-size:18px;padding:18px 20px;margin-bottom:26px}
+.logosIA{gap:34px}
+.logoMonolito{height:82px}
 .logoGPT{width:72px;height:72px}
 .textoIA{font-size:17px}
 .textoIAsecundario{font-size:16px}
-.botonIA{width:100%;font-size:18px;padding:18px 20px}
 }
 </style>
 </head>
@@ -182,28 +190,29 @@ header{padding:14px 16px}
 
 </div>
 
-
 <div class="bloqueIA">
-
-<img src="logotipo-monolito-pro.png" class="logoMonolito">
-
-<div class="lineaIA"></div>
 
 <div class="botonIA" onclick="abrir('ayuda.html')">
 🤖 AYUDA IA CHAT GPT
 </div>
 
+<div class="logosIA">
+<img src="logotipo-monolito.png" class="logoMonolito">
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" class="logoGPT">
+</div>
+
 <div class="lineaIA"></div>
 
 <div class="textoIA">
-MONOLITO GPT PRO · Navia fue desarrollado con ayuda de ChatGPT y experiencia real en hostelería.
+MONOLITO GPT PRO · Navia evoluciona continuamente mediante inteligencia artificial y mejoras constantes del sistema.
 </div>
 
 <div class="textoIAsecundario">
-La IA podrá ayudarte a comprender y utilizar mejor el sistema.
+Para aprovechar todas las funciones de asistencia avanzada y futuras actualizaciones IA, se recomienda el uso de ChatGPT.
 </div>
 
 </div>
+
 <script>
 function comprobarLogin(){
 const activo = localStorage.getItem("loginActivo");
