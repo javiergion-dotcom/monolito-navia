@@ -38,7 +38,16 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
 </head>
 
 <body>
+<body>
 
+<script>
+const nivel = localStorage.getItem("nivel");
+
+if(nivel === "demo"){
+  alert("Acceso no permitido en modo DEMO");
+  window.location.href = "index.html";
+}
+</script>
 <header>
   <button class="volver" onclick="volver()">←</button>
   ⚙️ CONFIGURACIÓN
