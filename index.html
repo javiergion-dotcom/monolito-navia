@@ -18,54 +18,19 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
 #usuario{background:rgba(255,255,255,.14);padding:9px 14px;border-radius:999px;font-size:15px;font-weight:700;white-space:nowrap;cursor:pointer}
 #hora{font-size:18px;font-weight:600;white-space:nowrap}
 
-.franja{
-  background:#eef2f5;
-  color:#4f5f69;
-  padding:11px 24px;
-  font-size:15px;
-  border-bottom:1px solid rgba(0,0,0,.05);
-  font-weight:700;
-}
+.franja{background:#eef2f5;color:#4f5f69;padding:11px 24px;font-size:15px;border-bottom:1px solid rgba(0,0,0,.05);font-weight:700}
 
-.panel{
-  padding:24px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:30px;
-}
+.panel{padding:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
 
 .boton{
-  position:relative;
-  min-height:132px;
-  border-radius:28px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  color:white;
-  font-size:22px;
-  font-weight:700;
-  letter-spacing:.4px;
-  cursor:pointer;
-  user-select:none;
-  padding:20px 14px;
-  touch-action:manipulation;
-  background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%);
-  box-shadow:
-    inset 0 3px 6px rgba(255,255,255,.24),
-    inset 0 -8px 16px rgba(0,0,0,.12),
-    0 16px 30px rgba(0,0,0,.30);
+  position:relative;min-height:132px;border-radius:28px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;color:white;font-size:22px;
+  font-weight:700;letter-spacing:.4px;cursor:pointer;user-select:none;padding:20px 14px;
+  touch-action:manipulation;background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%);
+  box-shadow:inset 0 3px 6px rgba(255,255,255,.24),inset 0 -8px 16px rgba(0,0,0,.12),0 16px 30px rgba(0,0,0,.30);
   transition:transform .08s ease,box-shadow .08s ease,filter .08s ease;
 }
-
-.boton:active{
-  transform:translateY(10px) scale(.96);
-  box-shadow:
-    inset 0 10px 18px rgba(0,0,0,.26),
-    0 6px 12px rgba(0,0,0,.28);
-  filter:brightness(.96);
-}
+.boton:active{transform:translateY(10px) scale(.96);box-shadow:inset 0 10px 18px rgba(0,0,0,.26),0 6px 12px rgba(0,0,0,.28);filter:brightness(.96)}
 
 .azul{background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%)}
 .naranja{background:linear-gradient(180deg,#f6ae1b 0%,#df8b00 100%)}
@@ -74,32 +39,11 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
 
 .icono{font-size:46px;line-height:1;margin-bottom:12px}
 
-.contador{
-  position:absolute;
-  top:11px;
-  right:13px;
-  min-width:30px;
-  height:30px;
-  padding:0 8px;
-  border-radius:999px;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  font-size:14px;
-  font-weight:700;
-  color:white;
-  box-shadow:0 3px 7px rgba(0,0,0,.22);
-}
-
+.contador{position:absolute;top:11px;right:13px;min-width:30px;height:30px;padding:0 8px;border-radius:999px;display:none;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;box-shadow:0 3px 7px rgba(0,0,0,.22)}
 .rojo{background:#ff0000}
 .amarillo{background:#d99a00}
 
-@media (max-width:1200px){
-  .panel{gap:24px}
-  .boton{min-height:126px;font-size:20px}
-  .icono{font-size:42px}
-}
-
+@media (max-width:1200px){.panel{gap:24px}.boton{min-height:126px;font-size:20px}.icono{font-size:42px}}
 @media (max-width:900px){
   .panel{grid-template-columns:repeat(2,1fr);gap:20px;padding:18px}
   .boton{min-height:130px;font-size:19px;border-radius:24px}
@@ -119,7 +63,6 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
     <div class="title">MONOLITO</div>
     <div class="sub">Sistema de control · El Monolito</div>
   </div>
-
   <div class="header-right">
     <div id="usuario" onclick="cerrarSesion()">OPERADOR</div>
     <div id="hora"></div>
@@ -138,22 +81,22 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
   <div class="boton verde" onclick="abrir('pagos.html')"><div class="icono">💳</div><div>PAGOS</div></div>
 
   <div class="boton rojoBoton" onclick="abrir('incidencias.html')">
-    <div class="icono">⚠️</div>
-    <div>INCIDENCIAS</div>
+    <div class="icono">⚠️</div><div>INCIDENCIAS</div>
     <div class="contador rojo" id="contadorIncidencias">0</div>
   </div>
 
   <div class="boton naranja" onclick="abrir('revision.html')"><div class="icono">🔎</div><div>REVISIÓN</div></div>
   <div class="boton azul" onclick="abrir('historico.html')"><div class="icono">📁</div><div>HISTÓRICO</div></div>
-  <div class="boton azul" onclick="abrir('ventas.html')"><div class="icono">💰</div><div>VENTAS</div></div>
+  <div class="boton azul" onclick="abrir('/documentos')"><div class="icono">🗂️</div><div>DOCUMENTOS</div></div>
 
+  <div class="boton azul" onclick="abrir('ventas.html')"><div class="icono">💰</div><div>VENTAS</div></div>
   <div class="boton verde" onclick="abrir('cambio.html')"><div class="icono">💵</div><div>CAMBIO</div></div>
   <div class="boton verde" onclick="abrir('rapel.html')"><div class="icono">💶</div><div>RAPPEL</div></div>
+
   <div class="boton azul" onclick="abrir('calendario.html')"><div class="icono">📅</div><div>CALENDARIO</div></div>
 
   <div class="boton naranja" onclick="abrir('comunicacion.html')">
-    <div class="icono">✉️</div>
-    <div>COMUNICACIÓN</div>
+    <div class="icono">✉️</div><div>COMUNICACIÓN</div>
     <div class="contador amarillo" id="contadorComunicacion">0</div>
   </div>
 
@@ -167,25 +110,17 @@ function comprobarLogin(){
   const activo = localStorage.getItem("loginActivo");
   const usuario = localStorage.getItem("usuario");
   const nivel = localStorage.getItem("nivel");
-
-  if(activo !== "SI" || !usuario || !nivel){
-    window.location.href = "login.html";
-  }
+  if(activo !== "SI" || !usuario || !nivel){window.location.href = "login.html";}
 }
-
 comprobarLogin();
 
 function cerrarSesion(){
-  vibrar();
-  sonidoClick();
-
+  vibrar();sonidoClick();
   if(!confirm("¿Cerrar sesión en MONOLITO?")) return;
-
   localStorage.removeItem("loginActivo");
   localStorage.removeItem("usuario");
   localStorage.removeItem("nivel");
   localStorage.removeItem("ultimoLogin");
-
   window.location.href = "login.html";
 }
 
@@ -194,101 +129,58 @@ function sonidoClick(){
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-
     osc.type = "sine";
     osc.frequency.setValueAtTime(240, ctx.currentTime);
-
     gain.gain.setValueAtTime(0.0001, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.08);
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.start(ctx.currentTime);osc.stop(ctx.currentTime + 0.08);
   }catch(e){}
 }
 
-function vibrar(){
-  try{
-    if(navigator.vibrate){
-      navigator.vibrate(20);
-    }
-  }catch(e){}
-}
+function vibrar(){try{if(navigator.vibrate){navigator.vibrate(20);}}catch(e){}}
 
 function abrir(destino){
-  vibrar();
-  sonidoClick();
-
-  setTimeout(function(){
-    window.location.href = destino;
-  },70);
+  vibrar();sonidoClick();
+  setTimeout(function(){window.location.href = destino;},70);
 }
 
-function leerIncidencias(){
-  return JSON.parse(localStorage.getItem("incidencias") || "[]");
-}
-
+function leerIncidencias(){return JSON.parse(localStorage.getItem("incidencias") || "[]");}
 function leerComunicaciones(){
   const nuevas = JSON.parse(localStorage.getItem("comunicaciones_monolito") || "[]");
   const antiguas = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
   return nuevas.concat(antiguas);
 }
-
-function leerCalendario(){
-  return JSON.parse(localStorage.getItem("calendario") || "{}");
-}
-
-function contarIncidencias(){
-  return leerIncidencias().filter(x => !x.resuelta).length;
-}
-
-function contarComunicaciones(){
-  return leerComunicaciones().filter(x => !x.resuelta && !x.hecha).length;
-}
+function leerCalendario(){return JSON.parse(localStorage.getItem("calendario") || "{}");}
+function contarIncidencias(){return leerIncidencias().filter(x => !x.resuelta).length;}
+function contarComunicaciones(){return leerComunicaciones().filter(x => !x.resuelta && !x.hecha).length;}
 
 function contarCalendario(){
   const data = leerCalendario();
-
-  const hoy = new Date();
-  hoy.setHours(0,0,0,0);
-
-  const limite = new Date(hoy);
-  limite.setDate(hoy.getDate() + 7);
-
+  const hoy = new Date();hoy.setHours(0,0,0,0);
+  const limite = new Date(hoy);limite.setDate(hoy.getDate() + 7);
   let total = 0;
-
   Object.values(data).forEach(r=>{
     if(!r.fecha || r.hecha) return;
-
     const f = new Date(r.fecha + "T12:00:00");
-
-    if(f >= hoy && f <= limite){
-      total++;
-    }
+    if(f >= hoy && f <= limite){total++;}
   });
-
   return total;
 }
 
 function reloj(){
   const d = new Date();
-
   document.getElementById("hora").innerHTML =
-    d.toLocaleDateString("es-ES") +
-    " · " +
+    d.toLocaleDateString("es-ES") + " · " +
     d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 }
 
 function saludo(){
   const h = new Date().getHours();
-
   if(h < 6) return "Buenas noches";
   if(h < 12) return "Buenos días";
   if(h < 21) return "Buenas tardes";
-
   return "Buenas noches";
 }
 
@@ -300,23 +192,14 @@ function cargarUsuario(){
 function actualizarContadores(){
   const inc = contarIncidencias();
   const com = contarComunicaciones();
-
   const contadorInc = document.getElementById("contadorIncidencias");
   const contadorCom = document.getElementById("contadorComunicacion");
 
-  if(inc > 0){
-    contadorInc.textContent = inc;
-    contadorInc.style.display = "flex";
-  }else{
-    contadorInc.style.display = "none";
-  }
+  if(inc > 0){contadorInc.textContent = inc;contadorInc.style.display = "flex";}
+  else{contadorInc.style.display = "none";}
 
-  if(com > 0){
-    contadorCom.textContent = com;
-    contadorCom.style.display = "flex";
-  }else{
-    contadorCom.style.display = "none";
-  }
+  if(com > 0){contadorCom.textContent = com;contadorCom.style.display = "flex";}
+  else{contadorCom.style.display = "none";}
 }
 
 function actualizarFranja(){
@@ -326,22 +209,10 @@ function actualizarFranja(){
   const usuario = localStorage.getItem("usuario") || "OPERADOR";
 
   let texto = saludo() + ", " + usuario;
-
-  if(inc > 0){
-    texto += " · [INC] " + inc;
-  }
-
-  if(com > 0){
-    texto += " · [COM] " + com;
-  }
-
-  if(cal > 0){
-    texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s");
-  }
-
-  if(inc === 0 && com === 0 && cal === 0){
-    texto += " · Sin avisos";
-  }
+  if(inc > 0){texto += " · [INC] " + inc;}
+  if(com > 0){texto += " · [COM] " + com;}
+  if(cal > 0){texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s");}
+  if(inc === 0 && com === 0 && cal === 0){texto += " · Sin avisos";}
 
   document.getElementById("franjaEstado").textContent = texto;
 }
