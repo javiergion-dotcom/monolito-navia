@@ -23,14 +23,19 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
 .panel{padding:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
 
 .boton{
-  position:relative;min-height:132px;border-radius:28px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;color:white;font-size:22px;
-  font-weight:700;letter-spacing:.4px;cursor:pointer;user-select:none;padding:20px 14px;
-  touch-action:manipulation;background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%);
-  box-shadow:inset 0 3px 6px rgba(255,255,255,.24),inset 0 -8px 16px rgba(0,0,0,.12),0 16px 30px rgba(0,0,0,.30);
-  transition:transform .08s ease,box-shadow .08s ease,filter .08s ease;
+position:relative;min-height:132px;border-radius:28px;display:flex;flex-direction:column;
+align-items:center;justify-content:center;text-align:center;color:white;font-size:22px;
+font-weight:700;letter-spacing:.4px;cursor:pointer;user-select:none;padding:20px 14px;
+touch-action:manipulation;background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%);
+box-shadow:inset 0 3px 6px rgba(255,255,255,.24),inset 0 -8px 16px rgba(0,0,0,.12),0 16px 30px rgba(0,0,0,.30);
+transition:transform .08s ease,box-shadow .08s ease,filter .08s ease;
 }
-.boton:active{transform:translateY(10px) scale(.96);box-shadow:inset 0 10px 18px rgba(0,0,0,.26),0 6px 12px rgba(0,0,0,.28);filter:brightness(.96)}
+
+.boton:active{
+transform:translateY(10px) scale(.96);
+box-shadow:inset 0 10px 18px rgba(0,0,0,.26),0 6px 12px rgba(0,0,0,.28);
+filter:brightness(.96)
+}
 
 .azul{background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%)}
 .naranja{background:linear-gradient(180deg,#f6ae1b 0%,#df8b00 100%)}
@@ -43,184 +48,291 @@ header{background:#17303d;color:white;padding:16px 24px;display:flex;justify-con
 .rojo{background:#ff0000}
 .amarillo{background:#d99a00}
 
+.bloqueIA{
+width:95%;
+max-width:1100px;
+margin:20px auto 40px auto;
+background:white;
+border-radius:30px;
+padding:35px 25px;
+box-shadow:0 10px 30px rgba(0,0,0,.15);
+text-align:center;
+}
+
+.logosIA{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:45px;
+flex-wrap:wrap;
+margin-bottom:25px;
+}
+
+.logoMonolito{
+height:90px;
+object-fit:contain;
+}
+
+.logoGPT{
+height:85px;
+object-fit:contain;
+}
+
+.textoIA{
+max-width:900px;
+margin:0 auto 30px auto;
+color:#111;
+font-size:20px;
+line-height:1.7;
+font-weight:600;
+}
+
+.botonIA{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+background:#111;
+color:white;
+padding:18px 34px;
+border-radius:999px;
+font-size:20px;
+font-weight:700;
+cursor:pointer;
+box-shadow:0 8px 20px rgba(0,0,0,.25);
+transition:.08s;
+}
+
+.botonIA:active{
+transform:translateY(5px) scale(.97);
+}
+
 @media (max-width:1200px){.panel{gap:24px}.boton{min-height:126px;font-size:20px}.icono{font-size:42px}}
+
 @media (max-width:900px){
-  .panel{grid-template-columns:repeat(2,1fr);gap:20px;padding:18px}
-  .boton{min-height:130px;font-size:19px;border-radius:24px}
-  .icono{font-size:40px;margin-bottom:10px}
-  header{padding:14px 16px}
-  .franja{padding:10px 16px;font-size:14px}
-  #hora{font-size:15px}
-  #usuario{font-size:13px;padding:8px 11px}
+.panel{grid-template-columns:repeat(2,1fr);gap:20px;padding:18px}
+.boton{min-height:130px;font-size:19px;border-radius:24px}
+.icono{font-size:40px;margin-bottom:10px}
+header{padding:14px 16px}
+.franja{padding:10px 16px;font-size:14px}
+#hora{font-size:15px}
+#usuario{font-size:13px;padding:8px 11px}
+
+.textoIA{font-size:17px}
+.logoMonolito{height:70px}
+.logoGPT{height:65px}
+.botonIA{width:100%;font-size:18px}
 }
 </style>
 </head>
-
 <body>
 
 <header>
-  <div class="header-left">
-    <div class="title">MONOLITO</div>
-    <div class="sub">Sistema de control · El Monolito</div>
-  </div>
-  <div class="header-right">
-    <div id="usuario" onclick="cerrarSesion()">OPERADOR</div>
-    <div id="hora"></div>
-  </div>
+<div class="header-left">
+<div class="title">MONOLITO</div>
+<div class="sub">Sistema de control · El Monolito</div>
+</div>
+
+<div class="header-right">
+<div id="usuario" onclick="cerrarSesion()">OPERADOR</div>
+<div id="hora"></div>
+</div>
 </header>
 
 <div class="franja" id="franjaEstado">Cargando estado...</div>
 
 <div class="panel">
 
-  <div class="boton azul" onclick="abrir('proveedores.html')"><div class="icono">🚚</div><div>PROVEEDORES</div></div>
-  <div class="boton azul" onclick="abrir('articulos.html')"><div class="icono">📦</div><div>ARTÍCULOS</div></div>
-  <div class="boton azul" onclick="abrir('comparador.html')"><div class="icono">📊</div><div>COMPARADOR</div></div>
+<div class="boton azul" onclick="abrir('proveedores.html')"><div class="icono">🚚</div><div>PROVEEDORES</div></div>
+<div class="boton azul" onclick="abrir('articulos.html')"><div class="icono">📦</div><div>ARTÍCULOS</div></div>
+<div class="boton azul" onclick="abrir('comparador.html')"><div class="icono">📊</div><div>COMPARADOR</div></div>
 
-  <div class="boton verde" onclick="abrir('pedidos.html')"><div class="icono">📝</div><div>PEDIDOS</div></div>
-  <div class="boton verde" onclick="abrir('pagos.html')"><div class="icono">💳</div><div>PAGOS</div></div>
+<div class="boton verde" onclick="abrir('pedidos.html')"><div class="icono">📝</div><div>PEDIDOS</div></div>
+<div class="boton verde" onclick="abrir('pagos.html')"><div class="icono">💳</div><div>PAGOS</div></div>
 
-  <div class="boton rojoBoton" onclick="abrir('incidencias.html')">
-    <div class="icono">⚠️</div><div>INCIDENCIAS</div>
-    <div class="contador rojo" id="contadorIncidencias">0</div>
-  </div>
+<div class="boton rojoBoton" onclick="abrir('incidencias.html')">
+<div class="icono">⚠️</div>
+<div>INCIDENCIAS</div>
+<div class="contador rojo" id="contadorIncidencias">0</div>
+</div>
 
-  <div class="boton naranja" onclick="abrir('revision.html')"><div class="icono">🔎</div><div>REVISIÓN</div></div>
-  <div class="boton azul" onclick="abrir('historico.html')"><div class="icono">📁</div><div>HISTÓRICO</div></div>
-  <div class="boton azul" onclick="abrir('/documentos')"><div class="icono">🗂️</div><div>DOCUMENTOS</div></div>
+<div class="boton naranja" onclick="abrir('revision.html')"><div class="icono">🔎</div><div>REVISIÓN</div></div>
+<div class="boton azul" onclick="abrir('historico.html')"><div class="icono">📁</div><div>HISTÓRICO</div></div>
+<div class="boton azul" onclick="abrir('/documentos')"><div class="icono">🗂️</div><div>DOCUMENTOS</div></div>
 
-  <div class="boton azul" onclick="abrir('ventas.html')"><div class="icono">💰</div><div>VENTAS</div></div>
-  <div class="boton verde" onclick="abrir('cambio.html')"><div class="icono">💵</div><div>CAMBIO</div></div>
-  <div class="boton verde" onclick="abrir('rapel.html')"><div class="icono">💶</div><div>RAPPEL</div></div>
+<div class="boton azul" onclick="abrir('ventas.html')"><div class="icono">💰</div><div>VENTAS</div></div>
+<div class="boton verde" onclick="abrir('cambio.html')"><div class="icono">💵</div><div>CAMBIO</div></div>
+<div class="boton verde" onclick="abrir('rapel.html')"><div class="icono">💶</div><div>RAPPEL</div></div>
 
-  <div class="boton azul" onclick="abrir('calendario.html')"><div class="icono">📅</div><div>CALENDARIO</div></div>
+<div class="boton azul" onclick="abrir('calendario.html')"><div class="icono">📅</div><div>CALENDARIO</div></div>
 
-  <div class="boton naranja" onclick="abrir('comunicacion.html')">
-    <div class="icono">✉️</div><div>COMUNICACIÓN</div>
-    <div class="contador amarillo" id="contadorComunicacion">0</div>
-  </div>
+<div class="boton naranja" onclick="abrir('comunicacion.html')">
+<div class="icono">✉️</div>
+<div>COMUNICACIÓN</div>
+<div class="contador amarillo" id="contadorComunicacion">0</div>
+</div>
 
-  <div class="boton naranja" onclick="abrir('ayuda.html')"><div class="icono">🤖</div><div>AYUDA</div></div>
-  <div class="boton azul" onclick="abrir('configuracion.html')"><div class="icono">⚙️</div><div>CONFIGURACIÓN</div></div>
+<div class="boton azul" onclick="abrir('configuracion.html')"><div class="icono">⚙️</div><div>CONFIGURACIÓN</div></div>
+
+</div>
+
+<div class="bloqueIA">
+
+<div class="logosIA">
+<img src="logo_monolito.png" class="logoMonolito">
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" class="logoGPT">
+</div>
+
+<div class="textoIA">
+MONOLITO GPT PRO · Navia fue desarrollado con ayuda de ChatGPT y experiencia real en hostelería.<br><br>
+
+La IA podrá ayudarte a comprender y utilizar mejor el sistema.
+</div>
+
+<div class="botonIA" onclick="abrir('ayuda.html')">
+🤖 AYUDA IA CHAT GPT
+</div>
 
 </div>
 
 <script>
 function comprobarLogin(){
-  const activo = localStorage.getItem("loginActivo");
-  const usuario = localStorage.getItem("usuario");
-  const nivel = localStorage.getItem("nivel");
-  if(activo !== "SI" || !usuario || !nivel){window.location.href = "login.html";}
+const activo = localStorage.getItem("loginActivo");
+const usuario = localStorage.getItem("usuario");
+const nivel = localStorage.getItem("nivel");
+if(activo !== "SI" || !usuario || !nivel){window.location.href = "login.html";}
 }
+
 comprobarLogin();
 
 function cerrarSesion(){
-  vibrar();sonidoClick();
-  if(!confirm("¿Cerrar sesión en MONOLITO?")) return;
-  localStorage.removeItem("loginActivo");
-  localStorage.removeItem("usuario");
-  localStorage.removeItem("nivel");
-  localStorage.removeItem("ultimoLogin");
-  window.location.href = "login.html";
+vibrar();
+sonidoClick();
+if(!confirm("¿Cerrar sesión en MONOLITO?")) return;
+localStorage.removeItem("loginActivo");
+localStorage.removeItem("usuario");
+localStorage.removeItem("nivel");
+localStorage.removeItem("ultimoLogin");
+window.location.href = "login.html";
 }
 
 function sonidoClick(){
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(240, ctx.currentTime);
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
-    osc.connect(gain);gain.connect(ctx.destination);
-    osc.start(ctx.currentTime);osc.stop(ctx.currentTime + 0.08);
-  }catch(e){}
+try{
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+const osc = ctx.createOscillator();
+const gain = ctx.createGain();
+osc.type = "sine";
+osc.frequency.setValueAtTime(240, ctx.currentTime);
+gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 0.01);
+gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+osc.connect(gain);
+gain.connect(ctx.destination);
+osc.start(ctx.currentTime);
+osc.stop(ctx.currentTime + 0.08);
+}catch(e){}
 }
 
-function vibrar(){try{if(navigator.vibrate){navigator.vibrate(20);}}catch(e){}}
+function vibrar(){
+try{
+if(navigator.vibrate){navigator.vibrate(20);}
+}catch(e){}
+}
 
 function abrir(destino){
-  vibrar();sonidoClick();
-  setTimeout(function(){window.location.href = destino;},70);
+vibrar();
+sonidoClick();
+setTimeout(function(){window.location.href = destino;},70);
 }
 
 function leerIncidencias(){return JSON.parse(localStorage.getItem("incidencias") || "[]");}
+
 function leerComunicaciones(){
-  const nuevas = JSON.parse(localStorage.getItem("comunicaciones_monolito") || "[]");
-  const antiguas = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
-  return nuevas.concat(antiguas);
+const nuevas = JSON.parse(localStorage.getItem("comunicaciones_monolito") || "[]");
+const antiguas = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
+return nuevas.concat(antiguas);
 }
+
 function leerCalendario(){return JSON.parse(localStorage.getItem("calendario") || "{}");}
+
 function contarIncidencias(){return leerIncidencias().filter(x => !x.resuelta).length;}
+
 function contarComunicaciones(){return leerComunicaciones().filter(x => !x.resuelta && !x.hecha).length;}
 
 function contarCalendario(){
-  const data = leerCalendario();
-  const hoy = new Date();hoy.setHours(0,0,0,0);
-  const limite = new Date(hoy);limite.setDate(hoy.getDate() + 7);
-  let total = 0;
-  Object.values(data).forEach(r=>{
-    if(!r.fecha || r.hecha) return;
-    const f = new Date(r.fecha + "T12:00:00");
-    if(f >= hoy && f <= limite){total++;}
-  });
-  return total;
+const data = leerCalendario();
+const hoy = new Date();
+hoy.setHours(0,0,0,0);
+const limite = new Date(hoy);
+limite.setDate(hoy.getDate() + 7);
+let total = 0;
+Object.values(data).forEach(r=>{
+if(!r.fecha || r.hecha) return;
+const f = new Date(r.fecha + "T12:00:00");
+if(f >= hoy && f <= limite){total++;}
+});
+return total;
 }
 
 function reloj(){
-  const d = new Date();
-  document.getElementById("hora").innerHTML =
-    d.toLocaleDateString("es-ES") + " · " +
-    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+const d = new Date();
+document.getElementById("hora").innerHTML = d.toLocaleDateString("es-ES") + " · " + d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
 }
 
 function saludo(){
-  const h = new Date().getHours();
-  if(h < 6) return "Buenas noches";
-  if(h < 12) return "Buenos días";
-  if(h < 21) return "Buenas tardes";
-  return "Buenas noches";
+const h = new Date().getHours();
+if(h < 6) return "Buenas noches";
+if(h < 12) return "Buenos días";
+if(h < 21) return "Buenas tardes";
+return "Buenas noches";
 }
 
 function cargarUsuario(){
-  const usuario = localStorage.getItem("usuario") || "OPERADOR";
-  document.getElementById("usuario").textContent = usuario;
+const usuario = localStorage.getItem("usuario") || "OPERADOR";
+document.getElementById("usuario").textContent = usuario;
 }
 
 function actualizarContadores(){
-  const inc = contarIncidencias();
-  const com = contarComunicaciones();
-  const contadorInc = document.getElementById("contadorIncidencias");
-  const contadorCom = document.getElementById("contadorComunicacion");
+const inc = contarIncidencias();
+const com = contarComunicaciones();
+const contadorInc = document.getElementById("contadorIncidencias");
+const contadorCom = document.getElementById("contadorComunicacion");
 
-  if(inc > 0){contadorInc.textContent = inc;contadorInc.style.display = "flex";}
-  else{contadorInc.style.display = "none";}
+if(inc > 0){
+contadorInc.textContent = inc;
+contadorInc.style.display = "flex";
+}else{
+contadorInc.style.display = "none";
+}
 
-  if(com > 0){contadorCom.textContent = com;contadorCom.style.display = "flex";}
-  else{contadorCom.style.display = "none";}
+if(com > 0){
+contadorCom.textContent = com;
+contadorCom.style.display = "flex";
+}else{
+contadorCom.style.display = "none";
+}
 }
 
 function actualizarFranja(){
-  const inc = contarIncidencias();
-  const com = contarComunicaciones();
-  const cal = contarCalendario();
-  const usuario = localStorage.getItem("usuario") || "OPERADOR";
+const inc = contarIncidencias();
+const com = contarComunicaciones();
+const cal = contarCalendario();
+const usuario = localStorage.getItem("usuario") || "OPERADOR";
 
-  let texto = saludo() + ", " + usuario;
-  if(inc > 0){texto += " · [INC] " + inc;}
-  if(com > 0){texto += " · [COM] " + com;}
-  if(cal > 0){texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s");}
-  if(inc === 0 && com === 0 && cal === 0){texto += " · Sin avisos";}
+let texto = saludo() + ", " + usuario;
 
-  document.getElementById("franjaEstado").textContent = texto;
+if(inc > 0){texto += " · [INC] " + inc;}
+if(com > 0){texto += " · [COM] " + com;}
+if(cal > 0){texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s");}
+if(inc === 0 && com === 0 && cal === 0){texto += " · Sin avisos";}
+
+document.getElementById("franjaEstado").textContent = texto;
 }
 
 setInterval(function(){
-  reloj();
-  actualizarFranja();
-  actualizarContadores();
+reloj();
+actualizarFranja();
+actualizarContadores();
 },1000);
 
 cargarUsuario();
