@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>RESUMEN VENTAS · MONOLITO</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+
+body{
+  margin:0;
+  font-family:Arial;
+  background:#eef2f5;
+  color:#17303d;
+}
 
 header{
   background:#17303d;
@@ -28,7 +36,9 @@ header{
   font-weight:900;
 }
 
-.contenedor{padding:16px}
+.contenedor{
+  padding:16px;
+}
 
 .selector{
   width:100%;
@@ -95,34 +105,51 @@ header{
   text-align:center;
 }
 
-.flojo{background:#ffe5e5;color:#c00000}
-.normal{background:#fff5cc;color:#b38f00}
-.fuerte{background:#e5ffe5;color:#1a7f1a}
+.flojo{
+  background:#ffe5e5;
+  color:#c00000;
+}
+
+.normal{
+  background:#fff5cc;
+  color:#b38f00;
+}
+
+.fuerte{
+  background:#e5ffe5;
+  color:#1a7f1a;
+}
 
 .vacio{
   text-align:center;
   font-weight:900;
   margin-top:20px;
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
- <button class="volver" onclick="window.location.href='ventas.html'">←</button>">←</button>
-
-  
+  <button class="volver" onclick="window.location.href='ventas.html'">←</button>
   📊 RESUMEN MES
 </header>
 
 <div class="contenedor">
 
-<input type="month" id="selectorMes" class="selector" onchange="pintar()">
+<input
+  type="month"
+  id="selectorMes"
+  class="selector"
+  onchange="pintar()"
+>
 
 <div id="lista"></div>
 
-<div class="total" id="totalMes">TOTAL: 0 €</div>
+<div class="total" id="totalMes">
+  TOTAL: 0 €
+</div>
 
 <div class="media" id="mediaMes"></div>
 
@@ -132,131 +159,61 @@ header{
 
 <script>
 
-function volver(){
-  window.location.href="ventas.html";
-}
-
 function euros(n){
-  return Number(n||0).toFixed(2).replace(".",",")+" €";
+  return Number(n||0)
+    .toFixed(2)
+    .replace(".",",")+" €";
 }
 
 function parseFecha(fechaStr){
+
   let partes = fechaStr.split("/");
-  return new Date(partes[2], partes[1]-1, partes[0]);
+
+  return new Date(
+    partes[2],
+    partes[1]-1,
+    partes[0]
+  );
 }
 
 function pintar(){
 
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
+  let data =
+    JSON.parse(localStorage.getItem("ventas") || "{}");
 
-  let valor = document.getElementById("selectorMes").value;
+  let valor =
+    document.getElementById("selectorMes").value;
+
   if(!valor) return;
 
   let [year, mes] = valor.split("-");
-  mes = Number(mes) - 1;
+
+  let yearActual = Number(year);
+
+  mes = Number(mes)-1;
 
   let totalMes = 0;
   let dias = 0;
   let html = "";
-/* COMPARADOR */
 
-let comparativaHTML = "";
-let yearActual = Number(year);
-
-let totalAnioActual = 0;
-let totalAnioAnterior = 0;
-
-Object.keys(data).forEach(fecha => {
-
-  let d = parseFecha(fecha);
-  let y = d.getFullYear();
-  let m = d.getMonth();
-
-  let total = Number(data[fecha].total || 0);
-
-  /* TOTAL MES MISMO AÑO */
-
-  if(y === yearActual && m === mes){
-    totalMes += total;
-  }
-
-  /* TOTAL AÑO ACTUAL */
-
-  if(y === yearActual){
-    totalAnioActual += total;
-  }
-
-  /* TOTAL AÑO ANTERIOR */
-
-  if(y === yearActual - 1){
-    totalAnioAnterior += total;
-  }
-
-});
-
-/* MESES ANTERIORES */
-
-for(let i=1;i<=4;i++){
-
-  let y = yearActual - i;
-  let totalComparado = 0;
+  let totalAnioActual = 0;
+  let totalAnioAnterior = 0;
 
   Object.keys(data).forEach(fecha => {
 
     let d = parseFecha(fecha);
 
-    if(
-      d.getFullYear() === y &&
-      d.getMonth() === mes
-    ){
-      totalComparado += Number(data[fecha].total || 0);
-    }
+    let y = d.getFullYear();
+    let m = d.getMonth();
 
-  });
+    let registro = data[fecha];
 
-  let diferencia = totalMes - totalComparado;
+    let total = Number(registro.total || 0);
 
-  let color = "white";
+    let sinCambio =
+      registro.sinCambioPrevio === true;
 
-  if(diferencia > 0){
-    color = "#d4ffd4";
-  }
-
-  if(diferencia < 0){
-    color = "#ffd4d4";
-  }
-
-  let porcentaje = totalComparado > 0
-    ? ((totalMes / totalComparado) * 100).toFixed(1)
-    : 0;
-
-  comparativaHTML += `
-    <div class="linea" style="background:${color}">
-      <div>
-        ${y}: ${euros(totalComparado)}
-      </div>
-
-      <div>
-        ${porcentaje}% 
-      </div>
-    </div>
-  `;
-}
-
-/* COMPARACIÓN AÑO */
-
-let porcentajeAnual = totalAnioAnterior > 0
-  ? ((totalAnioActual / totalAnioAnterior) * 100).toFixed(1)
-  : 0;
-  Object.keys(data).forEach(fecha => {
-
-    let d = parseFecha(fecha);
-
-    if(d.getFullYear() == year && d.getMonth() == mes){
-
-      let registro = data[fecha];
-      let total = Number(registro.total || 0);
-      let sinCambio = registro.sinCambioPrevio === true;
+    if(y === yearActual && m === mes){
 
       totalMes += total;
       dias++;
@@ -265,11 +222,24 @@ let porcentajeAnual = totalAnioAnterior > 0
         <div class="linea ${sinCambio ? "alerta" : ""}">
           <div class="fechaBox">
             <div>${fecha}</div>
-            ${sinCambio ? `<div class="avisoCambio">⚠ SIN CONTROL DE CAMBIO</div>` : ""}
+
+            ${sinCambio
+              ? `<div class="avisoCambio">⚠ SIN CONTROL DE CAMBIO</div>`
+              : ""
+            }
           </div>
+
           <div>${euros(total)}</div>
         </div>
       `;
+    }
+
+    if(y === yearActual){
+      totalAnioActual += total;
+    }
+
+    if(y === yearActual - 1){
+      totalAnioAnterior += total;
     }
 
   });
@@ -283,75 +253,132 @@ let porcentajeAnual = totalAnioAnterior > 0
   document.getElementById("totalMes").textContent =
     "TOTAL: " + euros(totalMes);
 
-  let media = dias ? totalMes / dias : 0;
+  let media =
+    dias ? totalMes / dias : 0;
 
   document.getElementById("mediaMes").textContent =
     "MEDIA DÍA: " + euros(media);
 
-  let estado = document.getElementById("estadoMes");
+  let totalMesAnterior = 0;
 
-let totalMesAnterior = 0;
+  Object.keys(data).forEach(fecha => {
 
-Object.keys(data).forEach(fecha => {
-  let d = parseFecha(fecha);
+    let d = parseFecha(fecha);
 
-  if(
-    d.getFullYear() === yearActual - 1 &&
-    d.getMonth() === mes
-  ){
-    totalMesAnterior += Number(data[fecha].total || 0);
+    if(
+      d.getFullYear() === yearActual - 1 &&
+      d.getMonth() === mes
+    ){
+      totalMesAnterior +=
+        Number(data[fecha].total || 0);
+    }
+
+  });
+
+  let diferenciaMes =
+    totalMes - totalMesAnterior;
+
+  let porcentajeMes =
+    totalMesAnterior > 0
+      ? ((totalMes / totalMesAnterior) * 100).toFixed(1)
+      : 0;
+
+  let porcentajeAnual =
+    totalAnioAnterior > 0
+      ? ((totalAnioActual / totalAnioAnterior) * 100).toFixed(1)
+      : 0;
+
+  let estado =
+    document.getElementById("estadoMes");
+
+  let clase = "normal";
+
+  let titulo =
+    "⚪ MES SIN COMPARATIVA";
+
+  if(totalMesAnterior > 0){
+
+    if(diferenciaMes < 0){
+
+      clase = "flojo";
+
+      titulo =
+        "🔴 POR DEBAJO DEL AÑO ANTERIOR";
+
+    }else if(diferenciaMes > 0){
+
+      clase = "fuerte";
+
+      titulo =
+        "🟢 POR ENCIMA DEL AÑO ANTERIOR";
+
+    }else{
+
+      clase = "normal";
+
+      titulo =
+        "⚪ IGUAL QUE EL AÑO ANTERIOR";
+    }
   }
-});
 
-let diferenciaMes = totalMes - totalMesAnterior;
+  estado.className =
+    "estado " + clase;
 
-let porcentajeMes = totalMesAnterior > 0
-  ? ((totalMes / totalMesAnterior) * 100).toFixed(1)
-  : 0;
+  estado.innerHTML = `
 
-let clase = "normal";
-let titulo = "⚪ MES SIN COMPARATIVA";
+    <div>${titulo}</div>
 
-if(totalMesAnterior > 0){
-  if(diferenciaMes < 0){
-    clase = "flojo";
-    titulo = "🔴 POR DEBAJO DEL AÑO ANTERIOR";
-  }else if(diferenciaMes > 0){
-    clase = "fuerte";
-    titulo = "🟢 POR ENCIMA DEL AÑO ANTERIOR";
-  }else{
-    clase = "normal";
-    titulo = "⚪ IGUAL QUE EL AÑO ANTERIOR";
-  }
+    <div style="margin-top:10px;font-size:15px">
+
+      Mes año anterior:
+      <strong>${euros(totalMesAnterior)}</strong>
+
+      <br><br>
+
+      Mes seleccionado:
+      <strong>${euros(totalMes)}</strong>
+
+      <br><br>
+
+      Diferencia:
+      <strong>${euros(diferenciaMes)}</strong>
+
+      <br><br>
+
+      Porcentaje:
+      <strong>${porcentajeMes}%</strong>
+
+    </div>
+
+    <div style="margin-top:16px;font-size:15px">
+
+      Año anterior completo:
+      <strong>${euros(totalAnioAnterior)}</strong>
+
+      <br><br>
+
+      Año actual acumulado:
+      <strong>${euros(totalAnioActual)}</strong>
+
+      <br><br>
+
+      Llevas el
+      <strong>${porcentajeAnual}%</strong>
+      del año anterior.
+
+    </div>
+  `;
 }
-
-estado.className = "estado " + clase;
-
-estado.innerHTML = `
-  <div>${titulo}</div>
-  <div style="margin-top:10px;font-size:15px">
-    Mes año anterior: <strong>${euros(totalMesAnterior)}</strong><br>
-    Mes seleccionado: <strong>${euros(totalMes)}</strong><br>
-    Diferencia: <strong>${euros(diferenciaMes)}</strong><br>
-    Porcentaje: <strong>${porcentajeMes}%</strong>
-  </div>
-
-  <div style="margin-top:14px;text-align:left">
-    ${comparativaHTML}
-  </div>
-
-  <div style="margin-top:14px;font-size:15px">
-    Año anterior completo: <strong>${euros(totalAnioAnterior)}</strong><br>
-    Año actual acumulado: <strong>${euros(totalAnioActual)}</strong><br>
-    Llevas el <strong>${porcentajeAnual}%</strong> del año anterior.
-  </div>
-`;
 
 /* INIT */
 
 let hoy = new Date();
-let mesActual = hoy.toISOString().slice(0,7);
-document.getElementById("selectorMes").value = mesActual;
+
+let mesActual =
+  hoy.toISOString().slice(0,7);
+
+document.getElementById("selectorMes").value =
+  mesActual;
 
 pintar();
 
