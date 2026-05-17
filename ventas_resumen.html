@@ -288,17 +288,62 @@ let porcentajeAnual = totalAnioAnterior > 0
 
   let estado = document.getElementById("estadoMes");
 
-  if(media < 200){
-    estado.textContent = "🔴 MES FLOJO";
-    estado.className = "estado flojo";
-  }else if(media < 400){
-    estado.textContent = "🟡 MES NORMAL";
-    estado.className = "estado normal";
+let totalMesAnterior = 0;
+
+Object.keys(data).forEach(fecha => {
+  let d = parseFecha(fecha);
+
+  if(
+    d.getFullYear() === yearActual - 1 &&
+    d.getMonth() === mes
+  ){
+    totalMesAnterior += Number(data[fecha].total || 0);
+  }
+});
+
+let diferenciaMes = totalMes - totalMesAnterior;
+
+let porcentajeMes = totalMesAnterior > 0
+  ? ((totalMes / totalMesAnterior) * 100).toFixed(1)
+  : 0;
+
+let clase = "normal";
+let titulo = "⚪ MES SIN COMPARATIVA";
+
+if(totalMesAnterior > 0){
+  if(diferenciaMes < 0){
+    clase = "flojo";
+    titulo = "🔴 POR DEBAJO DEL AÑO ANTERIOR";
+  }else if(diferenciaMes > 0){
+    clase = "fuerte";
+    titulo = "🟢 POR ENCIMA DEL AÑO ANTERIOR";
   }else{
-    estado.textContent = "🟢 MES FUERTE";
-    estado.className = "estado fuerte";
+    clase = "normal";
+    titulo = "⚪ IGUAL QUE EL AÑO ANTERIOR";
   }
 }
+
+estado.className = "estado " + clase;
+
+estado.innerHTML = `
+  <div>${titulo}</div>
+  <div style="margin-top:10px;font-size:15px">
+    Mes año anterior: <strong>${euros(totalMesAnterior)}</strong><br>
+    Mes seleccionado: <strong>${euros(totalMes)}</strong><br>
+    Diferencia: <strong>${euros(diferenciaMes)}</strong><br>
+    Porcentaje: <strong>${porcentajeMes}%</strong>
+  </div>
+
+  <div style="margin-top:14px;text-align:left">
+    ${comparativaHTML}
+  </div>
+
+  <div style="margin-top:14px;font-size:15px">
+    Año anterior completo: <strong>${euros(totalAnioAnterior)}</strong><br>
+    Año actual acumulado: <strong>${euros(totalAnioActual)}</strong><br>
+    Llevas el <strong>${porcentajeAnual}%</strong> del año anterior.
+  </div>
+`;
 
 /* INIT */
 
