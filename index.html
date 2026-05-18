@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -317,6 +316,12 @@ Cargando estado...
 <div>PEDIDOS</div>
 </div>
 
+<div class="boton naranja" onclick="abrir('avisos-pedidos.html')">
+<div class="icono">🛎️</div>
+<div>AVISOS PEDIDOS</div>
+<div class="contador amarillo" id="contadorAvisosPedidos">0</div>
+</div>
+
 <div class="boton verde" onclick="abrir('pagos.html')">
 <div class="icono">💳</div>
 <div>PAGOS</div>
@@ -404,6 +409,7 @@ MONOLITO GPT PRO · evoluciona continuamente mediante inteligencia artificial y 
 <div class="textoIAsecundario">
 Para aprovechar todas las funciones de asistencia avanzada y futuras actualizaciones IA, se recomienda el uso de ChatGPT.
 </div>
+
 <div style="margin-top:38px;padding-top:24px;border-top:1px solid #e5e5e5">
 
 <div style="font-size:22px;font-weight:900;color:#17303d;margin-bottom:22px">
@@ -507,6 +513,10 @@ const antiguas = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
 return nuevas.concat(antiguas);
 }
 
+function leerAvisosPedidos(){
+return JSON.parse(localStorage.getItem("avisos_pedidos") || "[]");
+}
+
 function leerCalendario(){
 return JSON.parse(localStorage.getItem("calendario") || "{}");
 }
@@ -517,6 +527,10 @@ return leerIncidencias().filter(x => !x.resuelta).length;
 
 function contarComunicaciones(){
 return leerComunicaciones().filter(x => !x.resuelta && !x.hecha).length;
+}
+
+function contarAvisosPedidos(){
+return leerAvisosPedidos().length;
 }
 
 function contarCalendario(){
@@ -579,9 +593,11 @@ function actualizarContadores(){
 
 const inc = contarIncidencias();
 const com = contarComunicaciones();
+const avisos = contarAvisosPedidos();
 
 const contadorInc = document.getElementById("contadorIncidencias");
 const contadorCom = document.getElementById("contadorComunicacion");
+const contadorAvisos = document.getElementById("contadorAvisosPedidos");
 
 if(inc > 0){
 contadorInc.textContent = inc;
@@ -597,12 +613,20 @@ contadorCom.style.display = "flex";
 contadorCom.style.display = "none";
 }
 
+if(avisos > 0){
+contadorAvisos.textContent = avisos;
+contadorAvisos.style.display = "flex";
+}else{
+contadorAvisos.style.display = "none";
+}
+
 }
 
 function actualizarFranja(){
 
 const inc = contarIncidencias();
 const com = contarComunicaciones();
+const avisos = contarAvisosPedidos();
 const cal = contarCalendario();
 
 const usuario = localStorage.getItem("usuario") || "OPERADOR";
@@ -617,11 +641,15 @@ if(com > 0){
 texto += " · [COM] " + com;
 }
 
+if(avisos > 0){
+texto += " · 🛎️ " + avisos + " aviso" + (avisos === 1 ? "" : "s") + " pedido";
+}
+
 if(cal > 0){
 texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s");
 }
 
-if(inc === 0 && com === 0 && cal === 0){
+if(inc === 0 && com === 0 && avisos === 0 && cal === 0){
 texto += " · Sin avisos";
 }
 
