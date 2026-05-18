@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🛎️ AVISOS PEDIDOS · MONOLITO</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#eef2f5;
+  color:#17303d;
+}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  font-size:20px;
+  font-weight:900;
+}
+
+.contenedor{
+  padding:16px;
+}
+
+textarea{
+  width:100%;
+  min-height:100px;
+  border-radius:16px;
+  border:1px solid #cfd8dc;
+  padding:14px;
+  font-size:16px;
+  resize:none;
+  box-sizing:border-box;
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:14px;
+  padding:14px;
+  font-size:16px;
+  font-weight:900;
+  margin-top:12px;
+}
+
+.guardar{
+  background:#48a530;
+  color:white;
+}
+
+.volver{
+  width:auto;
+  background:white;
+  color:#17303d;
+  margin-right:10px;
+  padding:7px 11px;
+}
+
+.card{
+  background:white;
+  border-radius:16px;
+  padding:14px;
+  margin-top:12px;
+}
+
+.texto{
+  font-weight:900;
+  font-size:15px;
+}
+
+.fecha{
+  margin-top:6px;
+  color:#60707a;
+  font-size:12px;
+  font-weight:900;
+}
+
+.eliminar{
+  background:#c00000;
+  color:white;
+}
+
+.vacio{
+  text-align:center;
+  font-weight:900;
+  color:#60707a;
+  margin-top:30px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  🛎️ AVISOS PEDIDOS
+</header>
+
+<div class="contenedor">
+
+<textarea
+  id="texto"
+  placeholder="Ejemplo: Falta gel de manos, mini servilletas o vasos takeaway..."
+></textarea>
+
+<button class="guardar" onclick="guardarAviso()">
+  Guardar aviso
+</button>
+
+<div id="lista"></div>
+
+</div>
+
+<script>
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+function leerAvisos(){
+  return JSON.parse(localStorage.getItem("avisos_pedidos") || "[]");
+}
+
+function guardarAvisos(data){
+  localStorage.setItem("avisos_pedidos", JSON.stringify(data));
+}
+
+function guardarAviso(){
+
+  const texto =
+    document.getElementById("texto").value.trim();
+
+  if(!texto){
+    alert("Escribe un aviso");
+    return;
+  }
+
+  let avisos = leerAvisos();
+
+  avisos.unshift({
+    texto:texto,
+    fecha:new Date().toLocaleString("es-ES")
+  });
+
+  guardarAvisos(avisos);
+
+  document.getElementById("texto").value = "";
+
+  pintar();
+}
+
+function eliminarAviso(i){
+
+  let avisos = leerAvisos();
+
+  avisos.splice(i,1);
+
+  guardarAvisos(avisos);
+
+  pintar();
+}
+
+function pintar(){
+
+  const avisos = leerAvisos();
+
+  let html = "";
+
+  if(avisos.length === 0){
+
+    html = `
+      <div class="vacio">
+        No hay avisos pendientes
+      </div>
+    `;
+
+  }else{
+
+    avisos.forEach((a,i)=>{
+
+      html += `
+        <div class="card">
+
+          <div class="texto">
+            🛎️ ${a.texto}
+          </div>
+
+          <div class="fecha">
+            ${a.fecha}
+          </div>
+
+          <button class="eliminar" onclick="eliminarAviso(${i})">
+            Eliminar aviso
+          </button>
+
+        </div>
+      `;
+
+    });
+  }
+
+  document.getElementById("lista").innerHTML = html;
+}
+
+pintar();
+
+</script>
+
+</body>
+</html>
