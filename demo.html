@@ -281,6 +281,111 @@ function entrarDemo(){
   });
 }
 </script>
+<script>
 
+/* ===== CONTROL DEMO ===== */
+
+function esDemo(){
+  const usuario =
+    (localStorage.getItem("usuario") || "")
+    .toUpperCase();
+
+  return usuario === "DEMO";
+}
+
+function bloquearDemo(){
+
+  if(!esDemo()) return;
+
+  const bloqueados = [
+
+    "configuracion.html",
+    "usuarios.html",
+    "licencias.html"
+
+  ];
+
+  document.querySelectorAll(".boton").forEach(b=>{
+
+    const onclick = b.getAttribute("onclick") || "";
+
+    bloqueados.forEach(destino=>{
+
+      if(onclick.includes(destino)){
+
+        b.style.opacity = ".45";
+        b.style.filter = "grayscale(1)";
+
+        b.onclick = function(){
+
+          alert(
+            "Acceso no disponible en modo DEMO"
+          );
+
+        };
+
+      }
+
+    });
+
+  });
+
+}
+
+/* ===== AUTO CADUCIDAD DEMO ===== */
+
+function controlarCaducidadDemo(){
+
+  if(!esDemo()) return;
+
+  const inicio =
+    Number(localStorage.getItem("demo_inicio") || 0);
+
+  if(!inicio) return;
+
+  const ahora = Date.now();
+
+  const limite =
+    60 * 60 * 1000;
+
+  if((ahora - inicio) > limite){
+
+    localStorage.removeItem("loginActivo");
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("nivel");
+    localStorage.removeItem("demo_inicio");
+
+    alert(
+      "Sesión DEMO finalizada"
+    );
+
+    window.location.href = "login.html";
+
+  }
+
+}
+
+/* ===== ACTIVAR DEMO ===== */
+
+if(
+  (localStorage.getItem("usuario") || "")
+  .toUpperCase() === "DEMO"
+){
+
+  if(!localStorage.getItem("demo_inicio")){
+
+    localStorage.setItem(
+      "demo_inicio",
+      Date.now()
+    );
+
+  }
+
+}
+
+bloquearDemo();
+controlarCaducidadDemo();
+
+</script>
 </body>
 </html>
