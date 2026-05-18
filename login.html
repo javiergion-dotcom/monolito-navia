@@ -142,6 +142,8 @@ button:active{
 <script>
 function usuariosBase(){
   return [
+    {nombre:"JAVI", pin:"0985", nivel:"HOSTELERIA", activo:true, fijo:true},
+    {nombre:"SILVIA", pin:"4321", nivel:"HOSTELERIA", activo:true, fijo:true},
     {nombre:"HOSTELERO", pin:"0000", nivel:"HOSTELERIA", activo:true, fijo:true},
     {nombre:"CAMARERO", pin:"1111", nivel:"CAMARERO", activo:true, fijo:true}
   ];
@@ -150,10 +152,23 @@ function usuariosBase(){
 function leerUsuarios(){
   let data = JSON.parse(localStorage.getItem("usuarios_monolito") || "null");
 
-  if(!data || data.length === 0){
-    data = usuariosBase();
-    localStorage.setItem("usuarios_monolito", JSON.stringify(data));
+  if(!Array.isArray(data)){
+    data = [];
   }
+
+  const base = usuariosBase();
+
+  base.forEach(b => {
+    const existe = data.find(u =>
+      String(u.nombre || "").toUpperCase() === String(b.nombre).toUpperCase()
+    );
+
+    if(!existe){
+      data.push(b);
+    }
+  });
+
+  localStorage.setItem("usuarios_monolito", JSON.stringify(data));
 
   return data;
 }
@@ -223,6 +238,8 @@ document.addEventListener("keydown", function(e){
     entrar();
   }
 });
+
+leerUsuarios();
 </script>
 
 </body>
