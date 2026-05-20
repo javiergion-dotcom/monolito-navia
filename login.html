@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LOGIN · MONOLITO</title>
+
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<title>LOGIN · MONOLITO GPT PRO</title>
 
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
 body{
   margin:0;
@@ -101,6 +111,15 @@ button:active{
   font-weight:900;
   min-height:20px;
 }
+
+.version{
+  margin-top:14px;
+  text-align:center;
+  font-size:11px;
+  color:#74848d;
+  font-weight:700;
+}
+
 </style>
 </head>
 
@@ -109,11 +128,21 @@ button:active{
 <div class="card">
 
   <div class="logo">MONOLITO</div>
-  <div class="sub">Acceso por PIN · Sistema de control</div>
 
-  <input id="pin" type="password" maxlength="8" readonly placeholder="PIN">
+  <div class="sub">
+    Acceso por PIN · Sistema de control
+  </div>
+
+  <input
+    id="pin"
+    type="password"
+    maxlength="8"
+    readonly
+    placeholder="PIN"
+  >
 
   <div class="teclado">
+
     <button onclick="num('1')">1</button>
     <button onclick="num('2')">2</button>
     <button onclick="num('3')">3</button>
@@ -127,8 +156,11 @@ button:active{
     <button onclick="num('9')">9</button>
 
     <button class="borrar" onclick="limpiar()">C</button>
+
     <button onclick="num('0')">0</button>
+
     <button class="entrar" onclick="entrar()">OK</button>
+
   </div>
 
   <div class="error" id="error"></div>
@@ -137,203 +169,454 @@ button:active{
     El PIN identifica al usuario y su nivel de autoridad.
   </div>
 
+  <div class="version" id="version"></div>
+
 </div>
 
 <script>
 
-/* =========================
+/* =====================================================
    VERSION GLOBAL
-========================= */
+===================================================== */
 
-const VERSION_MONOLITO = "2026.05.20.01";
+const VERSION_MONOLITO = "2026.05.20.LOGIN.FINAL.001";
 
-/* =========================
-   LIMPIEZA AUTOMATICA
-========================= */
+/* =====================================================
+   LIMPIAR CACHE / SERVICE WORKERS
+===================================================== */
 
-const versionGuardada = localStorage.getItem("version_monolito");
+async function limpiarCaches(){
 
-if(versionGuardada !== VERSION_MONOLITO){
+  try{
 
-  localStorage.removeItem("usuario");
-  localStorage.removeItem("nivel");
-  localStorage.removeItem("loginActivo");
-  localStorage.removeItem("ultimoLogin");
-  localStorage.removeItem("usuarios_monolito");
+    if("serviceWorker" in navigator){
 
-  localStorage.setItem("version_monolito", VERSION_MONOLITO);
+      const registros =
+      await navigator.serviceWorker.getRegistrations();
+
+      for(const reg of registros){
+
+        await reg.unregister();
+
+      }
+
+    }
+
+    if("caches" in window){
+
+      const keys = await caches.keys();
+
+      for(const key of keys){
+
+        await caches.delete(key);
+
+      }
+
+    }
+
+  }catch(e){
+
+    console.log(e);
+
+  }
+
 }
 
-/* =========================
+/* =====================================================
+   LIMPIEZA VERSIONES ANTIGUAS
+===================================================== */
+
+function limpiarVersionesAntiguas(){
+
+  const versionGuardada =
+  localStorage.getItem("version_monolito");
+
+  if(versionGuardada !== VERSION_MONOLITO){
+
+    localStorage.clear();
+
+    localStorage.setItem(
+      "version_monolito",
+      VERSION_MONOLITO
+    );
+
+  }
+
+}
+
+/* =====================================================
+   ELIMINAR USUARIOS ANTIGUOS
+===================================================== */
+
+function limpiarUsuariosAntiguos(){
+
+  let usuarios = [];
+
+  try{
+
+    usuarios =
+    JSON.parse(
+      localStorage.getItem("usuarios_monolito")
+      || "[]"
+    );
+
+  }catch(e){
+
+    usuarios = [];
+
+  }
+
+  if(!Array.isArray(usuarios)){
+
+    usuarios = [];
+
+  }
+
+  usuarios = usuarios.filter(u => {
+
+    const nombre =
+    String(u.nombre || "")
+    .toUpperCase()
+    .trim();
+
+    const pin =
+    String(u.pin || "")
+    .trim();
+
+    if(nombre === "JAVI") return false;
+
+    if(nombre === "JAVIER") return false;
+
+    if(pin === "0985") return false;
+
+    return true;
+
+  });
+
+  localStorage.setItem(
+    "usuarios_monolito",
+    JSON.stringify(usuarios)
+  );
+
+}
+
+/* =====================================================
    USUARIOS BASE
-========================= */
+===================================================== */
 
 function usuariosBase(){
 
   return [
 
-    {nombre:"SILVIA", pin:"2580", nivel:"HOSTELERIA", activo:true, fijo:true},
+    {
+      nombre:"SILVIA",
+      pin:"2580",
+      nivel:"HOSTELERIA",
+      activo:true,
+      fijo:true
+    },
 
-    {nombre:"HOSTELERO", pin:"0000", nivel:"HOSTELERIA", activo:true, fijo:true},
+    {
+      nombre:"HOSTELERO",
+      pin:"0000",
+      nivel:"HOSTELERIA",
+      activo:true,
+      fijo:true
+    },
 
-    {nombre:"CAMARERO", pin:"1111", nivel:"CAMARERO", activo:true, fijo:true}
+    {
+      nombre:"CAMARERO",
+      pin:"1111",
+      nivel:"CAMARERO",
+      activo:true,
+      fijo:true
+    }
 
   ];
+
 }
 
-/* =========================
+/* =====================================================
    LEER USUARIOS
-========================= */
+===================================================== */
 
 function leerUsuarios(){
 
-  let data = JSON.parse(localStorage.getItem("usuarios_monolito") || "null");
+  let data = [];
+
+  try{
+
+    data =
+    JSON.parse(
+      localStorage.getItem("usuarios_monolito")
+      || "[]"
+    );
+
+  }catch(e){
+
+    data = [];
+
+  }
 
   if(!Array.isArray(data)){
+
     data = [];
+
   }
 
   const base = usuariosBase();
 
   base.forEach(b => {
 
-    const existe = data.find(u =>
-      String(u.nombre || "").toUpperCase() === String(b.nombre).toUpperCase()
+    const existe =
+    data.find(u =>
+
+      String(u.nombre || "")
+      .toUpperCase()
+      .trim()
+
+      ===
+
+      String(b.nombre)
+      .toUpperCase()
+      .trim()
+
     );
 
     if(!existe){
+
       data.push(b);
+
+    }else{
+
+      existe.pin = b.pin;
+      existe.nivel = b.nivel;
+      existe.activo = b.activo;
+      existe.fijo = b.fijo;
+
     }
 
   });
 
-  /* ELIMINAR JAVI Y 0985 */
-
   data = data.filter(u => {
 
-    const nombre = String(u.nombre || "").toUpperCase();
-    const pin = String(u.pin || "");
+    const nombre =
+    String(u.nombre || "")
+    .toUpperCase()
+    .trim();
+
+    const pin =
+    String(u.pin || "")
+    .trim();
 
     if(nombre === "JAVI") return false;
+
+    if(nombre === "JAVIER") return false;
+
     if(pin === "0985") return false;
 
     return true;
+
   });
 
-  localStorage.setItem("usuarios_monolito", JSON.stringify(data));
+  localStorage.setItem(
+    "usuarios_monolito",
+    JSON.stringify(data)
+  );
 
   return data;
+
 }
 
-/* =========================
+/* =====================================================
    NIVEL USUARIO
-========================= */
+===================================================== */
 
 function nivelUsuario(u){
 
-  const nombre = String(u.nombre || "").toUpperCase();
-
   if(u.nivel) return u.nivel;
 
-  if(
-    nombre === "SILVIA" ||
-    nombre === "HOSTELERO"
-  ){
-    return "HOSTELERIA";
-  }
-
   return "CAMARERO";
+
 }
 
-/* =========================
+/* =====================================================
    TECLADO
-========================= */
+===================================================== */
 
 function num(n){
 
-  const p = document.getElementById("pin");
+  const p =
+  document.getElementById("pin");
 
   if(p.value.length >= 8) return;
 
   p.value += n;
 
-  document.getElementById("error").textContent = "";
+  document.getElementById("error")
+  .textContent = "";
+
 }
 
 function limpiar(){
 
-  document.getElementById("pin").value = "";
+  document.getElementById("pin")
+  .value = "";
 
-  document.getElementById("error").textContent = "";
+  document.getElementById("error")
+  .textContent = "";
+
 }
 
-/* =========================
+/* =====================================================
    LOGIN
-========================= */
+===================================================== */
 
 function entrar(){
 
-  const pin = document.getElementById("pin").value;
+  const pin =
+  document.getElementById("pin")
+  .value
+  .trim();
 
-  const usuarios = leerUsuarios();
+  if(pin === "0985"){
 
-  const usuario = usuarios.find(u =>
+    document.getElementById("error")
+    .textContent = "PIN eliminado";
 
-    String(u.pin) === String(pin) &&
+    limpiar();
+
+    return;
+
+  }
+
+  const usuarios =
+  leerUsuarios();
+
+  const usuario =
+  usuarios.find(u =>
+
+    String(u.pin || "").trim()
+
+    ===
+
+    String(pin)
+
+    &&
+
     u.activo !== false
 
   );
 
   if(!usuario){
 
-    document.getElementById("error").textContent = "PIN incorrecto";
+    document.getElementById("error")
+    .textContent = "PIN incorrecto";
 
     limpiar();
 
     return;
+
   }
 
-  const nivel = nivelUsuario(usuario);
+  const nivel =
+  nivelUsuario(usuario);
 
-  localStorage.setItem("usuario", usuario.nombre);
+  localStorage.setItem(
+    "usuario",
+    usuario.nombre
+  );
 
-  localStorage.setItem("nivel", nivel);
+  localStorage.setItem(
+    "nivel",
+    nivel
+  );
 
-  localStorage.setItem("loginActivo", "SI");
+  localStorage.setItem(
+    "loginActivo",
+    "SI"
+  );
 
-  localStorage.setItem("ultimoLogin", new Date().toLocaleString("es-ES"));
+  localStorage.setItem(
+    "ultimoLogin",
+    new Date().toLocaleString("es-ES")
+  );
 
-  window.location.href = "index.html?v=" + VERSION_MONOLITO;
+  localStorage.setItem(
+    "version_monolito",
+    VERSION_MONOLITO
+  );
+
+  window.location.href =
+  "index.html?v="
+  +
+  encodeURIComponent(VERSION_MONOLITO);
+
 }
 
-/* =========================
+/* =====================================================
    TECLADO FISICO
-========================= */
+===================================================== */
 
 document.addEventListener("keydown", function(e){
 
   if(e.key >= "0" && e.key <= "9"){
+
     num(e.key);
+
   }
 
   if(e.key === "Backspace"){
 
-    const p = document.getElementById("pin");
+    const p =
+    document.getElementById("pin");
 
-    p.value = p.value.slice(0,-1);
+    p.value =
+    p.value.slice(0,-1);
+
   }
 
   if(e.key === "Enter"){
+
     entrar();
+
   }
 
 });
 
-/* =========================
+/* =====================================================
    ARRANQUE
-========================= */
+===================================================== */
 
-leerUsuarios();
+(async function iniciar(){
+
+  await limpiarCaches();
+
+  limpiarVersionesAntiguas();
+
+  limpiarUsuariosAntiguos();
+
+  leerUsuarios();
+
+  document.getElementById("version")
+  .textContent =
+  "Versión: "
+  +
+  VERSION_MONOLITO;
+
+  if(!window.location.search.includes("v=")){
+
+    history.replaceState(
+      null,
+      "",
+      "login.html?v="
+      +
+      encodeURIComponent(VERSION_MONOLITO)
+    );
+
+  }
+
+})();
 
 </script>
 
