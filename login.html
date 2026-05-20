@@ -140,16 +140,53 @@ button:active{
 </div>
 
 <script>
+
+/* =========================
+   VERSION GLOBAL
+========================= */
+
+const VERSION_MONOLITO = "2026.05.20.01";
+
+/* =========================
+   LIMPIEZA AUTOMATICA
+========================= */
+
+const versionGuardada = localStorage.getItem("version_monolito");
+
+if(versionGuardada !== VERSION_MONOLITO){
+
+  localStorage.removeItem("usuario");
+  localStorage.removeItem("nivel");
+  localStorage.removeItem("loginActivo");
+  localStorage.removeItem("ultimoLogin");
+  localStorage.removeItem("usuarios_monolito");
+
+  localStorage.setItem("version_monolito", VERSION_MONOLITO);
+}
+
+/* =========================
+   USUARIOS BASE
+========================= */
+
 function usuariosBase(){
+
   return [
-    {nombre:"JAVI", pin:"0985", nivel:"HOSTELERIA", activo:true, fijo:true},
-    {nombre:"SILVIA", pin:"4321", nivel:"HOSTELERIA", activo:true, fijo:true},
+
+    {nombre:"SILVIA", pin:"2580", nivel:"HOSTELERIA", activo:true, fijo:true},
+
     {nombre:"HOSTELERO", pin:"0000", nivel:"HOSTELERIA", activo:true, fijo:true},
+
     {nombre:"CAMARERO", pin:"1111", nivel:"CAMARERO", activo:true, fijo:true}
+
   ];
 }
 
+/* =========================
+   LEER USUARIOS
+========================= */
+
 function leerUsuarios(){
+
   let data = JSON.parse(localStorage.getItem("usuarios_monolito") || "null");
 
   if(!Array.isArray(data)){
@@ -159,6 +196,7 @@ function leerUsuarios(){
   const base = usuariosBase();
 
   base.forEach(b => {
+
     const existe = data.find(u =>
       String(u.nombre || "").toUpperCase() === String(b.nombre).toUpperCase()
     );
@@ -166,6 +204,20 @@ function leerUsuarios(){
     if(!existe){
       data.push(b);
     }
+
+  });
+
+  /* ELIMINAR JAVI Y 0985 */
+
+  data = data.filter(u => {
+
+    const nombre = String(u.nombre || "").toUpperCase();
+    const pin = String(u.pin || "");
+
+    if(nombre === "JAVI") return false;
+    if(pin === "0985") return false;
+
+    return true;
   });
 
   localStorage.setItem("usuarios_monolito", JSON.stringify(data));
@@ -173,73 +225,116 @@ function leerUsuarios(){
   return data;
 }
 
+/* =========================
+   NIVEL USUARIO
+========================= */
+
 function nivelUsuario(u){
+
   const nombre = String(u.nombre || "").toUpperCase();
 
   if(u.nivel) return u.nivel;
 
-  if(nombre === "JAVI" || nombre === "JAVIER" || nombre === "SILVIA" || nombre === "HOSTELERO"){
+  if(
+    nombre === "SILVIA" ||
+    nombre === "HOSTELERO"
+  ){
     return "HOSTELERIA";
   }
 
   return "CAMARERO";
 }
 
+/* =========================
+   TECLADO
+========================= */
+
 function num(n){
+
   const p = document.getElementById("pin");
 
   if(p.value.length >= 8) return;
 
   p.value += n;
+
   document.getElementById("error").textContent = "";
 }
 
 function limpiar(){
+
   document.getElementById("pin").value = "";
+
   document.getElementById("error").textContent = "";
 }
 
+/* =========================
+   LOGIN
+========================= */
+
 function entrar(){
+
   const pin = document.getElementById("pin").value;
+
   const usuarios = leerUsuarios();
 
   const usuario = usuarios.find(u =>
+
     String(u.pin) === String(pin) &&
     u.activo !== false
+
   );
 
   if(!usuario){
+
     document.getElementById("error").textContent = "PIN incorrecto";
+
     limpiar();
+
     return;
   }
 
   const nivel = nivelUsuario(usuario);
 
   localStorage.setItem("usuario", usuario.nombre);
+
   localStorage.setItem("nivel", nivel);
+
   localStorage.setItem("loginActivo", "SI");
+
   localStorage.setItem("ultimoLogin", new Date().toLocaleString("es-ES"));
 
-  window.location.href = "index.html";
+  window.location.href = "index.html?v=" + VERSION_MONOLITO;
 }
 
+/* =========================
+   TECLADO FISICO
+========================= */
+
 document.addEventListener("keydown", function(e){
+
   if(e.key >= "0" && e.key <= "9"){
     num(e.key);
   }
 
   if(e.key === "Backspace"){
+
     const p = document.getElementById("pin");
+
     p.value = p.value.slice(0,-1);
   }
 
   if(e.key === "Enter"){
     entrar();
   }
+
 });
 
+/* =========================
+   ARRANQUE
+========================= */
+
 leerUsuarios();
+
 </script>
 
 </body>
