@@ -458,9 +458,9 @@ if (versionGuardada !== VERSION_MONOLITO) {
 }
 </script>
 function comprobarLogin(){
-const activo = sessionStorage.getItem("loginActivo");
-const usuario = sessionStorage.getItem("usuario");
-const nivel = sessionStorage.getItem("nivel");
+const activo = localStorage.getItem("loginActivo");
+const usuario = localStorage.getItem("usuario");
+const nivel = localStorage.getItem("nivel");
 if(activo !== "SI" || !usuario || !nivel){
 window.location.href = "login.html";
 }
