@@ -17,11 +17,10 @@ select{width:100%;padding:12px;border-radius:14px;margin-bottom:15px;font-size:1
 .fila{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px}
 input{width:80px;padding:10px;border-radius:12px;border:1px solid #ccc;text-align:center;font-size:16px}
 .totalLinea{font-weight:900;font-size:16px}
-.puntoVerdeLinea{margin-top:6px;font-size:13px;font-weight:900;color:#287a2b}
 .avisoCero{margin-top:8px;color:#c06b00;font-weight:900;font-size:13px}
 .botonCero{width:100%;margin-top:10px;padding:10px;border:0;border-radius:12px;font-weight:900;font-size:14px;background:#17303d;color:white}
 .botonCero.activo{background:#ff9800;color:white}
-.totalFinal{font-size:20px;font-weight:900;margin-top:20px;line-height:1.6}
+.totalFinal{font-size:22px;font-weight:900;margin-top:20px}
 button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-weight:900;font-size:16px}
 .guardar{background:#48a530;color:white}
 .volver{background:white;color:#17303d;width:auto;margin:0 10px 0 0;padding:7px 11px}
@@ -60,20 +59,6 @@ button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-
 </div>
 
 <script>
-/* ===== TABLA PUNTO VERDE EDITABLE ===== */
-/* Importes por unidad. Se aplican usando el campo Texto formato del artículo. */
-
-const PUNTO_VERDE = {
-  "LATA 33": 0.006,
-  "LATA 25": 0.005,
-  "PLASTICO 50": 0.010,
-  "PLASTICO 1.5": 0.018,
-  "BRICK 1L": 0.012,
-  "VIDRIO 20": 0.006,
-  "VIDRIO 25": 0.007,
-  "VIDRIO 33": 0.008
-};
-
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
 }
@@ -93,32 +78,6 @@ function normalizar(t){
     .toUpperCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g,"");
-}
-
-function puntoVerdeUnidad(textoFormato){
-  const f = normalizar(textoFormato);
-
-  if(!f) return 0;
-
-  const claves = Object.keys(PUNTO_VERDE);
-
-  for(let i=0;i<claves.length;i++){
-    if(f.includes(normalizar(claves[i]))){
-      return Number(PUNTO_VERDE[claves[i]] || 0);
-    }
-  }
-
-  return 0;
-}
-
-function puntoVerdeLinea(a){
-  if(a.costeCero) return 0;
-
-  const unidadesPorCaja = Number(a.formato || 1);
-  const cantidadCajas = Number(a.cantidad || 0);
-  const pvUnidad = puntoVerdeUnidad(a.unidadFormato || "");
-
-  return cantidadCajas * unidadesPorCaja * pvUnidad;
 }
 
 function leerArticulos(){
@@ -350,9 +309,7 @@ function pintar(){
 
   pedido.forEach((a,i)=>{
     const precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
-    const pvLinea = puntoVerdeLinea(a);
-    const lineaBase = Number(a.cantidad || 0) * precioCaja;
-    const lineaPago = a.costeCero ? 0 : lineaBase + pvLinea;
+    const lineaPago = a.costeCero ? 0 : Number(a.cantidad || 0) * precioCaja;
 
     html += `
     <div class="card ${a.costeCero ? "costeCero" : ""}">
@@ -360,16 +317,10 @@ function pintar(){
       <div class="nombre">${a.articulo}</div>
 
       <div class="detalle">
-        ${a.unidadFormato || ""} ·
+        ${a.unidadFormato} ·
         ${Number(a.precioUnidad || 0).toFixed(2)} € ·
         IVA ${a.iva}%
       </div>
-
-      ${pvLinea > 0 ? `
-        <div class="puntoVerdeLinea">
-          ♻ Punto Verde: ${pvLinea.toFixed(2)} €
-        </div>
-      ` : ""}
 
       ${avisoPromoHTML(a)}
 
@@ -482,21 +433,14 @@ function toggleCosteCero(i){
 }
 
 function calcular(){
-  let totalBase = 0;
-  let totalPuntoVerde = 0;
   let totalPago = 0;
 
   pedido.forEach((a,i)=>{
     let precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
-    let lineaBase = Number(a.cantidad || 0) * precioCaja;
-    let pvLinea = puntoVerdeLinea(a);
-    let lineaPago = a.costeCero ? 0 : lineaBase + pvLinea;
+    let linea = Number(a.cantidad || 0) * precioCaja;
+    let lineaPago = a.costeCero ? 0 : linea;
 
-    if(!a.costeCero){
-      totalBase += lineaBase;
-      totalPuntoVerde += pvLinea;
-      totalPago += lineaPago;
-    }
+    totalPago += lineaPago;
 
     const celda = document.getElementById("t"+i);
 
@@ -505,9 +449,7 @@ function calcular(){
     }
   });
 
-  document.getElementById("totalFinal").innerHTML =
-    "BASE: " + totalBase.toFixed(2) + " €<br>" +
-    "PUNTO VERDE: " + totalPuntoVerde.toFixed(2) + " €<br>" +
+  document.getElementById("totalFinal").textContent =
     "TOTAL PAGO: " + totalPago.toFixed(2) + " €";
 }
 
@@ -536,9 +478,6 @@ function guardarPedido(){
     const cantidadCargo = Number(a.cantidad || 0);
     const cantidadGratis = dPromo ? dPromo.gratisTotal : 0;
 
-    const pvUnidad = puntoVerdeUnidad(a.unidadFormato || "");
-    const pvLinea = costeCero ? 0 : puntoVerdeLinea(a);
-
     return {
       articulo: a.articulo,
       proveedor: proveedor,
@@ -553,9 +492,6 @@ function guardarPedido(){
 
       precioOriginalSinIva: precioOriginalSinIva,
       precioSinIva: costeCero ? 0 : precioOriginalSinIva,
-
-      puntoVerdeUnidad: pvUnidad,
-      puntoVerdeTotal: pvLinea,
 
       costeCero: costeCero,
       excluirRappel: costeCero,
@@ -573,22 +509,14 @@ function guardarPedido(){
     };
   });
 
-  const totalBase = lineasFinal.reduce((t,l)=>
+  const totalPago = lineasFinal.reduce((t,l)=>
     t + (l.cantidad * l.precioSinIva)
   ,0);
-
-  const totalPuntoVerde = lineasFinal.reduce((t,l)=>
-    t + Number(l.puntoVerdeTotal || 0)
-  ,0);
-
-  const totalPago = totalBase + totalPuntoVerde;
 
   const pedidoGuardado = {
     proveedor,
     fecha: ahora.toLocaleString("es-ES"),
     usuario: usuarioActual(),
-    totalBase,
-    totalPuntoVerde,
     totalPago,
     lineas: lineasFinal
   };
@@ -604,8 +532,6 @@ function guardarPedido(){
       proveedor,
       fecha: ahora.toLocaleString("es-ES"),
       total: totalPago,
-      totalBase,
-      totalPuntoVerde,
       lineas: lineasFinal.filter(l => !l.costeCero)
     });
 
