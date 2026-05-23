@@ -447,23 +447,17 @@ Javi · Hostelero
 </div>
 
 <script>
-const VERSION_MONOLITO = "2026-05-23-LOGIN-01";
 
-const versionGuardada = localStorage.getItem("MONOLITO_VERSION");
-
-if (versionGuardada !== VERSION_MONOLITO) {
-  localStorage.clear();
-  sessionStorage.clear();
-  localStorage.setItem("MONOLITO_VERSION", VERSION_MONOLITO);
-}
-</script>
 function comprobarLogin(){
+
 const activo = localStorage.getItem("loginActivo");
 const usuario = localStorage.getItem("usuario");
 const nivel = localStorage.getItem("nivel");
+
 if(activo !== "SI" || !usuario || !nivel){
 window.location.href = "login.html";
 }
+
 }
 
 comprobarLogin();
