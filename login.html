@@ -11,110 +11,25 @@
 
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#dfe6ec;
-  color:#17303d;
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:18px;
-}
-
-.card{
-  width:100%;
-  max-width:430px;
-  background:white;
-  border-radius:28px;
-  padding:26px;
-  box-shadow:0 18px 36px rgba(0,0,0,.25);
-}
-
-.logo{
-  text-align:center;
-  font-size:30px;
-  font-weight:900;
-  margin-bottom:6px;
-}
-
-.sub{
-  text-align:center;
-  color:#4f5f69;
-  font-weight:800;
-  margin-bottom:22px;
-}
-
-input{
-  width:100%;
-  padding:18px;
-  border-radius:18px;
-  border:1px solid #b8c2ca;
-  font-size:26px;
-  text-align:center;
-  letter-spacing:6px;
-  font-weight:900;
-}
-
-.teclado{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-top:18px;
-}
-
-button{
-  border:0;
-  border-radius:18px;
-  padding:18px;
-  font-size:22px;
-  font-weight:900;
-  background:#17303d;
-  color:white;
-  box-shadow:0 8px 16px rgba(0,0,0,.18);
-}
-
-button:active{
-  transform:translateY(4px) scale(.97);
-}
-
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#dfe6ec;color:#17303d;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+.card{width:100%;max-width:430px;background:white;border-radius:28px;padding:26px;box-shadow:0 18px 36px rgba(0,0,0,.25)}
+.logo{text-align:center;font-size:30px;font-weight:900;margin-bottom:6px}
+.sub{text-align:center;color:#4f5f69;font-weight:800;margin-bottom:22px}
+input{width:100%;padding:18px;border-radius:18px;border:1px solid #b8c2ca;font-size:26px;text-align:center;letter-spacing:6px;font-weight:900}
+.teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+button{border:0;border-radius:18px;padding:18px;font-size:22px;font-weight:900;background:#17303d;color:white;box-shadow:0 8px 16px rgba(0,0,0,.18)}
+button:active{transform:translateY(4px) scale(.97)}
 .borrar{background:#c00000}
 .entrar{background:#48a530}
-
-.error{
-  margin-top:14px;
-  color:#c00000;
-  text-align:center;
-  font-weight:900;
-  min-height:20px;
-}
-
-.aviso{
-  margin-top:18px;
-  background:#eef2f5;
-  border-radius:16px;
-  padding:13px;
-  text-align:center;
-  font-weight:800;
-  color:#4f5f69;
-}
-
-.version{
-  margin-top:12px;
-  text-align:center;
-  font-size:11px;
-  color:#74848d;
-  font-weight:700;
-}
+.error{margin-top:14px;color:#c00000;text-align:center;font-weight:900;min-height:20px}
+.aviso{margin-top:18px;background:#eef2f5;border-radius:16px;padding:13px;text-align:center;font-weight:800;color:#4f5f69}
+.version{margin-top:12px;text-align:center;font-size:11px;color:#74848d;font-weight:700}
 </style>
 </head>
 
 <body>
 
 <div class="card">
-
   <div class="logo">MONOLITO</div>
   <div class="sub">Acceso por PIN · Sistema de control</div>
 
@@ -124,15 +39,12 @@ button:active{
     <button onclick="num('1')">1</button>
     <button onclick="num('2')">2</button>
     <button onclick="num('3')">3</button>
-
     <button onclick="num('4')">4</button>
     <button onclick="num('5')">5</button>
     <button onclick="num('6')">6</button>
-
     <button onclick="num('7')">7</button>
     <button onclick="num('8')">8</button>
     <button onclick="num('9')">9</button>
-
     <button class="borrar" onclick="limpiar()">C</button>
     <button onclick="num('0')">0</button>
     <button class="entrar" onclick="entrar()">OK</button>
@@ -145,11 +57,16 @@ button:active{
   </div>
 
   <div class="version" id="version"></div>
-
 </div>
 
 <script>
-const VERSION_MONOLITO = "2026.05.20.LOGIN.LIMPIO.002";
+/*
+  MONOLITO · LOGIN LIMPIO
+  Esta versión invalida todo acceso anterior.
+*/
+
+const VERSION_MONOLITO = "2026.05.26.LOGIN.BLOQUEO_TOTAL.001";
+const CLAVE_SESION_MONOLITO = "MONOLITO_SESION_ACTIVA_" + VERSION_MONOLITO;
 
 async function limpiarCaches(){
   try{
@@ -171,23 +88,32 @@ async function limpiarCaches(){
   }
 }
 
-function controlarVersion(){
+function limpiarSesionAntigua(){
   const versionGuardada = localStorage.getItem("version_monolito");
 
   if(versionGuardada !== VERSION_MONOLITO){
-    localStorage.removeItem("usuario");
-    localStorage.removeItem("nivel");
-    localStorage.removeItem("loginActivo");
-    localStorage.removeItem("ultimoLogin");
+    localStorage.clear();
+    sessionStorage.clear();
     localStorage.setItem("version_monolito", VERSION_MONOLITO);
   }
 }
 
 function usuariosIniciales(){
   return [
-    {nombre:"SILVIA", pin:"4544", nivel:"HOSTELERIA", activo:true},
-    {nombre:"HOSTELERO", pin:"0000", nivel:"HOSTELERIA", activo:true},
-    {nombre:"CAMARERO", pin:"1111", nivel:"CAMARERO", activo:true}
+    {
+      nombre:"JAVIER",
+      pin:"0000",
+      nivel:"HOSTELERIA",
+      rol:"ADMIN",
+      activo:true
+    },
+    {
+      nombre:"DEMO",
+      pin:"1111",
+      nivel:"DEMO",
+      rol:"DEMO",
+      activo:true
+    }
   ];
 }
 
@@ -200,39 +126,25 @@ function leerUsuarios(){
     usuarios = [];
   }
 
-  if(!Array.isArray(usuarios)){
-    usuarios = [];
-  }
-
-  usuarios = usuarios.filter(u => {
-    const nombre = String(u.nombre || "").toUpperCase().trim();
-    const pin = String(u.pin || "").trim();
-
-    if(nombre === "JAVI") return false;
-    if(nombre === "JAVIER") return false;
-    if(pin === "0985") return false;
-
-    return true;
-  });
-
-  if(usuarios.length === 0){
+  if(!Array.isArray(usuarios) || usuarios.length === 0){
     usuarios = usuariosIniciales();
+    localStorage.setItem("usuarios_monolito", JSON.stringify(usuarios));
   }
 
-  localStorage.setItem("usuarios_monolito", JSON.stringify(usuarios));
-
-  return usuarios;
+  return usuarios.filter(u => u && u.activo !== false);
 }
 
 function nivelUsuario(usuario){
-  if(usuario.nivel) return usuario.nivel;
-  return "CAMARERO";
+  return usuario.nivel || "DEMO";
+}
+
+function rolUsuario(usuario){
+  return usuario.rol || nivelUsuario(usuario) || "DEMO";
 }
 
 function num(n){
   const p = document.getElementById("pin");
   if(p.value.length >= 8) return;
-
   p.value += n;
   document.getElementById("error").textContent = "";
 }
@@ -244,13 +156,6 @@ function limpiar(){
 
 function entrar(){
   const pin = document.getElementById("pin").value.trim();
-
-  if(pin === "0985"){
-    document.getElementById("error").textContent = "PIN eliminado";
-    limpiar();
-    return;
-  }
-
   const usuarios = leerUsuarios();
 
   const usuario = usuarios.find(u =>
@@ -264,33 +169,44 @@ function entrar(){
     return;
   }
 
-  localStorage.setItem("usuario", usuario.nombre);
-  localStorage.setItem("nivel", nivelUsuario(usuario));
+  const sesion = {
+    usuario: usuario.nombre,
+    nombre: usuario.nombre,
+    nivel: nivelUsuario(usuario),
+    rol: rolUsuario(usuario),
+    loginActivo: "SI",
+    version: VERSION_MONOLITO,
+    claveSesion: CLAVE_SESION_MONOLITO,
+    fechaLogin: new Date().toISOString()
+  };
+
+  localStorage.setItem("version_monolito", VERSION_MONOLITO);
+  localStorage.setItem("clave_sesion_monolito", CLAVE_SESION_MONOLITO);
+
+  localStorage.setItem("usuario", sesion.usuario);
+  localStorage.setItem("nivel", sesion.nivel);
+  localStorage.setItem("rol", sesion.rol);
   localStorage.setItem("loginActivo", "SI");
   localStorage.setItem("ultimoLogin", new Date().toLocaleString("es-ES"));
-  localStorage.setItem("version_monolito", VERSION_MONOLITO);
+  localStorage.setItem("sesion_monolito", JSON.stringify(sesion));
 
   window.location.href = "index.html?v=" + encodeURIComponent(VERSION_MONOLITO);
 }
 
 document.addEventListener("keydown", function(e){
-  if(e.key >= "0" && e.key <= "9"){
-    num(e.key);
-  }
+  if(e.key >= "0" && e.key <= "9") num(e.key);
 
   if(e.key === "Backspace"){
     const p = document.getElementById("pin");
     p.value = p.value.slice(0,-1);
   }
 
-  if(e.key === "Enter"){
-    entrar();
-  }
+  if(e.key === "Enter") entrar();
 });
 
 (async function iniciar(){
   await limpiarCaches();
-  controlarVersion();
+  limpiarSesionAntigua();
   leerUsuarios();
 
   document.getElementById("version").textContent = "Versión: " + VERSION_MONOLITO;
