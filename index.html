@@ -127,7 +127,6 @@ box-shadow:0 3px 7px rgba(0,0,0,.22)
 .amarillo{background:#d99a00}
 
 /* BLOQUE IA */
-
 .bloqueIA{
 width:92%;
 max-width:1000px;
@@ -212,64 +211,25 @@ color:#222
 }
 
 @media (max-width:900px){
-
 .panel{
 grid-template-columns:repeat(2,1fr);
 gap:20px;
 padding:18px
 }
-
-.boton{
-min-height:130px;
-font-size:19px;
-border-radius:24px
-}
-
-.icono{
-font-size:40px;
-margin-bottom:10px
-}
-
+.boton{min-height:130px;font-size:19px;border-radius:24px}
+.icono{font-size:40px;margin-bottom:10px}
 header{padding:14px 16px}
 .franja{padding:10px 16px;font-size:14px}
 #hora{font-size:15px}
 #usuario{font-size:13px;padding:8px 11px}
-
-.bloqueIA{
-width:92%;
-padding:32px 18px;
-border-radius:30px
-}
-
-.logoPrincipal{
-width:280px
-}
-
-.nombreMarca{
-font-size:30px
-}
-
-.frasePrincipal{
-font-size:24px
-}
-
-.fraseSecundaria{
-font-size:16px
-}
-
-.logoGPT{
-width:78px;
-height:78px
-}
-
-.textoIA{
-font-size:17px
-}
-
-.textoIAsecundario{
-font-size:16px
-}
-
+.bloqueIA{width:92%;padding:32px 18px;border-radius:30px}
+.logoPrincipal{width:280px}
+.nombreMarca{font-size:30px}
+.frasePrincipal{font-size:24px}
+.fraseSecundaria{font-size:16px}
+.logoGPT{width:78px;height:78px}
+.textoIA{font-size:17px}
+.textoIAsecundario{font-size:16px}
 }
 </style>
 </head>
@@ -277,7 +237,6 @@ font-size:16px
 <body>
 
 <header>
-
 <div class="header-left">
 <div class="title">MONOLITO GPT PRO</div>
 <div class="sub">Sistema de control · El Monolito</div>
@@ -287,11 +246,10 @@ font-size:16px
 <div id="usuario" onclick="cerrarSesion()">OPERADOR</div>
 <div id="hora"></div>
 </div>
-
 </header>
 
 <div class="franja" id="franjaEstado">
-Cargando estado...
+Cargando estado en tiempo real...
 </div>
 
 <div class="panel">
@@ -397,7 +355,6 @@ Cargando estado...
 </div>
 
 <div class="bloqueIA">
-
 <div class="nombreMarca">MONOLITO <span>GPT PRO</span></div>
 
 <div class="frasePrincipal">
@@ -421,351 +378,275 @@ Para aprovechar todas las funciones de asistencia avanzada y futuras actualizaci
 </div>
 
 <div style="margin-top:38px;padding-top:24px;border-top:1px solid #e5e5e5">
-
 <div style="font-size:22px;font-weight:900;color:#17303d;margin-bottom:22px">
 Javi · Hostelero
 </div>
 
 <div style="font-size:18px;line-height:1.8;color:#222;font-weight:600">
-
-<p>
-“Mi experiencia en hostelería y la inteligencia artificial hicieron posible el sistema que muchos hosteleros siempre quisimos tener.”
-</p>
-
-<p>
-“Hostelero + IA + constancia dan resultado.”
-</p>
-
-<p>
-“La IA viene a modernizar y ayudar a la hostelería.”
-</p>
-
+<p>“Mi experiencia en hostelería y la inteligencia artificial hicieron posible el sistema que muchos hosteleros siempre quisimos tener.”</p>
+<p>“Hostelero + IA + constancia dan resultado.”</p>
+<p>“La IA viene a modernizar y ayudar a la hostelería.”</p>
+</div>
+</div>
 </div>
 
-</div>
-
-</div>
-
-<script>
-
-function comprobarLogin(){
-
-const activo = localStorage.getItem("loginActivo");
-const usuario = localStorage.getItem("usuario");
-const nivel = localStorage.getItem("nivel");
-
-if(activo !== "SI" || !usuario || !nivel){
-window.location.href = "login.html";
-}
-
-}
-
-comprobarLogin();
-
-function cerrarSesion(){
-vibrar();
-sonidoClick();
-
-if(!confirm("¿Cerrar sesión en MONOLITO?")) return;
-
-localStorage.removeItem("loginActivo");
-localStorage.removeItem("usuario");
-localStorage.removeItem("nivel");
-localStorage.removeItem("ultimoLogin");
-localStorage.removeItem("demo_inicio");
-
-window.location.href = "login.html";
-}
-
-function sonidoClick(){
-try{
-const ctx = new (window.AudioContext || window.webkitAudioContext)();
-const osc = ctx.createOscillator();
-const gain = ctx.createGain();
-
-osc.type = "sine";
-osc.frequency.setValueAtTime(240, ctx.currentTime);
-
-gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-gain.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 0.01);
-gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
-
-osc.connect(gain);
-gain.connect(ctx.destination);
-
-osc.start(ctx.currentTime);
-osc.stop(ctx.currentTime + 0.08);
-
-}catch(e){}
-}
-
-function vibrar(){
-try{
-if(navigator.vibrate){
-navigator.vibrate(20);
-}
-}catch(e){}
-}
-
-function abrir(destino){
-vibrar();
-sonidoClick();
-
-setTimeout(function(){
-window.location.href = destino;
-},70);
-}
-
-function leerIncidencias(){
-return JSON.parse(localStorage.getItem("incidencias") || "[]");
-}
-
-function leerComunicaciones(){
-const nuevas = JSON.parse(localStorage.getItem("comunicaciones_monolito") || "[]");
-const antiguas = JSON.parse(localStorage.getItem("comunicaciones") || "[]");
-
-return nuevas.concat(antiguas);
-}
-
-function leerAvisosPedidos(){
-return JSON.parse(localStorage.getItem("avisos_pedidos") || "[]");
-}
-
-function leerCalendario(){
-return JSON.parse(localStorage.getItem("calendario") || "{}");
-}
-
-function contarIncidencias(){
-return leerIncidencias().filter(x => !x.resuelta).length;
-}
-
-function contarComunicaciones(){
-return leerComunicaciones().filter(x => !x.resuelta && !x.hecha).length;
-}
-
-function contarAvisosPedidos(){
-return leerAvisosPedidos().length;
-}
-
-function contarCalendario(){
-
-const data = leerCalendario();
-
-const hoy = new Date();
-hoy.setHours(0,0,0,0);
-
-const limite = new Date(hoy);
-limite.setDate(hoy.getDate() + 7);
-
-let total = 0;
-
-Object.values(data).forEach(r=>{
-
-if(!r.fecha || r.hecha) return;
-
-const f = new Date(r.fecha + "T12:00:00");
-
-if(f >= hoy && f <= limite){
-total++;
-}
-
-});
-
-return total;
-}
-
-function reloj(){
-
-const d = new Date();
-
-document.getElementById("hora").innerHTML =
-d.toLocaleDateString("es-ES") +
-" · " +
-d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
-
-}
-
-function saludo(){
-
-const h = new Date().getHours();
-
-if(h < 6) return "Buenas noches";
-if(h < 12) return "Buenos días";
-if(h < 21) return "Buenas tardes";
-
-return "Buenas noches";
-}
-
-function cargarUsuario(){
-
-const usuario = localStorage.getItem("usuario") || "OPERADOR";
-
-document.getElementById("usuario").textContent = usuario;
-}
-
-function actualizarContadores(){
-
-const inc = contarIncidencias();
-const com = contarComunicaciones();
-const avisos = contarAvisosPedidos();
-
-const contadorInc = document.getElementById("contadorIncidencias");
-const contadorCom = document.getElementById("contadorComunicacion");
-const contadorAvisos = document.getElementById("contadorAvisosPedidos");
-
-if(inc > 0){
-contadorInc.textContent = inc;
-contadorInc.style.display = "flex";
-}else{
-contadorInc.style.display = "none";
-}
-
-if(com > 0){
-contadorCom.textContent = com;
-contadorCom.style.display = "flex";
-}else{
-contadorCom.style.display = "none";
-}
-
-if(avisos > 0){
-contadorAvisos.textContent = avisos;
-contadorAvisos.style.display = "flex";
-}else{
-contadorAvisos.style.display = "none";
-}
-
-}
-
-function actualizarFranja(){
-
-const inc = contarIncidencias();
-const com = contarComunicaciones();
-const avisos = contarAvisosPedidos();
-const cal = contarCalendario();
-
-const usuario = localStorage.getItem("usuario") || "OPERADOR";
-
-let texto = saludo() + ", " + usuario;
-
-if(inc > 0){
-texto += " · [INC] " + inc;
-}
-
-if(com > 0){
-texto += " · [COM] " + com;
-}
-
-if(avisos > 0){
-texto += " · 🛎️ " + avisos + " aviso" + (avisos === 1 ? "" : "s") + " pedido";
-}
-
-if(cal > 0){
-texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s");
-}
-
-if(inc === 0 && com === 0 && avisos === 0 && cal === 0){
-texto += " · Sin avisos";
-}
-
-document.getElementById("franjaEstado").textContent = texto;
-
-}
-
-/* ===== CONTROL DEMO ===== */
-
-function esDemo(){
-const usuario = (localStorage.getItem("usuario") || "").toUpperCase();
-return usuario === "DEMO";
-}
-
-function bloquearDemo(){
-
-if(!esDemo()) return;
-
-const bloqueados = [
-"proveedores.html",
-"articulos.html",
-"configuracion.html",
-"rapel.html",
-"usuarios.html",
-"licencias.html"
-];
-
-document.querySelectorAll(".boton").forEach(b=>{
-
-const onclick = b.getAttribute("onclick") || "";
-
-bloqueados.forEach(destino=>{
-
-if(onclick.includes(destino)){
-
-b.style.opacity = ".45";
-b.style.filter = "grayscale(1)";
-
-b.onclick = function(){
-alert("Acceso no disponible en modo DEMO por protección de datos y configuración sensible.");
+<script type="module">
+/*
+  MONOLITO · PANEL CENTRAL NUBE (FIREBASE MULTIDISPOSITIVO)
+  Sincronización de marcadores y estado global en tiempo real.
+*/
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// CONEXIÓN SENSING CLAVES MONOLITO REAL
+const firebaseConfig = {
+  apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED", 
+  authDomain: "monolito-ed87d.firebaseapp.com",
+  projectId: "monolito-ed87d",
+  storageBucket: "monolito-ed87d.appspot.com",
+  messagingSenderId: "737849584362",
+  appId: "1:737849584362:web:3d1821bedcd64080cf8593",
+  measurementId: "G-7XCZ0VN7ID"
 };
 
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
+// Variables globales para mantener los totales de la nube en tiempo real
+let totalIncidenciasNube = 0;
+let totalComunicacionesNube = 0;
+let totalAvisosPedidosNube = 0;
+
+// CONTROL DE ACCESO LOCAL
+window.comprobarLogin = function(){
+  const activo = localStorage.getItem("loginActivo");
+  const usuario = localStorage.getItem("usuario");
+  const nivel = localStorage.getItem("nivel");
+
+  if(activo !== "SI" || !usuario || !nivel){
+    window.location.href = "login.html";
+  }
+};
+
+window.comprobarLogin();
+
+window.cerrarSesion = function(){
+  window.vibrar();
+  window.sonidoClick();
+
+  if(!confirm("¿Cerrar sesión en MONOLITO?")) return;
+
+  localStorage.removeItem("loginActivo");
+  localStorage.removeItem("usuario");
+  localStorage.removeItem("nivel");
+  localStorage.removeItem("ultimoLogin");
+  localStorage.removeItem("demo_inicio");
+
+  window.location.href = "login.html";
+};
+
+window.sonidoClick = function(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(240, ctx.currentTime);
+
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.03, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.08);
+  }catch(e){}
+};
+
+window.vibrar = function(){
+  try{
+    if(navigator.vibrate){ navigator.vibrate(20); }
+  }catch(e){}
+};
+
+window.abrir = function(destino){
+  window.vibrar();
+  window.sonidoClick();
+  setTimeout(function(){
+    window.location.href = destino;
+  },70);
+};
+
+// ==========================================
+// ESCUCHADORES EN TIEMPO REAL (MAGIC COUPLING)
+// ==========================================
+
+// Escucha incidencias activas en Firestore
+onSnapshot(collection(db, "incidencias"), (snapshot) => {
+  let lista = [];
+  snapshot.forEach(doc => { lista.push(doc.data()); });
+  totalIncidenciasNube = lista.filter(x => !x.resuelta).length;
+  window.actualizarInterfaz();
+}, (error) => {
+  console.log("Error leyendo incidencias en tiempo real, tirando de local.");
+  totalIncidenciasNube = JSON.parse(localStorage.getItem("incidencias") || "[]").filter(x => !x.resuelta).length;
+  window.actualizarInterfaz();
 });
 
+// Escucha comunicaciones en Firestore
+onSnapshot(collection(db, "comunicaciones"), (snapshot) => {
+  let lista = [];
+  snapshot.forEach(doc => { lista.push(doc.data()); });
+  totalComunicacionesNube = lista.filter(x => !x.resuelta && !x.hecha).length;
+  window.actualizarInterfaz();
 });
 
+// Escucha avisos de pedidos en Firestore
+onSnapshot(collection(db, "avisos_pedidos"), (snapshot) => {
+  let lista = [];
+  snapshot.forEach(doc => { lista.push(doc.data()); });
+  totalAvisosPedidosNube = lista.length;
+  window.actualizarInterfaz();
+});
+
+// El calendario permanece local por volumen y rendimiento offline inmediato
+function contarCalendarioLocal(){
+  let data = {};
+  try{ data = JSON.parse(localStorage.getItem("calendario") || "{}"); }catch(e){}
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+  const limite = new Date(hoy);
+  limite.setDate(hoy.getDate() + 7);
+  let total = 0;
+
+  Object.values(data).forEach(r=>{
+    if(!r.fecha || r.hecha) return;
+    const f = new Date(r.fecha + "T12:00:00");
+    if(f >= hoy && f <= limite){ total++; }
+  });
+  return total;
 }
 
-function controlarCaducidadDemo(){
+window.reloj = function(){
+  const d = new Date();
+  document.getElementById("hora").innerHTML =
+    d.toLocaleDateString("es-ES") +
+    " · " +
+    d.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+};
 
-if(!esDemo()) return;
-
-const inicio = Number(localStorage.getItem("demo_inicio") || 0);
-
-if(!inicio) return;
-
-const ahora = Date.now();
-const limite = 60 * 60 * 1000;
-
-if((ahora - inicio) > limite){
-
-localStorage.removeItem("loginActivo");
-localStorage.removeItem("usuario");
-localStorage.removeItem("nivel");
-localStorage.removeItem("demo_inicio");
-
-alert("Sesión DEMO finalizada");
-
-window.location.href = "login.html";
-
+function saludo(){
+  const h = new Date().getHours();
+  if(h < 6) return "Buenas noches";
+  if(h < 12) return "Buenos días";
+  if(h < 21) return "Buenas tardes";
+  return "Buenas noches";
 }
 
+window.cargarUsuario = function(){
+  const usuario = localStorage.getItem("usuario") || "OPERADOR";
+  document.getElementById("usuario").textContent = usuario;
+};
+
+window.actualizarInterfaz = function(){
+  // Actualización Dinámica de Contadores
+  const contadorInc = document.getElementById("contadorIncidencias");
+  const contadorCom = document.getElementById("contadorCommunication" || "contadorComunicacion");
+  const contadorAvisos = document.getElementById("contadorAvisosPedidos");
+
+  if(totalIncidenciasNube > 0){
+    contadorInc.textContent = totalIncidenciasNube;
+    contadorInc.style.display = "flex";
+  }else{ contadorInc.style.display = "none"; }
+
+  if(totalComunicacionesNube > 0){
+    contadorCom.textContent = totalComunicacionesNube;
+    contadorCom.style.display = "flex";
+  }else{ contadorCom.style.display = "none"; }
+
+  if(totalAvisosPedidosNube > 0){
+    contadorAvisos.textContent = totalAvisosPedidosNube;
+    contadorAvisos.style.display = "flex";
+  }else{ contadorAvisos.style.display = "none"; }
+
+  // Actualización de Franja Superior
+  const cal = contarCalendarioLocal();
+  const usuario = localStorage.getItem("usuario") || "OPERADOR";
+  let texto = saludo() + ", " + usuario;
+
+  if(totalIncidenciasNube > 0){ texto += " · [INC] " + totalIncidenciasNube; }
+  if(totalComunicacionesNube > 0){ texto += " · [COM] " + totalComunicacionesNube; }
+  if(totalAvisosPedidosNube > 0){ texto += " · 🛎️ " + totalAvisosPedidosNube + " aviso" + (totalAvisosPedidosNube === 1 ? "" : "s") + " pedido"; }
+  if(cal > 0){ texto += " · 📅 " + cal + " recordatorio" + (cal === 1 ? "" : "s"); }
+
+  if(totalIncidenciasNube === 0 && totalComunicacionesNube === 0 && totalAvisosPedidosNube === 0 && cal === 0){
+    texto += " · Sin avisos";
+  }
+
+  document.getElementById("franjaEstado").textContent = texto;
+};
+
+/* ===== CONTROL DEMO ===== */
+window.esDemo = function(){
+  const usuario = (localStorage.getItem("usuario") || "").toUpperCase();
+  return usuario === "DEMO";
+};
+
+window.bloquearDemo = function(){
+  if(!window.esDemo()) return;
+  const bloqueados = ["proveedores.html","articulos.html","configuracion.html","rapel.html","usuarios.html","licencias.html"];
+  document.querySelectorAll(".boton").forEach(b=>{
+    const onclick = b.getAttribute("onclick") || "";
+    bloqueados.forEach(destino=>{
+      if(onclick.includes(destino)){
+        b.style.opacity = ".45";
+        b.style.filter = "grayscale(1)";
+        b.onclick = function(){
+          alert("Acceso no disponible en modo DEMO por protección de datos y configuración sensible.");
+        };
+      }
+    });
+  });
+};
+
+window.controlarCaducidadDemo = function(){
+  if(!window.esDemo()) return;
+  const inicio = Number(localStorage.getItem("demo_inicio") || 0);
+  if(!inicio) return;
+  const ahora = Date.now();
+  const limite = 60 * 60 * 1000;
+
+  if((ahora - inicio) > limite){
+    localStorage.removeItem("loginActivo");
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("nivel");
+    localStorage.removeItem("demo_inicio");
+    alert("Sesión DEMO finalizada");
+    window.location.href = "login.html";
+  }
+};
+
+if(window.esDemo()){
+  if(!localStorage.getItem("demo_inicio")){
+    localStorage.setItem("demo_inicio", Date.now());
+  }
 }
 
-if(esDemo()){
-
-if(!localStorage.getItem("demo_inicio")){
-localStorage.setItem("demo_inicio", Date.now());
-}
-
-}
-
-/* ===== START ===== */
-
+// Reloj de refresco continuo secundario
 setInterval(function(){
-
-reloj();
-actualizarFranja();
-actualizarContadores();
-controlarCaducidadDemo();
-
+  window.reloj();
+  window.controlarCaducidadDemo();
 },1000);
 
-cargarUsuario();
-reloj();
-actualizarFranja();
-actualizarContadores();
-bloquearDemo();
-controlarCaducidadDemo();
-
+// Lanzamiento Inicial
+window.cargarUsuario();
+window.reloj();
+window.bloquearDemo();
+window.controlarCaducidadDemo();
 </script>
 
 <div style="
@@ -778,10 +659,8 @@ color:#4f5f69;
 text-align:center;
 line-height:1.7;
 ">
-
 MONOLITO GPT PRO® · elmonolito.es<br>
 Sistema registrado y protegido bajo dominio propio.
-
 </div>
 
 </body>
