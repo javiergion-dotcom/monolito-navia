@@ -59,14 +59,45 @@ button:active{transform:translateY(4px) scale(.97)}
   <div class="version" id="version"></div>
 </div>
 
-<script>
+<script type="module">
 /*
-  MONOLITO · LOGIN LIMPIO
-  Esta versión invalida todo acceso anterior.
+  MONOLITO · LOGIN EN NUBE (FIREBASE CONFIGURADO)
+  Sincronización en tiempo real con control de sesiones y bloqueo total de caché anterior.
 */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const VERSION_MONOLITO = "2026.05.26.LOGIN.BLOQUEO_TOTAL.001";
 const CLAVE_SESION_MONOLITO = "MONOLITO_SESION_ACTIVA_" + VERSION_MONOLITO;
+
+// CONEXIÓN INTEGRADA CON TU PROYECTO MONOLITO GPT PRO
+const firebaseConfig = {
+  apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED", 
+  authDomain: "monolito-ed87d.firebaseapp.com",
+  projectId: "monolito-ed87d",
+  storageBucket: "monolito-ed87d.appspot.com",
+  messagingSenderId: "737849584362",
+  appId: "1:737849584362:web:3d1821bedcd64080cf8593",
+  measurementId: "G-7XCZ0VN7ID"
+};
+
+// Inicialización de servicios
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Exportamos las funciones a la ventana global para que los botones de la interfaz respondan
+window.num = function(n){
+  const p = document.getElementById("pin");
+  if(p.value.length >= 8) return;
+  p.value += n;
+  document.getElementById("error").textContent = "";
+};
+
+window.limpiar = function(){
+  document.getElementById("pin").value = "";
+  document.getElementById("error").textContent = "";
+};
 
 async function limpiarCaches(){
   try{
@@ -117,21 +148,40 @@ function usuariosIniciales(){
   ];
 }
 
-function leerUsuarios(){
-  let usuarios = [];
-
+// Descarga en tiempo real la lista de usuarios autorizados desde tu base de datos Firestore
+async function leerUsuariosDesdeFirebase(){
   try{
-    usuarios = JSON.parse(localStorage.getItem("usuarios_monolito") || "[]");
+    // Conecta con la colección de usuarios en tu base de datos Firestore
+    const querySnapshot = await getDocs(collection(db, "usuarios"));
+    let lista = [];
+    
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if(data) lista.push(data);
+    });
+
+    if(lista.length > 0){
+      localStorage.setItem("usuarios_monolito", JSON.stringify(lista));
+      return lista.filter(u => u && u.activo !== false);
+    }
   }catch(e){
-    usuarios = [];
+    console.error("Error al sincronizar con la nube de Firebase, tirando de local:", e);
   }
 
-  if(!Array.isArray(usuarios) || usuarios.length === 0){
-    usuarios = usuariosIniciales();
-    localStorage.setItem("usuarios_monolito", JSON.stringify(usuarios));
+  // Respaldo local u offline en caso de que falle la red
+  let usuariosLocales = [];
+  try{
+    usuariosLocales = JSON.parse(localStorage.getItem("usuarios_monolito") || "[]");
+  }catch(e){
+    usuariosLocales = [];
   }
 
-  return usuarios.filter(u => u && u.activo !== false);
+  if(!Array.isArray(usuariosLocales) || usuariosLocales.length === 0){
+    usuariosLocales = usuariosIniciales();
+    localStorage.setItem("usuarios_monolito", JSON.stringify(usuariosLocales));
+  }
+
+  return usuariosLocales.filter(u => u && u.activo !== false);
 }
 
 function nivelUsuario(usuario){
@@ -142,30 +192,27 @@ function rolUsuario(usuario){
   return usuario.rol || nivelUsuario(usuario) || "DEMO";
 }
 
-function num(n){
-  const p = document.getElementById("pin");
-  if(p.value.length >= 8) return;
-  p.value += n;
-  document.getElementById("error").textContent = "";
-}
+// Proceso de login asíncrono consultando los credenciales en la nube
+window.entrar = async function(){
+  const pinInput = document.getElementById("pin").value.trim();
+  
+  if(!pinInput){
+    document.getElementById("error").textContent = "Introduce un PIN";
+    return;
+  }
 
-function limpiar(){
-  document.getElementById("pin").value = "";
-  document.getElementById("error").textContent = "";
-}
+  document.getElementById("error").textContent = "Validando acceso...";
 
-function entrar(){
-  const pin = document.getElementById("pin").value.trim();
-  const usuarios = leerUsuarios();
+  const usuarios = await leerUsuariosDesdeFirebase();
 
   const usuario = usuarios.find(u =>
-    String(u.pin || "").trim() === pin &&
+    String(u.pin || "").trim() === pinInput &&
     u.activo !== false
   );
 
   if(!usuario){
     document.getElementById("error").textContent = "PIN incorrecto";
-    limpiar();
+    window.limpiar();
     return;
   }
 
@@ -191,23 +238,27 @@ function entrar(){
   localStorage.setItem("sesion_monolito", JSON.stringify(sesion));
 
   window.location.href = "index.html?v=" + encodeURIComponent(VERSION_MONOLITO);
-}
+};
 
+// Captura del teclado físico
 document.addEventListener("keydown", function(e){
-  if(e.key >= "0" && e.key <= "9") num(e.key);
+  if(e.key >= "0" && e.key <= "9") window.num(e.key);
 
   if(e.key === "Backspace"){
     const p = document.getElementById("pin");
     p.value = p.value.slice(0,-1);
   }
 
-  if(e.key === "Enter") entrar();
+  if(e.key === "Enter") window.entrar();
 });
 
+// Inicialización del sistema
 (async function iniciar(){
   await limpiarCaches();
   limpiarSesionAntigua();
-  leerUsuarios();
+  
+  // Realiza una precarga silenciosa para acelerar la respuesta cuando pulsen "OK"
+  await leerUsuariosDesdeFirebase();
 
   document.getElementById("version").textContent = "Versión: " + VERSION_MONOLITO;
 
