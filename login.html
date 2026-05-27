@@ -7,22 +7,23 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 
-<title>LOGIN · MONOLITO GPT PRO</title>
+<title>LOGIN · MONOLITO & IA PRO</title>
 
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#dfe6ec;color:#17303d;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
 .card{width:100%;max-width:430px;background:white;border-radius:28px;padding:26px;box-shadow:0 18px 36px rgba(0,0,0,.25)}
-.logo{text-align:center;font-size:30px;font-weight:900;margin-bottom:6px}
-.sub{text-align:center;color:#4f5f69;font-weight:800;margin-bottom:22px}
-input{width:100%;padding:18px;border-radius:18px;border:1px solid #b8c2ca;font-size:26px;text-align:center;letter-spacing:6px;font-weight:900}
+.logo{text-align:center;font-size:30px;font-weight:900;margin-bottom:2px;color:#17303d}
+.logo span{color:#d4af37} /* Color dorado para el & IA PRO */
+.sub{text-align:center;color:#4f5f69;font-weight:800;margin-bottom:22px;font-size:14px}
+input{width:100%;padding:18px;border-radius:18px;border:1px solid #b8c2ca;font-size:26px;text-align:center;letter-spacing:6px;font-weight:900;background:#f8fafc}
 .teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
-button{border:0;border-radius:18px;padding:18px;font-size:22px;font-weight:900;background:#17303d;color:white;box-shadow:0 8px 16px rgba(0,0,0,.18)}
+button{border:0;border-radius:18px;padding:18px;font-size:22px;font-weight:900;background:#17303d;color:white;box-shadow:0 8px 16px rgba(0,0,0,.18);cursor:pointer}
 button:active{transform:translateY(4px) scale(.97)}
 .borrar{background:#c00000}
 .entrar{background:#48a530}
-.error{margin-top:14px;color:#c00000;text-align:center;font-weight:900;min-height:20px}
-.aviso{margin-top:18px;background:#eef2f5;border-radius:16px;padding:13px;text-align:center;font-weight:800;color:#4f5f69}
+.error{margin-top:14px;color:#c00000;text-align:center;font-weight:900;min-height:20px;font-size:15px}
+.aviso{margin-top:18px;background:#eef2f5;border-radius:16px;padding:13px;text-align:center;font-weight:800;color:#4f5f69;font-size:13px}
 .version{margin-top:12px;text-align:center;font-size:11px;color:#74848d;font-weight:700}
 </style>
 </head>
@@ -30,8 +31,8 @@ button:active{transform:translateY(4px) scale(.97)}
 <body>
 
 <div class="card">
-  <div class="logo">MONOLITO</div>
-  <div class="sub">Acceso por PIN · Sistema de control</div>
+  <div class="logo">MONOLITO <span>& IA PRO</span></div>
+  <div class="sub">Acceso por PIN · Sistema de Control</div>
 
   <input id="pin" type="password" maxlength="8" readonly placeholder="PIN">
 
@@ -53,7 +54,7 @@ button:active{transform:translateY(4px) scale(.97)}
   <div class="error" id="error"></div>
 
   <div class="aviso">
-    El PIN identifica al usuario y su nivel de autoridad.
+    El PIN identifica al usuario y su nivel de autoridad en la barra.
   </div>
 
   <div class="version" id="version"></div>
@@ -61,17 +62,18 @@ button:active{transform:translateY(4px) scale(.97)}
 
 <script type="module">
 /*
-  MONOLITO · LOGIN EN NUBE (FIREBASE CONFIGURADO)
+  MONOLITO & IA PRO · LOGIN SEGURO EN NUBE
   Sincronización en tiempo real con control de sesiones y bloqueo total de caché anterior.
 */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const VERSION_MONOLITO = "2026.05.26.LOGIN.BLOQUEO_TOTAL.001";
+const VERSION_MONOLITO = "2026.05.28.LOGIN.MONOLITO_IA_PRO.001";
 const CLAVE_SESION_MONOLITO = "MONOLITO_SESION_ACTIVA_" + VERSION_MONOLITO;
 
-// CONEXIÓN INTEGRADA CON TU PROYECTO MONOLITO GPT PRO
+// CONFIGURACIÓN DE TU PROYECTO FIREBASE COPIADO DE TU CONSOLA
+// ¡RECUERDA PEGAR TU API KEY EXACTA AQUÍ SIN TEXTOS EXTRAÑOS AL FINAL!
 const firebaseConfig = {
   apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED", 
   authDomain: "monolito-ed87d.firebaseapp.com",
@@ -86,7 +88,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Exportamos las funciones a la ventana global para que los botones de la interfaz respondan
+// Exportamos las funciones a la ventana global para los botones
 window.num = function(n){
   const p = document.getElementById("pin");
   if(p.value.length >= 8) return;
@@ -151,24 +153,32 @@ function usuariosIniciales(){
 // Descarga en tiempo real la lista de usuarios autorizados desde tu base de datos Firestore
 async function leerUsuariosDesdeFirebase(){
   try{
-    // Conecta con la colección de usuarios en tu base de datos Firestore
     const querySnapshot = await getDocs(collection(db, "usuarios"));
     let lista = [];
     
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      if(data) lista.push(data);
+      if(data) {
+        // Normalizamos los campos para que la app no falle si cambian las mayúsculas en Firestore
+        lista.push({
+          nombre: data.nombre || data.Nombre || "",
+          pin: String(data.pin || data.Pin || "").trim(),
+          nivel: data.nivel || data.Nivel || "DEMO",
+          rol: data.rol || data.Rol || "DEMO",
+          activo: data.activo !== undefined ? data.activo : true
+        });
+      }
     });
 
     if(lista.length > 0){
       localStorage.setItem("usuarios_monolito", JSON.stringify(lista));
-      return lista.filter(u => u && u.activo !== false);
+      return lista.filter(u => u.activo !== false);
     }
   }catch(e){
-    console.error("Error al sincronizar con la nube de Firebase, tirando de local:", e);
+    console.error("Error al sincronizar con Firebase, usando copia de seguridad local:", e);
   }
 
-  // Respaldo local u offline en caso de que falle la red
+  // Respaldo local u offline
   let usuariosLocales = [];
   try{
     usuariosLocales = JSON.parse(localStorage.getItem("usuarios_monolito") || "[]");
@@ -192,7 +202,7 @@ function rolUsuario(usuario){
   return usuario.rol || nivelUsuario(usuario) || "DEMO";
 }
 
-// Proceso de login asíncrono consultando los credenciales en la nube
+// Proceso de login asíncrono
 window.entrar = async function(){
   const pinInput = document.getElementById("pin").value.trim();
   
@@ -252,12 +262,11 @@ document.addEventListener("keydown", function(e){
   if(e.key === "Enter") window.entrar();
 });
 
-// Inicialización del sistema
+// Inicialización del sistema con trazabilidad automática
 (async function iniciar(){
   await limpiarCaches();
   limpiarSesionAntigua();
   
-  // Realiza una precarga silenciosa para acelerar la respuesta cuando pulsen "OK"
   await leerUsuariosDesdeFirebase();
 
   document.getElementById("version").textContent = "Versión: " + VERSION_MONOLITO;
