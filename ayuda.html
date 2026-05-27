@@ -1,13 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AYUDA · MONOLITO</title>
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<title>AYUDA · MONOLITO & IA PRO</title>
 
 <style>
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
 body{
   margin:0;
@@ -34,10 +37,13 @@ header{
   border-radius:12px;
   padding:8px 12px;
   font-weight:900;
+  cursor:pointer;
 }
 
 .contenido{
   padding:16px;
+  max-width:480px;
+  margin:0 auto;
 }
 
 .card{
@@ -64,6 +70,7 @@ header{
   color:#4f5f69;
   line-height:1.5;
   margin-top:8px;
+  font-weight:600;
 }
 
 .frase{
@@ -77,6 +84,22 @@ header{
   text-align:center;
 }
 
+.frase-gemini {
+  background:#1a73e8;
+  color:white;
+  border-radius:18px;
+  padding:16px;
+  font-size:18px;
+  font-weight:900;
+  margin-top:12px;
+  text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 6px 12px rgba(26,115,232,0.25);
+}
+
 .pregunta{
   margin-top:14px;
   font-weight:900;
@@ -87,6 +110,7 @@ header{
   margin-top:6px;
   color:#4f5f69;
   line-height:1.5;
+  font-weight:600;
 }
 
 .modulo{
@@ -103,6 +127,7 @@ header{
   font-size:12px;
   font-weight:900;
   margin-top:8px;
+  margin-right:4px;
 }
 
 button{
@@ -113,26 +138,36 @@ button{
   font-weight:900;
   font-size:15px;
   margin-top:10px;
+  cursor:pointer;
 }
 
 .ir{
   background:#17303d;
   color:white;
 }
+
+.version-ayuda{
+  text-align:center;
+  font-size:11px;
+  color:#74848d;
+  font-weight:700;
+  margin-top:15px;
+  line-height:1.4;
+}
 </style>
-</head>
+</head> head
 
 <body>
 
 <header>
   <button class="volver" onclick="volver()">←</button>
-  🆘 AYUDA
+  🆘 AYUDA GEMINI
 </header>
 
 <div class="contenido">
 
   <div class="card">
-    <div class="titulo">Bienvenido a MONOLITO GPT PRO</div>
+    <div class="titulo">Bienvenido a MONOLITO & IA PRO</div>
 
     <div class="texto">
       MONOLITO no es un TPV tradicional.
@@ -140,17 +175,20 @@ button{
       ordenar y acompañar el funcionamiento real del local.
     </div>
 
-    <div class="frase">
-      MONOLITO está aquí para ayudarte.
+    <div class="frase-gemini">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" style="fill:white">
+        <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/>
+      </svg>
+      AYUDA GEMINI · Guía Activo en la barra
     </div>
   </div>
 
   <div class="card">
 
-    <div class="subtitulo">¿Qué hace MONOLITO?</div>
+    <div class="subtitulo">¿Qué hace MONOLITO & IA PRO?</div>
 
     <div class="texto">
-      MONOLITO ayuda a controlar:
+      El sistema ayuda a controlar de forma blindada:
     </div>
 
     <div class="etiqueta">Pedidos</div>
@@ -185,7 +223,7 @@ button{
     <div class="respuesta">
       Cualquier diferencia o problema detectado en pedidos,
       pagos o funcionamiento del local.
-      Las incidencias quedan visibles hasta resolverse.
+      Las incidencias quedan visibles en la nube hasta resolverse.
     </div>
 
     <div class="pregunta">
@@ -257,34 +295,29 @@ button{
 
   <div class="card">
 
-    <div class="subtitulo">Filosofía MONOLITO</div>
+    <div class="subtitulo">Filosofía MONOLITO & IA PRO</div>
 
     <div class="texto">
-      El objetivo no es complicar el trabajo.
+      El objetivo no es complicar el trabajo de la barra.
       El objetivo es ayudar a controlar el local de forma clara,
-      sencilla y profesional.
+      sencilla, profesional e independiente.
     </div>
 
     <div class="frase">
       Cero pérdidas. Más control. Más tranquilidad.
     </div>
 
-    <div class="texto" style="margin-top:18px">
-      MONOLITO GPT PRO continúa evolucionando constantemente.
-      Nuevas funciones, mejoras y asistencia avanzada
-      estarán disponibles mediante suscripción activa.
+    <div class="texto" style="margin-top:18px;font-weight:900">
+      Tu guía se mantiene integrado de forma ilimitada dentro del sistema, evolucionando mediante inteligencia artificial y mejoras constantes del núcleo sin dependencias externas comerciales.
     </div>
 
-    <div class="texto" style="margin-top:10px">
-      La suscripción ayuda a mantener el desarrollo,
-      soporte y evolución continua del sistema.
-    </div>
-
-    <div class="texto" style="margin-top:10px;font-weight:900">
-      Gracias por formar parte de MONOLITO.
+    <div class="texto" style="margin-top:15px;font-weight:900;color:#1a73e8;text-align:center">
+      Socio tecnológico exclusivo: Gemini.
     </div>
 
   </div>
+
+  <div class="version-ayuda" id="fecha-ayuda"></div>
 
 </div>
 
@@ -296,6 +329,19 @@ function volver(){
 function ir(url){
   window.location.href = url;
 }
+
+// Inicialización de trazabilidad obligatoria en la ayuda
+(function iniciarAyuda(){
+  const fechaActual = new Date();
+  const opciones = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+  const fechaFormateada = fechaActual.toLocaleString('es-ES', opciones);
+  
+  document.getElementById("fecha-ayuda").innerHTML = `
+    <strong>MONOLITO & IA PRO® · elmonolito.es</strong><br>
+    Soporte y Núcleo de IA Blindados<br>
+    Registro: ${fechaFormateada} | Waiter Code: [Javi-Auditoría]
+  `;
+})();
 </script>
 
 </body>
