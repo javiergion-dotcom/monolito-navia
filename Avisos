@@ -2,27 +2,74 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Avisos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avisos Pedidos</title>
 <style>
-body{font-family:Arial;margin:0;background:#f2f2f2;}
+body{font-family:Arial,sans-serif;margin:0;background:#f2f2f2;}
 .header{background:#222;color:white;padding:14px;display:flex;justify-content:space-between;align-items:center;}
-.btn{background:#3c7ec4;color:white;padding:10px 16px;border-radius:8px;text-decoration:none;}
+.btn{background:#3c7ec4;color:white;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:bold;}
 .contenido{padding:20px;}
 .bloque{background:white;padding:15px;margin-bottom:12px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.2);}
-.titulo{font-weight:bold;margin-bottom:8px;}
+input, button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:1px solid #ccc;}
+button{background:#48a530;color:white;font-weight:bold;cursor:pointer;}
 </style>
 </head>
 
 <body>
 
 <div class="header">
-<div>✉ Avisos internos</div>
+<div>🛎 Avisos Pedidos</div>
 <a href="index.html" class="btn">← Volver</a>
 </div>
 
 <div class="contenido">
-<div class="bloque"><div class="titulo">Mensajes del equipo</div></div>
+    <div class="bloque">
+        <input type="text" id="nuevoAviso" placeholder="Escribe el aviso del pedido...">
+        <button onclick="enviarAviso()">Enviar aviso a la Nube</button>
+    </div>
+    
+    <div id="listaAvisos">
+        </div>
 </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED", 
+  authDomain: "monolito-ed87d.firebaseapp.com",
+  projectId: "monolito-ed87d",
+  storageBucket: "monolito-ed87d.appspot.com",
+  messagingSenderId: "737849584362",
+  appId: "1:737849584362:web:3d1821bedcd64080cf8593",
+  measurementId: "G-7XCZ0VN7ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Escuchar avisos en tiempo real
+onSnapshot(query(collection(db, "avisos_pedidos"), orderBy("fecha", "desc")), (snapshot) => {
+    let html = "";
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        html += `<div class="bloque">${data.mensaje} <br><small>${new Date(data.fecha).toLocaleTimeString()}</small></div>`;
+    });
+    document.getElementById("listaAvisos").innerHTML = html;
+});
+
+// Enviar aviso
+window.enviarAviso = async () => {
+    const txt = document.getElementById("nuevoAviso").value;
+    if(!txt) return;
+    await addDoc(collection(db, "avisos_pedidos"), {
+        mensaje: txt,
+        fecha: Date.now()
+    });
+    document.getElementById("nuevoAviso").value = "";
+};
+</script>
 
 </body>
 </html>
