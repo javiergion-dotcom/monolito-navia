@@ -1,367 +1,77 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PAGOS · MONOLITO</title>
-
-<style>
-body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;font-weight:900;font-size:20px}
-.icono{color:#4caf50}
-.semana{margin:18px 12px 8px;padding:10px;font-size:20px;font-weight:900;border-bottom:3px solid #17303d}
-.card{background:white;margin:12px;padding:14px;border-radius:16px}
-.nombre{font-size:22px;font-weight:900}
-.total{font-size:26px;font-weight:900;margin-top:6px}
-.detalle{color:#4f5f69;margin-top:4px}
-button{border:0;border-radius:10px;padding:8px 12px;font-weight:800;margin-top:6px}
-.botones{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.ver{background:#17303d;color:white}
-.comp{background:#9c27b0;color:white}
-.ok{background:#4caf50;color:white}
-.errorBtn{background:#f44336;color:white}
-.pdf{background:#ff9800;color:white}
-.lineas{display:none;margin-top:10px}
-.linea{padding:8px 0;border-bottom:1px dashed #ccc}
-.lineaError{background:#ffe5e5;color:#c00000;font-weight:900;padding:8px;border-radius:8px}
-.aviso{color:#c00000;font-weight:900;margin-top:6px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAGOS · MONOLITO</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f2f2f2; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
+        h2 { color: #17303d; text-align: center; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 18px; background: #17303d; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 18px; cursor: pointer; }
+        button:hover { background: #264a5d; }
+        .lista-item { background: #fff; padding: 15px; margin-top: 15px; border-radius: 10px; border-left: 6px solid #d35400; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-width: 500px; margin: 15px auto; }
+        .status { font-size: 14px; color: #17303d; text-align: center; margin-top: 15px; font-weight: bold; }
+    </style>
 </head>
-
 <body>
 
-<header><span class="icono">💳 PAGOS</span></header>
+    <div class="card">
+        <h2>💰 Registrar Pago</h2>
+        <input type="text" id="concepto" placeholder="Concepto (ej: Proveedor)">
+        <input type="number" id="cantidad" placeholder="Importe (€)">
+        <button onclick="registrarPago()">Registrar en Monolito</button>
+        <div id="statusMsg" class="status"></div>
+    </div>
 
-<div id="lista"></div>
+    <div id="listaPagos"></div>
 
-<script>
-function leerPagos(){
-  return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
-}
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-function guardarPagos(data){
-  localStorage.setItem("pagos_pendientes", JSON.stringify(data));
-}
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED",
+            projectId: "monolito-ed87d"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-function leerHistorico(){
-  return JSON.parse(localStorage.getItem("historico_pedidos") || "[]");
-}
+        window.registrarPago = async () => {
+            const concepto = document.getElementById("concepto").value;
+            const cantidad = document.getElementById("cantidad").value;
+            const msg = document.getElementById("statusMsg");
 
-function guardarHistorico(data){
-  localStorage.setItem("historico_pedidos", JSON.stringify(data));
-}
+            if(!concepto || !cantidad) {
+                alert("Por favor, rellena concepto e importe.");
+                return;
+            }
 
-function leerIncidencias(){
-  return JSON.parse(localStorage.getItem("incidencias") || "[]");
-}
+            try {
+                await addDoc(collection(db, "pagos"), {
+                    concepto: concepto,
+                    cantidad: parseFloat(cantidad),
+                    fecha: serverTimestamp(),
+                    waiterCode: localStorage.getItem("usuario") || "JAVI",
+                    fechaRegistro: new Date().toISOString()
+                });
+                msg.innerText = "✓ Pago guardado correctamente.";
+                document.getElementById("concepto").value = "";
+                document.getElementById("cantidad").value = "";
+            } catch (e) {
+                msg.innerText = "⚠ Error de conexión. Verifica la red.";
+            }
+        };
 
-function guardarIncidencias(data){
-  localStorage.setItem("incidencias", JSON.stringify(data));
-}
-
-function euros(n){
-  return Number(n||0).toFixed(2).replace(".",",")+" €";
-}
-
-function numero(n){
-  return Number(n || 0);
-}
-
-function fechaObjeto(fechaStr){
-  if(!fechaStr) return new Date();
-
-  let partes = String(fechaStr).split(",");
-  let fecha = partes[0].trim();
-  let trozos = fecha.split("/");
-
-  if(trozos.length === 3){
-    let dia = Number(trozos[0]);
-    let mes = Number(trozos[1]) - 1;
-    let ano = Number(trozos[2]);
-
-    let hora = 0, min = 0, seg = 0;
-
-    if(partes[1]){
-      let h = partes[1].trim().split(":");
-      hora = Number(h[0] || 0);
-      min = Number(h[1] || 0);
-      seg = Number(h[2] || 0);
-    }
-
-    return new Date(ano, mes, dia, hora, min, seg);
-  }
-
-  return new Date(fechaStr);
-}
-
-function obtenerSemana(fechaStr){
-  let d = fechaObjeto(fechaStr);
-  d.setHours(0,0,0,0);
-
-  let jueves = new Date(d);
-  jueves.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-
-  let semana1 = new Date(jueves.getFullYear(),0,4);
-  let semana = 1 + Math.round(((jueves - semana1) / 86400000 - 3 + ((semana1.getDay()+6)%7)) / 7);
-
-  return semana;
-}
-
-function anoSemana(fechaStr){
-  let d = fechaObjeto(fechaStr);
-  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-  return d.getFullYear();
-}
-
-function precioLinea(l){
-  if(numero(l.precioSinIva) > 0) return numero(l.precioSinIva);
-  if(numero(l.precioUnidad) > 0) return numero(l.precioUnidad) * numero(l.formato || 1);
-  if(numero(l.precio) > 0) return numero(l.precio);
-  if(numero(l.base) > 0 && numero(l.cantidad) > 0) return numero(l.base) / numero(l.cantidad);
-  return 0;
-}
-
-function baseLinea(l){
-  if(numero(l.base) > 0) return numero(l.base);
-  return numero(l.cantidad) * precioLinea(l);
-}
-
-function pintar(){
-  let data = leerPagos();
-  let html = "";
-
-  data.sort((a,b)=> fechaObjeto(b.fecha) - fechaObjeto(a.fecha));
-
-  if(data.length === 0){
-    document.getElementById("lista").innerHTML =
-      `<div class="card"><b>No hay pagos pendientes.</b></div>`;
-    return;
-  }
-
-  let grupos = {};
-
-  data.forEach(p=>{
-    let semana = obtenerSemana(p.fecha);
-    let ano = anoSemana(p.fecha);
-    let key = "SEMANA " + semana + " · " + ano;
-
-    if(!grupos[key]) grupos[key] = [];
-    grupos[key].push(p);
-  });
-
-  Object.keys(grupos).forEach(semana=>{
-    html += `<div class="semana">${semana}</div>`;
-
-    grupos[semana].forEach(p=>{
-      let i = data.indexOf(p);
-      let lineasHTML = "";
-
-      if(p.lineas){
-        p.lineas.forEach((l,idx)=>{
-          let precio = precioLinea(l);
-          let base = baseLinea(l);
-          let esError = p.erroresLineas && p.erroresLineas.includes(idx);
-
-          lineasHTML += `
-          <div class="linea ${esError ? "lineaError" : ""}">
-            <b>${l.articulo}</b><br>
-            ${l.cantidad} × ${euros(precio)} = ${euros(base)}
-            ${l.unidadFormato ? `<div class="detalle">${l.unidadFormato}</div>` : ""}
-            ${esError ? `<div>⚠ Error en esta línea</div>` : ""}
-          </div>`;
+        onSnapshot(query(collection(db, "pagos"), orderBy("fecha", "desc")), (snap) => {
+            let html = "<h2 style='text-align:center;'>Historial de Pagos</h2>";
+            snap.forEach(doc => {
+                const p = doc.data();
+                html += `<div class="lista-item"><strong>${p.concepto}</strong><br>${p.cantidad}€ - Ref: ${p.waiterCode}</div>`;
+            });
+            document.getElementById("listaPagos").innerHTML = html;
         });
-      }
-
-      html += `
-      <div class="card">
-        <div class="nombre">${p.proveedor}</div>
-        <div class="detalle">${p.fecha || ""}</div>
-        <div class="total">${euros(p.total)}</div>
-
-        ${p.erroresLineas && p.erroresLineas.length ? 
-          `<div class="aviso">⚠ ESTE PEDIDO TIENE ERRORES</div>` : ""}
-
-        <div class="botones">
-          <button class="ver" onclick="ver(${i})">Ver</button>
-          <button class="comp" onclick="comparar(${i})">Comparar</button>
-          <button class="ok" onclick="pagarOK(${i})">PAGAR OK</button>
-          <button class="errorBtn" onclick="incidencia(${i})">INCIDENCIA</button>
-          <button class="pdf" onclick="generarPDF(${i})">PDF</button>
-        </div>
-
-        <div class="lineas" id="l-${i}">
-          ${lineasHTML}
-        </div>
-      </div>`;
-    });
-  });
-
-  document.getElementById("lista").innerHTML = html;
-}
-
-function ver(i){
-  let d = document.getElementById("l-"+i);
-  d.style.display = d.style.display==="block" ? "none" : "block";
-}
-
-function comparar(i){
-  let data = leerPagos();
-  let p = data[i];
-
-  let errores = [];
-  let resultado = "";
-
-  p.lineas.forEach((l,idx)=>{
-    let precioEsperado = precioLinea(l);
-
-    let cant = prompt(`Cantidad real ${l.articulo}`, l.cantidad);
-    let precio = prompt(`Precio real ${l.articulo}`, precioEsperado);
-
-    let error = "";
-
-    if(Number(cant) !== Number(l.cantidad)) error += "UNIDADES ";
-    if(Number(precio) !== Number(precioEsperado)) error += "PRECIO ";
-
-    if(error === ""){
-      resultado += `✔ ${l.articulo}\n`;
-    }else{
-      resultado += `🔴 ${l.articulo}: ${error}\n`;
-      errores.push(idx);
-    }
-  });
-
-  p.erroresLineas = errores;
-  guardarPagos(data);
-  pintar();
-  alert(resultado);
-}
-
-function pagarOK(i){
-  let pagos = leerPagos();
-  let historico = leerHistorico();
-  let p = pagos[i];
-
-  if(p.erroresLineas && p.erroresLineas.length){
-    alert("No puedes pagar OK. Hay errores.");
-    return;
-  }
-
-  p.estado = "OK";
-  p.fechaPago = new Date().toLocaleString("es-ES");
-
-  historico.unshift(p);
-  pagos.splice(i,1);
-
-  guardarHistorico(historico);
-  guardarPagos(pagos);
-
-  pintar();
-}
-
-function incidencia(i){
-  let pagos = leerPagos();
-  let historico = leerHistorico();
-  let incidencias = leerIncidencias();
-
-  let p = pagos[i];
-
-  let motivo = prompt("Motivo de la incidencia:");
-  if(!motivo) return;
-
-  let solucion = prompt("Solución esperada del proveedor:");
-  if(!solucion) return;
-
-  let operador = localStorage.getItem("usuario") || "CAMARERO";
-
-  let nueva = {
-    id: Date.now(),
-    proveedor: p.proveedor,
-    motivo: motivo,
-    solucion: solucion,
-    fecha: new Date().toLocaleString("es-ES"),
-    creadaPor: operador,
-    resuelta: false
-  };
-
-  incidencias.unshift(nueva);
-  guardarIncidencias(incidencias);
-
-  p.estado = "INCIDENCIA";
-  p.motivoIncidencia = motivo;
-  p.solucionIncidencia = solucion;
-  p.fechaPago = new Date().toLocaleString("es-ES");
-
-  historico.unshift(p);
-  pagos.splice(i,1);
-
-  guardarHistorico(historico);
-  guardarPagos(pagos);
-
-  pintar();
-}
-
-function generarPDF(i){
-  let data = leerPagos();
-  let p = data[i];
-
-  let lineas = "";
-
-  if(p.lineas){
-    p.lineas.forEach(l=>{
-      let precio = precioLinea(l);
-      let base = baseLinea(l);
-
-      lineas += `
-        <div class="lineaPDF">
-          <b>${l.articulo}</b><br>
-          ${l.cantidad} × ${euros(precio)} = ${euros(base)}
-          ${l.unidadFormato ? `<br><span>${l.unidadFormato}</span>` : ""}
-        </div>
-      `;
-    });
-  }
-
-  let html = `
-  <!DOCTYPE html>
-  <html lang="es">
-  <head>
-  <meta charset="UTF-8">
-  <title>Pedido ${p.proveedor}</title>
-  <style>
-    body{font-family:Arial;padding:28px;color:#17303d}
-    h1{font-size:22px;margin-bottom:18px}
-    .dato{margin:4px 0;font-size:14px}
-    h2{font-size:16px;margin-top:22px;border-bottom:1px solid #ccc;padding-bottom:8px}
-    .lineaPDF{margin:10px 0;font-size:14px}
-    .lineaPDF span{color:#555;font-size:13px}
-    .totalPDF{margin-top:26px;border-top:2px solid #17303d;padding-top:12px;font-size:20px;font-weight:900}
-  </style>
-  </head>
-  <body>
-    <h1>MONOLITO · PEDIDO</h1>
-    <div class="dato"><b>Proveedor:</b> ${p.proveedor}</div>
-    <div class="dato"><b>Fecha:</b> ${p.fecha || ""}</div>
-    <div class="dato"><b>Estado:</b> ${p.estado || "PENDIENTE"}</div>
-
-    <h2>ARTÍCULOS</h2>
-    ${lineas}
-
-    <div class="totalPDF">TOTAL: ${euros(p.total)}</div>
-  </body>
-  </html>`;
-
-  let w = window.open("", "_blank");
-  w.document.open();
-  w.document.write(html);
-  w.document.close();
-
-  setTimeout(()=>{
-    w.print();
-  },500);
-}
-
-pintar();
-</script>
-
+    </script>
 </body>
 </html>
