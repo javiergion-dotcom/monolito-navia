@@ -204,9 +204,9 @@ margin-bottom:20px
 .logoGeminiBunker {
 width: 90px;
 height: 90px;
-object-fit: contain;
-margin-bottom: 22px;
-filter: drop-shadow(0px 4px 12px rgba(26,115,232,0.15));
+display: block;
+margin: 0 auto 22px auto;
+filter: drop-shadow(0px 4px 12px rgba(26,115,232,0.2));
 }
 
 .lineaIA{
@@ -397,7 +397,16 @@ Sistema de control hostelero impulsado por inteligencia artificial
 
 <div class="lineaIA"></div>
 
-<img src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4728c4cff2c69695851d.svg" class="logoGeminiBunker">
+<svg class="logoGeminiBunker" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M21 12C16.0294 12 12 16.0294 12 21C12 16.0294 7.97056 12 3 12C7.97056 12 12 7.97056 12 3C12 7.97056 16.0294 12 21 12Z" fill="url(#geminiGradient)"/>
+  <defs>
+    <linearGradient id="geminiGradient" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1a73e8"/>
+      <stop offset="50%" stop-color="#7baaf7"/>
+      <stop offset="100%" stop-color="#93bcf8"/>
+    </linearGradient>
+  </defs>
+</svg>
 
 <div class="textoIA">
 IA & MONOLITO PRO · evoluciona continuamente mediante inteligencia artificial y mejoras constantes del sistema.
@@ -415,7 +424,7 @@ Javi · Hostelero
 <div style="font-size:18px;line-height:1.8;color:#222;font-weight:600">
 <p>“Mi experiencia en hostelería y la inteligencia artificial hicieron posible el sistema que muchos hosteleros siempre quisimos tener.”</p>
 <p>“Hostelero + IA + constancia dan resultado.”</p>
-<p>“La IA viene a modernizar y ayudar a la hostelería.”</p>
+<p>“La IA viene a modernizar and ayudar a la hostelería.”</p>
 </div>
 </div>
 </div>
