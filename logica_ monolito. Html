@@ -1,0 +1,34 @@
+// 🔍 TEST DE CONEXIÓN DEL MONOLITO CENTRAL
+async function comprobarConexionCloud() {
+    const ahora = new Date();
+    console.log("⏳ Iniciando test de conexión con el búnker Cloud...");
+
+    // Paquete de prueba con el blindaje obligatorio
+    const pingPrueba = {
+        fecha: ahora.toLocaleDateString('es-ES'),
+        hora: ahora.toLocaleTimeString('es-ES'),
+        waiter_code: "SSTT", // Código de Servicio Técnico
+        estado: "TEST_CONEXION"
+    };
+
+    try {
+        // 1. Intentamos escribir en una colección de prueba de tu base de datos
+        // (Adapta 'db.collection' según si usas Firebase, Supabase, etc.)
+        await db.collection('probas_conexion').doc('ping').set(pingPrueba);
+        
+        // 2. Si llega aquí, es que ha escrito perfectamente
+        console.log("✅ [CONEXIÓN BLINDADA]: El dispositivo se comunica con la nube al 100%.");
+        alert("¡Éxito! El Monolito está conectado con la nube. Ya puedes cambiar el código de login.");
+        return true;
+
+    } catch (error) {
+        // 3. Si salta el error, es que las credenciales o el internet están fallando
+        console.error("❌ [ERROR DE CONEXIÓN]: El dispositivo está aislado.");
+        console.error("Detalle del fallo:", error.message);
+        alert("Ojo, Javi: La base de datos NO está respondiendo. Revisa las claves del archivo de configuración.");
+        return false;
+    }
+}
+
+// Ejecutar la comprobación al cargar
+comprobarConexionCloud();
