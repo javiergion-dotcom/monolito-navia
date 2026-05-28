@@ -94,7 +94,7 @@ inset 0 10px 18px rgba(0,0,0,.26),
 filter:brightness(.96)
 }
 
-/* 🟢 NUEVO BOTÓN IA EXTENDED: Alargado a pantalla completa con estética Monolito */
+/* 🟢 BOTÓN IA EXTENDED ALARGADO PANTALLA COMPLETA */
 .boton-ia-extended {
 width: calc(100% - 48px);
 margin: 10px auto 20px auto;
@@ -174,13 +174,6 @@ box-shadow:0 14px 38px rgba(0,0,0,.16);
 text-align:center
 }
 
-.logoPrincipal{
-width:340px;
-max-width:90%;
-object-fit:contain;
-margin-bottom:12px
-}
-
 .nombreMarca{
 font-size:36px;
 font-weight:900;
@@ -208,11 +201,12 @@ color:#4f5f69;
 margin-bottom:20px
 }
 
-.logoGPT{
-width:90px;
-height:90px;
-object-fit:contain;
-margin-bottom:22px
+.logoGeminiBunker {
+width: 90px;
+height: 90px;
+object-fit: contain;
+margin-bottom: 22px;
+filter: drop-shadow(0px 4px 12px rgba(26,115,232,0.15));
 }
 
 .lineaIA{
@@ -260,11 +254,10 @@ header{padding:14px 16px}
 #hora{font-size:15px}
 #usuario{font-size:13px;padding:8px 11px}
 .bloqueIA{width:92%;padding:32px 18px;border-radius:30px}
-.logoPrincipal{width:280px}
 .nombreMarca{font-size:30px}
 .frasePrincipal{font-size:24px}
 .fraseSecundaria{font-size:16px}
-.logoGPT{width:78px;height:78px}
+.logoGeminiBunker{width:78px;height:78px}
 .textoIA{font-size:17px}
 .textoIAsecundario{font-size:16px}
 }
@@ -386,7 +379,6 @@ Cargando estado en tiempo real...
 
 </div>
 
-<!-- 🟢 NUEVO BOTÓN EXTENDIDO: Cruza toda la pantalla y ejecuta la acción con vibración y sonido -->
 <div class="boton-ia-extended" onclick="abrir('ayuda.html')">
 <div class="icono-inline">✨</div>
 <div>AYUDA IA GOOGLE CLOUD</div>
@@ -405,7 +397,7 @@ Sistema de control hostelero impulsado por inteligencia artificial
 
 <div class="lineaIA"></div>
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" class="logoGPT">
+<img src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4728c4cff2c69695851d.svg" class="logoGeminiBunker">
 
 <div class="textoIA">
 IA & MONOLITO PRO · evoluciona continuamente mediante inteligencia artificial y mejoras constantes del sistema.
@@ -523,7 +515,6 @@ window.abrir = function(destino){
 // ESCUCHADORES EN TIEMPO REAL (MAGIC COUPLING)
 // ==========================================
 
-// Escucha incidencias activas en Firestore
 onSnapshot(collection(db, "incidencias"), (snapshot) => {
   let lista = [];
   snapshot.forEach(doc => { lista.push(doc.data()); });
@@ -535,7 +526,6 @@ onSnapshot(collection(db, "incidencias"), (snapshot) => {
   window.actualizarInterfaz();
 });
 
-// Escucha comunicaciones en Firestore
 onSnapshot(collection(db, "comunicaciones"), (snapshot) => {
   let lista = [];
   snapshot.forEach(doc => { lista.push(doc.data()); });
@@ -543,7 +533,6 @@ onSnapshot(collection(db, "comunicaciones"), (snapshot) => {
   window.actualizarInterfaz();
 });
 
-// Escucha avisos de pedidos en Firestore
 onSnapshot(collection(db, "avisos_pedidos"), (snapshot) => {
   let lista = [];
   snapshot.forEach(doc => { lista.push(doc.data()); });
@@ -551,7 +540,6 @@ onSnapshot(collection(db, "avisos_pedidos"), (snapshot) => {
   window.actualizarInterfaz();
 });
 
-// El calendario permanece local por volumen and rendimiento offline inmediato
 function contarCalendarioLocal(){
   let data = {};
   try{ data = JSON.parse(localStorage.getItem("calendario") || "{}"); }catch(e){}
@@ -591,9 +579,8 @@ window.cargarUsuario = function(){
 };
 
 window.actualizarInterfaz = function(){
-  // Actualización Dinámica de Contadores
   const contadorInc = document.getElementById("contadorIncidencias");
-  const contadorCom = document.getElementById("contadorComunicacion"); // 🔄 Corregida la sincronización multidispositivo directa
+  const contadorCom = document.getElementById("contadorComunicacion"); 
   const contadorAvisos = document.getElementById("contadorAvisosPedidos");
 
   if(totalIncidenciasNube > 0){
@@ -611,7 +598,6 @@ window.actualizarInterfaz = function(){
     contadorAvisos.style.display = "flex";
   }else{ contadorAvisos.style.display = "none"; }
 
-  // Actualización de Franja Superior
   const cal = contarCalendarioLocal();
   const usuario = localStorage.getItem("usuario") || "OPERADOR";
   let texto = saludo() + ", " + usuario;
@@ -636,10 +622,10 @@ window.esDemo = function(){
 
 window.bloquearDemo = function(){
   if(!window.esDemo()) return;
-  const bloqueados = ["proveedores.html","articulos.html","configuracion.html","rapel.html","usuarios.html","licencias.html"];
+  const blocked = ["proveedores.html","articulos.html","configuracion.html","rapel.html","usuarios.html","licencias.html"];
   document.querySelectorAll(".boton").forEach(b=>{
     const onclick = b.getAttribute("onclick") || "";
-    bloqueados.forEach(destino=>{
+    blocked.forEach(destino=>{
       if(onclick.includes(destino)){
         b.style.opacity = ".45";
         b.style.filter = "grayscale(1)";
@@ -674,13 +660,11 @@ if(window.esDemo()){
   }
 }
 
-// Reloj de refresco continuo secundario
 setInterval(function(){
   window.reloj();
   window.controlarCaducidadDemo();
 },1000);
 
-// Lanzamiento Inicial
 window.cargarUsuario();
 window.reloj();
 window.bloquearDemo();
