@@ -1,168 +1,66 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CONTROL DE PEDIDOS E INCIDENCIAS · MONOLITO & IA PRO</title>
-
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#dfe6ec;color:#17303d;padding:15px;display:flex;flex-direction:column;align-items:center}
-.container{width:100%;max-width:480px;display:flex;flex-direction:column;gap:15px}
-.card{background:white;border-radius:24px;padding:20px;box-shadow:0 10px 22px rgba(0,0,0,.12)}
-.titulo{font-size:22px;font-weight:900;margin-bottom:12px;color:#17303d;display:flex;align-items:center;gap:8px}
-.form-group{margin-bottom:14px;display:flex;flex-direction:column;gap:6px}
-label{font-weight:800;font-size:14px;color:#4f5f69}
-select,textarea{width:100%;padding:12px;border:2px solid #b8c2ca;border-radius:14px;font-size:15px;font-weight:700;color:#17303d;background:#f8fafc}
-select:focus,textarea:focus{outline:none;border-color:#17303d}
-textarea{resize:none;height:80px}
-
-/* El contenedor del chivato de Mahou */
-#alertas-proveedor{display:none;margin-top:5px;margin-bottom:15px}
-.alerta-roja{background:#c00000;color:white;padding:15px;border-radius:16px;font-weight:900;font-size:15px;line-height:1.4;box-shadow:0 6px 14px rgba(192,0,0,0.25);animation:pulso 2s infinite}
-
-.btn-guardar{width:100%;background:#17303d;color:white;border:0;border-radius:14px;padding:14px;font-weight:900;font-size:16px;cursor:pointer;margin-top:10px}
-.btn-guardar:active{transform:scale(0.98)}
-.badge-info{font-size:12px;color:#74848d;font-weight:700;text-align:center;margin-top:8px}
-
-@keyframes pulso{
-  0%{transform:scale(1)}
-  50%{transform:scale(1.02)}
-  100%{transform:scale(1)}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEDIDOS PROVEEDORES · MONOLITO</title>
+    <style>
+        body{font-family:Arial;margin:0;background:#f2f2f2;padding:15px;}
+        .card{background:white;padding:20px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.1);margin-bottom:15px;}
+        select, textarea{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;display:block;}
+        button{width:100%;padding:15px;background:#17303d;color:white;border:none;border-radius:8px;font-weight:900;cursor:pointer;}
+        .registro{background:white;padding:10px;margin-top:10px;border-radius:5px;border-left:5px solid #17303d;margin-bottom:8px;}
+    </style>
 </head>
 <body>
 
-<div class="container">
-
-  <div class="card">
-    <div class="titulo">📝 Control de Albarán</div>
-    
-    <div id="alertas-proveedor"></div>
-
-    <div class="form-group">
-      <label for="proveedor-select">Selecciona Proveedor:</label>
-      <select id="proveedor-select" onchange="comprobarHistorialProveedor()">
-        <option value="">-- Elige un proveedor de la lista --</option>
-        <option value="Mahou">Distribuciones Mahou S.L.</option>
-        <option value="Frutas Paquito">Frutas y Verduras Paquito</option>
-        <option value="Disbepo">Disbepo Bebidas</option>
-      </select>
+    <div class="card">
+        <h2>📦 Registrar Pedido</h2>
+        <select id="proveedor">
+            <option value="Mahou">Distribuciones Mahou S.L.</option>
+            <option value="Frutas Paquito">Frutas y Verduras Paquito</option>
+            <option value="Disbepo">Disbepo Bebidas</option>
+        </select>
+        <textarea id="detalle" placeholder="Detalle del pedido o incidencia..."></textarea>
+        <button onclick="guardarPedido()">Registrar en la Nube</button>
     </div>
 
-    <hr style="border:0;border-top:1px solid #dfe6ec;margin:15px 0">
+    <div id="listaPedidos"></div>
 
-    <div class="subtitulo" style="font-weight:900;font-size:16px;margin-bottom:10px;color:#c00000">⚠️ ¿Falta mercancía o hay error?</div>
-    
-    <div class="form-group">
-      <label for="incidencia-texto">Acuerdo de solución con el proveedor:</label>
-      <textarea id="incidencia-texto" placeholder="Ej: Falta 1 caja de Mahou de la comanda, se compromete a traerla sin coste el próximo martes..."></textarea>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <button class="btn-guardar" onclick="procesarEntradaPedido()">Registrar Pedido y Firmar</button>
-    <div class="badge-info">Registro Automático e Inmutable por Google Chrome</div>
-  </div>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED",
+            projectId: "monolito-ed87d"
+        };
+        const db = getFirestore(initializeApp(firebaseConfig));
 
-</div>
+        // Función para guardar el pedido
+        window.guardarPedido = async () => {
+            const prov = document.getElementById("proveedor").value;
+            const det = document.getElementById("detalle").value;
+            if(!det) return alert("Escribe el detalle del pedido");
+            
+            await addDoc(collection(db, "pedidos"), { 
+                proveedor: prov, 
+                detalle: det, 
+                fecha: Date.now() 
+            });
+            document.getElementById("detalle").value = "";
+            alert("Pedido registrado en el Monolito.");
+        };
 
-<script>
-// Simulador local de la base de datos de Incidencias en la nube (Para pruebas)
-// Dejamos una cargada de ejemplo para probar la lógica de la caja de Mahou
-if (!localStorage.getItem("incidencias_monolito")) {
-  const demoIncidencias = [
-    {
-      idIncidencia: "INC-12345",
-      proveedor: "Mahou",
-      motivo: "Se cobró de más en albarán anterior y debe una caja de Mahou de reposición.",
-      estado: "ABIERTA_PENDIENTE"
-    }
-  ];
-  localStorage.setItem("incidencias_monolito", JSON.stringify(demoIncidencias));
-}
-
-// 1. EL CHIVATO AUTOMÁTICO (Busca incidencias abiertas al cambiar de proveedor)
-function comprobarHistorialProveedor() {
-  const proveedorSeleccionado = document.getElementById("proveedor-select").value;
-  const contenedorAlertas = document.getElementById("alertas-proveedor");
-  
-  if (!proveedorSeleccionado) {
-    contenedorAlertas.style.display = "none";
-    return;
-  }
-
-  // Traemos los datos de la nube local
-  const incidencias = JSON.parse(localStorage.getItem("incidencias_monolito") || "[]");
-  
-  // Filtramos las que pertenezcan a este proveedor y sigan pendientes
-  const pendientes = incidencias.filter(inc => 
-    inc.proveedor.toLowerCase() === proveedorSeleccionado.toLowerCase() && 
-    inc.estado === "ABIERTA_PENDIENTE"
-  );
-
-  if (pendientes.length > 0) {
-    contenedorAlertas.innerHTML = ""; // Limpiamos residuos
-    
-    pendientes.forEach(inc => {
-      const tarjetaAviso = document.createElement("div");
-      tarjetaAviso.className = "alerta-roja";
-      tarjetaAviso.innerHTML = `⚠️ ATENCIÓN EN BARRA:<br>Este proveedor tiene una incidencia pendiente: <strong>"${inc.motivo.toUpperCase()}"</strong>`;
-      contenedorAlertas.appendChild(tarjetaAviso);
-    });
-    
-    contenedorAlertas.style.display = "block";
-    console.log(`[Monolito] Alerta activada para ${proveedorSeleccionado}`);
-  } else {
-    contenedorAlertas.style.display = "none";
-  }
-}
-
-// 2. EL REGISTRADOR DE PROMESAS (Crea la incidencia inmutable de forma automática)
-function procesarEntradaPedido() {
-  const proveedor = document.getElementById("proveedor-select").value;
-  const textoIncidencia = document.getElementById("incidencia-texto").value.trim();
-  
-  if (!proveedor) {
-    alert("Por favor, selecciona un proveedor antes de guardar.");
-    return;
-  }
-
-  const fechaActual = new Date();
-  const camareroActivo = localStorage.getItem("usuario") || "JAVI-BARRA"; // Captura tu código de barra
-
-  // Sello de auditoría inmutable
-  const selloAuditoria = {
-    timestamp: fechaActual.toISOString(),
-    fecha: fechaActual.toLocaleDateString("es-ES"),
-    hora: fechaActual.toLocaleTimeString("es-ES"),
-    waiterCode: camareroActivo,
-    entorno: "Google Chrome Verificado"
-  };
-
-  // Si el camarero ha escrito un descuadre, generamos e inyectamos la incidencia automática
-  if (textoIncidencia !== "") {
-    const nuevaIncidencia = {
-      idIncidencia: "INC-" + fechaActual.getTime(),
-      proveedor: proveedor,
-      motivo: textoIncidencia,
-      estado: "ABIERTA_PENDIENTE",
-      creado: selloAuditoria
-    };
-
-    let incidencias = JSON.parse(localStorage.getItem("incidencias_monolito") || "[]");
-    incidencias.push(nuevaIncidencia);
-    localStorage.setItem("incidencias_monolito", JSON.stringify(incidencias));
-    
-    alert(`Pedido guardado. Se ha abierto una Incidencia Activa para ${proveedor}.\n\nAparecerá un aviso en cada nuevo pedido hasta que se solucione.`);
-  } else {
-    alert("Pedido registrado con éxito. Proveedor al día y sin incidencias en este albarán.");
-  }
-
-  // Reseteamos el formulario de incidencias tras registrar
-  document.getElementById("incidencia-texto").value = "";
-  comprobarHistorialProveedor();
-}
-</script>
-
+        // Escuchar los pedidos en tiempo real
+        onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "desc")), (snap) => {
+            let html = "<h3>Últimos pedidos:</h3>";
+            snap.forEach(doc => { 
+                const d = doc.data();
+                html += `<div class="registro"><strong>${d.proveedor}</strong>: ${d.detalle}</div>`; 
+            });
+            document.getElementById("listaPedidos").innerHTML = html;
+        });
+    </script>
 </body>
 </html>
