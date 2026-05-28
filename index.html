@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONOLITO GPT PRO</title>
+<title>IA & MONOLITO PRO</title>
 
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -94,16 +94,52 @@ inset 0 10px 18px rgba(0,0,0,.26),
 filter:brightness(.96)
 }
 
+/* 🟢 NUEVO BOTÓN IA EXTENDED: Alargado a pantalla completa con estética Monolito */
+.boton-ia-extended {
+width: calc(100% - 48px);
+margin: 10px auto 20px auto;
+min-height: 64px;
+border-radius: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 12px;
+color: white;
+font-size: 20px;
+font-weight: 800;
+letter-spacing: .5px;
+cursor: pointer;
+user-select: none;
+padding: 16px 24px;
+touch-action: manipulation;
+background: linear-gradient(180deg, #34a853 0%, #2c8c46 100%);
+box-shadow:
+inset 0 3px 6px rgba(255,255,255,.3),
+inset 0 -4px 10px rgba(0,0,0,.15),
+0 10px 24px rgba(44,140,70,.25);
+transition: transform .08s ease, box-shadow .08s ease, filter .08s ease;
+}
+
+.boton-ia-extended:active {
+transform: translateY(4px) scale(.98);
+box-shadow: inset 0 6px 12px rgba(0,0,0,.3), 0 4px 8px rgba(0,0,0,.2);
+filter: brightness(.95);
+}
+
 .azul{background:linear-gradient(180deg,#8fb1c7 0%,#4f6f82 100%)}
 .naranja{background:linear-gradient(180deg,#f6ae1b 0%,#df8b00 100%)}
 .verde{background:linear-gradient(180deg,#78cc4b 0%,#48a530 100%)}
 .rojoBoton{background:linear-gradient(180deg,#ff4b4b 0%,#c40000 100%)}
-.iaBoton{background:linear-gradient(180deg,#f2c14e 0%,#d89a00 100%)}
 
 .icono{
 font-size:46px;
 line-height:1;
 margin-bottom:12px
+}
+
+.icono-inline{
+font-size: 28px;
+line-height: 1;
 }
 
 .contador{
@@ -154,7 +190,7 @@ margin-top:4px
 }
 
 .nombreMarca span{
-color:#d89a00
+color:#34a853
 }
 
 .frasePrincipal{
@@ -182,7 +218,7 @@ margin-bottom:22px
 .lineaIA{
 width:72%;
 height:1px;
-background:#d8c08a;
+background:#a2caa5;
 margin:20px auto 26px auto
 }
 
@@ -217,6 +253,7 @@ gap:20px;
 padding:18px
 }
 .boton{min-height:130px;font-size:19px;border-radius:24px}
+.boton-ia-extended {width: calc(100% - 36px); font-size: 17px; min-height: 58px; border-radius: 16px;}
 .icono{font-size:40px;margin-bottom:10px}
 header{padding:14px 16px}
 .franja{padding:10px 16px;font-size:14px}
@@ -238,7 +275,7 @@ header{padding:14px 16px}
 
 <header>
 <div class="header-left">
-<div class="title">MONOLITO GPT PRO</div>
+<div class="title">IA & MONOLITO PRO</div>
 <div class="sub">Sistema de control · El Monolito</div>
 </div>
 
@@ -347,15 +384,16 @@ Cargando estado en tiempo real...
 <div>CONFIGURACIÓN</div>
 </div>
 
-<div class="boton iaBoton" onclick="abrir('ayuda.html')">
-<div class="icono">🤖</div>
-<div>AYUDA IA</div>
 </div>
 
+<!-- 🟢 NUEVO BOTÓN EXTENDIDO: Cruza toda la pantalla y ejecuta la acción con vibración y sonido -->
+<div class="boton-ia-extended" onclick="abrir('ayuda.html')">
+<div class="icono-inline">✨</div>
+<div>AYUDA IA GOOGLE CLOUD</div>
 </div>
 
 <div class="bloqueIA">
-<div class="nombreMarca">MONOLITO <span>GPT PRO</span></div>
+<div class="nombreMarca">IA & <span>MONOLITO PRO</span></div>
 
 <div class="frasePrincipal">
 La hostelería entra en la era IA
@@ -370,11 +408,11 @@ Sistema de control hostelero impulsado por inteligencia artificial
 <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" class="logoGPT">
 
 <div class="textoIA">
-MONOLITO GPT PRO · evoluciona continuamente mediante inteligencia artificial y mejoras constantes del sistema.
+IA & MONOLITO PRO · evoluciona continuamente mediante inteligencia artificial y mejoras constantes del sistema.
 </div>
 
 <div class="textoIAsecundario">
-Para aprovechar todas las funciones de asistencia avanzada y futuras actualizaciones IA, se recomienda el uso de ChatGPT.
+Para aprovechar todas las funciones de asistencia avanzada y futuras actualizaciones IA, se recomienda el uso del motor de Google Cloud y Gemini.
 </div>
 
 <div style="margin-top:38px;padding-top:24px;border-top:1px solid #e5e5e5">
@@ -513,7 +551,7 @@ onSnapshot(collection(db, "avisos_pedidos"), (snapshot) => {
   window.actualizarInterfaz();
 });
 
-// El calendario permanece local por volumen y rendimiento offline inmediato
+// El calendario permanece local por volumen and rendimiento offline inmediato
 function contarCalendarioLocal(){
   let data = {};
   try{ data = JSON.parse(localStorage.getItem("calendario") || "{}"); }catch(e){}
@@ -555,7 +593,7 @@ window.cargarUsuario = function(){
 window.actualizarInterfaz = function(){
   // Actualización Dinámica de Contadores
   const contadorInc = document.getElementById("contadorIncidencias");
-  const contadorCom = document.getElementById("contadorCommunication" || "contadorComunicacion");
+  const contadorCom = document.getElementById("contadorComunicacion"); // 🔄 Corregida la sincronización multidispositivo directa
   const contadorAvisos = document.getElementById("contadorAvisosPedidos");
 
   if(totalIncidenciasNube > 0){
@@ -659,7 +697,7 @@ color:#4f5f69;
 text-align:center;
 line-height:1.7;
 ">
-MONOLITO GPT PRO® · elmonolito.es<br>
+IA & MONOLITO PRO® · elmonolito.es<br>
 Sistema registrado y protegido bajo dominio propio.
 </div>
 
