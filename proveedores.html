@@ -1,66 +1,337 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PEDIDOS PROVEEDORES · MONOLITO</title>
-    <style>
-        body{font-family:Arial;margin:0;background:#f2f2f2;padding:15px;}
-        .card{background:white;padding:20px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.1);margin-bottom:15px;}
-        select, textarea{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;display:block;}
-        button{width:100%;padding:15px;background:#17303d;color:white;border:none;border-radius:8px;font-weight:900;cursor:pointer;}
-        .registro{background:white;padding:10px;margin-top:10px;border-radius:5px;border-left:5px solid #17303d;margin-bottom:8px;}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEDIDOS · MONOLITO GPT PRO</title>
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{
+margin:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#dfe6ec;
+color:#111;
+padding:18px;
+}
+
+.header{
+background:#17303d;
+color:white;
+padding:16px;
+border-radius:22px;
+box-shadow:0 8px 20px rgba(0,0,0,.22);
+margin-bottom:18px;
+}
+
+.header h1{
+margin:0;
+font-size:26px;
+}
+
+.header .sub{
+margin-top:5px;
+font-size:14px;
+opacity:.85;
+font-weight:700;
+}
+
+.volver{
+margin-top:14px;
+width:100%;
+padding:14px;
+border:none;
+border-radius:16px;
+background:#8fb1c7;
+color:white;
+font-weight:900;
+font-size:16px;
+cursor:pointer;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:24px;
+box-shadow:0 10px 26px rgba(0,0,0,.14);
+margin-bottom:18px;
+}
+
+h2{
+margin-top:0;
+font-size:26px;
+}
+
+label{
+display:block;
+font-weight:900;
+margin-top:14px;
+margin-bottom:6px;
+color:#17303d;
+}
+
+select,textarea,input{
+width:100%;
+padding:14px;
+border-radius:14px;
+border:1px solid #cfd6db;
+font-size:17px;
+background:#f7f9fa;
+}
+
+textarea{
+min-height:120px;
+resize:vertical;
+}
+
+button.principal{
+width:100%;
+padding:16px;
+margin-top:18px;
+background:#17303d;
+color:white;
+border:none;
+border-radius:16px;
+font-weight:900;
+font-size:17px;
+cursor:pointer;
+box-shadow:0 8px 18px rgba(0,0,0,.18);
+}
+
+button.principal:active,
+.volver:active{
+transform:translateY(3px);
+}
+
+.registro{
+background:white;
+padding:14px;
+margin-bottom:12px;
+border-radius:16px;
+border-left:7px solid #17303d;
+box-shadow:0 5px 14px rgba(0,0,0,.08);
+}
+
+.registro strong{
+font-size:18px;
+}
+
+.fecha{
+font-size:13px;
+color:#667;
+font-weight:700;
+margin-top:5px;
+}
+
+.detalle{
+margin-top:8px;
+font-size:16px;
+line-height:1.4;
+}
+
+.vacio{
+background:white;
+padding:18px;
+border-radius:18px;
+color:#667;
+font-weight:700;
+text-align:center;
+}
+
+</style>
 </head>
+
 <body>
 
-    <div class="card">
-        <h2>📦 Registrar Pedido</h2>
-        <select id="proveedor">
-            <option value="Mahou">Distribuciones Mahou S.L.</option>
-            <option value="Frutas Paquito">Frutas y Verduras Paquito</option>
-            <option value="Disbepo">Disbepo Bebidas</option>
-        </select>
-        <textarea id="detalle" placeholder="Detalle del pedido o incidencia..."></textarea>
-        <button onclick="guardarPedido()">Registrar en la Nube</button>
-    </div>
+<div class="header">
+<h1>📦 PEDIDOS</h1>
+<div class="sub">MONOLITO GPT PRO · Registro de pedidos a proveedores</div>
+<button class="volver" onclick="volver()">VOLVER</button>
+</div>
 
-    <div id="listaPedidos"></div>
+<div class="card">
+<h2>Registrar pedido</h2>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<label>Proveedor</label>
+<select id="proveedor"></select>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED",
-            projectId: "monolito-ed87d"
-        };
-        const db = getFirestore(initializeApp(firebaseConfig));
+<label>Detalle del pedido o incidencia</label>
+<textarea id="detalle" placeholder="Ejemplo: pedir 3 cajas de Coca-Cola, revisar precio, falta albarán..."></textarea>
 
-        // Función para guardar el pedido
-        window.guardarPedido = async () => {
-            const prov = document.getElementById("proveedor").value;
-            const det = document.getElementById("detalle").value;
-            if(!det) return alert("Escribe el detalle del pedido");
-            
-            await addDoc(collection(db, "pedidos"), { 
-                proveedor: prov, 
-                detalle: det, 
-                fecha: Date.now() 
-            });
-            document.getElementById("detalle").value = "";
-            alert("Pedido registrado en el Monolito.");
-        };
+<button class="principal" onclick="guardarPedido()">GUARDAR PEDIDO</button>
+</div>
 
-        // Escuchar los pedidos en tiempo real
-        onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "desc")), (snap) => {
-            let html = "<h3>Últimos pedidos:</h3>";
-            snap.forEach(doc => { 
-                const d = doc.data();
-                html += `<div class="registro"><strong>${d.proveedor}</strong>: ${d.detalle}</div>`; 
-            });
-            document.getElementById("listaPedidos").innerHTML = html;
-        });
-    </script>
+<h2>Últimos pedidos</h2>
+<div id="listaPedidos"></div>
+
+<script>
+
+function volver(){
+window.location.href = "index.html";
+}
+
+function vibrar(){
+try{
+if(navigator.vibrate) navigator.vibrate(20);
+}catch(e){}
+}
+
+function ahoraTexto(){
+return new Date().toLocaleString("es-ES");
+}
+
+function leerPedidos(){
+try{
+return JSON.parse(localStorage.getItem("pedidos_monolito") || "[]");
+}catch(e){
+return [];
+}
+}
+
+function guardarPedidos(data){
+localStorage.setItem("pedidos_monolito", JSON.stringify(data));
+}
+
+function leerProveedores(){
+
+let proveedores = [];
+
+try{
+proveedores = JSON.parse(localStorage.getItem("proveedores_monolito") || "[]");
+}catch(e){
+proveedores = [];
+}
+
+if(!Array.isArray(proveedores) || proveedores.length === 0){
+
+proveedores = [
+{nombre:"Distribuciones Mahou S.L."},
+{nombre:"Frutas y Verduras Paquito"},
+{nombre:"Disbepo Bebidas"},
+{nombre:"Cabanella"},
+{nombre:"Proveedor general"}
+];
+
+}
+
+return proveedores;
+}
+
+function cargarProveedores(){
+
+const select = document.getElementById("proveedor");
+select.innerHTML = "";
+
+leerProveedores().forEach(p=>{
+
+const nombre =
+p.nombre ||
+p.proveedor ||
+p.empresa ||
+"Proveedor sin nombre";
+
+const option = document.createElement("option");
+option.value = nombre;
+option.textContent = nombre;
+
+select.appendChild(option);
+
+});
+
+}
+
+function guardarPedido(){
+
+vibrar();
+
+const proveedor = document.getElementById("proveedor").value.trim();
+const detalle = document.getElementById("detalle").value.trim();
+
+if(!proveedor){
+alert("Selecciona un proveedor.");
+return;
+}
+
+if(!detalle){
+alert("Escribe el detalle del pedido.");
+return;
+}
+
+const pedidos = leerPedidos();
+
+pedidos.unshift({
+id:Date.now(),
+proveedor:proveedor,
+detalle:detalle,
+fecha:ahoraTexto(),
+operador:localStorage.getItem("usuario") || "OPERADOR",
+estado:"PENDIENTE"
+});
+
+guardarPedidos(pedidos);
+
+document.getElementById("detalle").value = "";
+
+pintarPedidos();
+
+alert("Pedido guardado correctamente.");
+
+}
+
+function pintarPedidos(){
+
+const contenedor = document.getElementById("listaPedidos");
+const pedidos = leerPedidos();
+
+if(pedidos.length === 0){
+contenedor.innerHTML = '<div class="vacio">Todavía no hay pedidos registrados.</div>';
+return;
+}
+
+contenedor.innerHTML = "";
+
+pedidos.slice(0,30).forEach(p=>{
+
+const proveedor =
+p.proveedor ||
+p.nombreProveedor ||
+"Proveedor no indicado";
+
+const detalle =
+p.detalle ||
+p.descripcion ||
+p.texto ||
+"Sin detalle";
+
+const fecha =
+p.fecha ||
+p.fechaTexto ||
+"Sin fecha";
+
+const operador =
+p.operador ||
+"OPERADOR";
+
+const div = document.createElement("div");
+div.className = "registro";
+
+div.innerHTML = `
+<strong>${proveedor}</strong>
+<div class="fecha">${fecha} · ${operador}</div>
+<div class="detalle">${detalle}</div>
+`;
+
+contenedor.appendChild(div);
+
+});
+
+}
+
+cargarProveedores();
+pintarPedidos();
+
+</script>
+
 </body>
 </html>
