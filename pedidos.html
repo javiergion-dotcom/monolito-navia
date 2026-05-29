@@ -33,7 +33,26 @@ button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-
 .stockFila input{flex:1;width:auto}
 .avisosBox{background:#fff8db;border:3px solid #f0c94a;border-radius:18px;padding:14px;margin-bottom:16px}
 .avisosTitulo{font-weight:900;font-size:18px;margin-bottom:8px;color:#8a6a00}
-.avisoLinea{background:white;border-radius:12px;padding:10px;margin-top:8px;font-weight:900;color:#17303d}
+
+.avisoLinea{
+  background:white;
+  border-radius:12px;
+  padding:10px;
+  margin-top:8px;
+  font-weight:900;
+  color:#17303d;
+}
+
+.btnResolverAviso{
+  margin-top:10px;
+  background:#48a530;
+  color:white;
+  border:0;
+  border-radius:12px;
+  padding:10px;
+  font-weight:900;
+  width:100%;
+}
 </style>
 </head>
 
@@ -59,6 +78,7 @@ button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-
 </div>
 
 <script>
+
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
 }
@@ -109,7 +129,25 @@ function leerAvisosPedidos(){
   return JSON.parse(localStorage.getItem("avisos_pedidos") || "[]");
 }
 
+function resolverAvisoPedido(i){
+
+  let avisos = leerAvisosPedidos();
+
+  if(confirm("¿Eliminar aviso de pedidos?")){
+
+    avisos.splice(i,1);
+
+    localStorage.setItem(
+      "avisos_pedidos",
+      JSON.stringify(avisos)
+    );
+
+    pintarAvisosPedidos();
+  }
+}
+
 function pintarAvisosPedidos(){
+
   const avisos = leerAvisosPedidos();
 
   if(avisos.length === 0){
@@ -122,8 +160,22 @@ function pintarAvisosPedidos(){
       <div class="avisosTitulo">🛎️ AVISOS PARA PEDIDOS</div>
   `;
 
-  avisos.forEach(a=>{
-    html += `<div class="avisoLinea">🛎️ ${a.texto || a}</div>`;
+  avisos.forEach((a,i)=>{
+
+    html += `
+      <div class="avisoLinea">
+
+        🛎️ ${a.texto || a}
+
+        <button
+          class="btnResolverAviso"
+          onclick="resolverAvisoPedido(${i})"
+        >
+          ✅ RESUELTO
+        </button>
+
+      </div>
+    `;
   });
 
   html += `</div>`;
@@ -176,6 +228,7 @@ function cargarArticulos(){
 }
 
 function promoArticulo(a){
+
   const promos = leerPromociones();
 
   const nombreArticulo = normalizar(a.articulo);
@@ -185,23 +238,11 @@ function promoArticulo(a){
   hoy.setHours(0,0,0,0);
 
   return promos.find(p => {
+
     const proveedorPromo = normalizar(p.proveedor);
 
     if(proveedorPromo !== proveedorArticulo){
       return false;
-    }
-
-    const inicio = p.fechaInicio || p.inicio || p.desde || "";
-    const fin = p.fechaFin || p.fin || p.hasta || "";
-
-    if(inicio){
-      const dInicio = new Date(inicio + "T00:00:00");
-      if(hoy < dInicio) return false;
-    }
-
-    if(fin){
-      const dFin = new Date(fin + "T23:59:59");
-      if(hoy > dFin) return false;
     }
 
     const textoPromo = normalizar(
@@ -212,16 +253,13 @@ function promoArticulo(a){
       (p.nombre || "")
     );
 
-    if(!textoPromo){
-      return false;
-    }
-
     return textoPromo.includes(nombreArticulo) ||
            nombreArticulo.includes(textoPromo);
   });
 }
 
 function datosPromo(a){
+
   const promo = promoArticulo(a);
 
   if(!promo) return null;
@@ -247,6 +285,7 @@ function datosPromo(a){
   }
 
   const cantidad = Number(a.cantidad || 0);
+
   const bloques = Math.floor(cantidad / conCargo);
   const resto = cantidad % conCargo;
   const gratisTotal = bloques * gratis;
@@ -259,12 +298,9 @@ function datosPromo(a){
   }
 
   return {
-    promo,
     conCargo,
     gratis,
     cantidad,
-    bloques,
-    resto,
     gratisTotal,
     faltan,
     textoPedido
@@ -272,6 +308,7 @@ function datosPromo(a){
 }
 
 function avisoPromoHTML(a){
+
   const d = datosPromo(a);
 
   if(!d) return "";
@@ -284,19 +321,18 @@ function avisoPromoHTML(a){
   `;
 
   if(d.cantidad > 0 && d.gratisTotal > 0){
+
     html += `
       <div class="promoOk">
-        ✅ EN PEDIDO: ${d.textoPedido}<br>
-        ${d.cantidad} con cargo + ${d.gratisTotal} sin cargo<br>
-        Cuenta para RAPPEL: ${d.cantidad + d.gratisTotal}
+        ✅ EN PEDIDO: ${d.textoPedido}
       </div>
     `;
+
   }else if(d.cantidad > 0 && d.faltan > 0){
+
     html += `
       <div class="promoAlerta">
-        ⚠ Estás pidiendo ${d.cantidad}.<br>
-        Con ${d.conCargo} entra promoción ${d.conCargo} + ${d.gratis}.<br>
-        Faltan ${d.faltan}.
+        ⚠ Faltan ${d.faltan}
       </div>
     `;
   }
@@ -305,11 +341,19 @@ function avisoPromoHTML(a){
 }
 
 function pintar(){
+
   let html = "";
 
   pedido.forEach((a,i)=>{
-    const precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
-    const lineaPago = a.costeCero ? 0 : Number(a.cantidad || 0) * precioCaja;
+
+    const precioCaja =
+      Number(a.precioUnidad || 0) *
+      Number(a.formato || 1);
+
+    const lineaPago =
+      a.costeCero
+      ? 0
+      : Number(a.cantidad || 0) * precioCaja;
 
     html += `
     <div class="card ${a.costeCero ? "costeCero" : ""}">
@@ -327,9 +371,13 @@ function pintar(){
       ${
         a.mostrarStock ? `
         <div class="stockBox">
-          <div class="stockTitulo">📦 CONTROL DE ALMACÉN</div>
+
+          <div class="stockTitulo">
+            📦 CONTROL DE ALMACÉN
+          </div>
 
           <div class="stockFila">
+
             <input
               type="number"
               placeholder="Cuántas hay"
@@ -343,12 +391,15 @@ function pintar(){
               value="${a.pedir}"
               onchange="stockPedir(${i},this.value)"
             >
+
           </div>
+
         </div>
         ` : ""
       }
 
       <div class="fila">
+
         <input
           class="cantidadPedido"
           data-indice="${i}"
@@ -363,22 +414,32 @@ function pintar(){
         <div class="totalLinea" id="t${i}">
           ${lineaPago.toFixed(2)} €
         </div>
+
       </div>
 
       ${
-        esHostelero() ? `
-          <button class="botonCero ${a.costeCero ? "activo" : ""}" onclick="toggleCosteCero(${i})">
+        esHostelero()
+        ?
+        `
+          <button
+            class="botonCero ${a.costeCero ? "activo" : ""}"
+            onclick="toggleCosteCero(${i})"
+          >
             ${a.costeCero ? "✅ COSTE 0 € ACTIVADO" : "Marcar COSTE 0 €"}
           </button>
-        ` : ""
+        `
+        : ""
       }
 
       ${
-        a.costeCero ? `
+        a.costeCero
+        ?
+        `
           <div class="avisoCero">
             COSTE 0 € manual · No suma pagos · No suma RAPPEL
           </div>
-        ` : ""
+        `
+        : ""
       }
 
     </div>
@@ -396,6 +457,7 @@ function cambiar(i, valor){
 }
 
 function siguienteConEnter(e,i){
+
   if(e.key !== "Enter") return;
 
   e.preventDefault();
@@ -403,12 +465,16 @@ function siguienteConEnter(e,i){
   cambiar(i, e.target.value);
 
   setTimeout(function(){
-    const inputs = document.querySelectorAll(".cantidadPedido");
+
+    const inputs =
+      document.querySelectorAll(".cantidadPedido");
 
     if(inputs[i+1]){
+
       inputs[i+1].focus();
       inputs[i+1].select();
     }
+
   },80);
 }
 
@@ -421,31 +487,45 @@ function stockPedir(i,v){
 }
 
 function toggleCosteCero(i){
+
   if(!esHostelero()){
     alert("Solo hostelería puede marcar coste 0 €");
     return;
   }
 
-  pedido[i].costeCero = !pedido[i].costeCero;
-  pedido[i].excluirRappel = pedido[i].costeCero;
+  pedido[i].costeCero =
+    !pedido[i].costeCero;
+
+  pedido[i].excluirRappel =
+    pedido[i].costeCero;
 
   pintar();
 }
 
 function calcular(){
+
   let totalPago = 0;
 
   pedido.forEach((a,i)=>{
-    let precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
-    let linea = Number(a.cantidad || 0) * precioCaja;
-    let lineaPago = a.costeCero ? 0 : linea;
+
+    let precioCaja =
+      Number(a.precioUnidad || 0) *
+      Number(a.formato || 1);
+
+    let linea =
+      Number(a.cantidad || 0) * precioCaja;
+
+    let lineaPago =
+      a.costeCero ? 0 : linea;
 
     totalPago += lineaPago;
 
-    const celda = document.getElementById("t"+i);
+    const celda =
+      document.getElementById("t"+i);
 
     if(celda){
-      celda.textContent = lineaPago.toFixed(2) + " €";
+      celda.textContent =
+        lineaPago.toFixed(2) + " €";
     }
   });
 
@@ -454,14 +534,19 @@ function calcular(){
 }
 
 function guardarPedido(){
-  const proveedor = document.getElementById("proveedor").value;
+
+  const proveedor =
+    document.getElementById("proveedor").value;
 
   if(!proveedor){
     alert("Selecciona proveedor");
     return;
   }
 
-  const lineas = pedido.filter(a => Number(a.cantidad || 0) > 0);
+  const lineas =
+    pedido.filter(a =>
+      Number(a.cantidad || 0) > 0
+    );
 
   if(lineas.length === 0){
     alert("Sin cantidades");
@@ -471,47 +556,24 @@ function guardarPedido(){
   const ahora = new Date();
 
   const lineasFinal = lineas.map(a => {
-    const precioOriginalSinIva = Number(a.precioUnidad || 0) * Number(a.formato || 1);
-    const costeCero = a.costeCero === true;
-    const dPromo = datosPromo(a);
 
-    const cantidadCargo = Number(a.cantidad || 0);
-    const cantidadGratis = dPromo ? dPromo.gratisTotal : 0;
+    const precioOriginalSinIva =
+      Number(a.precioUnidad || 0) *
+      Number(a.formato || 1);
 
     return {
-      articulo: a.articulo,
-      proveedor: proveedor,
-
-      cantidad: cantidadCargo,
-      cantidadGratisPromo: cantidadGratis,
-      cantidadTotalRappel: costeCero ? 0 : cantidadCargo + cantidadGratis,
-
-      unidadFormato: a.unidadFormato || "",
-      formato: Number(a.formato || 1),
-      iva: Number(a.iva || 21),
-
-      precioOriginalSinIva: precioOriginalSinIva,
-      precioSinIva: costeCero ? 0 : precioOriginalSinIva,
-
-      costeCero: costeCero,
-      excluirRappel: costeCero,
-      cuentaConsumo:true,
-
-      stockActual:a.stockActual || "",
-      pedir:a.pedir || "",
-
-      promocionActiva: dPromo ? true : false,
-      promocionTexto: dPromo ? (dPromo.conCargo + " + " + dPromo.gratis) : "",
-      unidadesConCargoPromo: dPromo ? dPromo.conCargo : 0,
-      unidadesGratisPromo: dPromo ? dPromo.gratis : 0,
-      unidadesGratisCalculadas: cantidadGratis,
-      textoPedidoPromo: dPromo && dPromo.textoPedido ? dPromo.textoPedido : ""
+      articulo:a.articulo,
+      proveedor:proveedor,
+      cantidad:Number(a.cantidad || 0),
+      precioSinIva:a.costeCero ? 0 : precioOriginalSinIva,
+      costeCero:a.costeCero === true
     };
   });
 
-  const totalPago = lineasFinal.reduce((t,l)=>
-    t + (l.cantidad * l.precioSinIva)
-  ,0);
+  const totalPago =
+    lineasFinal.reduce((t,l)=>
+      t + (l.cantidad * l.precioSinIva)
+    ,0);
 
   const pedidoGuardado = {
     proveedor,
@@ -521,12 +583,20 @@ function guardarPedido(){
     lineas: lineasFinal
   };
 
-  let historico = JSON.parse(localStorage.getItem("pedidos_historico") || "[]");
+  let historico =
+    JSON.parse(localStorage.getItem("pedidos_historico") || "[]");
+
   historico.unshift(pedidoGuardado);
-  localStorage.setItem("pedidos_historico", JSON.stringify(historico));
+
+  localStorage.setItem(
+    "pedidos_historico",
+    JSON.stringify(historico)
+  );
 
   if(totalPago > 0){
-    let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+
+    let pagos =
+      JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 
     pagos.unshift({
       proveedor,
@@ -535,11 +605,14 @@ function guardarPedido(){
       lineas: lineasFinal.filter(l => !l.costeCero)
     });
 
-    localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
+    localStorage.setItem(
+      "pagos_pendientes",
+      JSON.stringify(pagos)
+    );
   }
 
   if(totalPago === 0){
-    alert("Pedido COSTE 0 € guardado en histórico. No genera pago pendiente.");
+    alert("Pedido COSTE 0 € guardado. No genera pago.");
   }else{
     alert("Pedido guardado correctamente");
   }
