@@ -1,66 +1,239 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PEDIDOS PROVEEDORES · MONOLITO</title>
-    <style>
-        body{font-family:Arial;margin:0;background:#f2f2f2;padding:15px;}
-        .card{background:white;padding:20px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.1);margin-bottom:15px;}
-        select, textarea{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;display:block;}
-        button{width:100%;padding:15px;background:#17303d;color:white;border:none;border-radius:8px;font-weight:900;cursor:pointer;}
-        .registro{background:white;padding:10px;margin-top:10px;border-radius:5px;border-left:5px solid #17303d;margin-bottom:8px;}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEDIDOS · MONOLITO</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
+.volver{background:white;color:#17303d}
+.contenido{padding:16px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+label{display:block;font-weight:900;margin-top:12px}
+select,input,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:6px}
+.guardar{width:100%;background:#48a530;color:white;margin-top:16px}
+.linea{background:#f2f5f7;border-radius:14px;padding:12px;margin-top:10px}
+.total{font-size:22px;font-weight:900;margin-top:12px}
+.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:800}
+</style>
 </head>
+
 <body>
 
-    <div class="card">
-        <h2>📦 Registrar Pedido</h2>
-        <select id="proveedor">
-            <option value="Mahou">Distribuciones Mahou S.L.</option>
-            <option value="Frutas Paquito">Frutas y Verduras Paquito</option>
-            <option value="Disbepo">Disbepo Bebidas</option>
-        </select>
-        <textarea id="detalle" placeholder="Detalle del pedido o incidencia..."></textarea>
-        <button onclick="guardarPedido()">Registrar en la Nube</button>
-    </div>
+<header>
+  <button class="volver" onclick="volver()">← Volver</button>
+  <h2>📦 PEDIDOS</h2>
+</header>
 
-    <div id="listaPedidos"></div>
+<div class="contenido">
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  <div class="card">
+    <label>Proveedor</label>
+    <select id="proveedor" onchange="cargarArticulosProveedor()"></select>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED",
-            projectId: "monolito-ed87d"
-        };
-        const db = getFirestore(initializeApp(firebaseConfig));
+    <label>Artículo</label>
+    <select id="articulo"></select>
 
-        // Función para guardar el pedido
-        window.guardarPedido = async () => {
-            const prov = document.getElementById("proveedor").value;
-            const det = document.getElementById("detalle").value;
-            if(!det) return alert("Escribe el detalle del pedido");
-            
-            await addDoc(collection(db, "pedidos"), { 
-                proveedor: prov, 
-                detalle: det, 
-                fecha: Date.now() 
-            });
-            document.getElementById("detalle").value = "";
-            alert("Pedido registrado en el Monolito.");
-        };
+    <label>Cantidad</label>
+    <input id="cantidad" type="number" step="1" value="1">
 
-        // Escuchar los pedidos en tiempo real
-        onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "desc")), (snap) => {
-            let html = "<h3>Últimos pedidos:</h3>";
-            snap.forEach(doc => { 
-                const d = doc.data();
-                html += `<div class="registro"><strong>${d.proveedor}</strong>: ${d.detalle}</div>`; 
-            });
-            document.getElementById("listaPedidos").innerHTML = html;
-        });
-    </script>
+    <button class="guardar" onclick="añadirLinea()">➕ Añadir al pedido</button>
+  </div>
+
+  <div class="card">
+    <h3>Pedido actual</h3>
+    <div id="lineas"></div>
+    <div class="total" id="total">Total sin IVA: 0.00 €</div>
+
+    <label>Observaciones / incidencia</label>
+    <textarea id="observaciones" placeholder="Notas del pedido..."></textarea>
+
+    <button class="guardar" onclick="guardarPedido()">💾 Guardar pedido</button>
+  </div>
+
+  <div id="historial"></div>
+
+</div>
+
+<script>
+let pedidoActual = [];
+
+function leerProveedores(){
+  let datos = JSON.parse(localStorage.getItem("proveedores") || "[]")
+    .filter(p => p.activo !== false);
+
+  if(datos.length === 0){
+    datos = [
+      {nombre:"CANDELAS"},
+      {nombre:"TURRADO"},
+      {nombre:"SANPEDRO"},
+      {nombre:"DEO"}
+    ];
+  }
+
+  return datos;
+}
+
+function leerArticulos(){
+  return JSON.parse(localStorage.getItem("articulos") || "[]")
+    .filter(a => a.activo !== false);
+}
+
+function precioCompra(a){
+  return Number(a.precioUnidad || 0) * Number(a.formato || 1);
+}
+
+function cargarProveedores(){
+  const proveedores = leerProveedores();
+  const sel = document.getElementById("proveedor");
+
+  sel.innerHTML = proveedores.map(p =>
+    `<option value="${p.nombre}">${p.nombre}</option>`
+  ).join("");
+
+  cargarArticulosProveedor();
+}
+
+function cargarArticulosProveedor(){
+  const proveedor = document.getElementById("proveedor").value;
+  const articulos = leerArticulos().filter(a => a.proveedor === proveedor);
+  const sel = document.getElementById("articulo");
+
+  if(articulos.length === 0){
+    sel.innerHTML = `<option value="">No hay artículos de este proveedor</option>`;
+    return;
+  }
+
+  sel.innerHTML = articulos.map((a,i) =>
+    `<option value="${i}">${a.articulo} · ${a.unidadFormato} · ${precioCompra(a).toFixed(2)} €</option>`
+  ).join("");
+}
+
+function articulosProveedorActual(){
+  const proveedor = document.getElementById("proveedor").value;
+  return leerArticulos().filter(a => a.proveedor === proveedor);
+}
+
+function añadirLinea(){
+  const articulos = articulosProveedorActual();
+  const idx = document.getElementById("articulo").value;
+
+  if(idx === ""){
+    alert("No hay artículo seleccionado.");
+    return;
+  }
+
+  const a = articulos[Number(idx)];
+  const cantidad = Number(document.getElementById("cantidad").value || 1);
+  const precio = precioCompra(a);
+  const total = cantidad * precio;
+
+  pedidoActual.push({
+    proveedor:a.proveedor,
+    articulo:a.articulo,
+    formato:a.unidadFormato,
+    iva:a.iva,
+    cantidad,
+    precio,
+    total
+  });
+
+  pintarLineas();
+}
+
+function pintarLineas(){
+  let html = "";
+  let total = 0;
+
+  pedidoActual.forEach((l,i)=>{
+    total += l.total;
+
+    html += `
+      <div class="linea">
+        <b>${l.articulo}</b><br>
+        ${l.formato} · IVA ${l.iva}%<br>
+        Cantidad: ${l.cantidad}<br>
+        Precio: ${l.precio.toFixed(2)} €<br>
+        Total: ${l.total.toFixed(2)} €
+        <br><br>
+        <button onclick="borrarLinea(${i})">Borrar línea</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("lineas").innerHTML = html || `<div class="vacio">Todavía no hay líneas.</div>`;
+  document.getElementById("total").textContent = "Total sin IVA: " + total.toFixed(2) + " €";
+}
+
+function borrarLinea(i){
+  pedidoActual.splice(i,1);
+  pintarLineas();
+}
+
+function guardarPedido(){
+  if(pedidoActual.length === 0){
+    alert("No hay líneas en el pedido.");
+    return;
+  }
+
+  const pedidos = JSON.parse(localStorage.getItem("pedidos") || "[]");
+
+  const pedido = {
+    fecha:new Date().toLocaleString("es-ES"),
+    proveedor:pedidoActual[0].proveedor,
+    lineas:pedidoActual,
+    total:pedidoActual.reduce((s,l)=>s+l.total,0),
+    observaciones:document.getElementById("observaciones").value.trim(),
+    estado:"PENDIENTE"
+  };
+
+  pedidos.unshift(pedido);
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
+
+  pedidoActual = [];
+  document.getElementById("observaciones").value = "";
+  pintarLineas();
+  pintarHistorial();
+
+  alert("Pedido guardado.");
+}
+
+function pintarHistorial(){
+  const pedidos = JSON.parse(localStorage.getItem("pedidos") || "[]");
+
+  let html = `<h3>Últimos pedidos</h3>`;
+
+  if(pedidos.length === 0){
+    html += `<div class="vacio">Sin pedidos guardados.</div>`;
+  }
+
+  pedidos.forEach(p=>{
+    html += `
+      <div class="card">
+        <b>${p.proveedor}</b><br>
+        ${p.fecha}<br>
+        Estado: ${p.estado}<br>
+        Total sin IVA: <b>${Number(p.total || 0).toFixed(2)} €</b><br>
+        ${p.observaciones ? "Notas: " + p.observaciones : ""}
+      </div>
+    `;
+  });
+
+  document.getElementById("historial").innerHTML = html;
+}
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+cargarProveedores();
+pintarLineas();
+pintarHistorial();
+</script>
+
 </body>
 </html>
