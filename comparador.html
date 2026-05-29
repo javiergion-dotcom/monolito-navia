@@ -1,66 +1,93 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PEDIDOS PROVEEDORES · MONOLITO</title>
-    <style>
-        body{font-family:Arial;margin:0;background:#f2f2f2;padding:15px;}
-        .card{background:white;padding:20px;border-radius:15px;box-shadow:0 4px 6px rgba(0,0,0,0.1);margin-bottom:15px;}
-        select, textarea{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc;display:block;}
-        button{width:100%;padding:15px;background:#17303d;color:white;border:none;border-radius:8px;font-weight:900;cursor:pointer;}
-        .registro{background:white;padding:10px;margin-top:10px;border-radius:5px;border-left:5px solid #17303d;margin-bottom:8px;}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPARADOR · MONOLITO</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:11px 14px;font-weight:800;font-size:15px}
+.volver{background:white;color:#17303d}
+.contenido{padding:16px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.nombre{font-size:20px;font-weight:900}
+.detalle{margin-top:6px;color:#4f5f69}
+.ok{color:#1f8f34;font-weight:900}
+.alerta{color:#d00000;font-weight:900}
+input{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-bottom:14px}
+.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:800}
+</style>
 </head>
+
 <body>
 
-    <div class="card">
-        <h2>📦 Registrar Pedido</h2>
-        <select id="proveedor">
-            <option value="Mahou">Distribuciones Mahou S.L.</option>
-            <option value="Frutas Paquito">Frutas y Verduras Paquito</option>
-            <option value="Disbepo">Disbepo Bebidas</option>
-        </select>
-        <textarea id="detalle" placeholder="Detalle del pedido o incidencia..."></textarea>
-        <button onclick="guardarPedido()">Registrar en la Nube</button>
-    </div>
+<header>
+  <button class="volver" onclick="volver()">← Volver</button>
+  <h2>📊 COMPARADOR</h2>
+</header>
 
-    <div id="listaPedidos"></div>
+<div class="contenido">
+  <input id="buscador" placeholder="Buscar artículo..." oninput="pintar()">
+  <div id="lista"></div>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<script>
+function leerArticulos(){
+  return JSON.parse(localStorage.getItem("articulos") || "[]")
+    .filter(a => a.activo !== false);
+}
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED",
-            projectId: "monolito-ed87d"
-        };
-        const db = getFirestore(initializeApp(firebaseConfig));
+function precioCompra(a){
+  return Number(a.precioUnidad || 0) * Number(a.formato || 1);
+}
 
-        // Función para guardar el pedido
-        window.guardarPedido = async () => {
-            const prov = document.getElementById("proveedor").value;
-            const det = document.getElementById("detalle").value;
-            if(!det) return alert("Escribe el detalle del pedido");
-            
-            await addDoc(collection(db, "pedidos"), { 
-                proveedor: prov, 
-                detalle: det, 
-                fecha: Date.now() 
-            });
-            document.getElementById("detalle").value = "";
-            alert("Pedido registrado en el Monolito.");
-        };
+function pintar(){
+  const filtro = document.getElementById("buscador").value.toUpperCase();
+  const articulos = leerArticulos();
 
-        // Escuchar los pedidos en tiempo real
-        onSnapshot(query(collection(db, "pedidos"), orderBy("fecha", "desc")), (snap) => {
-            let html = "<h3>Últimos pedidos:</h3>";
-            snap.forEach(doc => { 
-                const d = doc.data();
-                html += `<div class="registro"><strong>${d.proveedor}</strong>: ${d.detalle}</div>`; 
-            });
-            document.getElementById("listaPedidos").innerHTML = html;
-        });
-    </script>
+  if(articulos.length === 0){
+    document.getElementById("lista").innerHTML =
+      `<div class="vacio">No hay artículos cargados. Primero carga artículos en ARTÍCULOS.</div>`;
+    return;
+  }
+
+  let data = articulos.filter(a =>
+    (a.articulo || "").toUpperCase().includes(filtro) ||
+    (a.proveedor || "").toUpperCase().includes(filtro)
+  );
+
+  data.sort((a,b)=>
+    (a.articulo || "").localeCompare(b.articulo || "") ||
+    precioCompra(a) - precioCompra(b)
+  );
+
+  let html = "";
+
+  data.forEach(a=>{
+    html += `
+      <div class="card">
+        <div class="nombre">${a.articulo}</div>
+        <div class="detalle"><b>Proveedor:</b> ${a.proveedor}</div>
+        <div class="detalle"><b>Formato:</b> ${a.unidadFormato} · ${a.formato}</div>
+        <div class="detalle"><b>IVA:</b> ${a.iva}%</div>
+        <div class="detalle"><b>Precio unidad/base:</b> ${Number(a.precioUnidad || 0).toFixed(4)} €</div>
+        <div class="detalle"><b>Precio compra sin IVA:</b> ${precioCompra(a).toFixed(2)} €</div>
+      </div>
+    `;
+  });
+
+  document.getElementById("lista").innerHTML = html || `<div class="vacio">Sin resultados.</div>`;
+}
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+pintar();
+</script>
+
 </body>
 </html>
