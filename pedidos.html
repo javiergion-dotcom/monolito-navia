@@ -6,76 +6,78 @@
 <title>PEDIDOS · MONOLITO</title>
 
 <style>
-*{box-sizing:border-box}
 body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
-button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
-.volver{background:white;color:#17303d}
-.contenido{padding:16px}
-.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
-label{display:block;font-weight:900;margin-top:12px}
-select,input,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:6px}
-.guardar{width:100%;background:#48a530;color:white;margin-top:16px}
-.linea{background:#f2f5f7;border-radius:14px;padding:12px;margin-top:10px}
-.total{font-size:22px;font-weight:900;margin-top:12px}
-.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:800}
+header{background:#17303d;color:white;padding:16px;font-weight:900;font-size:20px}
+.contenedor{padding:16px}
+select{width:100%;padding:12px;border-radius:14px;margin-bottom:15px;font-size:16px}
+.card{background:white;border-radius:16px;padding:12px;margin-bottom:10px}
+.card.costeCero{border:3px solid #ff9800;background:#fff8ea}
+.nombre{font-weight:900;font-size:17px}
+.detalle{color:#4f5f69;font-size:14px;margin-top:4px}
+.fila{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px}
+input{width:80px;padding:10px;border-radius:12px;border:1px solid #ccc;text-align:center;font-size:16px}
+.totalLinea{font-weight:900;font-size:16px}
+.avisoCero{margin-top:8px;color:#c06b00;font-weight:900;font-size:13px}
+.botonCero{width:100%;margin-top:10px;padding:10px;border:0;border-radius:12px;font-weight:900;font-size:14px;background:#17303d;color:white}
+.botonCero.activo{background:#ff9800;color:white}
+.totalFinal{font-size:22px;font-weight:900;margin-top:20px}
+button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-weight:900;font-size:16px}
+.guardar{background:#48a530;color:white}
+.volver{background:white;color:#17303d;width:auto;margin:0 10px 0 0;padding:7px 11px}
+.promo{margin-top:10px;background:#fff6cf;border:2px solid #ffe066;border-radius:12px;padding:10px;font-size:13px;font-weight:900;color:#8a6a00}
+.promoOk{margin-top:8px;background:#e5ffe5;border:2px solid #8bd98b;border-radius:12px;padding:9px;font-size:13px;font-weight:900;color:#1a7f1a}
+.promoAlerta{margin-top:8px;background:#ffe5e5;border:2px solid #ff9b9b;border-radius:12px;padding:9px;font-size:13px;font-weight:900;color:#c00000}
+.stockBox{margin-top:10px;background:#eef7ff;border:2px solid #cfe5ff;border-radius:12px;padding:10px}
+.stockTitulo{font-size:13px;font-weight:900;margin-bottom:8px}
+.stockFila{display:flex;gap:10px}
+.stockFila input{flex:1;width:auto}
+.avisosBox{background:#fff8db;border:3px solid #f0c94a;border-radius:18px;padding:14px;margin-bottom:16px}
+.avisosTitulo{font-weight:900;font-size:18px;margin-bottom:8px;color:#8a6a00}
+.avisoLinea{background:white;border-radius:12px;padding:10px;margin-top:8px;font-weight:900;color:#17303d}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">← Volver</button>
-  <h2>📦 PEDIDOS</h2>
+  <button class="volver" onclick="volver()">←</button>
+  📝 PEDIDOS
 </header>
 
-<div class="contenido">
+<div class="contenedor">
 
-  <div class="card">
-    <label>Proveedor</label>
-    <select id="proveedor" onchange="cargarArticulosProveedor()"></select>
+<div id="avisosPedidos"></div>
 
-    <label>Artículo</label>
-    <select id="articulo"></select>
+<select id="proveedor" onchange="cargarArticulos()"></select>
 
-    <label>Cantidad</label>
-    <input id="cantidad" type="number" step="1" value="1">
+<div id="articulos"></div>
 
-    <button class="guardar" onclick="añadirLinea()">➕ Añadir al pedido</button>
-  </div>
+<div class="totalFinal" id="totalFinal">TOTAL PAGO: 0,00 €</div>
 
-  <div class="card">
-    <h3>Pedido actual</h3>
-    <div id="lineas"></div>
-    <div class="total" id="total">Total sin IVA: 0.00 €</div>
-
-    <label>Observaciones / incidencia</label>
-    <textarea id="observaciones" placeholder="Notas del pedido..."></textarea>
-
-    <button class="guardar" onclick="guardarPedido()">💾 Guardar pedido</button>
-  </div>
-
-  <div id="historial"></div>
+<button class="guardar" onclick="guardarPedido()">Guardar pedido</button>
 
 </div>
 
 <script>
-let pedidoActual = [];
+function usuarioActual(){
+  return localStorage.getItem("usuario") || "OPERADOR";
+}
 
-function leerProveedores(){
-  let datos = JSON.parse(localStorage.getItem("proveedores") || "[]")
-    .filter(p => p.activo !== false);
+function esHostelero(){
+  const u = usuarioActual().toUpperCase();
+  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+}
 
-  if(datos.length === 0){
-    datos = [
-      {nombre:"CANDELAS"},
-      {nombre:"TURRADO"},
-      {nombre:"SANPEDRO"},
-      {nombre:"DEO"}
-    ];
-  }
+function volver(){
+  window.location.href = "index.html";
+}
 
-  return datos;
+function normalizar(t){
+  return String(t || "")
+    .trim()
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"");
 }
 
 function leerArticulos(){
@@ -83,156 +85,471 @@ function leerArticulos(){
     .filter(a => a.activo !== false);
 }
 
-function precioCompra(a){
-  return Number(a.precioUnidad || 0) * Number(a.formato || 1);
+function leerProveedores(){
+  let p = JSON.parse(localStorage.getItem("proveedores") || "[]")
+    .filter(x => x.activo !== false);
+
+  if(p.length===0){
+    p = [
+      {nombre:"CANDELAS"},
+      {nombre:"TURRADO"},
+      {nombre:"SANPEDRO"},
+      {nombre:"DEO"}
+    ];
+  }
+
+  return p;
+}
+
+function leerPromociones(){
+  return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
+}
+
+function leerAvisosPedidos(){
+  return JSON.parse(localStorage.getItem("avisos_pedidos") || "[]");
+}
+
+function pintarAvisosPedidos(){
+  const avisos = leerAvisosPedidos();
+
+  if(avisos.length === 0){
+    document.getElementById("avisosPedidos").innerHTML = "";
+    return;
+  }
+
+  let html = `
+    <div class="avisosBox">
+      <div class="avisosTitulo">🛎️ AVISOS PARA PEDIDOS</div>
+  `;
+
+  avisos.forEach(a=>{
+    html += `<div class="avisoLinea">🛎️ ${a.texto || a}</div>`;
+  });
+
+  html += `</div>`;
+
+  document.getElementById("avisosPedidos").innerHTML = html;
 }
 
 function cargarProveedores(){
   const proveedores = leerProveedores();
-  const sel = document.getElementById("proveedor");
 
-  sel.innerHTML = proveedores.map(p =>
-    `<option value="${p.nombre}">${p.nombre}</option>`
-  ).join("");
-
-  cargarArticulosProveedor();
+  document.getElementById("proveedor").innerHTML =
+    `<option value="">Selecciona proveedor</option>` +
+    proveedores.map(p =>
+      `<option value="${p.nombre}">${p.nombre}</option>`
+    ).join("");
 }
 
-function cargarArticulosProveedor(){
+let pedido = [];
+
+function cargarArticulos(){
   const proveedor = document.getElementById("proveedor").value;
-  const articulos = leerArticulos().filter(a => a.proveedor === proveedor);
-  const sel = document.getElementById("articulo");
 
-  if(articulos.length === 0){
-    sel.innerHTML = `<option value="">No hay artículos de este proveedor</option>`;
-    return;
-  }
+  const articulos = leerArticulos().filter(a =>
+    normalizar(a.proveedor) === normalizar(proveedor)
+  );
 
-  sel.innerHTML = articulos.map((a,i) =>
-    `<option value="${i}">${a.articulo} · ${a.unidadFormato} · ${precioCompra(a).toFixed(2)} €</option>`
-  ).join("");
-}
+  pedido = articulos.map(a => ({
+    ...a,
+    cantidad:0,
+    costeCero:false,
+    excluirRappel:false,
+    stockActual:"",
+    pedir:"",
+    mostrarStock:false
+  }));
 
-function articulosProveedorActual(){
-  const proveedor = document.getElementById("proveedor").value;
-  return leerArticulos().filter(a => a.proveedor === proveedor);
-}
+  let historico = JSON.parse(localStorage.getItem("pedidos_historico") || "[]");
 
-function añadirLinea(){
-  const articulos = articulosProveedorActual();
-  const idx = document.getElementById("articulo").value;
+  let pedidosProveedor = historico.filter(p =>
+    normalizar(p.proveedor) === normalizar(proveedor)
+  );
 
-  if(idx === ""){
-    alert("No hay artículo seleccionado.");
-    return;
-  }
+  let activarStock = pedidosProveedor.length >= 3;
 
-  const a = articulos[Number(idx)];
-  const cantidad = Number(document.getElementById("cantidad").value || 1);
-  const precio = precioCompra(a);
-  const total = cantidad * precio;
-
-  pedidoActual.push({
-    proveedor:a.proveedor,
-    articulo:a.articulo,
-    formato:a.unidadFormato,
-    iva:a.iva,
-    cantidad,
-    precio,
-    total
+  pedido.forEach(a=>{
+    a.mostrarStock = activarStock;
   });
 
-  pintarLineas();
+  pintar();
 }
 
-function pintarLineas(){
-  let html = "";
-  let total = 0;
+function promoArticulo(a){
+  const promos = leerPromociones();
 
-  pedidoActual.forEach((l,i)=>{
-    total += l.total;
+  const nombreArticulo = normalizar(a.articulo);
+  const proveedorArticulo = normalizar(a.proveedor);
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  return promos.find(p => {
+    const proveedorPromo = normalizar(p.proveedor);
+
+    if(proveedorPromo !== proveedorArticulo){
+      return false;
+    }
+
+    const inicio = p.fechaInicio || p.inicio || p.desde || "";
+    const fin = p.fechaFin || p.fin || p.hasta || "";
+
+    if(inicio){
+      const dInicio = new Date(inicio + "T00:00:00");
+      if(hoy < dInicio) return false;
+    }
+
+    if(fin){
+      const dFin = new Date(fin + "T23:59:59");
+      if(hoy > dFin) return false;
+    }
+
+    const textoPromo = normalizar(
+      (p.articulo || "") + " " +
+      (p.producto || "") + " " +
+      (p.nombreArticulo || "") + " " +
+      (p.promocion || "") + " " +
+      (p.nombre || "")
+    );
+
+    if(!textoPromo){
+      return false;
+    }
+
+    return textoPromo.includes(nombreArticulo) ||
+           nombreArticulo.includes(textoPromo);
+  });
+}
+
+function datosPromo(a){
+  const promo = promoArticulo(a);
+
+  if(!promo) return null;
+
+  const conCargo = Number(
+    promo.unidadesConCargo ||
+    promo.conCargo ||
+    promo.pagadas ||
+    promo.cargo ||
+    0
+  );
+
+  const gratis = Number(
+    promo.unidadesGratis ||
+    promo.unidadesCoste0 ||
+    promo.sinCargo ||
+    promo.gratis ||
+    0
+  );
+
+  if(conCargo <= 0 || gratis <= 0){
+    return null;
+  }
+
+  const cantidad = Number(a.cantidad || 0);
+  const bloques = Math.floor(cantidad / conCargo);
+  const resto = cantidad % conCargo;
+  const gratisTotal = bloques * gratis;
+  const faltan = resto === 0 ? 0 : conCargo - resto;
+
+  let textoPedido = "";
+
+  if(gratisTotal > 0){
+    textoPedido = cantidad + " + " + gratisTotal;
+  }
+
+  return {
+    promo,
+    conCargo,
+    gratis,
+    cantidad,
+    bloques,
+    resto,
+    gratisTotal,
+    faltan,
+    textoPedido
+  };
+}
+
+function avisoPromoHTML(a){
+  const d = datosPromo(a);
+
+  if(!d) return "";
+
+  let html = `
+    <div class="promo">
+      🟡 PROMOCIÓN ACTIVA<br>
+      ${d.conCargo} + ${d.gratis}
+    </div>
+  `;
+
+  if(d.cantidad > 0 && d.gratisTotal > 0){
+    html += `
+      <div class="promoOk">
+        ✅ EN PEDIDO: ${d.textoPedido}<br>
+        ${d.cantidad} con cargo + ${d.gratisTotal} sin cargo<br>
+        Cuenta para RAPPEL: ${d.cantidad + d.gratisTotal}
+      </div>
+    `;
+  }else if(d.cantidad > 0 && d.faltan > 0){
+    html += `
+      <div class="promoAlerta">
+        ⚠ Estás pidiendo ${d.cantidad}.<br>
+        Con ${d.conCargo} entra promoción ${d.conCargo} + ${d.gratis}.<br>
+        Faltan ${d.faltan}.
+      </div>
+    `;
+  }
+
+  return html;
+}
+
+function pintar(){
+  let html = "";
+
+  pedido.forEach((a,i)=>{
+    const precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
+    const lineaPago = a.costeCero ? 0 : Number(a.cantidad || 0) * precioCaja;
 
     html += `
-      <div class="linea">
-        <b>${l.articulo}</b><br>
-        ${l.formato} · IVA ${l.iva}%<br>
-        Cantidad: ${l.cantidad}<br>
-        Precio: ${l.precio.toFixed(2)} €<br>
-        Total: ${l.total.toFixed(2)} €
-        <br><br>
-        <button onclick="borrarLinea(${i})">Borrar línea</button>
+    <div class="card ${a.costeCero ? "costeCero" : ""}">
+
+      <div class="nombre">${a.articulo}</div>
+
+      <div class="detalle">
+        ${a.unidadFormato} ·
+        ${Number(a.precioUnidad || 0).toFixed(2)} € ·
+        IVA ${a.iva}%
       </div>
+
+      ${avisoPromoHTML(a)}
+
+      ${
+        a.mostrarStock ? `
+        <div class="stockBox">
+          <div class="stockTitulo">📦 CONTROL DE ALMACÉN</div>
+
+          <div class="stockFila">
+            <input
+              type="number"
+              placeholder="Cuántas hay"
+              value="${a.stockActual}"
+              onchange="stockActual(${i},this.value)"
+            >
+
+            <input
+              type="number"
+              placeholder="Cuántas pides"
+              value="${a.pedir}"
+              onchange="stockPedir(${i},this.value)"
+            >
+          </div>
+        </div>
+        ` : ""
+      }
+
+      <div class="fila">
+        <input
+          class="cantidadPedido"
+          data-indice="${i}"
+          type="number"
+          value="${a.cantidad}"
+          onfocus="this.select()"
+          onclick="this.select()"
+          onchange="cambiar(${i}, this.value)"
+          onkeydown="siguienteConEnter(event, ${i})"
+        >
+
+        <div class="totalLinea" id="t${i}">
+          ${lineaPago.toFixed(2)} €
+        </div>
+      </div>
+
+      ${
+        esHostelero() ? `
+          <button class="botonCero ${a.costeCero ? "activo" : ""}" onclick="toggleCosteCero(${i})">
+            ${a.costeCero ? "✅ COSTE 0 € ACTIVADO" : "Marcar COSTE 0 €"}
+          </button>
+        ` : ""
+      }
+
+      ${
+        a.costeCero ? `
+          <div class="avisoCero">
+            COSTE 0 € manual · No suma pagos · No suma RAPPEL
+          </div>
+        ` : ""
+      }
+
+    </div>
     `;
   });
 
-  document.getElementById("lineas").innerHTML = html || `<div class="vacio">Todavía no hay líneas.</div>`;
-  document.getElementById("total").textContent = "Total sin IVA: " + total.toFixed(2) + " €";
+  document.getElementById("articulos").innerHTML = html;
+
+  calcular();
 }
 
-function borrarLinea(i){
-  pedidoActual.splice(i,1);
-  pintarLineas();
+function cambiar(i, valor){
+  pedido[i].cantidad = Number(valor || 0);
+  pintar();
+}
+
+function siguienteConEnter(e,i){
+  if(e.key !== "Enter") return;
+
+  e.preventDefault();
+
+  cambiar(i, e.target.value);
+
+  setTimeout(function(){
+    const inputs = document.querySelectorAll(".cantidadPedido");
+
+    if(inputs[i+1]){
+      inputs[i+1].focus();
+      inputs[i+1].select();
+    }
+  },80);
+}
+
+function stockActual(i,v){
+  pedido[i].stockActual = v;
+}
+
+function stockPedir(i,v){
+  pedido[i].pedir = v;
+}
+
+function toggleCosteCero(i){
+  if(!esHostelero()){
+    alert("Solo hostelería puede marcar coste 0 €");
+    return;
+  }
+
+  pedido[i].costeCero = !pedido[i].costeCero;
+  pedido[i].excluirRappel = pedido[i].costeCero;
+
+  pintar();
+}
+
+function calcular(){
+  let totalPago = 0;
+
+  pedido.forEach((a,i)=>{
+    let precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
+    let linea = Number(a.cantidad || 0) * precioCaja;
+    let lineaPago = a.costeCero ? 0 : linea;
+
+    totalPago += lineaPago;
+
+    const celda = document.getElementById("t"+i);
+
+    if(celda){
+      celda.textContent = lineaPago.toFixed(2) + " €";
+    }
+  });
+
+  document.getElementById("totalFinal").textContent =
+    "TOTAL PAGO: " + totalPago.toFixed(2) + " €";
 }
 
 function guardarPedido(){
-  if(pedidoActual.length === 0){
-    alert("No hay líneas en el pedido.");
+  const proveedor = document.getElementById("proveedor").value;
+
+  if(!proveedor){
+    alert("Selecciona proveedor");
     return;
   }
 
-  const pedidos = JSON.parse(localStorage.getItem("pedidos") || "[]");
+  const lineas = pedido.filter(a => Number(a.cantidad || 0) > 0);
 
-  const pedido = {
-    fecha:new Date().toLocaleString("es-ES"),
-    proveedor:pedidoActual[0].proveedor,
-    lineas:pedidoActual,
-    total:pedidoActual.reduce((s,l)=>s+l.total,0),
-    observaciones:document.getElementById("observaciones").value.trim(),
-    estado:"PENDIENTE"
-  };
-
-  pedidos.unshift(pedido);
-  localStorage.setItem("pedidos", JSON.stringify(pedidos));
-
-  pedidoActual = [];
-  document.getElementById("observaciones").value = "";
-  pintarLineas();
-  pintarHistorial();
-
-  alert("Pedido guardado.");
-}
-
-function pintarHistorial(){
-  const pedidos = JSON.parse(localStorage.getItem("pedidos") || "[]");
-
-  let html = `<h3>Últimos pedidos</h3>`;
-
-  if(pedidos.length === 0){
-    html += `<div class="vacio">Sin pedidos guardados.</div>`;
+  if(lineas.length === 0){
+    alert("Sin cantidades");
+    return;
   }
 
-  pedidos.forEach(p=>{
-    html += `
-      <div class="card">
-        <b>${p.proveedor}</b><br>
-        ${p.fecha}<br>
-        Estado: ${p.estado}<br>
-        Total sin IVA: <b>${Number(p.total || 0).toFixed(2)} €</b><br>
-        ${p.observaciones ? "Notas: " + p.observaciones : ""}
-      </div>
-    `;
+  const ahora = new Date();
+
+  const lineasFinal = lineas.map(a => {
+    const precioOriginalSinIva = Number(a.precioUnidad || 0) * Number(a.formato || 1);
+    const costeCero = a.costeCero === true;
+    const dPromo = datosPromo(a);
+
+    const cantidadCargo = Number(a.cantidad || 0);
+    const cantidadGratis = dPromo ? dPromo.gratisTotal : 0;
+
+    return {
+      articulo: a.articulo,
+      proveedor: proveedor,
+
+      cantidad: cantidadCargo,
+      cantidadGratisPromo: cantidadGratis,
+      cantidadTotalRappel: costeCero ? 0 : cantidadCargo + cantidadGratis,
+
+      unidadFormato: a.unidadFormato || "",
+      formato: Number(a.formato || 1),
+      iva: Number(a.iva || 21),
+
+      precioOriginalSinIva: precioOriginalSinIva,
+      precioSinIva: costeCero ? 0 : precioOriginalSinIva,
+
+      costeCero: costeCero,
+      excluirRappel: costeCero,
+      cuentaConsumo:true,
+
+      stockActual:a.stockActual || "",
+      pedir:a.pedir || "",
+
+      promocionActiva: dPromo ? true : false,
+      promocionTexto: dPromo ? (dPromo.conCargo + " + " + dPromo.gratis) : "",
+      unidadesConCargoPromo: dPromo ? dPromo.conCargo : 0,
+      unidadesGratisPromo: dPromo ? dPromo.gratis : 0,
+      unidadesGratisCalculadas: cantidadGratis,
+      textoPedidoPromo: dPromo && dPromo.textoPedido ? dPromo.textoPedido : ""
+    };
   });
 
-  document.getElementById("historial").innerHTML = html;
+  const totalPago = lineasFinal.reduce((t,l)=>
+    t + (l.cantidad * l.precioSinIva)
+  ,0);
+
+  const pedidoGuardado = {
+    proveedor,
+    fecha: ahora.toLocaleString("es-ES"),
+    usuario: usuarioActual(),
+    totalPago,
+    lineas: lineasFinal
+  };
+
+  let historico = JSON.parse(localStorage.getItem("pedidos_historico") || "[]");
+  historico.unshift(pedidoGuardado);
+  localStorage.setItem("pedidos_historico", JSON.stringify(historico));
+
+  if(totalPago > 0){
+    let pagos = JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
+
+    pagos.unshift({
+      proveedor,
+      fecha: ahora.toLocaleString("es-ES"),
+      total: totalPago,
+      lineas: lineasFinal.filter(l => !l.costeCero)
+    });
+
+    localStorage.setItem("pagos_pendientes", JSON.stringify(pagos));
+  }
+
+  if(totalPago === 0){
+    alert("Pedido COSTE 0 € guardado en histórico. No genera pago pendiente.");
+  }else{
+    alert("Pedido guardado correctamente");
+  }
+
+  location.reload();
 }
 
-function volver(){
-  window.location.href = "index.html";
-}
-
+pintarAvisosPedidos();
 cargarProveedores();
-pintarLineas();
-pintarHistorial();
+
 </script>
 
 </body>
