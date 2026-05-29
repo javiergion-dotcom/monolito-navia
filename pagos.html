@@ -7,20 +7,115 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:12px}
-header h2{margin:0;font-size:20px}
-button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;cursor:pointer}
-.volver{background:white;color:#17303d}
-.contenedor{padding:16px}
-.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
-.proveedor{font-size:22px;font-weight:900}
-.detalle{margin-top:6px;color:#5a6872;font-weight:700}
-.total{font-size:26px;font-weight:900;margin-top:10px}
-select,input{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:10px}
-.pagado{width:100%;background:#1f8f34;color:white;margin-top:10px}
-.incidencia{width:100%;background:#c00000;color:white;margin-top:10px}
-.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:900}
+
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#eef2f5;
+  color:#17303d;
+}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+header h2{
+  margin:0;
+  font-size:20px;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:12px;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.volver{
+  background:white;
+  color:#17303d;
+}
+
+.contenedor{
+  padding:16px;
+}
+
+.card{
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+
+.cardIncidencia{
+  border:3px solid #c00000;
+  background:#fff0f0;
+}
+
+.proveedor{
+  font-size:22px;
+  font-weight:900;
+}
+
+.detalle{
+  margin-top:6px;
+  color:#5a6872;
+  font-weight:700;
+}
+
+.total{
+  font-size:26px;
+  font-weight:900;
+  margin-top:10px;
+}
+
+.estadoIncidencia{
+  margin-top:10px;
+  background:#ffd6d6;
+  color:#9b0000;
+  padding:10px;
+  border-radius:14px;
+  font-weight:900;
+}
+
+select,input{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid #b8c2ca;
+  font-size:16px;
+  margin-top:10px;
+}
+
+.pagado{
+  width:100%;
+  background:#1f8f34;
+  color:white;
+  margin-top:10px;
+}
+
+.incidencia{
+  width:100%;
+  background:#c00000;
+  color:white;
+  margin-top:10px;
+}
+
+.vacio{
+  background:white;
+  border-radius:22px;
+  padding:18px;
+  text-align:center;
+  font-weight:900;
+}
 </style>
 </head>
 
@@ -71,12 +166,18 @@ function pintar(){
 
     pagos.forEach((p,i)=>{
 
+      const tieneIncidencia = p.estado === "INCIDENCIA";
+
       html += `
-        <div class="card">
+        <div class="card ${tieneIncidencia ? "cardIncidencia" : ""}">
 
-          <div class="proveedor">${p.proveedor || "SIN PROVEEDOR"}</div>
+          <div class="proveedor">
+            ${p.proveedor || "SIN PROVEEDOR"}
+          </div>
 
-          <div class="detalle">Fecha pedido: ${p.fecha || ""}</div>
+          <div class="detalle">
+            Fecha pedido: ${p.fecha || ""}
+          </div>
 
           <div class="detalle">
             Líneas: ${p.lineas ? p.lineas.length : 0}
@@ -85,6 +186,18 @@ function pintar(){
           <div class="total">
             ${Number(p.total || 0).toFixed(2)} €
           </div>
+
+          ${
+            tieneIncidencia
+            ? `
+              <div class="estadoIncidencia">
+                🚨 INCIDENCIA PENDIENTE<br>
+                Motivo: ${p.motivoIncidencia || "Sin motivo"}<br>
+                Solución prevista: ${p.solucionIncidencia || "Sin solución indicada"}
+              </div>
+            `
+            : ""
+          }
 
           <select id="tipo${i}">
             <option value="CONTADO">CONTADO</option>
@@ -145,20 +258,42 @@ function marcarIncidencia(i){
 
   const pago = pendientes[i];
 
-  incidencias.unshift({
-    id:Date.now(),
-    titulo:"Incidencia de pago",
-    texto:"Proveedor: " + (pago.proveedor || "") + " · Importe: " + Number(pago.total || 0).toFixed(2) + " €",
-    fecha:new Date().toLocaleString("es-ES"),
-    resuelta:false
-  });
+  const motivo = prompt("Motivo de la incidencia");
+  if(!motivo) return;
+
+  const solucion = prompt("¿Cómo se va a resolver con el proveedor?");
+  if(!solucion) return;
+
+  const incidencia = {
+    id: Date.now(),
+    proveedor: pago.proveedor || "",
+    titulo: "Incidencia con " + (pago.proveedor || "proveedor"),
+    texto:
+      "Proveedor: " + (pago.proveedor || "") +
+      " · Importe: " + Number(pago.total || 0).toFixed(2) + " €" +
+      " · Motivo: " + motivo +
+      " · Solución prevista: " + solucion,
+    motivo: motivo,
+    solucionPrevista: solucion,
+    fecha: new Date().toLocaleString("es-ES"),
+    pedidoFecha: pago.fecha || "",
+    importe: Number(pago.total || 0),
+    resuelta: false
+  };
+
+  incidencias.unshift(incidencia);
 
   pago.estado = "INCIDENCIA";
+  pago.motivoIncidencia = motivo;
+  pago.solucionIncidencia = solucion;
+  pago.fechaIncidencia = incidencia.fecha;
+  pago.incidenciaId = incidencia.id;
 
   guardarIncidencias(incidencias);
   guardarPagosPendientes(pendientes);
 
-  alert("Incidencia registrada.");
+  alert("Incidencia registrada. Este proveedor queda marcado hasta resolverla.");
+
   pintar();
 }
 
