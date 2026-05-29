@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🛎️ AVISOS PEDIDOS · MONOLITO</title>
+<title>AVISOS PEDIDOS · MONOLITO</title>
 
 <style>
+*{box-sizing:border-box}
+
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, Helvetica, sans-serif;
   background:#eef2f5;
   color:#17303d;
 }
@@ -17,77 +19,124 @@ header{
   background:#17303d;
   color:white;
   padding:16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+header h2{
+  margin:0;
   font-size:20px;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:12px;
+  font-size:16px;
   font-weight:900;
+  cursor:pointer;
+}
+
+.volver{
+  background:white;
+  color:#17303d;
+  width:auto;
+  padding:8px 12px;
 }
 
 .contenedor{
   padding:16px;
 }
 
-textarea{
-  width:100%;
-  min-height:100px;
-  border-radius:16px;
-  border:1px solid #cfd8dc;
-  padding:14px;
-  font-size:16px;
-  resize:none;
-  box-sizing:border-box;
+.card{
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
 }
 
-button{
-  width:100%;
-  border:0;
-  border-radius:14px;
-  padding:14px;
-  font-size:16px;
+label{
+  display:block;
   font-weight:900;
   margin-top:12px;
+}
+
+textarea, select{
+  width:100%;
+  margin-top:6px;
+  padding:13px;
+  border-radius:16px;
+  border:1px solid #b8c2ca;
+  font-size:16px;
+}
+
+textarea{
+  min-height:110px;
+  resize:none;
 }
 
 .guardar{
+  width:100%;
   background:#48a530;
   color:white;
-}
-
-.volver{
-  width:auto;
-  background:white;
-  color:#17303d;
-  margin-right:10px;
-  padding:7px 11px;
-}
-
-.card{
-  background:white;
-  border-radius:16px;
-  padding:14px;
-  margin-top:12px;
-}
-
-.texto{
-  font-weight:900;
-  font-size:15px;
-}
-
-.fecha{
-  margin-top:6px;
-  color:#60707a;
-  font-size:12px;
-  font-weight:900;
+  margin-top:14px;
 }
 
 .eliminar{
+  width:100%;
   background:#c00000;
   color:white;
+  margin-top:12px;
+}
+
+.aviso{
+  border-left:8px solid #ffb300;
+}
+
+.incidencia{
+  border-left:8px solid #c00000;
+}
+
+.texto{
+  font-size:16px;
+  font-weight:900;
+}
+
+.fecha{
+  margin-top:8px;
+  color:#60707a;
+  font-size:13px;
+  font-weight:900;
+}
+
+.tipo{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.tipoAviso{
+  background:#fff3cd;
+  color:#8a6200;
+}
+
+.tipoIncidencia{
+  background:#ffd7d7;
+  color:#9b0000;
 }
 
 .vacio{
+  background:white;
+  border-radius:22px;
+  padding:18px;
   text-align:center;
   font-weight:900;
   color:#60707a;
-  margin-top:30px;
 }
 </style>
 </head>
@@ -96,26 +145,29 @@ button{
 
 <header>
   <button class="volver" onclick="volver()">←</button>
-  🛎️ AVISOS PEDIDOS
+  <h2>🛎️ AVISOS PEDIDOS</h2>
 </header>
 
 <div class="contenedor">
 
-<textarea
-  id="texto"
-  placeholder="Ejemplo: Falta gel de manos, mini servilletas o vasos takeaway..."
-></textarea>
+  <div class="card">
+    <label>Tipo</label>
+    <select id="tipo">
+      <option value="AVISO">AVISO</option>
+      <option value="INCIDENCIA">INCIDENCIA</option>
+    </select>
 
-<button class="guardar" onclick="guardarAviso()">
-  Guardar aviso
-</button>
+    <label>Texto del aviso</label>
+    <textarea id="texto" placeholder="Ejemplo: Falta gel de manos, mini servilletas, vasos takeaway..."></textarea>
 
-<div id="lista"></div>
+    <button class="guardar" onclick="guardarAviso()">Guardar aviso</button>
+  </div>
+
+  <div id="lista"></div>
 
 </div>
 
 <script>
-
 function volver(){
   window.location.href = "index.html";
 }
@@ -129,12 +181,11 @@ function guardarAvisos(data){
 }
 
 function guardarAviso(){
-
-  const texto =
-    document.getElementById("texto").value.trim();
+  const texto = document.getElementById("texto").value.trim();
+  const tipo = document.getElementById("tipo").value;
 
   if(!texto){
-    alert("Escribe un aviso");
+    alert("Escribe un aviso.");
     return;
   }
 
@@ -142,50 +193,46 @@ function guardarAviso(){
 
   avisos.unshift({
     texto:texto,
+    tipo:tipo,
     fecha:new Date().toLocaleString("es-ES")
   });
 
   guardarAvisos(avisos);
 
   document.getElementById("texto").value = "";
+  document.getElementById("tipo").value = "AVISO";
 
   pintar();
 }
 
 function eliminarAviso(i){
-
   let avisos = leerAvisos();
 
-  avisos.splice(i,1);
-
-  guardarAvisos(avisos);
-
-  pintar();
+  if(confirm("¿Eliminar este aviso?")){
+    avisos.splice(i,1);
+    guardarAvisos(avisos);
+    pintar();
+  }
 }
 
 function pintar(){
-
   const avisos = leerAvisos();
-
   let html = "";
 
   if(avisos.length === 0){
-
-    html = `
-      <div class="vacio">
-        No hay avisos pendientes
-      </div>
-    `;
-
+    html = `<div class="vacio">No hay avisos pendientes</div>`;
   }else{
-
     avisos.forEach((a,i)=>{
+      const esIncidencia = a.tipo === "INCIDENCIA";
 
       html += `
-        <div class="card">
+        <div class="card ${esIncidencia ? "incidencia" : "aviso"}">
+          <div class="tipo ${esIncidencia ? "tipoIncidencia" : "tipoAviso"}">
+            ${esIncidencia ? "INCIDENCIA" : "AVISO"}
+          </div>
 
           <div class="texto">
-            🛎️ ${a.texto}
+            ${esIncidencia ? "🚨" : "🛎️"} ${a.texto}
           </div>
 
           <div class="fecha">
@@ -193,12 +240,10 @@ function pintar(){
           </div>
 
           <button class="eliminar" onclick="eliminarAviso(${i})">
-            Eliminar aviso
+            Eliminar
           </button>
-
         </div>
       `;
-
     });
   }
 
@@ -206,7 +251,6 @@ function pintar(){
 }
 
 pintar();
-
 </script>
 
 </body>
