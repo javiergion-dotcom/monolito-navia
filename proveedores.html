@@ -3,333 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PEDIDOS · MONOLITO GPT PRO</title>
+<title>PROVEEDORES</title>
 
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
 body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#dfe6ec;
-color:#111;
-padding:18px;
+  font-family:Arial;
+  background:#dfe6ec;
+  margin:0;
 }
 
-.header{
-background:#17303d;
-color:white;
-padding:16px;
-border-radius:22px;
-box-shadow:0 8px 20px rgba(0,0,0,.22);
-margin-bottom:18px;
+header{
+  background:#17303d;
+  color:white;
+  padding:20px;
+  font-size:22px;
+  font-weight:bold;
 }
 
-.header h1{
-margin:0;
-font-size:26px;
+.proveedor{
+  background:#547184;
+  color:white;
+  margin:12px;
+  padding:18px;
+  border-radius:14px;
+  font-size:20px;
+  cursor:pointer;
 }
 
-.header .sub{
-margin-top:5px;
-font-size:14px;
-opacity:.85;
-font-weight:700;
+.infoProveedor{
+  background:white;
+  margin:12px;
+  padding:15px;
+  border-radius:12px;
+  font-size:17px;
+  line-height:1.6;
+}
+
+#tabla{
+  margin:15px;
+}
+
+.fila{
+  background:white;
+  padding:14px;
+  margin-bottom:8px;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
+  font-size:18px;
+}
+
+input{
+  width:90px;
+  font-size:18px;
+  padding:6px;
+}
+
+button{
+  margin:15px;
+  padding:15px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  background:#48a530;
+  color:white;
+  width:90%;
 }
 
 .volver{
-margin-top:14px;
-width:100%;
-padding:14px;
-border:none;
-border-radius:16px;
-background:#8fb1c7;
-color:white;
-font-weight:900;
-font-size:16px;
-cursor:pointer;
+  background:#17303d;
 }
-
-.card{
-background:white;
-padding:20px;
-border-radius:24px;
-box-shadow:0 10px 26px rgba(0,0,0,.14);
-margin-bottom:18px;
-}
-
-h2{
-margin-top:0;
-font-size:26px;
-}
-
-label{
-display:block;
-font-weight:900;
-margin-top:14px;
-margin-bottom:6px;
-color:#17303d;
-}
-
-select,textarea,input{
-width:100%;
-padding:14px;
-border-radius:14px;
-border:1px solid #cfd6db;
-font-size:17px;
-background:#f7f9fa;
-}
-
-textarea{
-min-height:120px;
-resize:vertical;
-}
-
-button.principal{
-width:100%;
-padding:16px;
-margin-top:18px;
-background:#17303d;
-color:white;
-border:none;
-border-radius:16px;
-font-weight:900;
-font-size:17px;
-cursor:pointer;
-box-shadow:0 8px 18px rgba(0,0,0,.18);
-}
-
-button.principal:active,
-.volver:active{
-transform:translateY(3px);
-}
-
-.registro{
-background:white;
-padding:14px;
-margin-bottom:12px;
-border-radius:16px;
-border-left:7px solid #17303d;
-box-shadow:0 5px 14px rgba(0,0,0,.08);
-}
-
-.registro strong{
-font-size:18px;
-}
-
-.fecha{
-font-size:13px;
-color:#667;
-font-weight:700;
-margin-top:5px;
-}
-
-.detalle{
-margin-top:8px;
-font-size:16px;
-line-height:1.4;
-}
-
-.vacio{
-background:white;
-padding:18px;
-border-radius:18px;
-color:#667;
-font-weight:700;
-text-align:center;
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<h1>📦 PEDIDOS</h1>
-<div class="sub">MONOLITO GPT PRO · Registro de pedidos a proveedores</div>
-<button class="volver" onclick="volver()">VOLVER</button>
-</div>
+<header>PROVEEDORES</header>
 
-<div class="card">
-<h2>Registrar pedido</h2>
-
-<label>Proveedor</label>
-<select id="proveedor"></select>
-
-<label>Detalle del pedido o incidencia</label>
-<textarea id="detalle" placeholder="Ejemplo: pedir 3 cajas de Coca-Cola, revisar precio, falta albarán..."></textarea>
-
-<button class="principal" onclick="guardarPedido()">GUARDAR PEDIDO</button>
-</div>
-
-<h2>Últimos pedidos</h2>
-<div id="listaPedidos"></div>
+<div id="lista"></div>
+<div id="tabla"></div>
 
 <script>
 
-function volver(){
-window.location.href = "index.html";
+let proveedores = {
+
+  "Cafés Candelas": {
+    diaPedido:"Lunes",
+    diaReparto:"Martes",
+    formaPago:"Banco mensual",
+    articulos:[
+      {articulo:"Café mezcla 1kg", precio:17.00},
+      {articulo:"Café natural 1kg", precio:18.50},
+      {articulo:"Descafeinado 1kg", precio:19.00},
+      {articulo:"Café molido", precio:16.50},
+      {articulo:"Azúcar sobres", precio:1.20},
+      {articulo:"Sacarina", precio:2.10},
+      {articulo:"Chocolate taza", precio:3.20},
+      {articulo:"Cacao soluble", precio:2.50}
+    ]
+  },
+
+  "Turrado (Mahou)": {
+    diaPedido:"Miércoles",
+    diaReparto:"Jueves",
+    formaPago:"Reposición semanal",
+    articulos:[
+      {articulo:"Barril 50L", precio:78.00},
+      {articulo:"Barril 30L", precio:56.00},
+      {articulo:"Caja tercios", precio:16.00},
+      {articulo:"Caja quintos", precio:14.50},
+      {articulo:"Mahou 0,0", precio:15.20},
+      {articulo:"Radler", precio:15.00},
+      {articulo:"Cerveza especial", precio:17.20},
+      {articulo:"Agua mineral", precio:6.00}
+    ]
+  }
+
+};
+
+let actual = "";
+
+function cargar(){
+  let html="";
+  for(let p in proveedores){
+    html += `<div class="proveedor" onclick="ver('${p}')">${p}</div>`;
+  }
+  document.getElementById("lista").innerHTML = html;
 }
 
-function vibrar(){
-try{
-if(navigator.vibrate) navigator.vibrate(20);
-}catch(e){}
+function ver(p){
+  actual = p;
+  let proveedor = proveedores[p];
+  let datos = proveedor.articulos;
+
+  let html = `
+    <h2 style="margin:15px;">${p}</h2>
+
+    <div class="infoProveedor">
+      <b>Día de pedido:</b> ${proveedor.diaPedido}<br>
+      <b>Día de reparto:</b> ${proveedor.diaReparto}<br>
+      <b>Forma de pago:</b> ${proveedor.formaPago}
+    </div>
+  `;
+
+  datos.forEach((d,i)=>{
+    html += `
+      <div class="fila">
+        <div>${d.articulo}</div>
+        <div>
+          <input type="number" step="0.01" value="${d.precio}" id="p${i}">
+        </div>
+      </div>
+    `;
+  });
+
+  html += `<button onclick="guardar()">GUARDAR PRECIOS</button>`;
+  html += `<button class="volver" onclick="volverLista()">VOLVER A PROVEEDORES</button>`;
+
+  document.getElementById("lista").innerHTML = "";
+  document.getElementById("tabla").innerHTML = html;
 }
 
-function ahoraTexto(){
-return new Date().toLocaleString("es-ES");
+function guardar(){
+  let datos = proveedores[actual].articulos;
+
+  datos.forEach((d,i)=>{
+    let val = document.getElementById("p"+i).value;
+    d.precio = parseFloat(val);
+  });
+
+  alert("Precios guardados temporalmente");
 }
 
-function leerPedidos(){
-try{
-return JSON.parse(localStorage.getItem("pedidos_monolito") || "[]");
-}catch(e){
-return [];
-}
+function volverLista(){
+  document.getElementById("tabla").innerHTML = "";
+  cargar();
 }
 
-function guardarPedidos(data){
-localStorage.setItem("pedidos_monolito", JSON.stringify(data));
-}
-
-function leerProveedores(){
-
-let proveedores = [];
-
-try{
-proveedores = JSON.parse(localStorage.getItem("proveedores_monolito") || "[]");
-}catch(e){
-proveedores = [];
-}
-
-if(!Array.isArray(proveedores) || proveedores.length === 0){
-
-proveedores = [
-{nombre:"Distribuciones Mahou S.L."},
-{nombre:"Frutas y Verduras Paquito"},
-{nombre:"Disbepo Bebidas"},
-{nombre:"Cabanella"},
-{nombre:"Proveedor general"}
-];
-
-}
-
-return proveedores;
-}
-
-function cargarProveedores(){
-
-const select = document.getElementById("proveedor");
-select.innerHTML = "";
-
-leerProveedores().forEach(p=>{
-
-const nombre =
-p.nombre ||
-p.proveedor ||
-p.empresa ||
-"Proveedor sin nombre";
-
-const option = document.createElement("option");
-option.value = nombre;
-option.textContent = nombre;
-
-select.appendChild(option);
-
-});
-
-}
-
-function guardarPedido(){
-
-vibrar();
-
-const proveedor = document.getElementById("proveedor").value.trim();
-const detalle = document.getElementById("detalle").value.trim();
-
-if(!proveedor){
-alert("Selecciona un proveedor.");
-return;
-}
-
-if(!detalle){
-alert("Escribe el detalle del pedido.");
-return;
-}
-
-const pedidos = leerPedidos();
-
-pedidos.unshift({
-id:Date.now(),
-proveedor:proveedor,
-detalle:detalle,
-fecha:ahoraTexto(),
-operador:localStorage.getItem("usuario") || "OPERADOR",
-estado:"PENDIENTE"
-});
-
-guardarPedidos(pedidos);
-
-document.getElementById("detalle").value = "";
-
-pintarPedidos();
-
-alert("Pedido guardado correctamente.");
-
-}
-
-function pintarPedidos(){
-
-const contenedor = document.getElementById("listaPedidos");
-const pedidos = leerPedidos();
-
-if(pedidos.length === 0){
-contenedor.innerHTML = '<div class="vacio">Todavía no hay pedidos registrados.</div>';
-return;
-}
-
-contenedor.innerHTML = "";
-
-pedidos.slice(0,30).forEach(p=>{
-
-const proveedor =
-p.proveedor ||
-p.nombreProveedor ||
-"Proveedor no indicado";
-
-const detalle =
-p.detalle ||
-p.descripcion ||
-p.texto ||
-"Sin detalle";
-
-const fecha =
-p.fecha ||
-p.fechaTexto ||
-"Sin fecha";
-
-const operador =
-p.operador ||
-"OPERADOR";
-
-const div = document.createElement("div");
-div.className = "registro";
-
-div.innerHTML = `
-<strong>${proveedor}</strong>
-<div class="fecha">${fecha} · ${operador}</div>
-<div class="detalle">${detalle}</div>
-`;
-
-contenedor.appendChild(div);
-
-});
-
-}
-
-cargarProveedores();
-pintarPedidos();
+cargar();
 
 </script>
 
