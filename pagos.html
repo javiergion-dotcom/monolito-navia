@@ -1,77 +1,258 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PAGOS · MONOLITO</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f2f2f2; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
-        h2 { color: #17303d; text-align: center; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
-        button { width: 100%; padding: 18px; background: #17303d; color: white; border: none; border-radius: 10px; font-weight: 900; font-size: 18px; cursor: pointer; }
-        button:hover { background: #264a5d; }
-        .lista-item { background: #fff; padding: 15px; margin-top: 15px; border-radius: 10px; border-left: 6px solid #d35400; box-shadow: 0 2px 4px rgba(0,0,0,0.05); max-width: 500px; margin: 15px auto; }
-        .status { font-size: 14px; color: #17303d; text-align: center; margin-top: 15px; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAGOS · MONOLITO</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#eef2f5;
+  color:#17303d;
+}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+header h2{
+  margin:0;
+  font-size:20px;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:12px;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.volver{
+  background:white;
+  color:#17303d;
+}
+
+.contenedor{
+  padding:16px;
+}
+
+.card{
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+
+.proveedor{
+  font-size:22px;
+  font-weight:900;
+}
+
+.detalle{
+  margin-top:6px;
+  color:#5a6872;
+  font-weight:700;
+}
+
+.total{
+  font-size:26px;
+  font-weight:900;
+  margin-top:10px;
+}
+
+select,input{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid #b8c2ca;
+  font-size:16px;
+  margin-top:10px;
+}
+
+.guardar{
+  width:100%;
+  background:#48a530;
+  color:white;
+  margin-top:14px;
+}
+
+.pagado{
+  width:100%;
+  background:#1f8f34;
+  color:white;
+  margin-top:10px;
+}
+
+.incidencia{
+  width:100%;
+  background:#c00000;
+  color:white;
+  margin-top:10px;
+}
+
+.vacio{
+  background:white;
+  border-radius:22px;
+  padding:18px;
+  text-align:center;
+  font-weight:900;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="card">
-        <h2>💰 Registrar Pago</h2>
-        <input type="text" id="concepto" placeholder="Concepto (ej: Proveedor)">
-        <input type="number" id="cantidad" placeholder="Importe (€)">
-        <button onclick="registrarPago()">Registrar en Monolito</button>
-        <div id="statusMsg" class="status"></div>
-    </div>
+<header>
+  <button class="volver" onclick="volver()">←</button>
+  <h2>💰 PAGOS</h2>
+</header>
 
-    <div id="listaPagos"></div>
+<div class="contenedor">
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  <div id="lista"></div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED",
-            projectId: "monolito-ed87d"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+</div>
 
-        window.registrarPago = async () => {
-            const concepto = document.getElementById("concepto").value;
-            const cantidad = document.getElementById("cantidad").value;
-            const msg = document.getElementById("statusMsg");
+<script>
+function leerPedidos(){
+  return JSON.parse(localStorage.getItem("pedidos") || "[]");
+}
 
-            if(!concepto || !cantidad) {
-                alert("Por favor, rellena concepto e importe.");
-                return;
-            }
+function guardarPedidos(data){
+  localStorage.setItem("pedidos", JSON.stringify(data));
+}
 
-            try {
-                await addDoc(collection(db, "pagos"), {
-                    concepto: concepto,
-                    cantidad: parseFloat(cantidad),
-                    fecha: serverTimestamp(),
-                    waiterCode: localStorage.getItem("usuario") || "JAVI",
-                    fechaRegistro: new Date().toISOString()
-                });
-                msg.innerText = "✓ Pago guardado correctamente.";
-                document.getElementById("concepto").value = "";
-                document.getElementById("cantidad").value = "";
-            } catch (e) {
-                msg.innerText = "⚠ Error de conexión. Verifica la red.";
-            }
-        };
+function pintar(){
 
-        onSnapshot(query(collection(db, "pagos"), orderBy("fecha", "desc")), (snap) => {
-            let html = "<h2 style='text-align:center;'>Historial de Pagos</h2>";
-            snap.forEach(doc => {
-                const p = doc.data();
-                html += `<div class="lista-item"><strong>${p.concepto}</strong><br>${p.cantidad}€ - Ref: ${p.waiterCode}</div>`;
-            });
-            document.getElementById("listaPagos").innerHTML = html;
-        });
-    </script>
+  const pedidos = leerPedidos();
+
+  let html = "";
+
+  if(pedidos.length === 0){
+
+    html = `
+      <div class="vacio">
+        No hay pedidos pendientes
+      </div>
+    `;
+
+  }else{
+
+    pedidos.forEach((p,i)=>{
+
+      html += `
+        <div class="card">
+
+          <div class="proveedor">
+            ${p.proveedor || "SIN PROVEEDOR"}
+          </div>
+
+          <div class="detalle">
+            Fecha: ${p.fecha || ""}
+          </div>
+
+          <div class="detalle">
+            Estado: <strong>${p.estado || "PENDIENTE"}</strong>
+          </div>
+
+          ${
+            p.observaciones
+            ? `
+              <div class="detalle">
+                Notas: ${p.observaciones}
+              </div>
+            `
+            : ""
+          }
+
+          <div class="total">
+            ${Number(p.total || 0).toFixed(2)} €
+          </div>
+
+          <select id="tipo${i}">
+            <option value="CONTADO">CONTADO</option>
+            <option value="REPOSICION">REPOSICIÓN</option>
+            <option value="BANCO">BANCO</option>
+            <option value="A CUENTA">A CUENTA</option>
+          </select>
+
+          <input
+            type="number"
+            id="importe${i}"
+            placeholder="Importe pagado"
+            value="${Number(p.total || 0).toFixed(2)}"
+          >
+
+          <button class="pagado" onclick="marcarPagado(${i})">
+            ✅ Marcar pagado
+          </button>
+
+          <button class="incidencia" onclick="marcarIncidencia(${i})">
+            🚨 Marcar incidencia
+          </button>
+
+        </div>
+      `;
+
+    });
+
+  }
+
+  document.getElementById("lista").innerHTML = html;
+}
+
+function marcarPagado(i){
+
+  let pedidos = leerPedidos();
+
+  pedidos[i].estado = "PAGADO";
+  pedidos[i].tipoPago =
+    document.getElementById("tipo"+i).value;
+
+  pedidos[i].importePagado =
+    parseFloat(document.getElementById("importe"+i).value || 0);
+
+  pedidos[i].fechaPago =
+    new Date().toLocaleString("es-ES");
+
+  guardarPedidos(pedidos);
+
+  alert("Pago registrado.");
+
+  pintar();
+}
+
+function marcarIncidencia(i){
+
+  let pedidos = leerPedidos();
+
+  pedidos[i].estado = "INCIDENCIA";
+
+  guardarPedidos(pedidos);
+
+  alert("Pedido marcado con incidencia.");
+
+  pintar();
+}
+
+function volver(){
+  window.location.href = "index.html";
+}
+
+pintar();
+</script>
+
 </body>
 </html>
