@@ -77,6 +77,15 @@ button{
   margin-top:10px;
 }
 
+.pendiente{
+  margin-top:8px;
+  background:#fff4d8;
+  color:#8a5a00;
+  padding:10px;
+  border-radius:14px;
+  font-weight:900;
+}
+
 .estadoIncidencia{
   margin-top:10px;
   background:#ffd6d6;
@@ -84,6 +93,14 @@ button{
   padding:10px;
   border-radius:14px;
   font-weight:900;
+}
+
+.historialPago{
+  margin-top:10px;
+  background:#edf7ed;
+  border-radius:14px;
+  padding:10px;
+  font-size:14px;
 }
 
 select,input{
@@ -131,6 +148,7 @@ select,input{
 </div>
 
 <script>
+
 function leerPagosPendientes(){
   return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 }
@@ -161,10 +179,19 @@ function pintar(){
   let html = "";
 
   if(pagos.length === 0){
-    html = `<div class="vacio">No hay pagos pendientes</div>`;
+
+    html = `
+      <div class="vacio">
+        No hay pagos pendientes
+      </div>
+    `;
+
   }else{
 
     pagos.forEach((p,i)=>{
+
+      const total = Number(p.total || 0);
+      const pendiente = Number(p.pendiente || total);
 
       const tieneIncidencia = p.estado === "INCIDENCIA";
 
@@ -184,16 +211,35 @@ function pintar(){
           </div>
 
           <div class="total">
-            ${Number(p.total || 0).toFixed(2)} €
+            ${total.toFixed(2)} €
+          </div>
+
+          <div class="pendiente">
+            Pendiente: ${pendiente.toFixed(2)} €
           </div>
 
           ${
             tieneIncidencia
             ? `
               <div class="estadoIncidencia">
-                🚨 INCIDENCIA PENDIENTE<br>
-                Motivo: ${p.motivoIncidencia || "Sin motivo"}<br>
-                Solución prevista: ${p.solucionIncidencia || "Sin solución indicada"}
+                🚨 INCIDENCIA PENDIENTE<br><br>
+                Motivo: ${p.motivoIncidencia || ""}<br><br>
+                Solución prevista: ${p.solucionIncidencia || ""}
+              </div>
+            `
+            : ""
+          }
+
+          ${
+            p.historialPagos && p.historialPagos.length
+            ? `
+              <div class="historialPago">
+                <b>Historial pagos:</b><br>
+                ${
+                  p.historialPagos.map(h=>`
+                    • ${h.fecha} → ${Number(h.importe).toFixed(2)} €
+                  `).join("<br>")
+                }
               </div>
             `
             : ""
@@ -210,11 +256,11 @@ function pintar(){
             type="number"
             id="importe${i}"
             placeholder="Importe pagado"
-            value="${Number(p.total || 0).toFixed(2)}"
+            value="${pendiente.toFixed(2)}"
           >
 
           <button class="pagado" onclick="marcarPagado(${i})">
-            ✅ Marcar pagado
+            ✅ Registrar pago
           </button>
 
           <button class="incidencia" onclick="marcarIncidencia(${i})">
@@ -234,20 +280,68 @@ function marcarPagado(i){
   let pendientes = leerPagosPendientes();
   let historico = leerPagosHistorico();
 
-  const pago = pendientes[i];
+  let pago = pendientes[i];
 
-  pago.estado = "PAGADO";
-  pago.tipoPago = document.getElementById("tipo"+i).value;
-  pago.importePagado = parseFloat(document.getElementById("importe"+i).value || 0);
-  pago.fechaPago = new Date().toLocaleString("es-ES");
+  const tipoPago = document.getElementById("tipo"+i).value;
 
-  historico.unshift(pago);
-  pendientes.splice(i,1);
+  const importe = parseFloat(
+    document.getElementById("importe"+i).value || 0
+  );
 
-  guardarPagosHistorico(historico);
+  if(importe <= 0){
+    alert("Introduce importe válido");
+    return;
+  }
+
+  if(!pago.pendiente){
+    pago.pendiente = Number(pago.total || 0);
+  }
+
+  if(!pago.historialPagos){
+    pago.historialPagos = [];
+  }
+
+  pago.historialPagos.unshift({
+    fecha:new Date().toLocaleString("es-ES"),
+    importe:importe,
+    tipo:tipoPago
+  });
+
+  pago.tipoPago = tipoPago;
+
+  pago.pendiente =
+    Number(pago.pendiente) - importe;
+
+  if(pago.pendiente < 0){
+    pago.pendiente = 0;
+  }
+
+  if(pago.pendiente === 0){
+
+    pago.estado = "PAGADO";
+    pago.fechaPago = new Date().toLocaleString("es-ES");
+
+    historico.unshift(pago);
+
+    pendientes.splice(i,1);
+
+    guardarPagosHistorico(historico);
+
+    alert("Pago completado.");
+
+  }else{
+
+    pago.estado = "A CUENTA";
+
+    alert(
+      "Pago parcial registrado.\n\n" +
+      "Pendiente: " +
+      pago.pendiente.toFixed(2) + " €"
+    );
+  }
+
   guardarPagosPendientes(pendientes);
 
-  alert("Pago registrado.");
   pintar();
 }
 
@@ -261,38 +355,59 @@ function marcarIncidencia(i){
   const motivo = prompt("Motivo de la incidencia");
   if(!motivo) return;
 
-  const solucion = prompt("¿Cómo se va a resolver con el proveedor?");
+  const solucion = prompt("¿Cómo se resolverá?");
   if(!solucion) return;
 
   const incidencia = {
-    id: Date.now(),
-    proveedor: pago.proveedor || "",
-    titulo: "Incidencia con " + (pago.proveedor || "proveedor"),
+
+    id:Date.now(),
+
+    proveedor:pago.proveedor || "",
+
+    titulo:
+      "Incidencia con " +
+      (pago.proveedor || "proveedor"),
+
     texto:
       "Proveedor: " + (pago.proveedor || "") +
-      " · Importe: " + Number(pago.total || 0).toFixed(2) + " €" +
+      " · Importe: " +
+      Number(pago.total || 0).toFixed(2) + " €" +
       " · Motivo: " + motivo +
       " · Solución prevista: " + solucion,
-    motivo: motivo,
-    solucionPrevista: solucion,
-    fecha: new Date().toLocaleString("es-ES"),
-    pedidoFecha: pago.fecha || "",
-    importe: Number(pago.total || 0),
-    resuelta: false
+
+    motivo:motivo,
+
+    solucionPrevista:solucion,
+
+    fecha:new Date().toLocaleString("es-ES"),
+
+    pedidoFecha:pago.fecha || "",
+
+    importe:Number(pago.total || 0),
+
+    resuelta:false
   };
 
   incidencias.unshift(incidencia);
 
   pago.estado = "INCIDENCIA";
+
   pago.motivoIncidencia = motivo;
+
   pago.solucionIncidencia = solucion;
+
   pago.fechaIncidencia = incidencia.fecha;
+
   pago.incidenciaId = incidencia.id;
 
   guardarIncidencias(incidencias);
+
   guardarPagosPendientes(pendientes);
 
-  alert("Incidencia registrada. Este proveedor queda marcado hasta resolverla.");
+  alert(
+    "Incidencia registrada.\n\n" +
+    "Proveedor marcado hasta resolver."
+  );
 
   pintar();
 }
@@ -302,6 +417,7 @@ function volver(){
 }
 
 pintar();
+
 </script>
 
 </body>
