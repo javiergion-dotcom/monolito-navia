@@ -33,26 +33,8 @@ button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-
 .stockFila input{flex:1;width:auto}
 .avisosBox{background:#fff8db;border:3px solid #f0c94a;border-radius:18px;padding:14px;margin-bottom:16px}
 .avisosTitulo{font-weight:900;font-size:18px;margin-bottom:8px;color:#8a6a00}
-
-.avisoLinea{
-  background:white;
-  border-radius:12px;
-  padding:10px;
-  margin-top:8px;
-  font-weight:900;
-  color:#17303d;
-}
-
-.btnResolverAviso{
-  margin-top:10px;
-  background:#48a530;
-  color:white;
-  border:0;
-  border-radius:12px;
-  padding:10px;
-  font-weight:900;
-  width:100%;
-}
+.avisoLinea{background:white;border-radius:12px;padding:10px;margin-top:8px;font-weight:900;color:#17303d}
+.btnResolverAviso{margin-top:10px;background:#48a530;color:white;border:0;border-radius:12px;padding:10px;font-weight:900;width:100%}
 </style>
 </head>
 
@@ -77,7 +59,33 @@ button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-
 
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED",
+  authDomain: "monolito-ed87d.firebaseapp.com",
+  projectId: "monolito-ed87d",
+  storageBucket: "monolito-ed87d.appspot.com",
+  messagingSenderId: "737849584362",
+  appId: "1:737849584362:web:3d1821bedcd64080cf8593",
+  measurementId: "G-7XCZ0VN7ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let pedido = [];
+let avisosCloud = [];
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
@@ -125,32 +133,8 @@ function leerPromociones(){
   return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
 }
 
-function leerAvisosPedidos(){
-  return JSON.parse(localStorage.getItem("avisos_pedidos") || "[]");
-}
-
-function resolverAvisoPedido(i){
-
-  let avisos = leerAvisosPedidos();
-
-  if(confirm("¿Eliminar aviso de pedidos?")){
-
-    avisos.splice(i,1);
-
-    localStorage.setItem(
-      "avisos_pedidos",
-      JSON.stringify(avisos)
-    );
-
-    pintarAvisosPedidos();
-  }
-}
-
 function pintarAvisosPedidos(){
-
-  const avisos = leerAvisosPedidos();
-
-  if(avisos.length === 0){
+  if(avisosCloud.length === 0){
     document.getElementById("avisosPedidos").innerHTML = "";
     return;
   }
@@ -160,27 +144,59 @@ function pintarAvisosPedidos(){
       <div class="avisosTitulo">🛎️ AVISOS PARA PEDIDOS</div>
   `;
 
-  avisos.forEach((a,i)=>{
-
+  avisosCloud.forEach((a)=>{
     html += `
       <div class="avisoLinea">
+        🛎️ ${a.texto || ""}
 
-        🛎️ ${a.texto || a}
-
-        <button
-          class="btnResolverAviso"
-          onclick="resolverAvisoPedido(${i})"
-        >
+        <button class="btnResolverAviso" onclick="resolverAvisoPedido('${a.id}')">
           ✅ RESUELTO
         </button>
-
       </div>
     `;
   });
 
   html += `</div>`;
-
   document.getElementById("avisosPedidos").innerHTML = html;
+}
+
+async function resolverAvisoPedido(id){
+  if(!confirm("¿Eliminar aviso de pedidos?")) return;
+
+  try{
+    await deleteDoc(doc(db, "avisos_pedidos", id));
+  }catch(e){
+    console.error(e);
+    alert("No se pudo eliminar el aviso en Firebase.");
+  }
+}
+
+function iniciarAvisosFirebase(){
+  const q = query(
+    collection(db, "avisos_pedidos"),
+    orderBy("fechaMs", "desc")
+  );
+
+  onSnapshot(q, (snap)=>{
+    avisosCloud = [];
+
+    snap.forEach((d)=>{
+      avisosCloud.push({
+        id:d.id,
+        ...d.data()
+      });
+    });
+
+    pintarAvisosPedidos();
+
+  }, (error)=>{
+    console.error(error);
+    document.getElementById("avisosPedidos").innerHTML = `
+      <div class="avisosBox">
+        <div class="avisosTitulo">⚠️ No se pudieron cargar avisos</div>
+      </div>
+    `;
+  });
 }
 
 function cargarProveedores(){
@@ -192,8 +208,6 @@ function cargarProveedores(){
       `<option value="${p.nombre}">${p.nombre}</option>`
     ).join("");
 }
-
-let pedido = [];
 
 function cargarArticulos(){
   const proveedor = document.getElementById("proveedor").value;
@@ -228,7 +242,6 @@ function cargarArticulos(){
 }
 
 function promoArticulo(a){
-
   const promos = leerPromociones();
 
   const nombreArticulo = normalizar(a.articulo);
@@ -238,11 +251,23 @@ function promoArticulo(a){
   hoy.setHours(0,0,0,0);
 
   return promos.find(p => {
-
     const proveedorPromo = normalizar(p.proveedor);
 
     if(proveedorPromo !== proveedorArticulo){
       return false;
+    }
+
+    const inicio = p.fechaInicio || p.inicio || p.desde || "";
+    const fin = p.fechaFin || p.fin || p.hasta || "";
+
+    if(inicio){
+      const dInicio = new Date(inicio + "T00:00:00");
+      if(hoy < dInicio) return false;
+    }
+
+    if(fin){
+      const dFin = new Date(fin + "T23:59:59");
+      if(hoy > dFin) return false;
     }
 
     const textoPromo = normalizar(
@@ -253,13 +278,16 @@ function promoArticulo(a){
       (p.nombre || "")
     );
 
+    if(!textoPromo){
+      return false;
+    }
+
     return textoPromo.includes(nombreArticulo) ||
            nombreArticulo.includes(textoPromo);
   });
 }
 
 function datosPromo(a){
-
   const promo = promoArticulo(a);
 
   if(!promo) return null;
@@ -285,7 +313,6 @@ function datosPromo(a){
   }
 
   const cantidad = Number(a.cantidad || 0);
-
   const bloques = Math.floor(cantidad / conCargo);
   const resto = cantidad % conCargo;
   const gratisTotal = bloques * gratis;
@@ -298,9 +325,12 @@ function datosPromo(a){
   }
 
   return {
+    promo,
     conCargo,
     gratis,
     cantidad,
+    bloques,
+    resto,
     gratisTotal,
     faltan,
     textoPedido
@@ -308,7 +338,6 @@ function datosPromo(a){
 }
 
 function avisoPromoHTML(a){
-
   const d = datosPromo(a);
 
   if(!d) return "";
@@ -321,18 +350,19 @@ function avisoPromoHTML(a){
   `;
 
   if(d.cantidad > 0 && d.gratisTotal > 0){
-
     html += `
       <div class="promoOk">
-        ✅ EN PEDIDO: ${d.textoPedido}
+        ✅ EN PEDIDO: ${d.textoPedido}<br>
+        ${d.cantidad} con cargo + ${d.gratisTotal} sin cargo<br>
+        Cuenta para RAPPEL: ${d.cantidad + d.gratisTotal}
       </div>
     `;
-
   }else if(d.cantidad > 0 && d.faltan > 0){
-
     html += `
       <div class="promoAlerta">
-        ⚠ Faltan ${d.faltan}
+        ⚠ Estás pidiendo ${d.cantidad}.<br>
+        Con ${d.conCargo} entra promoción ${d.conCargo} + ${d.gratis}.<br>
+        Faltan ${d.faltan}.
       </div>
     `;
   }
@@ -341,19 +371,11 @@ function avisoPromoHTML(a){
 }
 
 function pintar(){
-
   let html = "";
 
   pedido.forEach((a,i)=>{
-
-    const precioCaja =
-      Number(a.precioUnidad || 0) *
-      Number(a.formato || 1);
-
-    const lineaPago =
-      a.costeCero
-      ? 0
-      : Number(a.cantidad || 0) * precioCaja;
+    const precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
+    const lineaPago = a.costeCero ? 0 : Number(a.cantidad || 0) * precioCaja;
 
     html += `
     <div class="card ${a.costeCero ? "costeCero" : ""}">
@@ -457,7 +479,6 @@ function cambiar(i, valor){
 }
 
 function siguienteConEnter(e,i){
-
   if(e.key !== "Enter") return;
 
   e.preventDefault();
@@ -465,16 +486,12 @@ function siguienteConEnter(e,i){
   cambiar(i, e.target.value);
 
   setTimeout(function(){
-
-    const inputs =
-      document.querySelectorAll(".cantidadPedido");
+    const inputs = document.querySelectorAll(".cantidadPedido");
 
     if(inputs[i+1]){
-
       inputs[i+1].focus();
       inputs[i+1].select();
     }
-
   },80);
 }
 
@@ -487,7 +504,6 @@ function stockPedir(i,v){
 }
 
 function toggleCosteCero(i){
-
   if(!esHostelero()){
     alert("Solo hostelería puede marcar coste 0 €");
     return;
@@ -503,11 +519,9 @@ function toggleCosteCero(i){
 }
 
 function calcular(){
-
   let totalPago = 0;
 
   pedido.forEach((a,i)=>{
-
     let precioCaja =
       Number(a.precioUnidad || 0) *
       Number(a.formato || 1);
@@ -534,7 +548,6 @@ function calcular(){
 }
 
 function guardarPedido(){
-
   const proveedor =
     document.getElementById("proveedor").value;
 
@@ -556,24 +569,50 @@ function guardarPedido(){
   const ahora = new Date();
 
   const lineasFinal = lineas.map(a => {
-
     const precioOriginalSinIva =
       Number(a.precioUnidad || 0) *
       Number(a.formato || 1);
 
+    const costeCero = a.costeCero === true;
+    const dPromo = datosPromo(a);
+
+    const cantidadCargo = Number(a.cantidad || 0);
+    const cantidadGratis = dPromo ? dPromo.gratisTotal : 0;
+
     return {
-      articulo:a.articulo,
-      proveedor:proveedor,
-      cantidad:Number(a.cantidad || 0),
-      precioSinIva:a.costeCero ? 0 : precioOriginalSinIva,
-      costeCero:a.costeCero === true
+      articulo: a.articulo,
+      proveedor: proveedor,
+
+      cantidad: cantidadCargo,
+      cantidadGratisPromo: cantidadGratis,
+      cantidadTotalRappel: costeCero ? 0 : cantidadCargo + cantidadGratis,
+
+      unidadFormato: a.unidadFormato || "",
+      formato: Number(a.formato || 1),
+      iva: Number(a.iva || 21),
+
+      precioOriginalSinIva: precioOriginalSinIva,
+      precioSinIva: costeCero ? 0 : precioOriginalSinIva,
+
+      costeCero: costeCero,
+      excluirRappel: costeCero,
+      cuentaConsumo:true,
+
+      stockActual:a.stockActual || "",
+      pedir:a.pedir || "",
+
+      promocionActiva: dPromo ? true : false,
+      promocionTexto: dPromo ? (dPromo.conCargo + " + " + dPromo.gratis) : "",
+      unidadesConCargoPromo: dPromo ? dPromo.conCargo : 0,
+      unidadesGratisPromo: dPromo ? dPromo.gratis : 0,
+      unidadesGratisCalculadas: cantidadGratis,
+      textoPedidoPromo: dPromo && dPromo.textoPedido ? dPromo.textoPedido : ""
     };
   });
 
-  const totalPago =
-    lineasFinal.reduce((t,l)=>
-      t + (l.cantidad * l.precioSinIva)
-    ,0);
+  const totalPago = lineasFinal.reduce((t,l)=>
+    t + (l.cantidad * l.precioSinIva)
+  ,0);
 
   const pedidoGuardado = {
     proveedor,
@@ -620,9 +659,20 @@ function guardarPedido(){
   location.reload();
 }
 
-pintarAvisosPedidos();
-cargarProveedores();
+Object.assign(window,{
+  volver,
+  cargarArticulos,
+  cambiar,
+  siguienteConEnter,
+  stockActual,
+  stockPedir,
+  toggleCosteCero,
+  guardarPedido,
+  resolverAvisoPedido
+});
 
+iniciarAvisosFirebase();
+cargarProveedores();
 </script>
 
 </body>
