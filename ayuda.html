@@ -84,8 +84,8 @@ header{
   text-align:center;
 }
 
-.frase-gemini {
-  background:#1a73e8;
+.frase-chatgpt{
+  background:#10a37f;
   color:white;
   border-radius:18px;
   padding:16px;
@@ -97,7 +97,7 @@ header{
   align-items:center;
   justify-content:center;
   gap:10px;
-  box-shadow:0 6px 12px rgba(26,115,232,0.25);
+  box-shadow:0 6px 12px rgba(16,163,127,0.25);
 }
 
 .pregunta{
@@ -155,13 +155,13 @@ button{
   line-height:1.4;
 }
 </style>
-</head> head
+</head>
 
 <body>
 
 <header>
   <button class="volver" onclick="volver()">←</button>
-  🆘 AYUDA GEMINI
+  🆘 AYUDA CHATGPT
 </header>
 
 <div class="contenido">
@@ -175,11 +175,8 @@ button{
       ordenar y acompañar el funcionamiento real del local.
     </div>
 
-    <div class="frase-gemini">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" style="fill:white">
-        <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z"/>
-      </svg>
-      AYUDA GEMINI · Guía Activo en la barra
+    <div class="frase-chatgpt">
+      🤖 AYUDA CHATGPT · Guía activa en la barra
     </div>
   </div>
 
@@ -188,16 +185,16 @@ button{
     <div class="subtitulo">¿Qué hace MONOLITO & IA PRO?</div>
 
     <div class="texto">
-      El sistema ayuda a controlar de forma blindada:
+      El sistema ayuda a controlar de forma clara:
     </div>
 
     <div class="etiqueta">Pedidos</div>
     <div class="etiqueta">Pagos</div>
     <div class="etiqueta">Incidencias</div>
-    <div class="etiqueta">RAPPEL</div>
     <div class="etiqueta">Promociones</div>
     <div class="etiqueta">Calendario</div>
     <div class="etiqueta">Documentos</div>
+    <div class="etiqueta">Comunicación</div>
     <div class="etiqueta">Mantenimiento</div>
 
   </div>
@@ -206,42 +203,33 @@ button{
 
     <div class="subtitulo">Preguntas rápidas</div>
 
-    <div class="pregunta">
-      ¿Qué es COSTE 0 €?
-    </div>
-
-    <div class="respuesta">
-      Son productos que entran en el local sin generar pago.
-      Sí cuentan en consumo e histórico,
-      pero no generan pagos pendientes ni RAPPEL.
-    </div>
-
-    <div class="pregunta">
-      ¿Qué es una incidencia?
-    </div>
+    <div class="pregunta">¿Qué es una incidencia?</div>
 
     <div class="respuesta">
       Cualquier diferencia o problema detectado en pedidos,
       pagos o funcionamiento del local.
-      Las incidencias quedan visibles en la nube hasta resolverse.
+      Las incidencias quedan visibles hasta resolverse.
     </div>
 
-    <div class="pregunta">
-      ¿Qué hace RAPPEL?
-    </div>
+    <div class="pregunta">¿Qué son las promociones?</div>
 
     <div class="respuesta">
-      Calcula automáticamente acuerdos anuales por litros,
-      promociones o porcentajes pactados con proveedores.
+      Son ofertas creadas por el negocio desde CONFIGURACIÓN.
+      PEDIDOS solo muestra promociones reales que estén guardadas y activas.
     </div>
 
-    <div class="pregunta">
-      ¿Para qué sirve DOCUMENTOS?
+    <div class="pregunta">¿Qué hace “Cuántas hay / Cuántas pido”?</div>
+
+    <div class="respuesta">
+      Permite comprobar el stock real en el momento del pedido.
+      No inventa datos: el operador mira, apunta cuántas hay y decide cuántas pide.
     </div>
+
+    <div class="pregunta">¿Para qué sirve DOCUMENTOS?</div>
 
     <div class="respuesta">
       Guarda imágenes, PDFs, acuerdos, contratos,
-      incidencias o cualquier documentación importante del local.
+      licencias, seguros o cualquier documentación importante del local.
     </div>
 
   </div>
@@ -253,8 +241,7 @@ button{
     <div class="modulo">
       <strong>📝 PEDIDOS</strong>
       <div class="texto">
-        Crear pedidos reales del local y controlar promociones,
-        incidencias y coste 0 €.
+        Crear pedidos reales del local, con avisos, promociones y control de stock real.
       </div>
       <button class="ir" onclick="ir('pedidos.html')">Ir a PEDIDOS</button>
     </div>
@@ -262,7 +249,7 @@ button{
     <div class="modulo">
       <strong>💶 PAGOS</strong>
       <div class="texto">
-        Revisar pagos pendientes, incidencias y movimientos económicos.
+        Revisar pagos pendientes, pagos a cuenta e incidencias.
       </div>
       <button class="ir" onclick="ir('pagos.html')">Ir a PAGOS</button>
     </div>
@@ -286,9 +273,10 @@ button{
     <div class="modulo">
       <strong>⚙️ CONFIGURACIÓN</strong>
       <div class="texto">
-        Usuarios, promociones y mantenimiento del sistema.
+        Usuarios, promociones, control de pedidos y mantenimiento del sistema.
+        El acceso demo no debe entrar aquí.
       </div>
-      <button class="ir" onclick="ir('configuracion.html')">Ir a CONFIGURACIÓN</button>
+      <button class="ir" onclick="irProtegido('configuracion.html')">Ir a CONFIGURACIÓN</button>
     </div>
 
   </div>
@@ -308,11 +296,12 @@ button{
     </div>
 
     <div class="texto" style="margin-top:18px;font-weight:900">
-      Tu guía se mantiene integrado de forma ilimitada dentro del sistema, evolucionando mediante inteligencia artificial y mejoras constantes del núcleo sin dependencias externas comerciales.
+      MONOLITO nace de la experiencia real en hostelería,
+      unido al trabajo constante con inteligencia artificial.
     </div>
 
-    <div class="texto" style="margin-top:15px;font-weight:900;color:#1a73e8;text-align:center">
-      Socio tecnológico exclusivo: Gemini.
+    <div class="texto" style="margin-top:15px;font-weight:900;color:#10a37f;text-align:center">
+      Desarrollado con apoyo de ChatGPT.
     </div>
 
   </div>
@@ -326,19 +315,42 @@ function volver(){
   window.location.href = "index.html";
 }
 
+function esDemo(){
+  const nivel = String(localStorage.getItem("nivel") || "").toUpperCase();
+  const rol = String(localStorage.getItem("rol") || "").toUpperCase();
+  const usuario = String(localStorage.getItem("usuario") || "").toUpperCase();
+
+  return nivel === "DEMO" || rol === "DEMO" || usuario === "DEMO";
+}
+
 function ir(url){
   window.location.href = url;
 }
 
-// Inicialización de trazabilidad obligatoria en la ayuda
+function irProtegido(url){
+  if(esDemo()){
+    alert("Acceso no permitido en modo DEMO.");
+    return;
+  }
+
+  window.location.href = url;
+}
+
 (function iniciarAyuda(){
   const fechaActual = new Date();
-  const opciones = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-  const fechaFormateada = fechaActual.toLocaleString('es-ES', opciones);
-  
+
+  const fechaFormateada = fechaActual.toLocaleString("es-ES", {
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit",
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit"
+  });
+
   document.getElementById("fecha-ayuda").innerHTML = `
     <strong>MONOLITO & IA PRO® · elmonolito.es</strong><br>
-    Soporte y Núcleo de IA Blindados<br>
+    Soporte y núcleo IA con ChatGPT<br>
     Registro: ${fechaFormateada} | Waiter Code: [Javi-Auditoría]
   `;
 })();
