@@ -7,185 +7,31 @@
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#eef2f5;
-  color:#17303d;
-}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:900;
-  font-size:20px;
-}
-
-.volver{
-  background:white;
-  color:#17303d;
-  border:0;
-  border-radius:12px;
-  padding:8px 12px;
-  font-weight:900;
-}
-
-.contenido{
-  padding:16px;
-}
-
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-
-.titulo{
-  font-size:22px;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
-.subtitulo{
-  font-size:16px;
-  font-weight:900;
-  margin-top:16px;
-  margin-bottom:8px;
-  color:#4f5f69;
-}
-
-label{
-  display:block;
-  font-weight:900;
-  margin-top:12px;
-  margin-bottom:6px;
-}
-
-input,select,textarea{
-  width:100%;
-  padding:12px;
-  border-radius:14px;
-  border:1px solid #b8c2ca;
-  font-size:16px;
-}
-
-textarea{
-  min-height:80px;
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:12px;
-  font-weight:900;
-  font-size:15px;
-}
-
-.guardar{
-  width:100%;
-  background:#48a530;
-  color:white;
-  margin-top:14px;
-}
-
-.nuevo{
-  width:100%;
-  background:#ff9800;
-  color:white;
-  margin-top:10px;
-}
-
-.borrar{
-  width:100%;
-  background:#c00000;
-  color:white;
-  margin-top:10px;
-}
-
-.editar{
-  background:#2196f3;
-  color:white;
-}
-
-.desactivar{
-  background:#ff9800;
-  color:white;
-}
-
-.reactivar{
-  background:#48a530;
-  color:white;
-}
-
-.linea{
-  border-top:1px solid #dfe6ec;
-  padding-top:12px;
-  margin-top:12px;
-}
-
-.nombre{
-  font-size:18px;
-  font-weight:900;
-}
-
-.detalle{
-  color:#4f5f69;
-  margin-top:5px;
-  font-size:14px;
-}
-
-.botones{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-  flex-wrap:wrap;
-}
-
-.botones button{
-  flex:1;
-}
-
-.inactivo{
-  opacity:.45;
-}
-
-.aviso{
-  background:#fff3cd;
-  color:#7a4d00;
-  border-radius:14px;
-  padding:12px;
-  font-weight:900;
-  margin-top:10px;
-}
-
-.rojoAviso{
-  background:#ffe0e0;
-  color:#c00000;
-  border-radius:14px;
-  padding:12px;
-  font-weight:900;
-  margin-top:10px;
-}
-
-.vacio{
-  background:#eef2f5;
-  border-radius:18px;
-  padding:16px;
-  text-align:center;
-  font-weight:900;
-  margin-top:10px;
-}
-
-.oculto{
-  display:none;
-}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px}
+.volver{background:white;color:#17303d;border:0;border-radius:12px;padding:8px 12px;font-weight:900}
+.contenido{padding:16px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.titulo{font-size:22px;font-weight:900;margin-bottom:10px}
+label{display:block;font-weight:900;margin-top:12px;margin-bottom:6px}
+input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px}
+textarea{min-height:80px}
+button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
+.guardar{width:100%;background:#48a530;color:white;margin-top:14px}
+.nuevo{width:100%;background:#ff9800;color:white;margin-top:10px}
+.borrar{width:100%;background:#c00000;color:white;margin-top:10px}
+.editar{background:#2196f3;color:white}
+.desactivar{background:#ff9800;color:white}
+.reactivar{background:#48a530;color:white}
+.linea{border-top:1px solid #dfe6ec;padding-top:12px;margin-top:12px}
+.nombre{font-size:18px;font-weight:900}
+.detalle{color:#4f5f69;margin-top:5px;font-size:14px}
+.botones{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.botones button{flex:1}
+.inactivo{opacity:.45}
+.aviso{background:#fff3cd;color:#7a4d00;border-radius:14px;padding:12px;font-weight:900;margin-top:10px}
+.rojoAviso{background:#ffe0e0;color:#c00000;border-radius:14px;padding:12px;font-weight:900;margin-top:10px}
+.vacio{background:#eef2f5;border-radius:18px;padding:16px;text-align:center;font-weight:900;margin-top:10px}
 </style>
 </head>
 
@@ -193,8 +39,7 @@ button{
 
 <script>
 const nivel = localStorage.getItem("nivel");
-
-if(nivel === "demo"){
+if(nivel === "demo" || nivel === "DEMO"){
   alert("Acceso no permitido en modo DEMO");
   window.location.href = "index.html";
 }
@@ -207,12 +52,11 @@ if(nivel === "demo"){
 
 <div class="contenido">
 
-  <!-- ================= USUARIOS ================= -->
-
   <div class="card">
+    <div class="titulo">Usuarios</div>
 
-    <div class="titulo">
-      Usuarios
+    <div class="aviso" id="estadoCloud">
+      Comprobando conexión cloud...
     </div>
 
     <label>Nombre usuario</label>
@@ -221,21 +65,27 @@ if(nivel === "demo"){
     <label>PIN</label>
     <input id="usuarioPin" type="number" placeholder="Ej: 1234">
 
-    <button class="guardar" onclick="guardarUsuario()">
-      💾 Guardar usuario
-    </button>
+    <label>Nivel</label>
+    <select id="usuarioNivel">
+      <option value="HOSTELERIA">HOSTELERÍA</option>
+      <option value="OPERADOR">OPERADOR</option>
+      <option value="DEMO">DEMO</option>
+    </select>
+
+    <label>Rol</label>
+    <select id="usuarioRol">
+      <option value="ADMIN">ADMIN</option>
+      <option value="OPERADOR">OPERADOR</option>
+      <option value="DEMO">DEMO</option>
+    </select>
+
+    <button class="guardar" onclick="guardarUsuario()">💾 Guardar usuario en cloud</button>
 
     <div id="listaUsuarios"></div>
-
   </div>
 
-  <!-- ================= PROMOCIONES ================= -->
-
   <div class="card">
-
-    <div class="titulo">
-      Promociones
-    </div>
+    <div class="titulo">Promociones</div>
 
     <label>Proveedor</label>
     <input id="promoProveedor" placeholder="Ej: TURRADO">
@@ -261,56 +111,32 @@ if(nivel === "demo"){
     <label>Nota</label>
     <textarea id="promoNota"></textarea>
 
-    <button class="guardar" onclick="guardarPromocion()">
-      💾 Guardar promoción
-    </button>
-
-    <button class="nuevo" onclick="limpiarPromocion()">
-      ➕ Nueva promoción
-    </button>
+    <button class="guardar" onclick="guardarPromocion()">💾 Guardar promoción</button>
+    <button class="nuevo" onclick="limpiarPromocion()">➕ Nueva promoción</button>
 
     <div class="aviso">
       PEDIDOS leerá automáticamente las promociones activas.
     </div>
 
     <div id="listaPromociones"></div>
-
   </div>
 
-  <!-- ================= CONTROL PEDIDOS ================= -->
-
   <div class="card">
+    <div class="titulo">Control pedidos</div>
 
-    <div class="titulo">
-      Control pedidos
-    </div>
-
-    <div class="detalle">
-      Configuración real de comportamiento en PEDIDOS.
-    </div>
-
-    <label>
-      Activar “Cuántas hay”
-    </label>
-
+    <label>Activar “Cuántas hay”</label>
     <select id="activarCuantasHay">
       <option value="SI">SI</option>
       <option value="NO">NO</option>
     </select>
 
-    <label>
-      Activar “Cuántas pido”
-    </label>
-
+    <label>Activar “Cuántas pido”</label>
     <select id="activarCuantasPido">
       <option value="SI">SI</option>
       <option value="NO">NO</option>
     </select>
 
-    <label>
-      Frecuencia control stock
-    </label>
-
+    <label>Frecuencia control stock</label>
     <select id="frecuenciaControl">
       <option value="SIEMPRE">SIEMPRE</option>
       <option value="SEMANAL">SEMANAL</option>
@@ -318,158 +144,126 @@ if(nivel === "demo"){
       <option value="PERSONALIZADO">PERSONALIZADO</option>
     </select>
 
-    <label>
-      Cada cuántos pedidos
-    </label>
+    <label>Cada cuántos pedidos</label>
+    <input type="number" id="cadaPedidos" placeholder="Ej: 4">
 
-    <input
-      type="number"
-      id="cadaPedidos"
-      placeholder="Ej: 4"
-    >
-
-    <button class="guardar" onclick="guardarControlPedidos()">
-      💾 Guardar control pedidos
-    </button>
-
-    <div class="aviso">
-      PEDIDOS leerá esta configuración automáticamente.
-    </div>
-
+    <button class="guardar" onclick="guardarControlPedidos()">💾 Guardar control pedidos</button>
   </div>
 
-  <!-- ================= SISTEMA ================= -->
-
   <div class="card">
-
-    <div class="titulo">
-      Sistema
-    </div>
+    <div class="titulo">Sistema</div>
 
     <div class="rojoAviso">
       Zona delicada. Solo usar para limpiar pruebas.
     </div>
 
-    <button class="borrar" onclick="borrarCalendario()">
-      Borrar calendario
-    </button>
-
-    <button class="borrar" onclick="borrarDocumentos()">
-      Borrar documentos
-    </button>
-
-    <button class="borrar" onclick="borrarPagos()">
-      Borrar pagos pendientes
-    </button>
-
-    <button class="borrar" onclick="borrarHistoricoPedidos()">
-      Borrar histórico pedidos
-    </button>
-
-    <button class="borrar" onclick="borrarIncidencias()">
-      Borrar incidencias
-    </button>
-
+    <button class="borrar" onclick="borrarCalendario()">Borrar calendario</button>
+    <button class="borrar" onclick="borrarDocumentos()">Borrar documentos</button>
+    <button class="borrar" onclick="borrarPagos()">Borrar pagos pendientes</button>
+    <button class="borrar" onclick="borrarHistoricoPedidos()">Borrar histórico pedidos</button>
+    <button class="borrar" onclick="borrarIncidencias()">Borrar incidencias</button>
   </div>
 
 </div>
 
-<script>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "PEGA_AQUI_TU_API_KEY_REAL",
+  authDomain: "monolito-ed87d.firebaseapp.com",
+  projectId: "monolito-ed87d",
+  storageBucket: "monolito-ed87d.appspot.com",
+  messagingSenderId: "737849584362",
+  appId: "1:737849584362:web:3d1821bedcd64080cf8593",
+  measurementId: "G-7XCZ0VN7ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 let editandoUsuario = "";
 let editandoPromo = "";
+let usuariosCloud = [];
 
-function volver(){
+window.volver = function(){
   window.location.href = "index.html";
-}
+};
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
 }
 
-function esHostelero(){
-  const u = usuarioActual().toUpperCase();
-  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
-}
-
-function protegerAcceso(){
-
-  if(!esHostelero()){
-
-    alert("⚠ ACCESO SOLO HOSTELERÍA");
-
-    window.location.href = "index.html";
-  }
-}
-
-protegerAcceso();
-
 function normalizar(t){
   return String(t || "").trim().toUpperCase();
 }
 
-/* ================= USUARIOS ================= */
-
-function usuariosBase(){
-
-  return [
-
-    {
-      nombre:"JAVI",
-      pin:"0000",
-      fijo:true,
-      activo:true
-    },
-
-    {
-      nombre:"SILVIA",
-      pin:"0000",
-      fijo:true,
-      activo:true
-    },
-
-    {
-      nombre:"CAMARERO",
-      pin:"1111",
-      fijo:true,
-      activo:true
-    }
-  ];
+function idUsuario(nombre){
+  return normalizar(nombre).replaceAll(" ","_");
 }
 
-function leerUsuarios(){
+/* ================= USUARIOS CLOUD ================= */
 
-  let data = JSON.parse(
-    localStorage.getItem("usuarios_monolito") || "null"
-  );
+async function leerUsuariosCloud(){
 
-  if(!data || data.length === 0){
+  try{
+    const snap = await getDocs(collection(db,"usuarios"));
+    let data = [];
 
-    data = usuariosBase();
+    snap.forEach(d=>{
+      const u = d.data();
 
-    guardarUsuarios(data);
+      data.push({
+        id:d.id,
+        nombre:u.nombre || "",
+        pin:String(u.pin || "").trim(),
+        nivel:u.nivel || "OPERADOR",
+        rol:u.rol || "OPERADOR",
+        activo:u.activo !== false,
+        fijo:u.fijo === true,
+        actualizado:u.actualizado || "",
+        actualizadoPor:u.actualizadoPor || ""
+      });
+    });
+
+    usuariosCloud = data;
+
+    localStorage.setItem("usuarios_monolito", JSON.stringify(data));
+
+    document.getElementById("estadoCloud").textContent =
+      "✅ Usuarios sincronizados con cloud · " + data.length;
+
+    return data;
+
+  }catch(e){
+
+    console.error(e);
+
+    document.getElementById("estadoCloud").textContent =
+      "⚠️ Cloud no disponible. Se muestra copia local.";
+
+    usuariosCloud = JSON.parse(localStorage.getItem("usuarios_monolito") || "[]");
+
+    return usuariosCloud;
   }
-
-  return data;
 }
 
-function guardarUsuarios(data){
+window.guardarUsuario = async function(){
 
-  localStorage.setItem(
-    "usuarios_monolito",
-    JSON.stringify(data)
-  );
-}
-
-function guardarUsuario(){
-
-  const nombre = normalizar(
-    document.getElementById("usuarioNombre").value
-  );
-
-  const pin = String(
-    document.getElementById("usuarioPin").value || ""
-  ).trim();
+  const nombre = normalizar(document.getElementById("usuarioNombre").value);
+  const pin = String(document.getElementById("usuarioPin").value || "").trim();
+  const nivel = document.getElementById("usuarioNivel").value;
+  const rol = document.getElementById("usuarioRol").value;
 
   if(!nombre){
     alert("Falta el nombre.");
@@ -481,144 +275,144 @@ function guardarUsuario(){
     return;
   }
 
-  let data = leerUsuarios();
-
-  let idx = data.findIndex(
-    u => normalizar(u.nombre) === nombre
-  );
-
-  if(editandoUsuario !== ""){
-    idx = Number(editandoUsuario);
-  }
-
-  const anterior = idx >= 0 ? data[idx] : {};
+  const anterior =
+    editandoUsuario !== ""
+    ? usuariosCloud[Number(editandoUsuario)] || {}
+    : {};
 
   const registro = {
-
     nombre,
     pin,
-
-    fijo: anterior.fijo || false,
-
+    nivel,
+    rol,
     activo: anterior.activo !== false,
-
+    fijo: anterior.fijo === true,
     actualizadoPor: usuarioActual(),
-
-    actualizado:
-      new Date().toLocaleString("es-ES")
+    actualizado: new Date().toLocaleString("es-ES")
   };
 
-  if(idx >= 0){
-    data[idx] = registro;
-  }else{
-    data.unshift(registro);
-  }
+  try{
+    await setDoc(doc(db,"usuarios",idUsuario(nombre)),registro);
 
-  guardarUsuarios(data);
+    alert("Usuario guardado en cloud.");
 
-  limpiarUsuario();
-
-  pintarUsuarios();
-}
-
-function limpiarUsuario(){
-
-  editandoUsuario = "";
-
-  document.getElementById("usuarioNombre").value = "";
-
-  document.getElementById("usuarioPin").value = "";
-}
-
-function editarUsuario(i){
-
-  const u = leerUsuarios()[i];
-
-  editandoUsuario = i;
-
-  document.getElementById("usuarioNombre").value =
-    u.nombre || "";
-
-  document.getElementById("usuarioPin").value =
-    u.pin || "";
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-}
-
-function eliminarUsuario(i){
-
-  let data = leerUsuarios();
-
-  const u = data[i];
-
-  if(u.fijo){
-
-    alert("Este usuario base no se elimina.");
-
+  }catch(e){
+    console.error(e);
+    alert("No se pudo guardar en cloud.");
     return;
   }
 
-  if(!confirm("¿Eliminar " + u.nombre + "?")) return;
+  limpiarUsuario();
+  await pintarUsuarios();
+};
 
-  data.splice(i,1);
-
-  guardarUsuarios(data);
-
-  pintarUsuarios();
+function limpiarUsuario(){
+  editandoUsuario = "";
+  document.getElementById("usuarioNombre").value = "";
+  document.getElementById("usuarioPin").value = "";
+  document.getElementById("usuarioNivel").value = "OPERADOR";
+  document.getElementById("usuarioRol").value = "OPERADOR";
 }
 
-function pintarUsuarios(){
+window.editarUsuario = function(i){
 
-  const data = leerUsuarios();
+  const u = usuariosCloud[i];
+
+  editandoUsuario = i;
+
+  document.getElementById("usuarioNombre").value = u.nombre || "";
+  document.getElementById("usuarioPin").value = u.pin || "";
+  document.getElementById("usuarioNivel").value = u.nivel || "OPERADOR";
+  document.getElementById("usuarioRol").value = u.rol || "OPERADOR";
+
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.toggleUsuario = async function(i){
+
+  const u = usuariosCloud[i];
+
+  if(!u){
+    return;
+  }
+
+  const nuevoEstado = u.activo === false ? true : false;
+
+  try{
+    await setDoc(
+      doc(db,"usuarios",idUsuario(u.nombre)),
+      {
+        ...u,
+        activo:nuevoEstado,
+        actualizado:new Date().toLocaleString("es-ES"),
+        actualizadoPor:usuarioActual()
+      }
+    );
+
+    await pintarUsuarios();
+
+  }catch(e){
+    console.error(e);
+    alert("No se pudo cambiar el estado en cloud.");
+  }
+};
+
+window.eliminarUsuario = async function(i){
+
+  const u = usuariosCloud[i];
+
+  if(!u){
+    return;
+  }
+
+  if(u.fijo){
+    alert("Este usuario base no se elimina.");
+    return;
+  }
+
+  if(!confirm("¿Eliminar por completo a " + u.nombre + "?")) return;
+
+  try{
+    await deleteDoc(doc(db,"usuarios",idUsuario(u.nombre)));
+    await pintarUsuarios();
+
+  }catch(e){
+    console.error(e);
+    alert("No se pudo eliminar en cloud.");
+  }
+};
+
+async function pintarUsuarios(){
+
+  const data = await leerUsuariosCloud();
 
   let html = "";
+
+  if(data.length === 0){
+    html = `<div class="vacio">No hay usuarios.</div>`;
+  }
 
   data.forEach((u,i)=>{
 
     html += `
-
       <div class="linea ${u.activo === false ? "inactivo" : ""}">
-
-        <div class="nombre">
-          ${u.nombre}
-        </div>
-
-        <div class="detalle">
-          PIN: ••••
-        </div>
-
-        <div class="detalle">
-          Última actualización:
-          ${u.actualizado || "-"}
-        </div>
+        <div class="nombre">${u.nombre}</div>
+        <div class="detalle">PIN: ${u.pin ? "••••" : "-"}</div>
+        <div class="detalle">Nivel: <strong>${u.nivel}</strong> · Rol: <strong>${u.rol}</strong></div>
+        <div class="detalle">Estado: <strong>${u.activo === false ? "INACTIVO" : "ACTIVO"}</strong></div>
+        <div class="detalle">Actualizado: ${u.actualizado || "-"}</div>
 
         <div class="botones">
-
-          <button
-            class="editar"
-            onclick="editarUsuario(${i})"
-          >
-            Cambiar PIN
+          <button class="editar" onclick="editarUsuario(${i})">Editar</button>
+          <button class="${u.activo === false ? "reactivar" : "desactivar"}" onclick="toggleUsuario(${i})">
+            ${u.activo === false ? "Activar" : "Desactivar"}
           </button>
-
           ${
             u.fijo
             ? ""
-            : `
-              <button
-                class="borrar"
-                onclick="eliminarUsuario(${i})"
-              >
-                Eliminar
-              </button>
-            `
+            : `<button class="borrar" onclick="eliminarUsuario(${i})">Eliminar</button>`
           }
-
         </div>
-
       </div>
     `;
   });
@@ -626,27 +420,18 @@ function pintarUsuarios(){
   document.getElementById("listaUsuarios").innerHTML = html;
 }
 
-/* ================= PROMOCIONES ================= */
+/* ================= PROMOCIONES LOCAL ================= */
 
 function leerPromociones(){
-
-  return JSON.parse(
-    localStorage.getItem("promociones_monolito") || "[]"
-  );
+  return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
 }
 
 function guardarPromociones(data){
-
-  localStorage.setItem(
-    "promociones_monolito",
-    JSON.stringify(data)
-  );
+  localStorage.setItem("promociones_monolito", JSON.stringify(data));
 }
 
-function limpiarPromocion(){
-
+window.limpiarPromocion = function(){
   editandoPromo = "";
-
   document.getElementById("promoProveedor").value = "";
   document.getElementById("promoNombre").value = "";
   document.getElementById("promoDescuento").value = "";
@@ -655,19 +440,12 @@ function limpiarPromocion(){
   document.getElementById("promoInicio").value = "";
   document.getElementById("promoFin").value = "";
   document.getElementById("promoNota").value = "";
-}
+};
 
-function guardarPromocion(){
+window.guardarPromocion = function(){
 
-  const proveedor = normalizar(
-    document.getElementById("promoProveedor").value
-  );
-
-  const nombre =
-    document.getElementById("promoNombre")
-    .value
-    .trim()
-    .toUpperCase();
+  const proveedor = normalizar(document.getElementById("promoProveedor").value);
+  const nombre = document.getElementById("promoNombre").value.trim().toUpperCase();
 
   if(!proveedor){
     alert("Falta proveedor.");
@@ -680,51 +458,22 @@ function guardarPromocion(){
   }
 
   let data = leerPromociones();
-
-  let idx =
-    editandoPromo !== ""
-    ? Number(editandoPromo)
-    : -1;
-
-  const anterior =
-    idx >= 0
-    ? data[idx]
-    : {};
+  let idx = editandoPromo !== "" ? Number(editandoPromo) : -1;
+  const anterior = idx >= 0 ? data[idx] : {};
 
   const registro = {
-
     id: anterior.id || Date.now(),
-
     proveedor,
-
     nombre,
-
-    descuento:Number(
-      document.getElementById("promoDescuento").value || 0
-    ),
-
-    cargo:Number(
-      document.getElementById("promoCargo").value || 0
-    ),
-
-    gratis:Number(
-      document.getElementById("promoGratis").value || 0
-    ),
-
-    inicio:
-      document.getElementById("promoInicio").value,
-
-    fin:
-      document.getElementById("promoFin").value,
-
-    nota:
-      document.getElementById("promoNota").value.trim(),
-
-    activa:
-      anterior.activa !== false,
-
-    actualizado:
-      new Date().toLocaleString("es-ES")
+    descuento:Number(document.getElementById("promoDescuento").value || 0),
+    cargo:Number(document.getElementById("promoCargo").value || 0),
+    gratis:Number(document.getElementById("promoGratis").value || 0),
+    inicio:document.getElementById("promoInicio").value,
+    fin:document.getElementById("promoFin").value,
+    nota:document.getElementById("promoNota").value.trim(),
+    activa:anterior.activa !== false,
+    actualizadoPor:usuarioActual(),
+    actualizado:new Date().toLocaleString("es-ES")
   };
 
   if(idx >= 0){
@@ -734,74 +483,42 @@ function guardarPromocion(){
   }
 
   guardarPromociones(data);
-
   limpiarPromocion();
-
   pintarPromociones();
-}
+};
 
-function editarPromocion(i){
+window.editarPromocion = function(i){
 
   const p = leerPromociones()[i];
 
   editandoPromo = i;
 
-  document.getElementById("promoProveedor").value =
-    p.proveedor || "";
+  document.getElementById("promoProveedor").value = p.proveedor || "";
+  document.getElementById("promoNombre").value = p.nombre || "";
+  document.getElementById("promoDescuento").value = p.descuento || "";
+  document.getElementById("promoCargo").value = p.cargo || "";
+  document.getElementById("promoGratis").value = p.gratis || "";
+  document.getElementById("promoInicio").value = p.inicio || "";
+  document.getElementById("promoFin").value = p.fin || "";
+  document.getElementById("promoNota").value = p.nota || "";
 
-  document.getElementById("promoNombre").value =
-    p.nombre || "";
+  window.scrollTo({top:0,behavior:"smooth"});
+};
 
-  document.getElementById("promoDescuento").value =
-    p.descuento || "";
-
-  document.getElementById("promoCargo").value =
-    p.cargo || "";
-
-  document.getElementById("promoGratis").value =
-    p.gratis || "";
-
-  document.getElementById("promoInicio").value =
-    p.inicio || "";
-
-  document.getElementById("promoFin").value =
-    p.fin || "";
-
-  document.getElementById("promoNota").value =
-    p.nota || "";
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-}
-
-function togglePromocion(i){
-
+window.togglePromocion = function(i){
   let data = leerPromociones();
-
-  data[i].activa =
-    data[i].activa === false
-    ? true
-    : false;
-
+  data[i].activa = data[i].activa === false ? true : false;
   guardarPromociones(data);
-
   pintarPromociones();
-}
+};
 
-function borrarPromocion(i){
-
-  if(!confirm("¿Borrar promoción?")) return;
-
+window.borrarPromocion = function(i){
+  if(!confirm("¿Borrar esta promoción?")) return;
   let data = leerPromociones();
-
   data.splice(i,1);
-
   guardarPromociones(data);
-
   pintarPromociones();
-}
+};
 
 function pintarPromociones(){
 
@@ -810,87 +527,27 @@ function pintarPromociones(){
   let html = "";
 
   if(data.length === 0){
-
-    html = `
-      <div class="vacio">
-        No hay promociones guardadas.
-      </div>
-    `;
+    html = `<div class="vacio">No hay promociones guardadas.</div>`;
   }
 
   data.forEach((p,i)=>{
-
     html += `
-
       <div class="linea ${p.activa === false ? "inactivo" : ""}">
-
-        <div class="nombre">
-          ${p.nombre}
-        </div>
-
-        <div class="detalle">
-          Proveedor:
-          <strong>${p.proveedor}</strong>
-        </div>
-
-        <div class="detalle">
-          ${p.cargo || 0}
-          con cargo ·
-          ${p.gratis || 0}
-          coste 0 €
-        </div>
-
-        <div class="detalle">
-          Inicio:
-          ${p.inicio || "-"}
-          ·
-          Fin:
-          ${p.fin || "-"}
-        </div>
-
-        ${
-          p.nota
-          ? `
-            <div class="detalle">
-              Nota:
-              ${p.nota}
-            </div>
-          `
-          : ""
-        }
-
-        <div class="detalle">
-          Estado:
-          <strong>
-            ${p.activa === false ? "INACTIVA" : "ACTIVA"}
-          </strong>
-        </div>
+        <div class="nombre">${p.nombre}</div>
+        <div class="detalle">Proveedor: <strong>${p.proveedor}</strong></div>
+        <div class="detalle">% descuento: ${Number(p.descuento || 0).toFixed(2).replace(".",",")}%</div>
+        <div class="detalle">${p.cargo || 0} con cargo · ${p.gratis || 0} coste 0 €</div>
+        <div class="detalle">Inicio: ${p.inicio || "-"} · Fin: ${p.fin || "-"}</div>
+        ${p.nota ? `<div class="detalle">Nota: ${p.nota}</div>` : ""}
+        <div class="detalle">Estado: <strong>${p.activa === false ? "INACTIVA" : "ACTIVA"}</strong></div>
 
         <div class="botones">
-
-          <button
-            class="editar"
-            onclick="editarPromocion(${i})"
-          >
-            Editar
-          </button>
-
-          <button
-            class="${p.activa === false ? "reactivar" : "desactivar"}"
-            onclick="togglePromocion(${i})"
-          >
+          <button class="editar" onclick="editarPromocion(${i})">Editar</button>
+          <button class="${p.activa === false ? "reactivar" : "desactivar"}" onclick="togglePromocion(${i})">
             ${p.activa === false ? "Activar" : "Desactivar"}
           </button>
-
-          <button
-            class="borrar"
-            onclick="borrarPromocion(${i})"
-          >
-            Borrar
-          </button>
-
+          <button class="borrar" onclick="borrarPromocion(${i})">Borrar</button>
         </div>
-
       </div>
     `;
   });
@@ -901,113 +558,77 @@ function pintarPromociones(){
 /* ================= CONTROL PEDIDOS ================= */
 
 function leerControlPedidos(){
-
   return JSON.parse(
-
     localStorage.getItem("control_pedidos_monolito") ||
-
     JSON.stringify({
-
       activarCuantasHay:"SI",
-
       activarCuantasPido:"SI",
-
       frecuencia:"SIEMPRE",
-
       cadaPedidos:4
     })
   );
 }
 
-function guardarControlPedidos(){
+window.guardarControlPedidos = function(){
 
   const data = {
-
-    activarCuantasHay:
-      document.getElementById("activarCuantasHay").value,
-
-    activarCuantasPido:
-      document.getElementById("activarCuantasPido").value,
-
-    frecuencia:
-      document.getElementById("frecuenciaControl").value,
-
-    cadaPedidos:
-      Number(
-        document.getElementById("cadaPedidos").value || 0
-      )
+    activarCuantasHay:document.getElementById("activarCuantasHay").value,
+    activarCuantasPido:document.getElementById("activarCuantasPido").value,
+    frecuencia:document.getElementById("frecuenciaControl").value,
+    cadaPedidos:Number(document.getElementById("cadaPedidos").value || 0)
   };
 
-  localStorage.setItem(
-    "control_pedidos_monolito",
-    JSON.stringify(data)
-  );
+  localStorage.setItem("control_pedidos_monolito", JSON.stringify(data));
 
   alert("Configuración pedidos guardada.");
-}
+};
 
 function pintarControlPedidos(){
 
   const data = leerControlPedidos();
 
-  document.getElementById("activarCuantasHay").value =
-    data.activarCuantasHay || "SI";
-
-  document.getElementById("activarCuantasPido").value =
-    data.activarCuantasPido || "SI";
-
-  document.getElementById("frecuenciaControl").value =
-    data.frecuencia || "SIEMPRE";
-
-  document.getElementById("cadaPedidos").value =
-    data.cadaPedidos || 4;
+  document.getElementById("activarCuantasHay").value = data.activarCuantasHay || "SI";
+  document.getElementById("activarCuantasPido").value = data.activarCuantasPido || "SI";
+  document.getElementById("frecuenciaControl").value = data.frecuencia || "SIEMPRE";
+  document.getElementById("cadaPedidos").value = data.cadaPedidos || 4;
 }
 
 /* ================= SISTEMA ================= */
 
 function confirmarTexto(texto){
-
-  return prompt(
-    texto +
-    "\n\nEscribe BORRAR para confirmar:"
-  ) === "BORRAR";
+  return prompt(texto + "\n\nEscribe BORRAR para confirmar:") === "BORRAR";
 }
 
 function borrarClave(clave,nombre){
-
   if(!confirmarTexto("Vas a borrar " + nombre + ".")) return;
-
   localStorage.removeItem(clave);
-
   alert(nombre + " borrado.");
 }
 
-function borrarCalendario(){
+window.borrarCalendario = function(){
   borrarClave("calendario","calendario");
-}
+};
 
-function borrarDocumentos(){
+window.borrarDocumentos = function(){
   borrarClave("documentos_monolito","documentos");
-}
+};
 
-function borrarPagos(){
+window.borrarPagos = function(){
   borrarClave("pagos_pendientes","pagos pendientes");
-}
+};
 
-function borrarHistoricoPedidos(){
-  borrarClave("pedidos_historico","histórico pedidos");
-}
+window.borrarHistoricoPedidos = function(){
+  borrarClave("pagos_historico","histórico pagos");
+};
 
-function borrarIncidencias(){
+window.borrarIncidencias = function(){
   borrarClave("incidencias","incidencias");
-}
+};
 
 /* ================= START ================= */
 
-pintarUsuarios();
-
+await pintarUsuarios();
 pintarPromociones();
-
 pintarControlPedidos();
 
 </script>
