@@ -24,6 +24,7 @@ button{
   padding:10px 14px;
   font-weight:800;
   font-size:15px;
+  cursor:pointer;
 }
 
 .volver{background:white;color:#17303d}
@@ -54,7 +55,7 @@ input,select,textarea{
 }
 
 textarea{
-  min-height:120px;
+  min-height:110px;
   margin-top:6px;
 }
 
@@ -115,6 +116,7 @@ textarea{
 .media{background:#fff3c4;color:#9a7300}
 .baja{background:#e4f5ff;color:#17627f}
 .hecha{background:#e5ffe5;color:#1a7f1a}
+.fija{background:#e9e5ff;color:#47308a}
 
 .acciones{
   display:flex;
@@ -137,12 +139,45 @@ textarea{
   color:white;
 }
 
+.azul{
+  background:#17627f;
+  color:white;
+}
+
 .vacio{
   background:white;
   border-radius:22px;
   padding:20px;
   text-align:center;
   font-weight:800;
+}
+
+.tareaFija{
+  border-top:1px solid #dfe6ec;
+  padding-top:12px;
+  margin-top:12px;
+}
+
+.tareaFija.okFija{
+  opacity:.55;
+}
+
+.checkGrande{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.checkGrande input{
+  width:24px;
+  height:24px;
+  margin-top:2px;
+}
+
+.miniTexto{
+  color:#4f5f69;
+  font-size:14px;
+  margin-top:4px;
 }
 </style>
 </head>
@@ -157,6 +192,14 @@ textarea{
 <div class="contenido">
 
   <div class="card">
+    <div class="fechaTitulo">✅ Tareas fijas de esta semana</div>
+    <div class="detalle" id="semanaTexto"></div>
+    <div id="tareasFijas"></div>
+  </div>
+
+  <div class="card">
+    <div class="fechaTitulo">➕ Recordatorio puntual</div>
+
     <label>Elegir día</label>
     <input type="date" id="fecha" onchange="cargarDia()">
 
@@ -173,7 +216,7 @@ textarea{
     <label>Nota</label>
     <textarea id="nota" placeholder="Escribe aquí lo importante de ese día: abrir a las 9, refuerzo de personal, comprobar cambio, proveedor especial..."></textarea>
 
-    <button class="guardar" onclick="guardarNota()">💾 Guardar recordatorio</button>
+    <button class="guardar" onclick="guardarNota()">💾 Guardar recordatorio puntual</button>
     <button class="limpiar" onclick="nuevoRecordatorio()">➕ Nuevo / limpiar pantalla</button>
     <button class="eliminar" onclick="eliminarNota()">🗑 Eliminar recordatorio de este día</button>
   </div>
@@ -188,14 +231,6 @@ textarea{
 <script>
 function volver(){
   window.location.href = "index.html";
-}
-
-function leerCalendario(){
-  return JSON.parse(localStorage.getItem("calendario") || "{}");
-}
-
-function guardarCalendario(data){
-  localStorage.setItem("calendario", JSON.stringify(data));
 }
 
 function usuarioActual(){
@@ -222,6 +257,18 @@ function clasePrioridad(p){
   if(p === "ALTA") return "alta";
   if(p === "BAJA") return "baja";
   return "media";
+}
+
+/* =========================
+   RECORDATORIOS PUNTUALES
+========================= */
+
+function leerCalendario(){
+  return JSON.parse(localStorage.getItem("calendario") || "{}");
+}
+
+function guardarCalendario(data){
+  localStorage.setItem("calendario", JSON.stringify(data));
 }
 
 function cargarDia(){
@@ -258,11 +305,11 @@ function guardarNota(){
   }
 
   let data = leerCalendario();
-
   const anterior = data[fecha] || {};
 
   data[fecha] = {
     fecha,
+    tipo:"PUNTUAL",
     titulo: titulo || "Recordatorio",
     texto,
     prioridad,
@@ -276,7 +323,7 @@ function guardarNota(){
   guardarCalendario(data);
   pintarProximos();
 
-  alert("Recordatorio guardado.");
+  alert("Recordatorio puntual guardado.");
 }
 
 function eliminarNota(){
@@ -287,20 +334,18 @@ function eliminarNota(){
     return;
   }
 
-  if(!confirm("¿Eliminar el recordatorio de este día?")) return;
+  if(!confirm("¿Eliminar el recordatorio puntual de este día?")) return;
 
   let data = leerCalendario();
   delete data[fecha];
 
   guardarCalendario(data);
-
   nuevoRecordatorio();
   pintarProximos();
 }
 
 function marcarHecho(fecha){
   let data = leerCalendario();
-
   if(!data[fecha]) return;
 
   data[fecha].hecha = true;
@@ -314,7 +359,6 @@ function marcarHecho(fecha){
 
 function reabrir(fecha){
   let data = leerCalendario();
-
   if(!data[fecha]) return;
 
   data[fecha].hecha = false;
@@ -337,6 +381,154 @@ function borrarDesdeLista(fecha){
   pintarProximos();
 }
 
+/* =========================
+   TAREAS FIJAS SEMANALES
+========================= */
+
+const TAREAS_FIJAS_BASE = [
+  {
+    id:"control_cambio",
+    titulo:"Control de cambio semanal",
+    nota:"Revisar si hubo cambios importantes en el sistema, precios, proveedores o funcionamiento.",
+    prioridad:"ALTA"
+  },
+  {
+    id:"revisar_incidencias",
+    titulo:"Revisar incidencias pendientes",
+    nota:"Comprobar incidencias abiertas, rojas o amarillas, y dejar anotado lo que sigue pendiente.",
+    prioridad:"ALTA"
+  },
+  {
+    id:"revisar_proveedores",
+    titulo:"Revisar proveedores",
+    nota:"Mirar si hay cambios de precios, pedidos pendientes, promociones o avisos importantes.",
+    prioridad:"MEDIA"
+  },
+  {
+    id:"revisar_pagos",
+    titulo:"Revisar pagos",
+    nota:"Comprobar pagos pendientes, vencimientos y facturas que haya que marcar como pagadas.",
+    prioridad:"MEDIA"
+  },
+  {
+    id:"revisar_promociones",
+    titulo:"Revisar promociones activas",
+    nota:"Comprobar promociones vigentes, fechas y si están bien aplicadas.",
+    prioridad:"MEDIA"
+  },
+  {
+    id:"limpieza_revision",
+    titulo:"Revisión general semanal",
+    nota:"Revisión rápida del estado general: avisos, tareas, documentos, pedidos e incidencias.",
+    prioridad:"BAJA"
+  }
+];
+
+function leerTareasFijas(){
+  let tareas = JSON.parse(localStorage.getItem("tareasFijasCalendario") || "null");
+
+  if(!tareas || !Array.isArray(tareas)){
+    localStorage.setItem("tareasFijasCalendario", JSON.stringify(TAREAS_FIJAS_BASE));
+    return TAREAS_FIJAS_BASE;
+  }
+
+  return tareas;
+}
+
+function inicioSemanaISO(){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+
+  const dia = d.getDay();
+  const diff = dia === 0 ? -6 : 1 - dia;
+
+  d.setDate(d.getDate() + diff);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+
+  return d.toISOString().slice(0,10);
+}
+
+function finSemanaISO(){
+  const ini = new Date(inicioSemanaISO() + "T12:00:00");
+  ini.setDate(ini.getDate() + 6);
+  ini.setMinutes(ini.getMinutes() - ini.getTimezoneOffset());
+  return ini.toISOString().slice(0,10);
+}
+
+function claveSemana(){
+  return "tareasFijasSemana_" + inicioSemanaISO();
+}
+
+function leerEstadoSemana(){
+  return JSON.parse(localStorage.getItem(claveSemana()) || "{}");
+}
+
+function guardarEstadoSemana(estado){
+  localStorage.setItem(claveSemana(), JSON.stringify(estado));
+}
+
+function pintarTareasFijas(){
+  const cont = document.getElementById("tareasFijas");
+  const semanaTexto = document.getElementById("semanaTexto");
+
+  const tareas = leerTareasFijas();
+  const estado = leerEstadoSemana();
+
+  semanaTexto.innerHTML = `Semana del <strong>${fechaBonita(inicioSemanaISO())}</strong> al <strong>${fechaBonita(finSemanaISO())}</strong>`;
+
+  let html = "";
+
+  tareas.forEach(t=>{
+    const hecha = estado[t.id]?.hecha || false;
+
+    html += `
+      <div class="tareaFija ${hecha ? "okFija" : ""}">
+        <div class="checkGrande">
+          <input type="checkbox" ${hecha ? "checked" : ""} onchange="toggleTareaFija('${t.id}')">
+          <div>
+            <div><strong>${t.titulo}</strong></div>
+            ${t.nota ? `<div class="miniTexto">${t.nota}</div>` : ""}
+            <div class="etiqueta fija">FIJA SEMANAL</div>
+            <div class="etiqueta ${clasePrioridad(t.prioridad)}">${t.prioridad || "MEDIA"}</div>
+            ${
+              hecha
+              ? `<div class="detalle">Hecha por: ${estado[t.id].hechaPor || "OPERADOR"} · ${estado[t.id].fechaHecha || "-"}</div>`
+              : `<div class="detalle">Pendiente esta semana</div>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  cont.innerHTML = html || `<div class="vacio">No hay tareas fijas configuradas.</div>`;
+}
+
+function toggleTareaFija(id){
+  let estado = leerEstadoSemana();
+
+  if(estado[id]?.hecha){
+    estado[id] = {
+      hecha:false,
+      reabiertaPor: usuarioActual(),
+      fechaReabierta: new Date().toLocaleString("es-ES")
+    };
+  }else{
+    estado[id] = {
+      hecha:true,
+      hechaPor: usuarioActual(),
+      fechaHecha: new Date().toLocaleString("es-ES")
+    };
+  }
+
+  guardarEstadoSemana(estado);
+  pintarTareasFijas();
+}
+
+/* =========================
+   LISTADO PRÓXIMOS 7 DÍAS
+========================= */
+
 function pintarProximos(){
   const data = leerCalendario();
   const cont = document.getElementById("proximos");
@@ -356,7 +548,7 @@ function pintarProximos(){
   items.sort((a,b)=>a.fecha.localeCompare(b.fecha));
 
   if(items.length === 0){
-    cont.innerHTML = `<div class="vacio">No hay recordatorios pendientes en los próximos 7 días.</div>`;
+    cont.innerHTML = `<div class="vacio">No hay recordatorios puntuales pendientes en los próximos 7 días.</div>`;
     return;
   }
 
@@ -386,8 +578,13 @@ function pintarProximos(){
   cont.innerHTML = html;
 }
 
+/* =========================
+   ARRANQUE
+========================= */
+
 document.getElementById("fecha").value = hoyISO();
 cargarDia();
+pintarTareasFijas();
 pintarProximos();
 </script>
 
