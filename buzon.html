@@ -6,70 +6,33 @@
 <title>BUZÓN · MONOLITO</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#eef2f5;
-color:#17303d;
-}
-
-header{
-background:#17303d;
-color:white;
-padding:18px;
-font-size:22px;
-font-weight:900;
-display:flex;
-align-items:center;
-gap:12px;
-}
-
-.volver{
-background:white;
-color:#17303d;
-border:0;
-border-radius:12px;
-padding:8px 12px;
-font-weight:900;
-}
-
-.contenedor{
-padding:24px;
-max-width:900px;
-margin:auto;
-}
-
-.card{
-background:white;
-border-radius:24px;
-padding:30px;
-box-shadow:0 10px 24px rgba(0,0,0,.12);
-}
-
-.titulo{
-font-size:32px;
-font-weight:900;
-margin-bottom:20px;
-}
-
-.texto{
-font-size:19px;
-line-height:1.8;
-font-weight:600;
-color:#222;
-}
-
-.estado{
-margin-top:30px;
-background:#fff6cf;
-border:2px solid #ffe066;
-padding:18px;
-border-radius:18px;
-font-size:18px;
-font-weight:900;
-color:#8a6a00;
-text-align:center;
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:12px}
+button{border:0;border-radius:14px;padding:11px 14px;font-weight:900;font-size:15px;cursor:pointer}
+.volver{background:white;color:#17303d}
+.contenedor{padding:16px;max-width:950px;margin:auto}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+h2,h3{margin:0 0 12px}
+label{display:block;font-weight:900;margin-top:12px;margin-bottom:6px}
+input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px}
+textarea{min-height:120px}
+.guardar{background:#48a530;color:white;width:100%;margin-top:14px;font-size:17px}
+.limpiar{background:#ff9800;color:white;width:100%;margin-top:10px}
+.item{border-top:1px solid #dfe6ec;padding-top:12px;margin-top:12px}
+.detalle{font-size:14px;color:#4f5f69;margin-top:6px}
+.etiqueta{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:900;margin-top:8px;margin-right:5px}
+.PENDIENTE{background:#fff3c4;color:#9a7300}
+.REVISADO{background:#e4f5ff;color:#17627f}
+.SOLUCIONADO{background:#e5ffe5;color:#1a7f1a}
+.DEFECTO{background:#ffe0e0;color:#c00000}
+.MEJORA{background:#e9e5ff;color:#47308a}
+.SUGERENCIA{background:#e4f5ff;color:#17627f}
+.acciones{display:flex;gap:8px;margin-top:10px}
+.acciones button{flex:1}
+.azul{background:#17627f;color:white}
+.ok{background:#48a530;color:white}
+.vacio{text-align:center;font-weight:900;padding:18px}
 </style>
 </head>
 
@@ -77,47 +40,162 @@ text-align:center;
 
 <header>
 <button class="volver" onclick="history.back()">←</button>
-📬 BUZÓN
+<h2>📬 BUZÓN</h2>
 </header>
 
 <div class="contenedor">
 
 <div class="card">
+<h3>📬 Buzón de sugerencias y mejoras</h3>
 
-<div class="titulo">
-BUZÓN DE SUGERENCIAS · EN CONSTRUCCIÓN
+<label>Nombre</label>
+<input id="nombre" placeholder="Nombre">
+
+<label>Apellidos</label>
+<input id="apellidos" placeholder="Apellidos">
+
+<label>Empresa</label>
+<input id="empresa" placeholder="Empresa">
+
+<label>Cargo</label>
+<input id="cargo" placeholder="Cargo">
+
+<label>Tipo</label>
+<select id="tipo">
+  <option value="SUGERENCIA">SUGERENCIA</option>
+  <option value="MEJORA">MEJORA DEL SISTEMA</option>
+  <option value="DEFECTO">DEFECTO / ERROR</option>
+  <option value="INCIDENCIA">INCIDENCIA</option>
+</select>
+
+<label>Sugerencia / comentario</label>
+<textarea id="mensaje" placeholder="Escribe aquí la sugerencia, defecto detectado o mejora propuesta..."></textarea>
+
+<button class="guardar" onclick="guardarBuzon()">💾 Guardar en buzón</button>
+<button class="limpiar" onclick="limpiarFormulario()">➕ Limpiar formulario</button>
 </div>
 
-<div class="texto">
-
-Este módulo estará destinado a sugerencias profesionales y propuestas de mejora relacionadas con MONOLITO GPT PRO.
-
-<br><br>
-
-El formulario será estructurado e identificado:
-
-<br><br>
-
-• Nombre y apellidos<br>
-• Empresa<br>
-• Cargo<br>
-• Datos de contacto<br>
-• Sugerencia o propuesta<br>
-
-<br>
-
-Objetivo:
-mantener una evolución real y profesional del sistema.
-
-</div>
-
-<div class="estado">
-MÓDULO EN DESARROLLO
+<div class="card">
+<h3>📋 Entradas del buzón</h3>
+<div id="listado"></div>
 </div>
 
 </div>
 
-</div>
+<script>
+const CLAVE_BUZON = "buzonMonolito";
+
+function usuarioActual(){
+  return localStorage.getItem("usuario") || "OPERADOR";
+}
+
+function leerBuzon(){
+  return JSON.parse(localStorage.getItem(CLAVE_BUZON) || "[]");
+}
+
+function guardarBuzonLocal(data){
+  localStorage.setItem(CLAVE_BUZON, JSON.stringify(data));
+}
+
+function guardarBuzon(){
+  const nombre = document.getElementById("nombre").value.trim();
+  const apellidos = document.getElementById("apellidos").value.trim();
+  const empresa = document.getElementById("empresa").value.trim();
+  const cargo = document.getElementById("cargo").value.trim();
+  const tipo = document.getElementById("tipo").value;
+  const mensaje = document.getElementById("mensaje").value.trim();
+
+  if(!nombre || !apellidos || !empresa || !cargo || !mensaje){
+    alert("Completa nombre, apellidos, empresa, cargo y sugerencia.");
+    return;
+  }
+
+  const entrada = {
+    id: "BZ-" + Date.now(),
+    nombre,
+    apellidos,
+    empresa,
+    cargo,
+    tipo,
+    mensaje,
+    estado: "PENDIENTE",
+    creadaPor: usuarioActual(),
+    fecha: new Date().toLocaleString("es-ES")
+  };
+
+  let data = leerBuzon();
+  data.unshift(entrada);
+  guardarBuzonLocal(data);
+
+  limpiarFormulario();
+  pintarBuzon();
+
+  alert("Entrada guardada en el buzón.");
+}
+
+function limpiarFormulario(){
+  document.getElementById("nombre").value = "";
+  document.getElementById("apellidos").value = "";
+  document.getElementById("empresa").value = "";
+  document.getElementById("cargo").value = "";
+  document.getElementById("tipo").value = "SUGERENCIA";
+  document.getElementById("mensaje").value = "";
+}
+
+function cambiarEstado(id, estado){
+  let data = leerBuzon();
+  data = data.map(e=>{
+    if(e.id === id){
+      e.estado = estado;
+      e.actualizadoPor = usuarioActual();
+      e.fechaActualizacion = new Date().toLocaleString("es-ES");
+    }
+    return e;
+  });
+  guardarBuzonLocal(data);
+  pintarBuzon();
+}
+
+function pintarBuzon(){
+  const cont = document.getElementById("listado");
+  const data = leerBuzon();
+
+  if(data.length === 0){
+    cont.innerHTML = `<div class="vacio">No hay entradas en el buzón.</div>`;
+    return;
+  }
+
+  let html = "";
+
+  data.forEach(e=>{
+    html += `
+      <div class="item">
+        <strong>${e.nombre} ${e.apellidos}</strong>
+        <div class="detalle">${e.empresa} · ${e.cargo}</div>
+
+        <span class="etiqueta ${e.tipo}">${e.tipo}</span>
+        <span class="etiqueta ${e.estado}">${e.estado}</span>
+
+        <div style="margin-top:10px">${e.mensaje.replace(/\n/g,"<br>")}</div>
+
+        <div class="detalle">
+          Registrado por: ${e.creadaPor} · ${e.fecha}
+          ${e.fechaActualizacion ? `<br>Actualizado por: ${e.actualizadoPor} · ${e.fechaActualizacion}` : ""}
+        </div>
+
+        <div class="acciones">
+          <button class="azul" onclick="cambiarEstado('${e.id}','REVISADO')">Revisado</button>
+          <button class="ok" onclick="cambiarEstado('${e.id}','SOLUCIONADO')">Solucionado</button>
+        </div>
+      </div>
+    `;
+  });
+
+  cont.innerHTML = html;
+}
+
+pintarBuzon();
+</script>
 
 </body>
 </html>
