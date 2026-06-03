@@ -64,7 +64,7 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
     <textarea id="nota" placeholder="Observación, condiciones, explicación..."></textarea>
 
     <div class="aviso">
-      Este primer archivo documental guarda en este navegador/dispositivo. Para nube real y archivos grandes, más adelante lo pasamos a Azure/Firebase.
+      Las fotos se reducen automáticamente para ocupar menos espacio. Los PDF se guardan sin modificar.
     </div>
 
     <button class="guardar" onclick="guardarDocumento()">💾 Guardar documento</button>
@@ -130,7 +130,69 @@ function hoyAnio(){
 document.getElementById("anio").value = hoyAnio();
 document.getElementById("filtroAnio").value = hoyAnio();
 
-function guardarDocumento(){
+function comprimirImagen(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+      const img = new Image();
+
+      img.onload = function(){
+        const maxAncho = 1600;
+        const maxAlto = 1600;
+
+        let ancho = img.width;
+        let alto = img.height;
+
+        if(ancho > maxAncho || alto > maxAlto){
+          const ratio = Math.min(maxAncho / ancho, maxAlto / alto);
+          ancho = Math.round(ancho * ratio);
+          alto = Math.round(alto * ratio);
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = ancho;
+        canvas.height = alto;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, ancho, alto);
+
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.78);
+
+        resolve({
+          archivo:dataUrl,
+          tipo:"image/jpeg",
+          nombre:file.name.replace(/\.[^/.]+$/, "") + "_optimizado.jpg"
+        });
+      };
+
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function leerArchivoNormal(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+      resolve({
+        archivo:e.target.result,
+        tipo:file.type,
+        nombre:file.name
+      });
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function guardarDocumento(){
   const nombre = document.getElementById("nombre").value.trim();
   const categoria = document.getElementById("categoria").value;
   const anio = Number(document.getElementById("anio").value || hoyAnio());
@@ -147,41 +209,48 @@ function guardarDocumento(){
     return;
   }
 
-  if(file.size > 3 * 1024 * 1024){
-    alert("Archivo demasiado grande para esta primera versión. Usa uno menor de 3 MB.");
+  let archivoFinal;
+
+  try{
+    if(file.type.startsWith("image/")){
+      archivoFinal = await comprimirImagen(file);
+    }else{
+      if(file.size > 3 * 1024 * 1024){
+        alert("PDF demasiado grande para esta primera versión. Usa uno menor de 3 MB.");
+        return;
+      }
+
+      archivoFinal = await leerArchivoNormal(file);
+    }
+  }catch(e){
+    alert("No se pudo procesar el archivo.");
     return;
   }
 
-  const reader = new FileReader();
+  let data = leerDocumentos();
 
-  reader.onload = function(e){
-    let data = leerDocumentos();
+  data.unshift({
+    id: Date.now(),
+    nombre,
+    categoria,
+    anio,
+    nota,
+    archivoNombre:archivoFinal.nombre,
+    archivoTipo:archivoFinal.tipo,
+    archivo:archivoFinal.archivo,
+    usuario:usuarioActual(),
+    fecha:new Date().toLocaleString("es-ES")
+  });
 
-    data.unshift({
-      id: Date.now(),
-      nombre,
-      categoria,
-      anio,
-      nota,
-      archivoNombre:file.name,
-      archivoTipo:file.type,
-      archivo:e.target.result,
-      usuario:usuarioActual(),
-      fecha:new Date().toLocaleString("es-ES")
-    });
+  guardarDocumentos(data);
 
-    guardarDocumentos(data);
+  document.getElementById("nombre").value="";
+  document.getElementById("nota").value="";
+  document.getElementById("archivo").value="";
 
-    document.getElementById("nombre").value="";
-    document.getElementById("nota").value="";
-    document.getElementById("archivo").value="";
+  pintar();
 
-    pintar();
-
-    alert("Documento guardado.");
-  };
-
-  reader.readAsDataURL(file);
+  alert("Documento guardado.");
 }
 
 function abrirDocumento(id){
