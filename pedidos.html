@@ -133,6 +133,17 @@ function leerPromociones(){
   return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
 }
 
+function debeMostrarStock(a){
+  return (
+    a.controlStock === true ||
+    a.avisarPedido === true ||
+    a.tenerEnCuenta === true ||
+    a.stockProgramado === true ||
+    a.controlPedido === true ||
+    a.pedirProgramado === true
+  );
+}
+
 function pintarAvisosPedidos(){
   if(avisosCloud.length === 0){
     document.getElementById("avisosPedidos").innerHTML = "";
@@ -223,20 +234,8 @@ function cargarArticulos(){
     excluirRappel:false,
     stockActual:"",
     pedir:"",
-    mostrarStock:false
+    mostrarStock:debeMostrarStock(a)
   }));
-
-  let historico = JSON.parse(localStorage.getItem("pedidos_historico") || "[]");
-
-  let pedidosProveedor = historico.filter(p =>
-    normalizar(p.proveedor) === normalizar(proveedor)
-  );
-
-  let activarStock = pedidosProveedor.length >= 3;
-
-  pedido.forEach(a=>{
-    a.mostrarStock = activarStock;
-  });
 
   pintar();
 }
