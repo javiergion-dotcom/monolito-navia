@@ -1,3 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMUNICACIÓN · MONOLITO</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#eef2f5;
+  color:#17303d;
+}
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+header h2{margin:0;font-size:20px}
+button{
+  border:0;
+  border-radius:14px;
+  padding:12px;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+}
+.volver{
+  background:white;
+  color:#17303d;
+}
+.contenedor{padding:16px}
+.card{
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.10);
+}
+textarea{
+  width:100%;
+  min-height:110px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+.guardar{
+  width:100%;
+  margin-top:10px;
+  background:#17303d;
+  color:white;
+}
+.comunicacion{
+  border-left:8px solid #f2c94c;
+}
+.fecha{
+  font-size:13px;
+  color:#666;
+  margin-top:8px;
+}
+.hecha{
+  opacity:.55;
+  text-decoration:line-through;
+}
+.acciones{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+.ok{background:#27ae60;color:white}
+.borrar{background:#c0392b;color:white}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="volver" onclick="location.href='index.html'">← Volver</button>
+  <h2>COMUNICACIÓN</h2>
+</header>
+
+<div class="contenedor">
+
+  <div class="card">
+    <h3>Nueva comunicación</h3>
+    <textarea id="mensaje" placeholder="Escribe aquí la comunicación para el siguiente turno..."></textarea>
+    <button class="guardar" onclick="guardarComunicacion()">GUARDAR COMUNICACIÓN</button>
+  </div>
+
+  <div id="lista"></div>
+
+</div>
+
+<script>
+const CLAVE = "monolito_comunicaciones";
+
+function usuarioActual(){
+  return localStorage.getItem("usuarioActual") || "JAVI";
+}
+
+function leer(){
+  return JSON.parse(localStorage.getItem(CLAVE) || "[]");
+}
+
+function guardar(data){
+  localStorage.setItem(CLAVE, JSON.stringify(data));
+}
+
 async function guardarComunicacion() {
   const mensaje = document.getElementById("mensaje").value.trim();
 
@@ -6,11 +120,11 @@ async function guardarComunicacion() {
     return;
   }
 
-  // 1. Guardado local (mantenemos la estructura)
   let data = leer();
+
   const nuevaComunicacion = {
     id: Date.now(),
-    mensaje,
+    mensaje: mensaje,
     usuario: usuarioActual(),
     fecha: new Date().toLocaleString("es-ES"),
     hecha: false
@@ -19,18 +133,75 @@ async function guardarComunicacion() {
   data.unshift(nuevaComunicacion);
   guardar(data);
 
-  // 2. BLINDAJE: Sincronización con la nube (Google Cloud/Firebase)
   try {
-    if (typeof db !== 'undefined') {
-      // Guardamos en la colección 'comunicaciones' del monolito
-      await db.collection('comunicaciones').doc(nuevaComunicacion.id.toString()).set(nuevaComunicacion);
+    if (typeof db !== "undefined") {
+      await db.collection("comunicaciones")
+        .doc(nuevaComunicacion.id.toString())
+        .set(nuevaComunicacion);
+
       console.log("✅ Comunicación sincronizada con la nube.");
     }
   } catch (error) {
     console.error("⚠️ Aviso: La comunicación se guardó localmente, pero no pudo sincronizarse con la nube.", error);
   }
 
-  document.getElementById("mensaje").value="";
+  document.getElementById("mensaje").value = "";
   pintar();
-  alert("Comunicación guardada y sincronizada.");
+  alert("Comunicación guardada.");
 }
+
+function marcarHecha(id){
+  let data = leer();
+  data = data.map(c => {
+    if(c.id === id){
+      c.hecha = !c.hecha;
+    }
+    return c;
+  });
+  guardar(data);
+  pintar();
+}
+
+function borrarComunicacion(id){
+  if(!confirm("¿Borrar esta comunicación?")) return;
+
+  let data = leer().filter(c => c.id !== id);
+  guardar(data);
+  pintar();
+}
+
+function pintar(){
+  const lista = document.getElementById("lista");
+  const data = leer();
+
+  if(data.length === 0){
+    lista.innerHTML = `
+      <div class="card">
+        No hay comunicaciones pendientes.
+      </div>
+    `;
+    return;
+  }
+
+  lista.innerHTML = data.map(c => `
+    <div class="card comunicacion ${c.hecha ? "hecha" : ""}">
+      <strong>${c.usuario}</strong>
+      <p>${c.mensaje}</p>
+      <div class="fecha">${c.fecha}</div>
+      <div class="acciones">
+        <button class="ok" onclick="marcarHecha(${c.id})">
+          ${c.hecha ? "REABRIR" : "HECHA"}
+        </button>
+        <button class="borrar" onclick="borrarComunicacion(${c.id})">
+          BORRAR
+        </button>
+      </div>
+    </div>
+  `).join("");
+}
+
+pintar();
+</script>
+
+</body>
+</html>
