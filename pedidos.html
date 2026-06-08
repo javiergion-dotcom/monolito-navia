@@ -526,7 +526,7 @@ function calcular(){
       Number(a.formato || 1);
 
     let linea =
-      Number(a.cantidad || 0) * precioCaja;
+     Number(a.pedir || 0) * precioCaja;
 
     let lineaPago =
       a.costeCero ? 0 : linea;
