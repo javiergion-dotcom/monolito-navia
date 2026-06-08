@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -29,8 +30,11 @@ button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-
 .promoAlerta{margin-top:8px;background:#ffe5e5;border:2px solid #ff9b9b;border-radius:12px;padding:9px;font-size:13px;font-weight:900;color:#c00000}
 .stockBox{margin-top:10px;background:#eef7ff;border:2px solid #cfe5ff;border-radius:12px;padding:10px}
 .stockTitulo{font-size:13px;font-weight:900;margin-bottom:8px}
-.stockFila{display:flex;gap:10px}
-.stockFila input{flex:1;width:auto}
+.stockFila{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stockCol{background:white;border-radius:12px;padding:8px}
+.stockCol label{display:block;font-size:12px;font-weight:900;margin-bottom:5px;color:#17303d;text-align:center}
+.stockCol input{width:100%}
+.totalExistencias{margin-top:10px;background:#17303d;color:white;border-radius:12px;padding:10px;text-align:center;font-weight:900}
 .avisosBox{background:#fff8db;border:3px solid #f0c94a;border-radius:18px;padding:14px;margin-bottom:16px}
 .avisosTitulo{font-weight:900;font-size:18px;margin-bottom:8px;color:#8a6a00}
 .avisoLinea{background:white;border-radius:12px;padding:10px;margin-top:8px;font-weight:900;color:#17303d}
@@ -108,6 +112,10 @@ function normalizar(t){
     .replace(/[\u0300-\u036f]/g,"");
 }
 
+function dinero(n){
+  return Number(n || 0).toLocaleString("es-ES",{style:"currency",currency:"EUR"});
+}
+
 function leerArticulos(){
   return JSON.parse(localStorage.getItem("articulos") || "[]")
     .filter(a => a.activo !== false);
@@ -131,17 +139,6 @@ function leerProveedores(){
 
 function leerPromociones(){
   return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
-}
-
-function debeMostrarStock(a){
-  return (
-    a.controlStock === true ||
-    a.avisarPedido === true ||
-    a.tenerEnCuenta === true ||
-    a.stockProgramado === true ||
-    a.controlPedido === true ||
-    a.pedirProgramado === true
-  );
 }
 
 function pintarAvisosPedidos(){
@@ -229,12 +226,11 @@ function cargarArticulos(){
 
   pedido = articulos.map(a => ({
     ...a,
-    cantidad:0,
+    cantidad:"",
     costeCero:false,
     excluirRappel:false,
     stockActual:"",
-    pedir:"",
-    mostrarStock:debeMostrarStock(a)
+    pedir:""
   }));
 
   pintar();
@@ -311,7 +307,7 @@ function datosPromo(a){
     return null;
   }
 
-  const cantidad = Number(a.cantidad || 0);
+  const cantidad = Number(a.pedir || 0);
   const bloques = Math.floor(cantidad / conCargo);
   const resto = cantidad % conCargo;
   const gratisTotal = bloques * gratis;
@@ -369,12 +365,16 @@ function avisoPromoHTML(a){
   return html;
 }
 
+function totalExistencias(a){
+  return Number(a.stockActual || 0) + Number(a.pedir || 0);
+}
+
 function pintar(){
   let html = "";
 
   pedido.forEach((a,i)=>{
     const precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
-    const lineaPago = a.costeCero ? 0 : Number(a.cantidad || 0) * precioCaja;
+    const lineaPago = a.costeCero ? 0 : Number(a.pedir || 0) * precioCaja;
 
     html += `
     <div class="card ${a.costeCero ? "costeCero" : ""}">
@@ -382,60 +382,54 @@ function pintar(){
       <div class="nombre">${a.articulo}</div>
 
       <div class="detalle">
-        ${a.unidadFormato} ·
+        ${a.unidadFormato || ""} ·
         ${Number(a.precioUnidad || 0).toFixed(2)} € ·
-        IVA ${a.iva}%
+        IVA ${a.iva || 21}%
       </div>
 
       ${avisoPromoHTML(a)}
 
-      ${
-        a.mostrarStock ? `
-        <div class="stockBox">
+      <div class="stockBox">
+        <div class="stockTitulo">📦 ALMACÉN / PEDIDO</div>
 
-          <div class="stockTitulo">
-            📦 CONTROL DE ALMACÉN
-          </div>
+        <div class="stockFila">
 
-          <div class="stockFila">
-
+          <div class="stockCol">
+            <label>CUÁNTAS HAY</label>
             <input
               type="number"
-              placeholder="Cuántas hay"
+              placeholder="Hay"
               value="${a.stockActual}"
               onchange="stockActual(${i},this.value)"
+              oninput="stockActual(${i},this.value)"
             >
+          </div>
 
+          <div class="stockCol">
+            <label>CUÁNTAS PIDO</label>
             <input
+              class="cantidadPedido"
+              data-indice="${i}"
               type="number"
-              placeholder="Cuántas pides"
+              placeholder="Pido"
               value="${a.pedir}"
               onchange="stockPedir(${i},this.value)"
+              oninput="stockPedir(${i},this.value)"
+              onkeydown="siguienteConEnter(event, ${i})"
             >
-
           </div>
 
         </div>
-        ` : ""
-      }
+
+        <div class="totalExistencias" id="existencias${i}">
+          TOTAL EXISTENCIAS: ${totalExistencias(a)}
+        </div>
+      </div>
 
       <div class="fila">
-
-        <input
-          class="cantidadPedido"
-          data-indice="${i}"
-          type="number"
-          value="${a.cantidad}"
-          onfocus="this.select()"
-          onclick="this.select()"
-          onchange="cambiar(${i}, this.value)"
-          onkeydown="siguienteConEnter(event, ${i})"
-        >
-
         <div class="totalLinea" id="t${i}">
           ${lineaPago.toFixed(2)} €
         </div>
-
       </div>
 
       ${
@@ -473,16 +467,14 @@ function pintar(){
 }
 
 function cambiar(i, valor){
-  pedido[i].cantidad = Number(valor || 0);
-  pintar();
+  pedido[i].pedir = valor;
+  calcular();
 }
 
 function siguienteConEnter(e,i){
   if(e.key !== "Enter") return;
 
   e.preventDefault();
-
-  cambiar(i, e.target.value);
 
   setTimeout(function(){
     const inputs = document.querySelectorAll(".cantidadPedido");
@@ -496,10 +488,22 @@ function siguienteConEnter(e,i){
 
 function stockActual(i,v){
   pedido[i].stockActual = v;
+
+  const celda = document.getElementById("existencias"+i);
+  if(celda){
+    celda.textContent = "TOTAL EXISTENCIAS: " + totalExistencias(pedido[i]);
+  }
 }
 
 function stockPedir(i,v){
   pedido[i].pedir = v;
+
+  const celda = document.getElementById("existencias"+i);
+  if(celda){
+    celda.textContent = "TOTAL EXISTENCIAS: " + totalExistencias(pedido[i]);
+  }
+
+  calcular();
 }
 
 function toggleCosteCero(i){
@@ -526,7 +530,7 @@ function calcular(){
       Number(a.formato || 1);
 
     let linea =
-     Number(a.pedir || 0) * precioCaja;
+      Number(a.pedir || 0) * precioCaja;
 
     let lineaPago =
       a.costeCero ? 0 : linea;
@@ -557,11 +561,11 @@ function guardarPedido(){
 
   const lineas =
     pedido.filter(a =>
-      Number(a.cantidad || 0) > 0
+      Number(a.pedir || 0) > 0
     );
 
   if(lineas.length === 0){
-    alert("Sin cantidades");
+    alert("Sin cantidades pedidas");
     return;
   }
 
@@ -575,7 +579,7 @@ function guardarPedido(){
     const costeCero = a.costeCero === true;
     const dPromo = datosPromo(a);
 
-    const cantidadCargo = Number(a.cantidad || 0);
+    const cantidadCargo = Number(a.pedir || 0);
     const cantidadGratis = dPromo ? dPromo.gratisTotal : 0;
 
     return {
@@ -599,6 +603,7 @@ function guardarPedido(){
 
       stockActual:a.stockActual || "",
       pedir:a.pedir || "",
+      totalExistencias: totalExistencias(a),
 
       promocionActiva: dPromo ? true : false,
       promocionTexto: dPromo ? (dPromo.conCargo + " + " + dPromo.gratis) : "",
