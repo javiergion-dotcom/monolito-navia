@@ -7,29 +7,171 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d;display:flex;flex-
-header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
-button{border:0;border-radius:14px;padding:11px 14px;font-weight:800;font-size:15px}
-.volver{background:white;color:#17303d}
-.contenido{padding:16px}
-.nuevo{width:100%;background:#ff9800;color:white;margin-bottom:12px;font-size:17px}
-.base{width:100%;background:#17303d;color:white;margin-bottom:14px;font-size:17px}
-.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
-.card.inactivo{opacity:.45}
-.nombre{font-size:21px;font-weight:900}
-.detalle{margin-top:6px;color:#4f5f69}
-.precioFinal{font-size:22px;font-weight:900;margin-top:8px}
-.botones{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.editar{background:#2196f3;color:white}
-.desactivar{background:#ff0000;color:white}
-.reactivar{background:#48a530;color:white}
-.ficha{background:white;border-radius:24px;padding:16px;box-shadow:0 10px 22px rgba(0,0,0,.16)}
-label{display:block;font-weight:800;margin-top:12px}
-input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:6px}
-.guardar{width:100%;background:#48a530;color:white;margin-top:16px}
-.cancelar{width:100%;background:#dfe6ec;color:#17303d;margin-top:10px}
-.oculto{display:none}
-.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:800}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#eef2f5;
+  color:#17303d;
+}
+
+header{
+  background:#17303d;
+  color:white;
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+header h2{
+  margin:0;
+  font-size:22px;
+}
+
+button{
+  border:0;
+  border-radius:14px;
+  padding:11px 14px;
+  font-weight:800;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.volver{
+  background:white;
+  color:#17303d;
+}
+
+.contenido{
+  padding:16px;
+  width:100%;
+  max-width:none;
+}
+
+.nuevo{
+  width:100%;
+  background:#ff9800;
+  color:white;
+  margin-bottom:12px;
+  font-size:17px;
+}
+
+.base{
+  width:100%;
+  background:#17303d;
+  color:white;
+  margin-bottom:14px;
+  font-size:17px;
+}
+
+#lista{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:14px;
+}
+
+.card{
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+
+.card.inactivo{
+  opacity:.45;
+}
+
+.nombre{
+  font-size:21px;
+  font-weight:900;
+}
+
+.detalle{
+  margin-top:6px;
+  color:#4f5f69;
+  font-size:15px;
+}
+
+.precioFinal{
+  font-size:22px;
+  font-weight:900;
+  margin-top:8px;
+  color:#17303d;
+}
+
+.botones{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+  flex-wrap:wrap;
+}
+
+.editar{
+  background:#2196f3;
+  color:white;
+}
+
+.desactivar{
+  background:#ff0000;
+  color:white;
+}
+
+.reactivar{
+  background:#48a530;
+  color:white;
+}
+
+.ficha{
+  background:white;
+  border-radius:24px;
+  padding:16px;
+  box-shadow:0 10px 22px rgba(0,0,0,.16);
+  width:100%;
+}
+
+label{
+  display:block;
+  font-weight:800;
+  margin-top:12px;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid #b8c2ca;
+  font-size:16px;
+  margin-top:6px;
+}
+
+.guardar{
+  width:100%;
+  background:#48a530;
+  color:white;
+  margin-top:16px;
+}
+
+.cancelar{
+  width:100%;
+  background:#dfe6ec;
+  color:#17303d;
+  margin-top:10px;
+}
+
+.oculto{
+  display:none;
+}
+
+.vacio{
+  background:white;
+  border-radius:22px;
+  padding:18px;
+  text-align:center;
+  font-weight:800;
+}
 </style>
 </head>
 
