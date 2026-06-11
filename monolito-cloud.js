@@ -15,13 +15,13 @@ from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 /* ================= FIREBASE MONOLITO ================= */
 
 const firebaseConfig = {
-  apiKey: "PEGA_AQUI_TU_API_KEY_REAL",
+  apiKey: "AIzaSyAxbU-eWFeKfBSMfwq8sJikpnbE8sOtr-s",
   authDomain: "monolito-ed87d.firebaseapp.com",
   projectId: "monolito-ed87d",
-  storageBucket: "monolito-ed87d.appspot.com",
+  storageBucket: "monolito-ed87d.firebasestorage.app",
   messagingSenderId: "737849584362",
-  appId: "1:737849584362:web:3d1821bedcd64080cf8593",
-  measurementId: "G-7XCZ0VN7ID"
+  appId: "1:737849584362:web:bdb3b3b9fd65425dcf8593",
+  measurementId: "G-V8KHB086M3"
 };
 
 const app = initializeApp(firebaseConfig);
