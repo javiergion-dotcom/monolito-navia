@@ -225,7 +225,20 @@ input,select{
 
 </div>
 
-import { leerColeccion, guardarColeccion, escucharColeccion } from "./monolitocloud.js";
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion
+} from "./monolitocloud.js";
+
+let articulos = [];
+let proveedoresGlobal = [];
+
+function usuarioActual(){
+  localStorage.setItem("usuario","JAVI");
+  return "JAVI";
+}
 
 function puedeEditar(){
   const u = usuarioActual();
@@ -234,66 +247,48 @@ function puedeEditar(){
 
 function articulosIniciales(){
   return [
-    {proveedor:"CANDELAS", articulo:"CAFÉ NATURAL", precioUnidad:17.00, formato:3, unidadFormato:"LATA 3KG", iva:10, activo:true},
-    {proveedor:"CANDELAS", articulo:"CAFÉ DESCAFEINADO", precioUnidad:18.00, formato:2, unidadFormato:"LATA 2KG", iva:10, activo:true},
-    {proveedor:"SANPEDRO", articulo:"COCA COLA LATA 33CL", precioUnidad:0.56, formato:24, unidadFormato:"CAJA 24", iva:21, activo:true},
-    {proveedor:"TURRADO", articulo:"MAHOU 5 ESTRELLAS 1/3", precioUnidad:17.96, formato:1, unidadFormato:"CAJA", iva:21, activo:true}
+    {id:"cafe_natural", proveedor:"CANDELAS", articulo:"CAFÉ NATURAL", precioUnidad:17.00, formato:3, unidadFormato:"LATA 3KG", iva:10, activo:true},
+    {id:"cafe_descafeinado", proveedor:"CANDELAS", articulo:"CAFÉ DESCAFEINADO", precioUnidad:18.00, formato:2, unidadFormato:"LATA 2KG", iva:10, activo:true},
+    {id:"coca_cola_lata_33cl", proveedor:"SANPEDRO", articulo:"COCA COLA LATA 33CL", precioUnidad:0.56, formato:24, unidadFormato:"CAJA 24", iva:21, activo:true},
+    {id:"mahou_5_estrellas_13", proveedor:"TURRADO", articulo:"MAHOU 5 ESTRELLAS 1/3", precioUnidad:17.96, formato:1, unidadFormato:"CAJA", iva:21, activo:true}
   ];
-}
-
-function leerArticulos(){
-  return JSON.parse(localStorage.getItem("articulos") || "[]");
-}
-
-function guardarArticulos(data){
-  localStorage.setItem("articulos", JSON.stringify(data));
-}
-
-function cargarArticulosBase(){
-  if(confirm("¿Cargar artículos base?")){
-    guardarArticulos(articulosIniciales());
-    pintar();
-  }
-}
-
-function leerProveedores(){
-  let proveedores = JSON.parse(localStorage.getItem("proveedores") || "[]")
-    .filter(p => p.activo !== false);
-
-  if(proveedores.length === 0){
-    proveedores = [
-      {nombre:"CANDELAS"},
-      {nombre:"TURRADO"},
-      {nombre:"SANPEDRO"},
-      {nombre:"DEO"}
-    ];
-  }
-
-  return proveedores;
 }
 
 function precioCompra(a){
   return Number(a.precioUnidad || 0) * Number(a.formato || 1);
 }
 
+async function cargarProveedores(){
+  proveedoresGlobal = await leerColeccion("proveedores");
+
+  proveedoresGlobal = proveedoresGlobal.filter(p => p.activo !== false);
+
+  if(proveedoresGlobal.length === 0){
+    proveedoresGlobal = [
+      {nombre:"CANDELAS"},
+      {nombre:"TURRADO"},
+      {nombre:"SANPEDRO"},
+      {nombre:"DEO"}
+    ];
+  }
+}
+
 function cargarSelectProveedores(){
-  const proveedores = leerProveedores();
   const sel = document.getElementById("proveedor");
 
-  sel.innerHTML = proveedores.map(p =>
+  sel.innerHTML = proveedoresGlobal.map(p =>
     `<option value="${p.nombre}">${p.nombre}</option>`
   ).join("");
 }
 
 function pintar(){
-  const data = leerArticulos();
   let html = "";
 
-  if(data.length === 0){
+  if(articulos.length === 0){
     html = `<div class="vacio">No hay artículos todavía.</div>`;
   }
 
-  data.forEach((a,i)=>{
+  articulos.forEach((a,i)=>{
     html += `
       <div class="card ${a.activo === false ? "inactivo" : ""}">
         <div class="nombre">${a.articulo || "SIN NOMBRE"}</div>
@@ -320,7 +315,19 @@ function pintar(){
   document.getElementById("lista").innerHTML = html;
 }
 
-function abrirNuevo(){
+async function guardarTodo(){
+  await guardarColeccion("articulos", articulos);
+}
+
+window.cargarArticulosBase = async function(){
+  if(confirm("¿Cargar artículos base?")){
+    articulos = articulosIniciales();
+    await guardarTodo();
+    pintar();
+  }
+}
+
+window.abrirNuevo = function(){
   if(!puedeEditar()) return;
 
   cargarSelectProveedores();
@@ -337,13 +344,12 @@ function abrirNuevo(){
   document.getElementById("vistaFicha").classList.remove("oculto");
 }
 
-function abrirEditar(i){
+window.abrirEditar = function(i){
   if(!puedeEditar()) return;
 
   cargarSelectProveedores();
 
-  const data = leerArticulos();
-  const a = data[i];
+  const a = articulos[i];
 
   document.getElementById("tituloFicha").textContent = "Editar artículo";
   document.getElementById("indiceArticulo").value = i;
@@ -358,7 +364,7 @@ function abrirEditar(i){
   document.getElementById("vistaFicha").classList.remove("oculto");
 }
 
-function guardarFicha(){
+window.guardarFicha = async function(){
   if(!puedeEditar()) return;
 
   const articulo = document.getElementById("articulo").value.trim().toUpperCase();
@@ -368,7 +374,6 @@ function guardarFicha(){
     return;
   }
 
-  let data = leerArticulos();
   const idx = document.getElementById("indiceArticulo").value;
 
   const nuevo = {
@@ -382,49 +387,59 @@ function guardarFicha(){
   };
 
   if(idx === ""){
-    data.unshift(nuevo);
+    nuevo.id = String(Date.now()) + "_" + Math.random().toString(36).slice(2);
+    articulos.unshift(nuevo);
   }else{
-    const anterior = data[Number(idx)];
+    const anterior = articulos[Number(idx)];
+    nuevo.id = anterior.id;
     nuevo.activo = anterior.activo !== false;
-    data[Number(idx)] = nuevo;
+    articulos[Number(idx)] = nuevo;
   }
 
-  guardarArticulos(data);
+  await guardarTodo();
   cerrarFicha();
 }
 
-function cerrarFicha(){
+window.cerrarFicha = function(){
   document.getElementById("vistaFicha").classList.add("oculto");
   document.getElementById("vistaLista").classList.remove("oculto");
   pintar();
 }
 
-function desactivarArticulo(i){
+window.desactivarArticulo = async function(i){
   if(!puedeEditar()) return;
 
-  let data = leerArticulos();
-
   if(confirm("¿Desactivar este artículo?")){
-    data[i].activo = false;
-    guardarArticulos(data);
+    articulos[i].activo = false;
+    await guardarTodo();
     pintar();
   }
 }
 
-function reactivarArticulo(i){
+window.reactivarArticulo = async function(i){
   if(!puedeEditar()) return;
 
-  let data = leerArticulos();
-  data[i].activo = true;
-  guardarArticulos(data);
+  articulos[i].activo = true;
+  await guardarTodo();
   pintar();
 }
 
-function volver(){
+window.volver = function(){
   window.location.href = "index.html";
 }
 
-pintar();
+async function iniciar(){
+  await cargarProveedores();
+
+  escucharColeccion("articulos", (lista)=>{
+    articulos = lista.sort((a,b)=>
+      (a.articulo || "").localeCompare(b.articulo || "")
+    );
+    pintar();
+  });
+}
+
+iniciar();
 </script>
 
 </body>
