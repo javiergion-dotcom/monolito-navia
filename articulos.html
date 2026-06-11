@@ -225,11 +225,7 @@ input,select{
 
 </div>
 
-<script>
-function usuarioActual(){
-  localStorage.setItem("usuario","JAVI");
-  return "JAVI";
-}
+import { leerColeccion, guardarColeccion, escucharColeccion } from "./monolitocloud.js";
 
 function puedeEditar(){
   const u = usuarioActual();
