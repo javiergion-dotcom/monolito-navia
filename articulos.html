@@ -227,21 +227,15 @@ input,select{
 
 <script type="module">
 
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion
+} from "./monolito-cloud.js";
 
 let articulos = [];
 let proveedoresGlobal = [];
-async function leerColeccion(nombre){
-  const datos = localStorage.getItem(nombre);
-  return datos ? JSON.parse(datos) : [];
-}
 
-async function guardarColeccion(nombre, datos){
-  localStorage.setItem(nombre, JSON.stringify(datos));
-}
-
-function escucharColeccion(nombre, callback){
-  leerColeccion(nombre).then(callback);
-}
 function usuarioActual(){
   localStorage.setItem("usuario","JAVI");
   return "JAVI";
