@@ -433,6 +433,9 @@ async function iniciar(){
   await cargarProveedores();
 
   escucharColeccion("articulos", (lista)=>{
+
+    console.log("ARTICULOS FIREBASE:", lista);
+
     articulos = lista.sort((a,b)=>
       (a.articulo || "").localeCompare(b.articulo || "")
     );
