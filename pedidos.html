@@ -1,44 +1,31 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PEDIDOS · MONOLITO</title>
+<title>PAGOS · MONOLITO</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;font-weight:900;font-size:20px}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:12px}
+header h2{margin:0;font-size:20px}
+button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;cursor:pointer}
+.volver{background:white;color:#17303d}
 .contenedor{padding:16px}
-select{width:100%;padding:12px;border-radius:14px;margin-bottom:15px;font-size:16px}
-.card{background:white;border-radius:16px;padding:12px;margin-bottom:10px}
-.card.costeCero{border:3px solid #ff9800;background:#fff8ea}
-.nombre{font-weight:900;font-size:17px}
-.detalle{color:#4f5f69;font-size:14px;margin-top:4px}
-.fila{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:10px}
-input{width:80px;padding:10px;border-radius:12px;border:1px solid #ccc;text-align:center;font-size:16px}
-.totalLinea{font-weight:900;font-size:16px}
-.avisoCero{margin-top:8px;color:#c06b00;font-weight:900;font-size:13px}
-.botonCero{width:100%;margin-top:10px;padding:10px;border:0;border-radius:12px;font-weight:900;font-size:14px;background:#17303d;color:white}
-.botonCero.activo{background:#ff9800;color:white}
-.totalFinal{font-size:22px;font-weight:900;margin-top:20px}
-button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-weight:900;font-size:16px}
-.guardar{background:#48a530;color:white}
-.volver{background:white;color:#17303d;width:auto;margin:0 10px 0 0;padding:7px 11px}
-.promo{margin-top:10px;background:#fff6cf;border:2px solid #ffe066;border-radius:12px;padding:10px;font-size:13px;font-weight:900;color:#8a6a00}
-.promoOk{margin-top:8px;background:#e5ffe5;border:2px solid #8bd98b;border-radius:12px;padding:9px;font-size:13px;font-weight:900;color:#1a7f1a}
-.promoAlerta{margin-top:8px;background:#ffe5e5;border:2px solid #ff9b9b;border-radius:12px;padding:9px;font-size:13px;font-weight:900;color:#c00000}
-.stockBox{margin-top:10px;background:#eef7ff;border:2px solid #cfe5ff;border-radius:12px;padding:10px}
-.stockTitulo{font-size:13px;font-weight:900;margin-bottom:8px}
-.stockFila{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stockCol{background:white;border-radius:12px;padding:8px}
-.stockCol label{display:block;font-size:12px;font-weight:900;margin-bottom:5px;color:#17303d;text-align:center}
-.stockCol input{width:100%}
-.totalExistencias{margin-top:10px;background:#17303d;color:white;border-radius:12px;padding:10px;text-align:center;font-weight:900}
-.avisosBox{background:#fff8db;border:3px solid #f0c94a;border-radius:18px;padding:14px;margin-bottom:16px}
-.avisosTitulo{font-weight:900;font-size:18px;margin-bottom:8px;color:#8a6a00}
-.avisoLinea{background:white;border-radius:12px;padding:10px;margin-top:8px;font-weight:900;color:#17303d}
-.btnResolverAviso{margin-top:10px;background:#48a530;color:white;border:0;border-radius:12px;padding:10px;font-weight:900;width:100%}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.cardIncidencia{border:3px solid #c00000;background:#fff0f0}
+.proveedor{font-size:22px;font-weight:900}
+.detalle{margin-top:6px;color:#5a6872;font-weight:700}
+.total{font-size:26px;font-weight:900;margin-top:10px}
+.pendiente{margin-top:8px;background:#fff4d8;color:#8a5a00;padding:10px;border-radius:14px;font-weight:900}
+.estadoIncidencia{margin-top:10px;background:#ffd6d6;color:#9b0000;padding:10px;border-radius:14px;font-weight:900}
+.historialPago{margin-top:10px;background:#edf7ed;border-radius:14px;padding:10px;font-size:14px}
+select,input{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:10px}
+.pagado{width:100%;background:#1f8f34;color:white;margin-top:10px}
+.verPedido{width:100%;background:#17303d;color:white;margin-top:10px}
+.incidencia{width:100%;background:#c00000;color:white;margin-top:10px}
+.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:900}
 </style>
 </head>
 
@@ -46,637 +33,292 @@ button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-
 
 <header>
   <button class="volver" onclick="volver()">←</button>
-  📝 PEDIDOS
+  <h2>💰 PAGOS</h2>
 </header>
 
 <div class="contenedor">
-
-<div id="avisosPedidos"></div>
-
-<select id="proveedor" onchange="cargarArticulos()"></select>
-
-<div id="articulos"></div>
-
-<div class="totalFinal" id="totalFinal">TOTAL PAGO: 0,00 €</div>
-
-<button class="guardar" onclick="guardarPedido()">Guardar pedido</button>
-
+  <div id="lista"></div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED",
-  authDomain: "monolito-ed87d.firebaseapp.com",
-  projectId: "monolito-ed87d",
-  storageBucket: "monolito-ed87d.appspot.com",
-  messagingSenderId: "737849584362",
-  appId: "1:737849584362:web:3d1821bedcd64080cf8593",
-  measurementId: "G-7XCZ0VN7ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-let pedido = [];
-let avisosCloud = [];
-
-function usuarioActual(){
-  return localStorage.getItem("usuario") || "OPERADOR";
+<script>
+function leerPagosPendientes(){
+  return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 }
 
-function esHostelero(){
-  const u = usuarioActual().toUpperCase();
-  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+function guardarPagosPendientes(data){
+  localStorage.setItem("pagos_pendientes", JSON.stringify(data));
+}
+
+function leerPagosHistorico(){
+  return JSON.parse(localStorage.getItem("pagos_historico") || "[]");
+}
+
+function guardarPagosHistorico(data){
+  localStorage.setItem("pagos_historico", JSON.stringify(data));
+}
+
+function leerIncidencias(){
+  return JSON.parse(localStorage.getItem("incidencias") || "[]");
+}
+
+function guardarIncidencias(data){
+  localStorage.setItem("incidencias", JSON.stringify(data));
+}
+
+function dinero(n){
+  return Number(n || 0).toFixed(2) + " €";
+}
+
+function pintar(){
+  const pagos = leerPagosPendientes();
+  let html = "";
+
+  if(pagos.length === 0){
+    html = `<div class="vacio">No hay pagos pendientes</div>`;
+  }else{
+    pagos.forEach((p,i)=>{
+      const total = Number(p.total || p.totalPago || 0);
+      const pendiente = Number(p.pendiente || total);
+      const tieneIncidencia = p.estado === "INCIDENCIA";
+
+      html += `
+        <div class="card ${tieneIncidencia ? "cardIncidencia" : ""}">
+          <div class="proveedor">${p.proveedor || "SIN PROVEEDOR"}</div>
+          <div class="detalle">Fecha pedido: ${p.fecha || ""}</div>
+          <div class="detalle">Líneas: ${p.lineas ? p.lineas.length : 0}</div>
+          <div class="total">${dinero(total)}</div>
+          <div class="pendiente">Pendiente: ${dinero(pendiente)}</div>
+
+          ${tieneIncidencia ? `
+            <div class="estadoIncidencia">
+              🚨 INCIDENCIA PENDIENTE<br><br>
+              Motivo: ${p.motivoIncidencia || ""}<br><br>
+              Solución prevista: ${p.solucionIncidencia || ""}
+            </div>
+          ` : ""}
+
+          ${p.historialPagos && p.historialPagos.length ? `
+            <div class="historialPago">
+              <b>Historial pagos:</b><br>
+              ${p.historialPagos.map(h=>`
+                • ${h.fecha} → ${dinero(h.importe)} ${h.tipo ? "(" + h.tipo + ")" : ""}
+              `).join("<br>")}
+            </div>
+          ` : ""}
+
+          <button class="verPedido" onclick="verPedido(${i})">
+            📄 Ver pedido completo
+          </button>
+
+          <select id="tipo${i}">
+            <option value="CONTADO">CONTADO</option>
+            <option value="REPOSICION">REPOSICIÓN</option>
+            <option value="BANCO">BANCO</option>
+            <option value="A CUENTA">A CUENTA</option>
+          </select>
+
+          <input
+            type="number"
+            id="importe${i}"
+            placeholder="Importe pagado"
+            value="${pendiente.toFixed(2)}"
+          >
+
+          <button class="pagado" onclick="marcarPagado(${i})">
+            ✅ Registrar pago
+          </button>
+
+          <button class="incidencia" onclick="marcarIncidencia(${i})">
+            🚨 Marcar incidencia
+          </button>
+        </div>
+      `;
+    });
+  }
+
+  document.getElementById("lista").innerHTML = html;
+}
+
+function obtenerPrecioLinea(l){
+  return Number(
+    l.precioSinIva ??
+    l.precioOriginalSinIva ??
+    l.precio ??
+    l.precioUnidad ??
+    l.precio_unitario ??
+    l.importeUnidad ??
+    0
+  );
+}
+
+function obtenerCantidadLinea(l){
+  return Number(
+    l.cantidad ??
+    l.unidades ??
+    l.pedir ??
+    l.uds ??
+    0
+  );
+}
+
+function obtenerNombreLinea(l){
+  return l.articulo || l.nombre || l.producto || "Artículo";
+}
+
+function verPedido(i){
+  const pagos = leerPagosPendientes();
+  const p = pagos[i];
+
+  if(!p){
+    alert("No se encontró el pedido.");
+    return;
+  }
+
+  const total = Number(p.total || p.totalPago || 0);
+  const pendiente = Number(p.pendiente || total);
+
+  let texto = "";
+  texto += "PEDIDO COMPLETO\n";
+  texto += "=============================\n\n";
+  texto += "Proveedor: " + (p.proveedor || "SIN PROVEEDOR") + "\n";
+  texto += "Fecha: " + (p.fecha || "") + "\n";
+  texto += "Estado: " + (p.estado || "PENDIENTE") + "\n\n";
+  texto += "DESGLOSE\n";
+  texto += "-----------------------------\n\n";
+
+  if(p.lineas && p.lineas.length){
+    p.lineas.forEach((l,idx)=>{
+      const articulo = obtenerNombreLinea(l);
+      const cantidad = obtenerCantidadLinea(l);
+      const precio = obtenerPrecioLinea(l);
+      const iva = Number(l.iva || 0);
+      const subtotal = Number(l.subtotal ?? l.importe ?? (cantidad * precio));
+
+      texto += (idx + 1) + ". " + articulo + "\n";
+      texto += "   Unidades: " + cantidad + "\n";
+      texto += "   Precio unidad: " + dinero(precio) + "\n";
+      texto += "   Subtotal: " + dinero(subtotal) + "\n";
+      if(iva){ texto += "   IVA: " + iva + "%\n"; }
+      if(l.cantidadGratisPromo){
+        texto += "   Gratis promo: " + l.cantidadGratisPromo + "\n";
+      }
+      texto += "\n";
+    });
+  }else{
+    texto += "Este pedido no tiene líneas guardadas.\n\n";
+  }
+
+  texto += "-----------------------------\n";
+  texto += "Total pedido: " + dinero(total) + "\n";
+  texto += "Pendiente: " + dinero(pendiente) + "\n";
+
+  if(p.motivoIncidencia){
+    texto += "\nINCIDENCIA\n";
+    texto += "Motivo: " + p.motivoIncidencia + "\n";
+    texto += "Solución prevista: " + (p.solucionIncidencia || "") + "\n";
+  }
+
+  alert(texto);
+}
+
+function marcarPagado(i){
+  let pendientes = leerPagosPendientes();
+  let historico = leerPagosHistorico();
+  let pago = pendientes[i];
+
+  const tipoPago = document.getElementById("tipo"+i).value;
+  const importe = parseFloat(document.getElementById("importe"+i).value || 0);
+
+  if(importe <= 0){
+    alert("Introduce importe válido");
+    return;
+  }
+
+  if(!pago.pendiente){
+    pago.pendiente = Number(pago.total || pago.totalPago || 0);
+  }
+
+  if(!pago.historialPagos){
+    pago.historialPagos = [];
+  }
+
+  pago.historialPagos.unshift({
+    fecha:new Date().toLocaleString("es-ES"),
+    importe:importe,
+    tipo:tipoPago
+  });
+
+  pago.tipoPago = tipoPago;
+  pago.pendiente = Number(pago.pendiente) - importe;
+
+  if(pago.pendiente < 0){
+    pago.pendiente = 0;
+  }
+
+  if(pago.pendiente === 0){
+    pago.estado = "PAGADO";
+    pago.fechaPago = new Date().toLocaleString("es-ES");
+    historico.unshift(pago);
+    pendientes.splice(i,1);
+    guardarPagosHistorico(historico);
+    alert("Pago completado.");
+  }else{
+    pago.estado = "A CUENTA";
+    alert("Pago parcial registrado.\n\nPendiente: " + dinero(pago.pendiente));
+  }
+
+  guardarPagosPendientes(pendientes);
+  pintar();
+}
+
+function marcarIncidencia(i){
+  let pendientes = leerPagosPendientes();
+  let incidencias = leerIncidencias();
+  const pago = pendientes[i];
+
+  const motivo = prompt("Motivo de la incidencia");
+  if(!motivo) return;
+
+  const solucion = prompt("¿Cómo se resolverá?");
+  if(!solucion) return;
+
+  const incidencia = {
+    id:Date.now(),
+    proveedor:pago.proveedor || "",
+    titulo:"Incidencia con " + (pago.proveedor || "proveedor"),
+    texto:
+      "Proveedor: " + (pago.proveedor || "") +
+      " · Importe: " + dinero(pago.total || pago.totalPago || 0) +
+      " · Motivo: " + motivo +
+      " · Solución prevista: " + solucion,
+    motivo:motivo,
+    solucionPrevista:solucion,
+    fecha:new Date().toLocaleString("es-ES"),
+    pedidoFecha:pago.fecha || "",
+    importe:Number(pago.total || pago.totalPago || 0),
+    resuelta:false
+  };
+
+  incidencias.unshift(incidencia);
+
+  pago.estado = "INCIDENCIA";
+  pago.motivoIncidencia = motivo;
+  pago.solucionIncidencia = solucion;
+  pago.fechaIncidencia = incidencia.fecha;
+  pago.incidenciaId = incidencia.id;
+
+  guardarIncidencias(incidencias);
+  guardarPagosPendientes(pendientes);
+
+  alert("Incidencia registrada.\n\nProveedor marcado hasta resolver.");
+  pintar();
 }
 
 function volver(){
   window.location.href = "index.html";
 }
 
-function normalizar(t){
-  return String(t || "")
-    .trim()
-    .toUpperCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"");
-}
-
-function dinero(n){
-  return Number(n || 0).toLocaleString("es-ES",{style:"currency",currency:"EUR"});
-}
-
-function leerArticulos(){
-  return JSON.parse(localStorage.getItem("articulos") || "[]")
-    .filter(a => a.activo !== false);
-}
-
-function leerProveedores(){
-  let p = JSON.parse(localStorage.getItem("proveedores") || "[]")
-    .filter(x => x.activo !== false);
-
-  if(p.length===0){
-    p = [
-      {nombre:"CANDELAS"},
-      {nombre:"TURRADO"},
-      {nombre:"SANPEDRO"},
-      {nombre:"DEO"}
-    ];
-  }
-
-  return p;
-}
-
-function leerPromociones(){
-  return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
-}
-
-function pintarAvisosPedidos(){
-  if(avisosCloud.length === 0){
-    document.getElementById("avisosPedidos").innerHTML = "";
-    return;
-  }
-
-  let html = `
-    <div class="avisosBox">
-      <div class="avisosTitulo">🛎️ AVISOS PARA PEDIDOS</div>
-  `;
-
-  avisosCloud.forEach((a)=>{
-    html += `
-      <div class="avisoLinea">
-        🛎️ ${a.texto || ""}
-
-        <button class="btnResolverAviso" onclick="resolverAvisoPedido('${a.id}')">
-          ✅ RESUELTO
-        </button>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-  document.getElementById("avisosPedidos").innerHTML = html;
-}
-
-async function resolverAvisoPedido(id){
-  if(!confirm("¿Eliminar aviso de pedidos?")) return;
-
-  try{
-    await deleteDoc(doc(db, "avisos_pedidos", id));
-  }catch(e){
-    console.error(e);
-    alert("No se pudo eliminar el aviso en Firebase.");
-  }
-}
-
-function iniciarAvisosFirebase(){
-  const q = query(
-    collection(db, "avisos_pedidos"),
-    orderBy("fechaMs", "desc")
-  );
-
-  onSnapshot(q, (snap)=>{
-    avisosCloud = [];
-
-    snap.forEach((d)=>{
-      avisosCloud.push({
-        id:d.id,
-        ...d.data()
-      });
-    });
-
-    pintarAvisosPedidos();
-
-  }, (error)=>{
-    console.error(error);
-    document.getElementById("avisosPedidos").innerHTML = `
-      <div class="avisosBox">
-        <div class="avisosTitulo">⚠️ No se pudieron cargar avisos</div>
-      </div>
-    `;
-  });
-}
-
-function cargarProveedores(){
-  const proveedores = leerProveedores();
-
-  document.getElementById("proveedor").innerHTML =
-    `<option value="">Selecciona proveedor</option>` +
-    proveedores.map(p =>
-      `<option value="${p.nombre}">${p.nombre}</option>`
-    ).join("");
-}
-
-function cargarArticulos(){
-  const proveedor = document.getElementById("proveedor").value;
-
-  const articulos = leerArticulos().filter(a =>
-    normalizar(a.proveedor) === normalizar(proveedor)
-  );
-
-  pedido = articulos.map(a => ({
-    ...a,
-    cantidad:"",
-    costeCero:false,
-    excluirRappel:false,
-    stockActual:"",
-    pedir:""
-  }));
-
-  pintar();
-}
-
-function promoArticulo(a){
-  const promos = leerPromociones();
-
-  const nombreArticulo = normalizar(a.articulo);
-  const proveedorArticulo = normalizar(a.proveedor);
-
-  const hoy = new Date();
-  hoy.setHours(0,0,0,0);
-
-  return promos.find(p => {
-    const proveedorPromo = normalizar(p.proveedor);
-
-    if(proveedorPromo !== proveedorArticulo){
-      return false;
-    }
-
-    const inicio = p.fechaInicio || p.inicio || p.desde || "";
-    const fin = p.fechaFin || p.fin || p.hasta || "";
-
-    if(inicio){
-      const dInicio = new Date(inicio + "T00:00:00");
-      if(hoy < dInicio) return false;
-    }
-
-    if(fin){
-      const dFin = new Date(fin + "T23:59:59");
-      if(hoy > dFin) return false;
-    }
-
-    const textoPromo = normalizar(
-      (p.articulo || "") + " " +
-      (p.producto || "") + " " +
-      (p.nombreArticulo || "") + " " +
-      (p.promocion || "") + " " +
-      (p.nombre || "")
-    );
-
-    if(!textoPromo){
-      return false;
-    }
-
-    return textoPromo.includes(nombreArticulo) ||
-           nombreArticulo.includes(textoPromo);
-  });
-}
-
-function datosPromo(a){
-  const promo = promoArticulo(a);
-
-  if(!promo) return null;
-
-  const conCargo = Number(
-    promo.unidadesConCargo ||
-    promo.conCargo ||
-    promo.pagadas ||
-    promo.cargo ||
-    0
-  );
-
-  const gratis = Number(
-    promo.unidadesGratis ||
-    promo.unidadesCoste0 ||
-    promo.sinCargo ||
-    promo.gratis ||
-    0
-  );
-
-  if(conCargo <= 0 || gratis <= 0){
-    return null;
-  }
-
-  const cantidad = Number(a.pedir || 0);
-  const bloques = Math.floor(cantidad / conCargo);
-  const resto = cantidad % conCargo;
-  const gratisTotal = bloques * gratis;
-  const faltan = resto === 0 ? 0 : conCargo - resto;
-
-  let textoPedido = "";
-
-  if(gratisTotal > 0){
-    textoPedido = cantidad + " + " + gratisTotal;
-  }
-
-  return {
-    promo,
-    conCargo,
-    gratis,
-    cantidad,
-    bloques,
-    resto,
-    gratisTotal,
-    faltan,
-    textoPedido
-  };
-}
-
-function avisoPromoHTML(a){
-  const d = datosPromo(a);
-
-  if(!d) return "";
-
-  let html = `
-    <div class="promo">
-      🟡 PROMOCIÓN ACTIVA<br>
-      ${d.conCargo} + ${d.gratis}
-    </div>
-  `;
-
-  if(d.cantidad > 0 && d.gratisTotal > 0){
-    html += `
-      <div class="promoOk">
-        ✅ EN PEDIDO: ${d.textoPedido}<br>
-        ${d.cantidad} con cargo + ${d.gratisTotal} sin cargo<br>
-        Cuenta para RAPPEL: ${d.cantidad + d.gratisTotal}
-      </div>
-    `;
-  }else if(d.cantidad > 0 && d.faltan > 0){
-    html += `
-      <div class="promoAlerta">
-        ⚠ Estás pidiendo ${d.cantidad}.<br>
-        Con ${d.conCargo} entra promoción ${d.conCargo} + ${d.gratis}.<br>
-        Faltan ${d.faltan}.
-      </div>
-    `;
-  }
-
-  return html;
-}
-
-function totalExistencias(a){
-  return Number(a.stockActual || 0) + Number(a.pedir || 0);
-}
-
-function pintar(){
-  let html = "";
-
-  pedido.forEach((a,i)=>{
-    const precioCaja = Number(a.precioUnidad || 0) * Number(a.formato || 1);
-    const lineaPago = a.costeCero ? 0 : Number(a.pedir || 0) * precioCaja;
-
-    html += `
-    <div class="card ${a.costeCero ? "costeCero" : ""}">
-
-      <div class="nombre">${a.articulo}</div>
-
-      <div class="detalle">
-        ${a.unidadFormato || ""} ·
-        ${Number(a.precioUnidad || 0).toFixed(2)} € ·
-        IVA ${a.iva || 21}%
-      </div>
-
-      ${avisoPromoHTML(a)}
-
-      <div class="stockBox">
-        <div class="stockTitulo">📦 ALMACÉN / PEDIDO</div>
-
-        <div class="stockFila">
-
-          <div class="stockCol">
-            <label>CUÁNTAS HAY</label>
-            <input
-              type="number"
-              placeholder="Hay"
-              value="${a.stockActual}"
-              onchange="stockActual(${i},this.value)"
-              oninput="stockActual(${i},this.value)"
-            >
-          </div>
-
-          <div class="stockCol">
-            <label>CUÁNTAS PIDO</label>
-            <input
-              class="cantidadPedido"
-              data-indice="${i}"
-              type="number"
-              placeholder="Pido"
-              value="${a.pedir}"
-              onchange="stockPedir(${i},this.value)"
-              oninput="stockPedir(${i},this.value)"
-              onkeydown="siguienteConEnter(event, ${i})"
-            >
-          </div>
-
-        </div>
-
-        <div class="totalExistencias" id="existencias${i}">
-          TOTAL EXISTENCIAS: ${totalExistencias(a)}
-        </div>
-      </div>
-
-      <div class="fila">
-        <div class="totalLinea" id="t${i}">
-          ${lineaPago.toFixed(2)} €
-        </div>
-      </div>
-
-      ${
-        esHostelero()
-        ?
-        `
-          <button
-            class="botonCero ${a.costeCero ? "activo" : ""}"
-            onclick="toggleCosteCero(${i})"
-          >
-            ${a.costeCero ? "✅ COSTE 0 € ACTIVADO" : "Marcar COSTE 0 €"}
-          </button>
-        `
-        : ""
-      }
-
-      ${
-        a.costeCero
-        ?
-        `
-          <div class="avisoCero">
-            COSTE 0 € manual · No suma pagos · No suma RAPPEL
-          </div>
-        `
-        : ""
-      }
-
-    </div>
-    `;
-  });
-
-  document.getElementById("articulos").innerHTML = html;
-
-  calcular();
-}
-
-function cambiar(i, valor){
-  pedido[i].pedir = valor;
-  calcular();
-}
-
-function siguienteConEnter(e,i){
-  if(e.key !== "Enter") return;
-
-  e.preventDefault();
-
-  setTimeout(function(){
-    const inputs = document.querySelectorAll(".cantidadPedido");
-
-    if(inputs[i+1]){
-      inputs[i+1].focus();
-      inputs[i+1].select();
-    }
-  },80);
-}
-
-function stockActual(i,v){
-  pedido[i].stockActual = v;
-
-  const celda = document.getElementById("existencias"+i);
-  if(celda){
-    celda.textContent = "TOTAL EXISTENCIAS: " + totalExistencias(pedido[i]);
-  }
-}
-
-function stockPedir(i,v){
-  pedido[i].pedir = v;
-
-  const celda = document.getElementById("existencias"+i);
-  if(celda){
-    celda.textContent = "TOTAL EXISTENCIAS: " + totalExistencias(pedido[i]);
-  }
-
-  calcular();
-}
-
-function toggleCosteCero(i){
-  if(!esHostelero()){
-    alert("Solo hostelería puede marcar coste 0 €");
-    return;
-  }
-
-  pedido[i].costeCero =
-    !pedido[i].costeCero;
-
-  pedido[i].excluirRappel =
-    pedido[i].costeCero;
-
-  pintar();
-}
-
-function calcular(){
-  let totalPago = 0;
-
-  pedido.forEach((a,i)=>{
-    let precioCaja =
-      Number(a.precioUnidad || 0) *
-      Number(a.formato || 1);
-
-    let linea =
-      Number(a.pedir || 0) * precioCaja;
-
-    let lineaPago =
-      a.costeCero ? 0 : linea;
-
-    totalPago += lineaPago;
-
-    const celda =
-      document.getElementById("t"+i);
-
-    if(celda){
-      celda.textContent =
-        lineaPago.toFixed(2) + " €";
-    }
-  });
-
-  document.getElementById("totalFinal").textContent =
-    "TOTAL PAGO: " + totalPago.toFixed(2) + " €";
-}
-
-function guardarPedido(){
-  const proveedor =
-    document.getElementById("proveedor").value;
-
-  if(!proveedor){
-    alert("Selecciona proveedor");
-    return;
-  }
-
-  const lineas =
-    pedido.filter(a =>
-      Number(a.pedir || 0) > 0
-    );
-
-  if(lineas.length === 0){
-    alert("Sin cantidades pedidas");
-    return;
-  }
-
-  const ahora = new Date();
-
-  const lineasFinal = lineas.map(a => {
-    const precioOriginalSinIva =
-      Number(a.precioUnidad || 0) *
-      Number(a.formato || 1);
-
-    const costeCero = a.costeCero === true;
-    const dPromo = datosPromo(a);
-
-    const cantidadCargo = Number(a.pedir || 0);
-    const cantidadGratis = dPromo ? dPromo.gratisTotal : 0;
-
-    return {
-      articulo: a.articulo,
-      proveedor: proveedor,
-
-      cantidad: cantidadCargo,
-      cantidadGratisPromo: cantidadGratis,
-      cantidadTotalRappel: costeCero ? 0 : cantidadCargo + cantidadGratis,
-
-      unidadFormato: a.unidadFormato || "",
-      formato: Number(a.formato || 1),
-      iva: Number(a.iva || 21),
-
-      precioOriginalSinIva: precioOriginalSinIva,
-      precioSinIva: costeCero ? 0 : precioOriginalSinIva,
-
-      costeCero: costeCero,
-      excluirRappel: costeCero,
-      cuentaConsumo:true,
-
-      stockActual:a.stockActual || "",
-      pedir:a.pedir || "",
-      totalExistencias: totalExistencias(a),
-
-      promocionActiva: dPromo ? true : false,
-      promocionTexto: dPromo ? (dPromo.conCargo + " + " + dPromo.gratis) : "",
-      unidadesConCargoPromo: dPromo ? dPromo.conCargo : 0,
-      unidadesGratisPromo: dPromo ? dPromo.gratis : 0,
-      unidadesGratisCalculadas: cantidadGratis,
-      textoPedidoPromo: dPromo && dPromo.textoPedido ? dPromo.textoPedido : ""
-    };
-  });
-
-  const totalPago = lineasFinal.reduce((t,l)=>
-    t + (l.cantidad * l.precioSinIva)
-  ,0);
-
-  const pedidoGuardado = {
-    proveedor,
-    fecha: ahora.toLocaleString("es-ES"),
-    usuario: usuarioActual(),
-    totalPago,
-    lineas: lineasFinal
-  };
-
-  let historico =
-    JSON.parse(localStorage.getItem("pedidos_historico") || "[]");
-
-  historico.unshift(pedidoGuardado);
-
-  localStorage.setItem(
-    "pedidos_historico",
-    JSON.stringify(historico)
-  );
-
-  if(totalPago > 0){
-
-    let pagos =
-      JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
-
-    pagos.unshift({
-      proveedor,
-      fecha: ahora.toLocaleString("es-ES"),
-      total: totalPago,
-      lineas: lineasFinal.filter(l => !l.costeCero)
-    });
-
-    localStorage.setItem(
-      "pagos_pendientes",
-      JSON.stringify(pagos)
-    );
-  }
-
-  if(totalPago === 0){
-    alert("Pedido COSTE 0 € guardado. No genera pago.");
-  }else{
-    alert("Pedido guardado correctamente");
-  }
-
-  location.reload();
-}
-
-Object.assign(window,{
-  volver,
-  cargarArticulos,
-  cambiar,
-  siguienteConEnter,
-  stockActual,
-  stockPedir,
-  toggleCosteCero,
-  guardarPedido,
-  resolverAvisoPedido
-});
-
-iniciarAvisosFirebase();
-cargarProveedores();
+pintar();
 </script>
 
 </body>
