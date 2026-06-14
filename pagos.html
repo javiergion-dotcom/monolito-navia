@@ -119,6 +119,13 @@ select,input{
   margin-top:10px;
 }
 
+.verPedido{
+  width:100%;
+  background:#17303d;
+  color:white;
+  margin-top:10px;
+}
+
 .incidencia{
   width:100%;
   background:#c00000;
@@ -192,7 +199,6 @@ function pintar(){
 
       const total = Number(p.total || 0);
       const pendiente = Number(p.pendiente || total);
-
       const tieneIncidencia = p.estado === "INCIDENCIA";
 
       html += `
@@ -245,6 +251,10 @@ function pintar(){
             : ""
           }
 
+          <button class="verPedido" onclick="verPedido(${i})">
+            📄 Ver pedido completo
+          </button>
+
           <select id="tipo${i}">
             <option value="CONTADO">CONTADO</option>
             <option value="REPOSICION">REPOSICIÓN</option>
@@ -273,6 +283,95 @@ function pintar(){
   }
 
   document.getElementById("lista").innerHTML = html;
+}
+
+function verPedido(i){
+
+  const pagos = leerPagosPendientes();
+  const p = pagos[i];
+
+  if(!p){
+    alert("No se encontró el pedido.");
+    return;
+  }
+
+  let texto = "";
+
+  texto += "PEDIDO COMPLETO\n";
+  texto += "=============================\n\n";
+
+  texto += "Proveedor: " + (p.proveedor || "SIN PROVEEDOR") + "\n";
+  texto += "Fecha: " + (p.fecha || "") + "\n";
+  texto += "Estado: " + (p.estado || "PENDIENTE") + "\n\n";
+
+  texto += "DESGLOSE\n";
+  texto += "-----------------------------\n\n";
+
+  if(p.lineas && p.lineas.length){
+
+    p.lineas.forEach((l,idx)=>{
+
+      const articulo =
+        l.articulo ||
+        l.nombre ||
+        l.producto ||
+        "Artículo";
+
+      const unidades = Number(
+        l.unidades ||
+        l.cantidad ||
+        l.uds ||
+        0
+      );
+
+      const precio = Number(
+        l.precio ||
+        l.precioUnidad ||
+        l.precio_unitario ||
+        l.importeUnidad ||
+        0
+      );
+
+      const iva = Number(
+        l.iva ||
+        l.tipoIva ||
+        0
+      );
+
+      const subtotal = Number(
+        l.subtotal ||
+        l.importe ||
+        (unidades * precio)
+      );
+
+      texto += (idx + 1) + ". " + articulo + "\n";
+      texto += "   Unidades: " + unidades + "\n";
+      texto += "   Precio unidad: " + precio.toFixed(2) + " €\n";
+      texto += "   Subtotal: " + subtotal.toFixed(2) + " €\n";
+
+      if(iva){
+        texto += "   IVA: " + iva + "%\n";
+      }
+
+      texto += "\n";
+    });
+
+  }else{
+
+    texto += "Este pedido no tiene líneas guardadas.\n\n";
+  }
+
+  texto += "-----------------------------\n";
+  texto += "Total pedido: " + Number(p.total || 0).toFixed(2) + " €\n";
+  texto += "Pendiente: " + Number(p.pendiente || p.total || 0).toFixed(2) + " €\n";
+
+  if(p.motivoIncidencia){
+    texto += "\nINCIDENCIA\n";
+    texto += "Motivo: " + p.motivoIncidencia + "\n";
+    texto += "Solución prevista: " + (p.solucionIncidencia || "") + "\n";
+  }
+
+  alert(texto);
 }
 
 function marcarPagado(i){
@@ -422,3 +521,4 @@ pintar();
 
 </body>
 </html>
+  
