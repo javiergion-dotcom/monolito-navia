@@ -7,187 +7,47 @@
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#eef2f5;
-  color:#17303d;
-}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:11px 14px;
-  font-weight:800;
-  font-size:15px;
-  cursor:pointer;
-}
-
-.volver{
-  background:white;
-  color:#17303d;
-}
-
-.contenido{
-  padding:16px;
-}
-
-.nuevo{
-  width:100%;
-  background:#ff9800;
-  color:white;
-  margin-bottom:14px;
-  font-size:17px;
-}
-
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:12px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-
-.card.inactivo{
-  opacity:.45;
-}
-
-.card.alerta{
-  border:3px solid #c00000;
-  background:#fff0f0;
-}
-
-.nombre{
-  font-size:22px;
-  font-weight:900;
-}
-
-.detalle{
-  margin-top:6px;
-  color:#4f5f69;
-}
-
-.avisoRojo{
-  margin-top:10px;
-  background:#ffd6d6;
-  color:#9b0000;
-  padding:10px;
-  border-radius:14px;
-  font-weight:900;
-}
-
-.avisoAmarillo{
-  margin-top:10px;
-  background:#fff4d8;
-  color:#8a5a00;
-  padding:10px;
-  border-radius:14px;
-  font-weight:900;
-}
-
-.botones{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-  flex-wrap:wrap;
-}
-
-.editar{
-  background:#2196f3;
-  color:white;
-}
-
-.desactivar{
-  background:#ff0000;
-  color:white;
-}
-
-.reactivar{
-  background:#48a530;
-  color:white;
-}
-
-.incidenciasBtn{
-  background:#c00000;
-  color:white;
-}
-
-.pagosBtn{
-  background:#ff9800;
-  color:white;
-}
-
-.ficha{
-  background:white;
-  border-radius:24px;
-  padding:16px;
-  box-shadow:0 10px 22px rgba(0,0,0,.16);
-}
-
-.ficha h3{
-  margin-top:0;
-}
-
-label{
-  display:block;
-  font-weight:800;
-  margin-top:12px;
-}
-
-input, select, textarea{
-  width:100%;
-  padding:12px;
-  border-radius:14px;
-  border:1px solid #b8c2ca;
-  font-size:16px;
-  margin-top:6px;
-}
-
-textarea{
-  min-height:90px;
-}
-
-.guardar{
-  width:100%;
-  background:#48a530;
-  color:white;
-  margin-top:16px;
-}
-
-.cancelar{
-  width:100%;
-  background:#dfe6ec;
-  color:#17303d;
-  margin-top:10px;
-}
-
-.oculto{
-  display:none;
-}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center}
+button{border:0;border-radius:14px;padding:11px 14px;font-weight:800;font-size:15px;cursor:pointer}
+.volver{background:white;color:#17303d}
+.contenido{padding:16px}
+.nuevo{width:100%;background:#ff9800;color:white;margin-bottom:14px;font-size:17px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.card.inactivo{opacity:.45}
+.card.alerta{border:3px solid #c00000;background:#fff0f0}
+.nombre{font-size:22px;font-weight:900}
+.detalle{margin-top:6px;color:#4f5f69}
+.avisoRojo{margin-top:10px;background:#ffd6d6;color:#9b0000;padding:10px;border-radius:14px;font-weight:900}
+.avisoAmarillo{margin-top:10px;background:#fff4d8;color:#8a5a00;padding:10px;border-radius:14px;font-weight:900}
+.botones{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.editar{background:#2196f3;color:white}
+.desactivar{background:#ff0000;color:white}
+.reactivar{background:#48a530;color:white}
+.incidenciasBtn{background:#c00000;color:white}
+.pagosBtn{background:#ff9800;color:white}
+.ficha{background:white;border-radius:24px;padding:16px;box-shadow:0 10px 22px rgba(0,0,0,.16)}
+.ficha h3{margin-top:0}
+label{display:block;font-weight:800;margin-top:12px}
+input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:6px}
+textarea{min-height:90px}
+.guardar{width:100%;background:#48a530;color:white;margin-top:16px}
+.cancelar{width:100%;background:#dfe6ec;color:#17303d;margin-top:10px}
+.oculto{display:none}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">← Volver</button>
+  <button id="btnVolver" class="volver">← Volver</button>
   <h2>🚚 PROVEEDORES</h2>
 </header>
 
 <div class="contenido">
 
   <div id="vistaLista">
-    <button class="nuevo" onclick="abrirFichaNuevo()">➕ Nuevo proveedor</button>
+    <button id="btnNuevo" class="nuevo">➕ Nuevo proveedor</button>
     <div id="lista"></div>
   </div>
 
@@ -195,7 +55,7 @@ textarea{
     <div class="ficha">
       <h3 id="tituloFicha">Ficha proveedor</h3>
 
-      <input type="hidden" id="indiceProveedor">
+      <input type="hidden" id="idProveedor">
 
       <label>Nombre proveedor</label>
       <input id="nombreProveedor" placeholder="Ej: SANPEDRO">
@@ -220,17 +80,28 @@ textarea{
       <label>Notas / condiciones</label>
       <textarea id="notasProveedor" placeholder="Condiciones, acuerdos, descuentos, observaciones..."></textarea>
 
-      <button class="guardar" onclick="guardarFicha()">💾 Guardar proveedor</button>
-      <button class="cancelar" onclick="cerrarFicha()">Cancelar</button>
+      <button id="btnGuardar" class="guardar">💾 Guardar proveedor</button>
+      <button id="btnCancelar" class="cancelar">Cancelar</button>
     </div>
   </div>
 
 </div>
 
-<script>
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion
+} from "./monolito-cloud.js";
+
+let proveedores = [];
+let incidencias = [];
+let pagosPendientes = [];
+
 function usuarioActual(){
-  localStorage.setItem("usuario","JAVI");
-  return "JAVI";
+  const u = localStorage.getItem("usuario") || "JAVI";
+  localStorage.setItem("usuario", u);
+  return u;
 }
 
 function puedeEditar(){
@@ -238,36 +109,22 @@ function puedeEditar(){
   return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
 }
 
+function crearId(texto){
+  return String(texto || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"_")
+    .replace(/^_+|_+$/g,"")
+    + "_" + Date.now();
+}
+
 function proveedoresIniciales(){
   return [
-    {nombre:"CANDELAS", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
-    {nombre:"TURRADO", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
-    {nombre:"SANPEDRO", formaPago:"CONTADO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
-    {nombre:"DEO", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true}
+    {id:"candelas", nombre:"CANDELAS", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
+    {id:"turrado", nombre:"TURRADO", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
+    {id:"sanpedro", nombre:"SANPEDRO", formaPago:"CONTADO", contacto:"", telefono:"", dias:"", notas:"", activo:true},
+    {id:"deo", nombre:"DEO", formaPago:"BANCO", contacto:"", telefono:"", dias:"", notas:"", activo:true}
   ];
-}
-
-function leerProveedores(){
-  let datos = JSON.parse(localStorage.getItem("proveedores") || "null");
-
-  if(!datos || datos.length === 0){
-    datos = proveedoresIniciales();
-    guardarProveedores(datos);
-  }
-
-  return datos;
-}
-
-function guardarProveedores(data){
-  localStorage.setItem("proveedores", JSON.stringify(data));
-}
-
-function leerIncidencias(){
-  return JSON.parse(localStorage.getItem("incidencias") || "[]");
-}
-
-function leerPagosPendientes(){
-  return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
 }
 
 function normalizar(txt){
@@ -276,7 +133,7 @@ function normalizar(txt){
 
 function incidenciasAbiertasProveedor(nombre){
   const proveedor = normalizar(nombre);
-  return leerIncidencias().filter(i =>
+  return incidencias.filter(i =>
     normalizar(i.proveedor) === proveedor &&
     i.resuelta !== true
   );
@@ -284,7 +141,7 @@ function incidenciasAbiertasProveedor(nombre){
 
 function pagosPendientesProveedor(nombre){
   const proveedor = normalizar(nombre);
-  return leerPagosPendientes().filter(p =>
+  return pagosPendientes.filter(p =>
     normalizar(p.proveedor) === proveedor
   );
 }
@@ -300,18 +157,25 @@ function euros(n){
   return Number(n || 0).toFixed(2).replace(".",",") + " €";
 }
 
+async function guardarLista(){
+  await guardarColeccion("proveedores", proveedores);
+}
+
 function pintar(){
-  const data = leerProveedores();
   let html = "";
 
-  data.forEach((p,i)=>{
+  if(proveedores.length === 0){
+    html = `<div class="card"><strong>No hay proveedores todavía.</strong></div>`;
+  }
 
-    const incidencias = incidenciasAbiertasProveedor(p.nombre);
-    const pagos = pagosPendientesProveedor(p.nombre);
+  proveedores.forEach((p)=>{
+
+    const incs = incidenciasAbiertasProveedor(p.nombre);
+    const pags = pagosPendientesProveedor(p.nombre);
     const totalPendiente = totalPendienteProveedor(p.nombre);
 
-    const tieneIncidencias = incidencias.length > 0;
-    const tienePagos = pagos.length > 0;
+    const tieneIncidencias = incs.length > 0;
+    const tienePagos = pags.length > 0;
 
     html += `
       <div class="card ${p.activo === false ? "inactivo" : ""} ${tieneIncidencias ? "alerta" : ""}">
@@ -333,46 +197,38 @@ function pintar(){
 
         ${
           tieneIncidencias
-          ? `
-            <div class="avisoRojo">
-              🚨 ${incidencias.length} incidencia(s) abierta(s). Revisar antes de pedir.
-            </div>
-          `
+          ? `<div class="avisoRojo">🚨 ${incs.length} incidencia(s) abierta(s). Revisar antes de pedir.</div>`
           : ""
         }
 
         ${
           tienePagos
-          ? `
-            <div class="avisoAmarillo">
-              💰 ${pagos.length} pago(s) pendiente(s). Total pendiente: ${euros(totalPendiente)}
-            </div>
-          `
+          ? `<div class="avisoAmarillo">💰 ${pags.length} pago(s) pendiente(s). Total pendiente: ${euros(totalPendiente)}</div>`
           : ""
         }
 
         ${puedeEditar() ? `
           <div class="botones">
 
-            <button class="editar" onclick="abrirFichaEditar(${i})">
+            <button class="editar" data-accion="editar" data-id="${p.id}">
               Editar ficha
             </button>
 
             ${
               p.activo === false
-              ? `<button class="reactivar" onclick="reactivarProveedor(${i})">Reactivar</button>`
-              : `<button class="desactivar" onclick="desactivarProveedor(${i})">Desactivar</button>`
+              ? `<button class="reactivar" data-accion="reactivar" data-id="${p.id}">Reactivar</button>`
+              : `<button class="desactivar" data-accion="desactivar" data-id="${p.id}">Desactivar</button>`
             }
 
             ${
               tieneIncidencias
-              ? `<button class="incidenciasBtn" onclick="irIncidencias()">Ver incidencias</button>`
+              ? `<button class="incidenciasBtn" data-accion="incidencias">Ver incidencias</button>`
               : ""
             }
 
             ${
               tienePagos
-              ? `<button class="pagosBtn" onclick="irPagos()">Ver pagos</button>`
+              ? `<button class="pagosBtn" data-accion="pagos">Ver pagos</button>`
               : ""
             }
 
@@ -390,7 +246,7 @@ function abrirFichaNuevo(){
   if(!puedeEditar()) return;
 
   document.getElementById("tituloFicha").textContent = "Nuevo proveedor";
-  document.getElementById("indiceProveedor").value = "";
+  document.getElementById("idProveedor").value = "";
 
   document.getElementById("nombreProveedor").value = "";
   document.getElementById("formaPago").value = "BANCO";
@@ -403,18 +259,21 @@ function abrirFichaNuevo(){
   document.getElementById("vistaFicha").classList.remove("oculto");
 }
 
-function abrirFichaEditar(i){
+function abrirFichaEditar(id){
   if(!puedeEditar()) return;
 
-  const data = leerProveedores();
-  const p = data[i];
+  const p = proveedores.find(x => x.id === id);
+  if(!p){
+    alert("No se encontró el proveedor.");
+    return;
+  }
 
   if(incidenciasAbiertasProveedor(p.nombre).length > 0){
     alert("Atención: este proveedor tiene incidencias abiertas.");
   }
 
   document.getElementById("tituloFicha").textContent = "Editar proveedor";
-  document.getElementById("indiceProveedor").value = i;
+  document.getElementById("idProveedor").value = p.id;
 
   document.getElementById("nombreProveedor").value = p.nombre || "";
   document.getElementById("formaPago").value = p.formaPago || "BANCO";
@@ -427,7 +286,7 @@ function abrirFichaEditar(i){
   document.getElementById("vistaFicha").classList.remove("oculto");
 }
 
-function guardarFicha(){
+async function guardarFicha(){
   if(!puedeEditar()) return;
 
   const nombre = document.getElementById("nombreProveedor").value.trim().toUpperCase();
@@ -437,38 +296,41 @@ function guardarFicha(){
     return;
   }
 
+  const idActual = document.getElementById("idProveedor").value;
+  const id = idActual || crearId(nombre);
+  const anterior = proveedores.find(p => p.id === id);
+
+  const existe = proveedores.find(p =>
+    p.id !== id &&
+    normalizar(p.nombre) === nombre &&
+    p.activo !== false
+  );
+
+  if(existe){
+    alert("Ya existe un proveedor activo con ese nombre.");
+    return;
+  }
+
   const proveedor = {
+    id,
     nombre,
     formaPago: document.getElementById("formaPago").value,
     contacto: document.getElementById("contactoProveedor").value.trim(),
     telefono: document.getElementById("telefonoProveedor").value.trim(),
     dias: document.getElementById("diasProveedor").value.trim(),
     notas: document.getElementById("notasProveedor").value.trim(),
-    activo:true
+    activo: anterior ? anterior.activo !== false : true,
+    actualizadoPor: usuarioActual(),
+    actualizadoEn: new Date().toISOString()
   };
 
-  let data = leerProveedores();
-  const idx = document.getElementById("indiceProveedor").value;
-
-  if(idx === ""){
-    const existe = data.find(p =>
-      (p.nombre || "").toUpperCase() === nombre &&
-      p.activo !== false
-    );
-
-    if(existe){
-      alert("Ya existe un proveedor activo con ese nombre.");
-      return;
-    }
-
-    data.unshift(proveedor);
+  if(anterior){
+    proveedores = proveedores.map(p => p.id === id ? proveedor : p);
   }else{
-    const anterior = data[Number(idx)];
-    proveedor.activo = anterior.activo !== false;
-    data[Number(idx)] = proveedor;
+    proveedores.unshift(proveedor);
   }
 
-  guardarProveedores(data);
+  await guardarLista();
   cerrarFicha();
 }
 
@@ -478,25 +340,34 @@ function cerrarFicha(){
   pintar();
 }
 
-function desactivarProveedor(i){
+async function desactivarProveedor(id){
   if(!puedeEditar()) return;
 
-  let data = leerProveedores();
-  const nombre = data[i].nombre || "este proveedor";
+  const p = proveedores.find(x => x.id === id);
+  if(!p) return;
 
-  if(confirm("¿Desactivar " + nombre + "? No aparecerá en pedidos nuevos.")){
-    data[i].activo = false;
-    guardarProveedores(data);
+  if(confirm("¿Desactivar " + (p.nombre || "este proveedor") + "? No aparecerá en pedidos nuevos.")){
+    proveedores = proveedores.map(x =>
+      x.id === id
+      ? {...x, activo:false, actualizadoPor:usuarioActual(), actualizadoEn:new Date().toISOString()}
+      : x
+    );
+
+    await guardarLista();
     pintar();
   }
 }
 
-function reactivarProveedor(i){
+async function reactivarProveedor(id){
   if(!puedeEditar()) return;
 
-  let data = leerProveedores();
-  data[i].activo = true;
-  guardarProveedores(data);
+  proveedores = proveedores.map(p =>
+    p.id === id
+    ? {...p, activo:true, actualizadoPor:usuarioActual(), actualizadoEn:new Date().toISOString()}
+    : p
+  );
+
+  await guardarLista();
   pintar();
 }
 
@@ -512,7 +383,55 @@ function volver(){
   window.location.href = "index.html";
 }
 
-pintar();
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnNuevo").addEventListener("click", abrirFichaNuevo);
+  document.getElementById("btnGuardar").addEventListener("click", guardarFicha);
+  document.getElementById("btnCancelar").addEventListener("click", cerrarFicha);
+
+  document.getElementById("lista").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    const accion = btn.dataset.accion;
+    const id = btn.dataset.id;
+
+    if(accion === "editar") abrirFichaEditar(id);
+    if(accion === "desactivar") desactivarProveedor(id);
+    if(accion === "reactivar") reactivarProveedor(id);
+    if(accion === "incidencias") irIncidencias();
+    if(accion === "pagos") irPagos();
+  });
+}
+
+async function iniciar(){
+  activarBotones();
+
+  escucharColeccion("proveedores", async (lista)=>{
+    proveedores = lista.sort((a,b)=>
+      (a.nombre || "").localeCompare(b.nombre || "")
+    );
+
+    if(proveedores.length === 0){
+      proveedores = proveedoresIniciales();
+      await guardarLista();
+    }
+
+    pintar();
+  });
+
+  escucharColeccion("incidencias", (lista)=>{
+    incidencias = lista;
+    pintar();
+  });
+
+  escucharColeccion("pagos_pendientes", (lista)=>{
+    pagosPendientes = lista;
+    pintar();
+  });
+}
+
+iniciar();
 </script>
 
 </body>
