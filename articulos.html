@@ -1,432 +1,355 @@
-<!DOCTYPE html>  <html lang="es">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
-<title>ARTÍCULOS · MONOLITO</title>  <style>  
-*{box-sizing:border-box}  
-  
-body{  
-  margin:0;  
-  font-family:Arial,Helvetica,sans-serif;  
-  background:#eef2f5;  
-  color:#17303d;  
-}  
-  
-header{  
-  background:#17303d;  
-  color:white;  
-  padding:16px;  
-  display:flex;  
-  justify-content:space-between;  
-  align-items:center;  
-  gap:12px;  
-}  
-  
-header h2{  
-  margin:0;  
-  font-size:22px;  
-}  
-  
-button{  
-  border:0;  
-  border-radius:14px;  
-  padding:11px 14px;  
-  font-weight:800;  
-  font-size:15px;  
-  cursor:pointer;  
-}  
-  
-.volver{  
-  background:white;  
-  color:#17303d;  
-}  
-  
-.contenido{  
-  padding:16px;  
-  width:100%;  
-  max-width:none;  
-}  
-  
-.nuevo{  
-  width:100%;  
-  background:#ff9800;  
-  color:white;  
-  margin-bottom:12px;  
-  font-size:17px;  
-}  
-  
-.base{  
-  width:100%;  
-  background:#17303d;  
-  color:white;  
-  margin-bottom:14px;  
-  font-size:17px;  
-}  
-  
-#lista{  
-  width:100%;  
-  display:grid;  
-  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));  
-  gap:14px;  
-}  
-  
-.card{  
-  background:white;  
-  border-radius:22px;  
-  padding:16px;  
-  box-shadow:0 8px 18px rgba(0,0,0,.12);  
-}  
-  
-.card.inactivo{  
-  opacity:.45;  
-}  
-  
-.nombre{  
-  font-size:21px;  
-  font-weight:900;  
-}  
-  
-.detalle{  
-  margin-top:6px;  
-  color:#4f5f69;  
-  font-size:15px;  
-}  
-  
-.precioFinal{  
-  font-size:22px;  
-  font-weight:900;  
-  margin-top:8px;  
-  color:#17303d;  
-}  
-  
-.botones{  
-  display:flex;  
-  gap:8px;  
-  margin-top:12px;  
-  flex-wrap:wrap;  
-}  
-  
-.editar{  
-  background:#2196f3;  
-  color:white;  
-}  
-  
-.desactivar{  
-  background:#ff0000;  
-  color:white;  
-}  
-  
-.reactivar{  
-  background:#48a530;  
-  color:white;  
-}  
-  
-.ficha{  
-  background:white;  
-  border-radius:24px;  
-  padding:16px;  
-  box-shadow:0 10px 22px rgba(0,0,0,.16);  
-  width:100%;  
-}  
-  
-label{  
-  display:block;  
-  font-weight:800;  
-  margin-top:12px;  
-}  
-  
-input,select{  
-  width:100%;  
-  padding:12px;  
-  border-radius:14px;  
-  border:1px solid #b8c2ca;  
-  font-size:16px;  
-  margin-top:6px;  
-}  
-  
-.guardar{  
-  width:100%;  
-  background:#48a530;  
-  color:white;  
-  margin-top:16px;  
-}  
-  
-.cancelar{  
-  width:100%;  
-  background:#dfe6ec;  
-  color:#17303d;  
-  margin-top:10px;  
-}  
-  
-.oculto{  
-  display:none;  
-}  
-  
-.vacio{  
-  background:white;  
-  border-radius:22px;  
-  padding:18px;  
-  text-align:center;  
-  font-weight:800;  
-}  
-</style>  </head>  <body>  <header>  
-  <button class="volver" onclick="volver()">← Volver</button>  
-  <h2>📦 ARTÍCULOS</h2>  
-</header>  <div class="contenido">    <div id="vistaLista">  
-    <button class="nuevo" onclick="abrirNuevo()">➕ Nuevo artículo</button>  
-    <button class="base" onclick="cargarArticulosBase()">📦 Cargar artículos base</button>  
-    <div id="lista"></div>  
-  </div>    <div id="vistaFicha" class="oculto">  
-    <div class="ficha">  
-      <h3 id="tituloFicha">Artículo</h3>  <input type="hidden" id="indiceArticulo">  
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARTÍCULOS · MONOLITO</title>
 
-  <label>Proveedor</label>  
-  <select id="proveedor"></select>  
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header h2{margin:0;font-size:22px}
+button{border:0;border-radius:14px;padding:11px 14px;font-weight:800;font-size:15px;cursor:pointer}
+.volver{background:white;color:#17303d}
+.contenido{padding:16px;width:100%}
+.nuevo{width:100%;background:#ff9800;color:white;margin-bottom:12px;font-size:17px}
+.base{width:100%;background:#17303d;color:white;margin-bottom:14px;font-size:17px}
+#lista{width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.card{background:white;border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.card.inactivo{opacity:.45}
+.nombre{font-size:21px;font-weight:900}
+.detalle{margin-top:6px;color:#4f5f69;font-size:15px}
+.precioFinal{font-size:22px;font-weight:900;margin-top:8px;color:#17303d}
+.botones{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.editar{background:#2196f3;color:white}
+.desactivar{background:#ff0000;color:white}
+.reactivar{background:#48a530;color:white}
+.ficha{background:white;border-radius:24px;padding:16px;box-shadow:0 10px 22px rgba(0,0,0,.16);width:100%}
+label{display:block;font-weight:800;margin-top:12px}
+input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:6px}
+.guardar{width:100%;background:#48a530;color:white;margin-top:16px}
+.cancelar{width:100%;background:#dfe6ec;color:#17303d;margin-top:10px}
+.oculto{display:none}
+.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:800}
+</style>
+</head>
 
-  <label>Artículo</label>  
-  <input id="articulo">  
+<body>
 
-  <label>Precio unidad / base sin IVA</label>  
-  <input id="precioUnidad" type="number" step="0.0001">  
+<header>
+  <button class="volver" onclick="volver()">← Volver</button>
+  <h2>📦 ARTÍCULOS</h2>
+</header>
 
-  <label>Formato / unidades</label>  
-  <input id="formato" type="number" step="0.01">  
+<div class="contenido">
 
-  <label>Texto formato</label>  
-  <input id="unidadFormato" placeholder="CAJA 24, PACK 6, LATA 3KG...">  
+  <div id="vistaLista">
+    <button class="nuevo" onclick="abrirNuevo()">➕ Nuevo artículo</button>
+    <button class="base" onclick="cargarArticulosBase()">📦 Cargar artículos base</button>
+    <div id="lista"></div>
+  </div>
 
-  <label>IVA</label>  
-  <select id="iva">  
-    <option value="4">4%</option>  
-    <option value="10">10%</option>  
-    <option value="21">21%</option>  
-  </select>  
+  <div id="vistaFicha" class="oculto">
+    <div class="ficha">
+      <h3 id="tituloFicha">Artículo</h3>
 
-  <button class="guardar" onclick="guardarFicha()">💾 Guardar artículo</button>  
-  <button class="cancelar" onclick="cerrarFicha()">Cancelar</button>  
+      <input type="hidden" id="idArticulo">
+
+      <label>Proveedor</label>
+      <select id="proveedor"></select>
+
+      <label>Artículo</label>
+      <input id="articulo">
+
+      <label>Precio unidad / base sin IVA</label>
+      <input id="precioUnidad" type="number" step="0.0001">
+
+      <label>Formato / unidades</label>
+      <input id="formato" type="number" step="0.01">
+
+      <label>Texto formato</label>
+      <input id="unidadFormato" placeholder="CAJA 24, PACK 6, LATA 3KG...">
+
+      <label>IVA</label>
+      <select id="iva">
+        <option value="4">4%</option>
+        <option value="10">10%</option>
+        <option value="21">21%</option>
+      </select>
+
+      <button class="guardar" onclick="guardarFicha()">💾 Guardar artículo</button>
+      <button class="cancelar" onclick="cerrarFicha()">Cancelar</button>
+    </div>
+  </div>
+
 </div>
 
-  </div>  </div>  <script type="module">  
-  
-  
-let articulos = [];  
-let proveedoresGlobal = [];  
-async function leerColeccion(nombre){  
-  const datos = localStorage.getItem(nombre);  
-  return datos ? JSON.parse(datos) : [];  
-}  
-  
-async function guardarColeccion(nombre, datos){  
-  localStorage.setItem(nombre, JSON.stringify(datos));  
-}  
-  
-function escucharColeccion(nombre, callback){  
-  leerColeccion(nombre).then(callback);  
-}  
-function usuarioActual(){  
-  localStorage.setItem("usuario","JAVI");  
-  return "JAVI";  
-}  
-  
-function puedeEditar(){  
-  const u = usuarioActual();  
-  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";  
-}  
-  
-function articulosIniciales(){  
-  return [  
-    {id:"cafe_natural", proveedor:"CANDELAS", articulo:"CAFÉ NATURAL", precioUnidad:17.00, formato:3, unidadFormato:"LATA 3KG", iva:10, activo:true},  
-    {id:"cafe_descafeinado", proveedor:"CANDELAS", articulo:"CAFÉ DESCAFEINADO", precioUnidad:18.00, formato:2, unidadFormato:"LATA 2KG", iva:10, activo:true},  
-    {id:"coca_cola_lata_33cl", proveedor:"SANPEDRO", articulo:"COCA COLA LATA 33CL", precioUnidad:0.56, formato:24, unidadFormato:"CAJA 24", iva:21, activo:true},  
-    {id:"mahou_5_estrellas_13", proveedor:"TURRADO", articulo:"MAHOU 5 ESTRELLAS 1/3", precioUnidad:17.96, formato:1, unidadFormato:"CAJA", iva:21, activo:true}  
-  ];  
-}  
-  
-function precioCompra(a){  
-  return Number(a.precioUnidad || 0) * Number(a.formato || 1);  
-}  
-  
-async function cargarProveedores(){  
-  proveedoresGlobal = await leerColeccion("proveedores");  
-  
-  proveedoresGlobal = proveedoresGlobal.filter(p => p.activo !== false);  
-  
-  if(proveedoresGlobal.length === 0){  
-    proveedoresGlobal = [  
-      {nombre:"CANDELAS"},  
-      {nombre:"TURRADO"},  
-      {nombre:"SANPEDRO"},  
-      {nombre:"DEO"}  
-    ];  
-  }  
-}  
-  
-function cargarSelectProveedores(){  
-  const sel = document.getElementById("proveedor");  
-  
-  sel.innerHTML = proveedoresGlobal.map(p =>  
-    `<option value="${p.nombre}">${p.nombre}</option>`  
-  ).join("");  
-}  
-  
-function pintar(){  
-  let html = "";  
-  
-  if(articulos.length === 0){  
-    html = `<div class="vacio">No hay artículos todavía.</div>`;  
-  }  
-  
-  articulos.forEach((a,i)=>{  
-    html += `  
-      <div class="card ${a.activo === false ? "inactivo" : ""}">  
-        <div class="nombre">${a.articulo || "SIN NOMBRE"}</div>  
-        <div class="detalle">${a.proveedor || "SIN PROVEEDOR"} · ${a.unidadFormato || "SIN FORMATO"}</div>  
-        <div class="detalle">Precio unidad/base sin IVA: ${Number(a.precioUnidad || 0).toFixed(4)} €</div>  
-        <div class="detalle">Formato: ${a.formato || 1}</div>  
-        <div class="detalle">IVA: ${a.iva || 21}%</div>  
-        <div class="precioFinal">Precio compra sin IVA: ${precioCompra(a).toFixed(2)} €</div>  
-  
-        ${puedeEditar() ? `  
-          <div class="botones">  
-            <button class="editar" onclick="abrirEditar(${i})">Editar</button>  
-            ${  
-              a.activo === false  
-              ? `<button class="reactivar" onclick="reactivarArticulo(${i})">Reactivar</button>`  
-              : `<button class="desactivar" onclick="desactivarArticulo(${i})">Desactivar</button>`  
-            }  
-          </div>  
-        ` : ""}  
-      </div>  
-    `;  
-  });  
-  
-  document.getElementById("lista").innerHTML = html;  
-}  
-  
-async function guardarTodo(){  
-  await guardarColeccion("articulos", articulos);  
-}  
-  
-window.cargarArticulosBase = async function(){  
-  if(confirm("¿Cargar artículos base?")){  
-    articulos = articulosIniciales();  
-    await guardarTodo();  
-    pintar();  
-  }  
-}  
-  
-window.abrirNuevo = function(){  
-  if(!puedeEditar()) return;  
-  
-  cargarSelectProveedores();  
-  
-  document.getElementById("tituloFicha").textContent = "Nuevo artículo";  
-  document.getElementById("indiceArticulo").value = "";  
-  document.getElementById("articulo").value = "";  
-  document.getElementById("precioUnidad").value = "";  
-  document.getElementById("formato").value = "1";  
-  document.getElementById("unidadFormato").value = "CAJA";  
-  document.getElementById("iva").value = "21";  
-  
-  document.getElementById("vistaLista").classList.add("oculto");  
-  document.getElementById("vistaFicha").classList.remove("oculto");  
-}  
-  
-window.abrirEditar = function(i){  
-  if(!puedeEditar()) return;  
-  
-  cargarSelectProveedores();  
-  
-  const a = articulos[i];  
-  
-  document.getElementById("tituloFicha").textContent = "Editar artículo";  
-  document.getElementById("indiceArticulo").value = i;  
-  document.getElementById("proveedor").value = a.proveedor || "";  
-  document.getElementById("articulo").value = a.articulo || "";  
-  document.getElementById("precioUnidad").value = a.precioUnidad || 0;  
-  document.getElementById("formato").value = a.formato || 1;  
-  document.getElementById("unidadFormato").value = a.unidadFormato || "CAJA";  
-  document.getElementById("iva").value = a.iva || 21;  
-  
-  document.getElementById("vistaLista").classList.add("oculto");  
-  document.getElementById("vistaFicha").classList.remove("oculto");  
-}  
-  
-window.guardarFicha = async function(){  
-  if(!puedeEditar()) return;  
-  
-  const articulo = document.getElementById("articulo").value.trim().toUpperCase();  
-  
-  if(!articulo){  
-    alert("Falta el nombre del artículo.");  
-    return;  
-  }  
-  
-  const idx = document.getElementById("indiceArticulo").value;  
-  
-  const nuevo = {  
-    proveedor: document.getElementById("proveedor").value,  
-    articulo,  
-    precioUnidad: parseFloat(document.getElementById("precioUnidad").value || 0),  
-    formato: parseFloat(document.getElementById("formato").value || 1),  
-    unidadFormato: document.getElementById("unidadFormato").value.trim().toUpperCase(),  
-    iva: parseFloat(document.getElementById("iva").value || 21),  
-    activo:true  
-  };  
-  
-  if(idx === ""){  
-    nuevo.id = String(Date.now()) + "_" + Math.random().toString(36).slice(2);  
-    articulos.unshift(nuevo);  
-  }else{  
-    const anterior = articulos[Number(idx)];  
-    nuevo.id = anterior.id;  
-    nuevo.activo = anterior.activo !== false;  
-    articulos[Number(idx)] = nuevo;  
-  }  
-  
-  await guardarTodo();  
-  cerrarFicha();  
-}  
-  
-window.cerrarFicha = function(){  
-  document.getElementById("vistaFicha").classList.add("oculto");  
-  document.getElementById("vistaLista").classList.remove("oculto");  
-  pintar();  
-}  
-  
-window.desactivarArticulo = async function(i){  
-  if(!puedeEditar()) return;  
-  
-  if(confirm("¿Desactivar este artículo?")){  
-    articulos[i].activo = false;  
-    await guardarTodo();  
-    pintar();  
-  }  
-}  
-  
-window.reactivarArticulo = async function(i){  
-  if(!puedeEditar()) return;  
-  
-  articulos[i].activo = true;  
-  await guardarTodo();  
-  pintar();  
-}  
-  
-window.volver = function(){  
-  window.location.href = "index.html";  
-}  
-  
-async function iniciar(){  
-  await cargarProveedores();  
-  
-  escucharColeccion("articulos", (lista)=>{  
-    articulos = lista.sort((a,b)=>  
-      (a.articulo || "").localeCompare(b.articulo || "")  
-    );  
-    pintar();  
-  });  
-}  
-  
-iniciar();  
-</script>  </body>  
-</html>  
+<script type="module">
+import { db } from "./monolito-cloud.js";
+
+import {
+  collection,
+  doc,
+  setDoc,
+  getDocs,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+let articulos = [];
+let proveedoresGlobal = [];
+
+async function leerColeccion(nombre){
+  const snap = await getDocs(collection(db, nombre));
+  return snap.docs.map(d => ({
+    id: d.id,
+    ...d.data()
+  }));
+}
+
+async function guardarDocumento(nombre, id, datos){
+  await setDoc(doc(db, nombre, id), datos, { merge:true });
+}
+
+function escucharColeccion(nombre, callback){
+  return onSnapshot(collection(db, nombre), (snap)=>{
+    const datos = snap.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+    callback(datos);
+  });
+}
+
+function usuarioActual(){
+  const u = localStorage.getItem("usuario") || "JAVI";
+  localStorage.setItem("usuario", u);
+  return u;
+}
+
+function puedeEditar(){
+  const u = usuarioActual();
+  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
+}
+
+function crearId(texto){
+  return String(texto || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"_")
+    .replace(/^_+|_+$/g,"")
+    + "_" + Date.now();
+}
+
+function articulosIniciales(){
+  return [
+    {id:"cafe_natural", proveedor:"CANDELAS", articulo:"CAFÉ NATURAL", precioUnidad:17.00, formato:3, unidadFormato:"LATA 3KG", iva:10, activo:true},
+    {id:"cafe_descafeinado", proveedor:"CANDELAS", articulo:"CAFÉ DESCAFEINADO", precioUnidad:18.00, formato:2, unidadFormato:"LATA 2KG", iva:10, activo:true},
+    {id:"coca_cola_lata_33cl", proveedor:"SANPEDRO", articulo:"COCA COLA LATA 33CL", precioUnidad:0.56, formato:24, unidadFormato:"CAJA 24", iva:21, activo:true},
+    {id:"mahou_5_estrellas_13", proveedor:"TURRADO", articulo:"MAHOU 5 ESTRELLAS 1/3", precioUnidad:17.96, formato:1, unidadFormato:"CAJA", iva:21, activo:true}
+  ];
+}
+
+function precioCompra(a){
+  return Number(a.precioUnidad || 0) * Number(a.formato || 1);
+}
+
+async function cargarProveedores(){
+  proveedoresGlobal = await leerColeccion("proveedores");
+  proveedoresGlobal = proveedoresGlobal.filter(p => p.activo !== false);
+
+  if(proveedoresGlobal.length === 0){
+    proveedoresGlobal = [
+      {nombre:"CANDELAS"},
+      {nombre:"TURRADO"},
+      {nombre:"SANPEDRO"},
+      {nombre:"DEO"}
+    ];
+  }
+}
+
+function cargarSelectProveedores(){
+  const sel = document.getElementById("proveedor");
+
+  sel.innerHTML = proveedoresGlobal.map(p =>
+    `<option value="${p.nombre}">${p.nombre}</option>`
+  ).join("");
+}
+
+function pintar(){
+  let html = "";
+
+  if(articulos.length === 0){
+    html = `<div class="vacio">No hay artículos todavía.</div>`;
+  }
+
+  articulos.forEach((a)=>{
+    html += `
+      <div class="card ${a.activo === false ? "inactivo" : ""}">
+        <div class="nombre">${a.articulo || "SIN NOMBRE"}</div>
+        <div class="detalle">${a.proveedor || "SIN PROVEEDOR"} · ${a.unidadFormato || "SIN FORMATO"}</div>
+        <div class="detalle">Precio unidad/base sin IVA: ${Number(a.precioUnidad || 0).toFixed(4)} €</div>
+        <div class="detalle">Formato: ${a.formato || 1}</div>
+        <div class="detalle">IVA: ${a.iva || 21}%</div>
+        <div class="precioFinal">Precio compra sin IVA: ${precioCompra(a).toFixed(2)} €</div>
+
+        ${puedeEditar() ? `
+          <div class="botones">
+            <button class="editar" onclick="abrirEditar('${a.id}')">Editar</button>
+            ${
+              a.activo === false
+              ? `<button class="reactivar" onclick="reactivarArticulo('${a.id}')">Reactivar</button>`
+              : `<button class="desactivar" onclick="desactivarArticulo('${a.id}')">Desactivar</button>`
+            }
+          </div>
+        ` : ""}
+      </div>
+    `;
+  });
+
+  document.getElementById("lista").innerHTML = html;
+}
+
+window.cargarArticulosBase = async function(){
+  if(!puedeEditar()) return;
+
+  if(confirm("¿Cargar artículos base?")){
+    const base = articulosIniciales();
+
+    for(const a of base){
+      await guardarDocumento("articulos", a.id, a);
+    }
+
+    alert("Artículos base cargados en la nube.");
+  }
+}
+
+window.abrirNuevo = function(){
+  if(!puedeEditar()) return;
+
+  cargarSelectProveedores();
+
+  document.getElementById("tituloFicha").textContent = "Nuevo artículo";
+  document.getElementById("idArticulo").value = "";
+  document.getElementById("articulo").value = "";
+  document.getElementById("precioUnidad").value = "";
+  document.getElementById("formato").value = "1";
+  document.getElementById("unidadFormato").value = "CAJA";
+  document.getElementById("iva").value = "21";
+
+  document.getElementById("vistaLista").classList.add("oculto");
+  document.getElementById("vistaFicha").classList.remove("oculto");
+}
+
+window.abrirEditar = function(id){
+  if(!puedeEditar()) return;
+
+  cargarSelectProveedores();
+
+  const a = articulos.find(x => x.id === id);
+  if(!a){
+    alert("No se encontró el artículo.");
+    return;
+  }
+
+  document.getElementById("tituloFicha").textContent = "Editar artículo";
+  document.getElementById("idArticulo").value = a.id;
+  document.getElementById("proveedor").value = a.proveedor || "";
+  document.getElementById("articulo").value = a.articulo || "";
+  document.getElementById("precioUnidad").value = a.precioUnidad || 0;
+  document.getElementById("formato").value = a.formato || 1;
+  document.getElementById("unidadFormato").value = a.unidadFormato || "CAJA";
+  document.getElementById("iva").value = a.iva || 21;
+
+  document.getElementById("vistaLista").classList.add("oculto");
+  document.getElementById("vistaFicha").classList.remove("oculto");
+}
+
+window.guardarFicha = async function(){
+  if(!puedeEditar()) return;
+
+  const articulo = document.getElementById("articulo").value.trim().toUpperCase();
+
+  if(!articulo){
+    alert("Falta el nombre del artículo.");
+    return;
+  }
+
+  const idActual = document.getElementById("idArticulo").value;
+  const id = idActual || crearId(articulo);
+
+  const anterior = articulos.find(x => x.id === id);
+
+  const nuevo = {
+    id,
+    proveedor: document.getElementById("proveedor").value,
+    articulo,
+    precioUnidad: parseFloat(document.getElementById("precioUnidad").value || 0),
+    formato: parseFloat(document.getElementById("formato").value || 1),
+    unidadFormato: document.getElementById("unidadFormato").value.trim().toUpperCase(),
+    iva: parseFloat(document.getElementById("iva").value || 21),
+    activo: anterior ? anterior.activo !== false : true,
+    actualizadoPor: usuarioActual(),
+    actualizadoEn: new Date().toISOString()
+  };
+
+  await guardarDocumento("articulos", id, nuevo);
+
+  cerrarFicha();
+}
+
+window.cerrarFicha = function(){
+  document.getElementById("vistaFicha").classList.add("oculto");
+  document.getElementById("vistaLista").classList.remove("oculto");
+}
+
+window.desactivarArticulo = async function(id){
+  if(!puedeEditar()) return;
+
+  const a = articulos.find(x => x.id === id);
+  if(!a) return;
+
+  if(confirm("¿Desactivar este artículo?")){
+    await guardarDocumento("articulos", id, {
+      ...a,
+      activo:false,
+      actualizadoPor: usuarioActual(),
+      actualizadoEn: new Date().toISOString()
+    });
+  }
+}
+
+window.reactivarArticulo = async function(id){
+  if(!puedeEditar()) return;
+
+  const a = articulos.find(x => x.id === id);
+  if(!a) return;
+
+  await guardarDocumento("articulos", id, {
+    ...a,
+    activo:true,
+    actualizadoPor: usuarioActual(),
+    actualizadoEn: new Date().toISOString()
+  });
+}
+
+window.volver = function(){
+  window.location.href = "index.html";
+}
+
+async function iniciar(){
+  await cargarProveedores();
+
+  escucharColeccion("articulos", (lista)=>{
+    articulos = lista.sort((a,b)=>
+      (a.articulo || "").localeCompare(b.articulo || "")
+    );
+    pintar();
+  });
+}
+
+iniciar();
+</script>
+
+</body>
+</html>
