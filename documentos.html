@@ -15,7 +15,7 @@ header{background:#17303d;color:white;padding:16px;display:flex;align-items:cent
 label{display:block;font-weight:900;margin-top:12px;margin-bottom:6px}
 input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px}
 textarea{min-height:80px}
-button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
+button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px;cursor:pointer}
 .guardar{width:100%;background:#48a530;color:white;margin-top:14px}
 .borrar{width:100%;background:#c00000;color:white;margin-top:10px}
 .abrir{width:100%;background:#17303d;color:white;margin-top:10px}
@@ -32,7 +32,7 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">←</button>
+  <button id="btnVolver" class="volver">←</button>
   📂 DOCUMENTOS
 </header>
 
@@ -64,17 +64,17 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
     <textarea id="nota" placeholder="Observación, condiciones, explicación..."></textarea>
 
     <div class="aviso">
-      Las fotos se reducen automáticamente para ocupar menos espacio. Los PDF se guardan sin modificar.
+      Las fotos se reducen automáticamente para ocupar menos espacio. Los PDF deben ser pequeños.
     </div>
 
-    <button class="guardar" onclick="guardarDocumento()">💾 Guardar documento</button>
+    <button id="btnGuardar" class="guardar">💾 Guardar documento</button>
   </div>
 
   <div class="card">
     <div class="titulo">Buscar / filtrar</div>
 
     <div class="filtros">
-      <select id="filtroCategoria" onchange="pintar()">
+      <select id="filtroCategoria">
         <option value="">Todas</option>
         <option value="ACUERDOS">ACUERDOS</option>
         <option value="FACTURAS">FACTURAS</option>
@@ -84,7 +84,7 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
         <option value="OTROS">OTROS</option>
       </select>
 
-      <input id="filtroAnio" type="number" placeholder="Año" oninput="pintar()">
+      <input id="filtroAnio" type="number" placeholder="Año">
     </div>
   </div>
 
@@ -92,13 +92,20 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
 
 </div>
 
-<script>
-function volver(){
-  window.location.href="index.html";
-}
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion,
+  borrarDocumento
+} from "./monolito-cloud.js";
+
+let documentos = [];
+
+const COLECCION = "documentos";
 
 function usuarioActual(){
-  return localStorage.getItem("usuario") || "OPERADOR";
+  return localStorage.getItem("usuario") || "JAVI";
 }
 
 function esHostelero(){
@@ -113,22 +120,27 @@ function protegerAcceso(){
   }
 }
 
-protegerAcceso();
-
-function leerDocumentos(){
-  return JSON.parse(localStorage.getItem("documentos_monolito") || "[]");
-}
-
-function guardarDocumentos(data){
-  localStorage.setItem("documentos_monolito", JSON.stringify(data));
-}
-
 function hoyAnio(){
   return new Date().getFullYear();
 }
 
-document.getElementById("anio").value = hoyAnio();
-document.getElementById("filtroAnio").value = hoyAnio();
+function crearId(texto){
+  return String(texto || "documento")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"_")
+    .replace(/^_+|_+$/g,"")
+    + "_" + Date.now();
+}
+
+function esc(txt){
+  return String(txt || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 
 function comprimirImagen(file){
   return new Promise((resolve, reject)=>{
@@ -138,8 +150,8 @@ function comprimirImagen(file){
       const img = new Image();
 
       img.onload = function(){
-        const maxAncho = 1600;
-        const maxAlto = 1600;
+        const maxAncho = 1200;
+        const maxAlto = 1200;
 
         let ancho = img.width;
         let alto = img.height;
@@ -157,7 +169,7 @@ function comprimirImagen(file){
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, ancho, alto);
 
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.78);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.65);
 
         resolve({
           archivo:dataUrl,
@@ -182,7 +194,7 @@ function leerArchivoNormal(file){
     reader.onload = function(e){
       resolve({
         archivo:e.target.result,
-        tipo:file.type,
+        tipo:file.type || "application/pdf",
         nombre:file.name
       });
     };
@@ -192,7 +204,11 @@ function leerArchivoNormal(file){
   });
 }
 
-async function guardarDocumento(){
+async function guardarLista(){
+  await guardarColeccion(COLECCION, documentos);
+}
+
+async function guardarDocumentoNuevo(){
   const nombre = document.getElementById("nombre").value.trim();
   const categoria = document.getElementById("categoria").value;
   const anio = Number(document.getElementById("anio").value || hoyAnio());
@@ -215,8 +231,8 @@ async function guardarDocumento(){
     if(file.type.startsWith("image/")){
       archivoFinal = await comprimirImagen(file);
     }else{
-      if(file.size > 3 * 1024 * 1024){
-        alert("PDF demasiado grande para esta primera versión. Usa uno menor de 3 MB.");
+      if(file.size > 700 * 1024){
+        alert("PDF demasiado grande para guardar en esta versión. Usa uno menor de 700 KB.");
         return;
       }
 
@@ -227,10 +243,8 @@ async function guardarDocumento(){
     return;
   }
 
-  let data = leerDocumentos();
-
-  data.unshift({
-    id: Date.now(),
+  const nuevo = {
+    id: crearId(nombre),
     nombre,
     categoria,
     anio,
@@ -239,10 +253,13 @@ async function guardarDocumento(){
     archivoTipo:archivoFinal.tipo,
     archivo:archivoFinal.archivo,
     usuario:usuarioActual(),
-    fecha:new Date().toLocaleString("es-ES")
-  });
+    fecha:new Date().toLocaleString("es-ES"),
+    actualizadoEn:new Date().toISOString()
+  };
 
-  guardarDocumentos(data);
+  documentos.unshift(nuevo);
+
+  await guardarLista();
 
   document.getElementById("nombre").value="";
   document.getElementById("nota").value="";
@@ -253,17 +270,18 @@ async function guardarDocumento(){
   alert("Documento guardado.");
 }
 
-function abrirDocumento(id){
-  const doc = leerDocumentos().find(d => d.id === id);
+function abrirDocumentoGuardado(id){
+  const doc = documentos.find(d => String(d.id) === String(id));
   if(!doc) return;
 
   const w = window.open();
+
   w.document.write(`
     <html>
-      <head><title>${doc.nombre}</title></head>
+      <head><title>${esc(doc.nombre)}</title></head>
       <body style="margin:0;background:#222">
         ${
-          doc.archivoTipo.includes("pdf")
+          String(doc.archivoTipo || "").includes("pdf")
           ? `<iframe src="${doc.archivo}" style="width:100%;height:100vh;border:0"></iframe>`
           : `<img src="${doc.archivo}" style="max-width:100%;display:block;margin:auto">`
         }
@@ -272,16 +290,18 @@ function abrirDocumento(id){
   `);
 }
 
-function borrarDocumento(id){
+async function borrarDocumentoGuardado(id){
   if(!confirm("¿Borrar este documento?")) return;
 
-  let data = leerDocumentos().filter(d => d.id !== id);
-  guardarDocumentos(data);
+  documentos = documentos.filter(d => String(d.id) !== String(id));
+
+  await borrarDocumento(COLECCION, id);
+
   pintar();
 }
 
 function pintar(){
-  let data = leerDocumentos();
+  let data = [...documentos];
 
   const filtroCategoria = document.getElementById("filtroCategoria").value;
   const filtroAnio = document.getElementById("filtroAnio").value;
@@ -294,6 +314,8 @@ function pintar(){
     data = data.filter(d => Number(d.anio) === Number(filtroAnio));
   }
 
+  data.sort((a,b)=> String(b.actualizadoEn || b.fecha || "").localeCompare(String(a.actualizadoEn || a.fecha || "")));
+
   let html = "";
 
   if(data.length === 0){
@@ -303,17 +325,17 @@ function pintar(){
   data.forEach(d=>{
     html += `
       <div class="card">
-        <div class="titulo">${d.nombre}</div>
+        <div class="titulo">${esc(d.nombre)}</div>
         <div class="etiqueta ${d.categoria === "ACUERDOS" ? "acuerdo" : ""}">
-          ${d.categoria} · ${d.anio}
+          ${esc(d.categoria)} · ${esc(d.anio)}
         </div>
 
-        <div class="detalle">Archivo: ${d.archivoNombre || "-"}</div>
-        ${d.nota ? `<div class="detalle">Nota: ${d.nota}</div>` : ""}
-        <div class="detalle">Guardado por: ${d.usuario || "OPERADOR"} · ${d.fecha || ""}</div>
+        <div class="detalle">Archivo: ${esc(d.archivoNombre || "-")}</div>
+        ${d.nota ? `<div class="detalle">Nota: ${esc(d.nota)}</div>` : ""}
+        <div class="detalle">Guardado por: ${esc(d.usuario || "OPERADOR")} · ${esc(d.fecha || "")}</div>
 
-        <button class="abrir" onclick="abrirDocumento(${d.id})">👁 Ver documento</button>
-        <button class="borrar" onclick="borrarDocumento(${d.id})">🗑 Borrar</button>
+        <button class="abrir" data-accion="abrir" data-id="${esc(d.id)}">👁 Ver documento</button>
+        <button class="borrar" data-accion="borrar" data-id="${esc(d.id)}">🗑 Borrar</button>
       </div>
     `;
   });
@@ -321,7 +343,66 @@ function pintar(){
   document.getElementById("lista").innerHTML = html;
 }
 
-pintar();
+function volver(){
+  window.location.href="index.html";
+}
+
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnGuardar").addEventListener("click", guardarDocumentoNuevo);
+
+  document.getElementById("filtroCategoria").addEventListener("change", pintar);
+  document.getElementById("filtroAnio").addEventListener("input", pintar);
+
+  document.getElementById("lista").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    const accion = btn.dataset.accion;
+    const id = btn.dataset.id;
+
+    if(accion === "abrir") abrirDocumentoGuardado(id);
+    if(accion === "borrar") borrarDocumentoGuardado(id);
+  });
+}
+
+async function iniciar(){
+  protegerAcceso();
+
+  document.getElementById("anio").value = hoyAnio();
+  document.getElementById("filtroAnio").value = hoyAnio();
+
+  activarBotones();
+
+  escucharColeccion(COLECCION, async (lista)=>{
+    documentos = lista;
+    pintar();
+  });
+
+  const nube = await leerColeccion(COLECCION);
+
+  if(nube.length === 0){
+    const localViejo = localStorage.getItem("documentos_monolito");
+
+    if(localViejo){
+      try{
+        const recuperados = JSON.parse(localViejo).map(d => ({
+          ...d,
+          id: d.id ? String(d.id) : crearId(d.nombre),
+          actualizadoEn: d.actualizadoEn || new Date().toISOString()
+        }));
+
+        if(recuperados.length > 0){
+          documentos = recuperados;
+          await guardarLista();
+          pintar();
+        }
+      }catch(e){}
+    }
+  }
+}
+
+iniciar();
 </script>
 
 </body>
