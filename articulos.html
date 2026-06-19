@@ -38,15 +38,15 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">← Volver</button>
+  <button id="btnVolver" class="volver">← Volver</button>
   <h2>📦 ARTÍCULOS</h2>
 </header>
 
 <div class="contenido">
 
   <div id="vistaLista">
-    <button class="nuevo" onclick="abrirNuevo()">➕ Nuevo artículo</button>
-    <button class="base" onclick="cargarArticulosBase()">📦 Cargar artículos base</button>
+    <button id="btnNuevo" class="nuevo">➕ Nuevo artículo</button>
+    <button id="btnBase" class="base">📦 Cargar artículos base</button>
     <div id="lista"></div>
   </div>
 
@@ -78,48 +78,22 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
         <option value="21">21%</option>
       </select>
 
-      <button class="guardar" onclick="guardarFicha()">💾 Guardar artículo</button>
-      <button class="cancelar" onclick="cerrarFicha()">Cancelar</button>
+      <button id="btnGuardar" class="guardar">💾 Guardar artículo</button>
+      <button id="btnCancelar" class="cancelar">Cancelar</button>
     </div>
   </div>
 
 </div>
 
 <script type="module">
-import { db } from "./monolito-cloud.js";
-
 import {
-  collection,
-  doc,
-  setDoc,
-  getDocs,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion
+} from "./monolito-cloud.js";
 
 let articulos = [];
 let proveedoresGlobal = [];
-
-async function leerColeccion(nombre){
-  const snap = await getDocs(collection(db, nombre));
-  return snap.docs.map(d => ({
-    id: d.id,
-    ...d.data()
-  }));
-}
-
-async function guardarDocumento(nombre, id, datos){
-  await setDoc(doc(db, nombre, id), datos, { merge:true });
-}
-
-function escucharColeccion(nombre, callback){
-  return onSnapshot(collection(db, nombre), (snap)=>{
-    const datos = snap.docs.map(d => ({
-      id: d.id,
-      ...d.data()
-    }));
-    callback(datos);
-  });
-}
 
 function usuarioActual(){
   const u = localStorage.getItem("usuario") || "JAVI";
@@ -170,7 +144,6 @@ async function cargarProveedores(){
 
 function cargarSelectProveedores(){
   const sel = document.getElementById("proveedor");
-
   sel.innerHTML = proveedoresGlobal.map(p =>
     `<option value="${p.nombre}">${p.nombre}</option>`
   ).join("");
@@ -195,11 +168,11 @@ function pintar(){
 
         ${puedeEditar() ? `
           <div class="botones">
-            <button class="editar" onclick="abrirEditar('${a.id}')">Editar</button>
+            <button class="editar" data-accion="editar" data-id="${a.id}">Editar</button>
             ${
               a.activo === false
-              ? `<button class="reactivar" onclick="reactivarArticulo('${a.id}')">Reactivar</button>`
-              : `<button class="desactivar" onclick="desactivarArticulo('${a.id}')">Desactivar</button>`
+              ? `<button class="reactivar" data-accion="reactivar" data-id="${a.id}">Reactivar</button>`
+              : `<button class="desactivar" data-accion="desactivar" data-id="${a.id}">Desactivar</button>`
             }
           </div>
         ` : ""}
@@ -210,21 +183,22 @@ function pintar(){
   document.getElementById("lista").innerHTML = html;
 }
 
-window.cargarArticulosBase = async function(){
+async function guardarLista(){
+  await guardarColeccion("articulos", articulos);
+}
+
+async function cargarArticulosBase(){
   if(!puedeEditar()) return;
 
   if(confirm("¿Cargar artículos base?")){
-    const base = articulosIniciales();
-
-    for(const a of base){
-      await guardarDocumento("articulos", a.id, a);
-    }
-
+    articulos = articulosIniciales();
+    await guardarLista();
+    pintar();
     alert("Artículos base cargados en la nube.");
   }
 }
 
-window.abrirNuevo = function(){
+function abrirNuevo(){
   if(!puedeEditar()) return;
 
   cargarSelectProveedores();
@@ -241,7 +215,7 @@ window.abrirNuevo = function(){
   document.getElementById("vistaFicha").classList.remove("oculto");
 }
 
-window.abrirEditar = function(id){
+function abrirEditar(id){
   if(!puedeEditar()) return;
 
   cargarSelectProveedores();
@@ -265,7 +239,7 @@ window.abrirEditar = function(id){
   document.getElementById("vistaFicha").classList.remove("oculto");
 }
 
-window.guardarFicha = async function(){
+async function guardarFicha(){
   if(!puedeEditar()) return;
 
   const articulo = document.getElementById("articulo").value.trim().toUpperCase();
@@ -277,7 +251,6 @@ window.guardarFicha = async function(){
 
   const idActual = document.getElementById("idArticulo").value;
   const id = idActual || crearId(articulo);
-
   const anterior = articulos.find(x => x.id === id);
 
   const nuevo = {
@@ -293,51 +266,76 @@ window.guardarFicha = async function(){
     actualizadoEn: new Date().toISOString()
   };
 
-  await guardarDocumento("articulos", id, nuevo);
+  if(anterior){
+    articulos = articulos.map(a => a.id === id ? nuevo : a);
+  }else{
+    articulos.unshift(nuevo);
+  }
 
+  await guardarLista();
   cerrarFicha();
 }
 
-window.cerrarFicha = function(){
+function cerrarFicha(){
   document.getElementById("vistaFicha").classList.add("oculto");
   document.getElementById("vistaLista").classList.remove("oculto");
+  pintar();
 }
 
-window.desactivarArticulo = async function(id){
+async function desactivarArticulo(id){
   if(!puedeEditar()) return;
 
-  const a = articulos.find(x => x.id === id);
-  if(!a) return;
-
   if(confirm("¿Desactivar este artículo?")){
-    await guardarDocumento("articulos", id, {
-      ...a,
-      activo:false,
-      actualizadoPor: usuarioActual(),
-      actualizadoEn: new Date().toISOString()
-    });
+    articulos = articulos.map(a =>
+      a.id === id
+      ? {...a, activo:false, actualizadoPor:usuarioActual(), actualizadoEn:new Date().toISOString()}
+      : a
+    );
+
+    await guardarLista();
+    pintar();
   }
 }
 
-window.reactivarArticulo = async function(id){
+async function reactivarArticulo(id){
   if(!puedeEditar()) return;
 
-  const a = articulos.find(x => x.id === id);
-  if(!a) return;
+  articulos = articulos.map(a =>
+    a.id === id
+    ? {...a, activo:true, actualizadoPor:usuarioActual(), actualizadoEn:new Date().toISOString()}
+    : a
+  );
 
-  await guardarDocumento("articulos", id, {
-    ...a,
-    activo:true,
-    actualizadoPor: usuarioActual(),
-    actualizadoEn: new Date().toISOString()
-  });
+  await guardarLista();
+  pintar();
 }
 
-window.volver = function(){
+function volver(){
   window.location.href = "index.html";
 }
 
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnNuevo").addEventListener("click", abrirNuevo);
+  document.getElementById("btnBase").addEventListener("click", cargarArticulosBase);
+  document.getElementById("btnGuardar").addEventListener("click", guardarFicha);
+  document.getElementById("btnCancelar").addEventListener("click", cerrarFicha);
+
+  document.getElementById("lista").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    const accion = btn.dataset.accion;
+    const id = btn.dataset.id;
+
+    if(accion === "editar") abrirEditar(id);
+    if(accion === "desactivar") desactivarArticulo(id);
+    if(accion === "reactivar") reactivarArticulo(id);
+  });
+}
+
 async function iniciar(){
+  activarBotones();
   await cargarProveedores();
 
   escucharColeccion("articulos", (lista)=>{
