@@ -85,8 +85,7 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
 
 </div>
 
-        ${puedeEditar() ? `
-          <div<script type="module">
+<script type="module">
 import { db } from "./monolito-cloud.js";
 
 import {
@@ -186,12 +185,6 @@ function pintar(){
 
   articulos.forEach((a)=>{
     html += `
-       <script type="module">
-import {
-  leerColeccion,
-  guardarColeccion,
-  escucharColeccion
-} from "./monolito-cloud.js";     
       <div class="card ${a.activo === false ? "inactivo" : ""}">
         <div class="nombre">${a.articulo || "SIN NOMBRE"}</div>
         <div class="detalle">${a.proveedor || "SIN PROVEEDOR"} · ${a.unidadFormato || "SIN FORMATO"}</div>
@@ -200,7 +193,8 @@ import {
         <div class="detalle">IVA: ${a.iva || 21}%</div>
         <div class="precioFinal">Precio compra sin IVA: ${precioCompra(a).toFixed(2)} €</div>
 
- class="botones">
+        ${puedeEditar() ? `
+          <div class="botones">
             <button class="editar" onclick="abrirEditar('${a.id}')">Editar</button>
             ${
               a.activo === false
@@ -322,7 +316,40 @@ window.desactivarArticulo = async function(id){
       actualizadoPor: usuarioActual(),
       actualizadoEn: new Date().toISOString()
     });
+  }
+}
 
+window.reactivarArticulo = async function(id){
+  if(!puedeEditar()) return;
+
+  const a = articulos.find(x => x.id === id);
+  if(!a) return;
+
+  await guardarDocumento("articulos", id, {
+    ...a,
+    activo:true,
+    actualizadoPor: usuarioActual(),
+    actualizadoEn: new Date().toISOString()
+  });
+}
+
+window.volver = function(){
+  window.location.href = "index.html";
+}
+
+async function iniciar(){
+  await cargarProveedores();
+
+  escucharColeccion("articulos", (lista)=>{
+    articulos = lista.sort((a,b)=>
+      (a.articulo || "").localeCompare(b.articulo || "")
+    );
+    pintar();
+  });
+}
+
+iniciar();
+</script>
 
 </body>
 </html>
