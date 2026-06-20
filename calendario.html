@@ -18,10 +18,14 @@ label{display:block;font-weight:900;margin-top:12px}
 input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:6px}
 textarea{min-height:90px}
 .guardar{width:100%;background:#17303d;color:white;margin-top:14px}
+.seccion{font-size:21px;font-weight:900;margin:20px 0 10px}
 .tarea{border-left:8px solid #17303d}
+.semanal{border-left:8px solid #7b61ff;background:#f5f2ff}
+.puntual{border-left:8px solid #2196f3;background:#eef7ff}
 .acuerdo{border-left:8px solid #ff9800;background:#fff8ea}
-.aviso{border-left:8px solid #f2c94c}
+.aviso{border-left:8px solid #f2c94c;background:#fffbea}
 .diario{border-left:8px solid #48a530;background:#f1fff4}
+.recordatorio{border-left:8px solid #c00000;background:#fff0f0}
 .hecha{opacity:.55;text-decoration:line-through}
 .titulo{font-size:20px;font-weight:900}
 .detalle{margin-top:6px;color:#56646f;font-weight:700}
@@ -29,9 +33,9 @@ textarea{min-height:90px}
 .acciones{display:flex;gap:8px;margin-top:10px}
 .ok{background:#27ae60;color:white}
 .borrar{background:#c0392b;color:white}
-.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:900}
-.filtros{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:900;margin-bottom:14px}
 .etiqueta{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;margin-top:8px;background:#eef2f5}
+.alerta{background:#ffd6d6;color:#9b0000}
 </style>
 </head>
 
@@ -66,6 +70,7 @@ textarea{min-height:90px}
       <option value="0">El mismo día</option>
       <option value="1">1 día antes</option>
       <option value="7">1 semana antes</option>
+      <option value="10">10 días antes</option>
       <option value="15">15 días antes</option>
       <option value="30">1 mes antes</option>
     </select>
@@ -78,31 +83,25 @@ textarea{min-height:90px}
     </select>
 
     <label>Texto</label>
-    <textarea id="texto" placeholder="Ej: Una semana antes recordar acuerdo Mahou. En Navidad abrimos a las 10:00. En estas fechas solemos comprar más refrescos..."></textarea>
+    <textarea id="texto" placeholder="Ej: Revisar acuerdo Mahou. En Navidad abrimos a las 10:00. En estas fechas compramos más refrescos..."></textarea>
 
     <button id="btnGuardar" class="guardar">💾 GUARDAR</button>
   </div>
 
-  <div class="card">
-    <div class="titulo">Filtrar</div>
-    <div class="filtros">
-      <select id="filtroTipo">
-        <option value="">Todos</option>
-        <option value="TAREA">TAREAS</option>
-        <option value="AVISO">AVISOS</option>
-        <option value="ACUERDO">ACUERDOS</option>
-        <option value="DIARIO">DIARIO</option>
-      </select>
+  <div class="seccion">🛎️ RECORDATORIOS ACTIVOS</div>
+  <div id="recordatorios"></div>
 
-      <select id="filtroEstado">
-        <option value="">Todo</option>
-        <option value="PENDIENTE">Pendiente</option>
-        <option value="HECHA">Hecha</option>
-      </select>
-    </div>
-  </div>
+  <div class="seccion">📌 TAREAS PENDIENTES</div>
+  <div id="pendientes"></div>
 
-  <div id="lista"></div>
+  <div class="seccion">🔄 TAREAS SEMANALES</div>
+  <div id="semanales"></div>
+
+  <div class="seccion">📅 TAREAS PUNTUALES</div>
+  <div id="puntuales"></div>
+
+  <div class="seccion">📖 DIARIO / ACUERDOS DEL NEGOCIO</div>
+  <div id="diario"></div>
 
 </div>
 
@@ -138,6 +137,20 @@ function esc(txt){
     .replaceAll("'","&#039;");
 }
 
+function fechaMs(fecha){
+  return new Date(fecha + "T00:00:00").getTime();
+}
+
+function diasHasta(fecha){
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  const f = new Date(fecha + "T00:00:00");
+  f.setHours(0,0,0,0);
+
+  return Math.round((f - hoy) / 86400000);
+}
+
 async function guardarLista(){
   await guardarColeccion(COLECCION, entradas);
 }
@@ -171,7 +184,7 @@ async function guardarEntrada(){
     hecha:false,
     usuario:usuarioActual(),
     creado:new Date().toLocaleString("es-ES"),
-    fechaMs:new Date(fecha + "T00:00:00").getTime(),
+    fechaMs:fechaMs(fecha),
     actualizadoEn:new Date().toISOString()
   };
 
@@ -183,6 +196,7 @@ async function guardarEntrada(){
   document.getElementById("tipo").value = "TAREA";
   document.getElementById("recordatorio").value = "0";
   document.getElementById("repeticion").value = "PUNTUAL";
+  document.getElementById("fecha").value = hoyISO();
 
   pintar();
   alert("Entrada guardada.");
@@ -212,10 +226,12 @@ async function borrarEntrada(id){
   pintar();
 }
 
-function claseTipo(tipo){
-  if(tipo === "ACUERDO") return "acuerdo";
-  if(tipo === "AVISO") return "aviso";
-  if(tipo === "DIARIO") return "diario";
+function claseEntrada(e){
+  if(e.tipo === "ACUERDO") return "acuerdo";
+  if(e.tipo === "AVISO") return "aviso";
+  if(e.tipo === "DIARIO") return "diario";
+  if(e.repeticion === "SEMANAL") return "semanal";
+  if(e.repeticion === "PUNTUAL") return "puntual";
   return "tarea";
 }
 
@@ -224,65 +240,98 @@ function textoRecordatorio(dias){
   if(dias === 0) return "El mismo día";
   if(dias === 1) return "1 día antes";
   if(dias === 7) return "1 semana antes";
+  if(dias === 10) return "10 días antes";
   if(dias === 15) return "15 días antes";
   if(dias === 30) return "1 mes antes";
   return dias + " días antes";
 }
 
-function pintar(){
-  const lista = document.getElementById("lista");
-  const filtroTipo = document.getElementById("filtroTipo").value;
-  const filtroEstado = document.getElementById("filtroEstado").value;
-
-  let data = [...entradas];
-
-  if(filtroTipo){
-    data = data.filter(e => e.tipo === filtroTipo);
-  }
-
-  if(filtroEstado === "PENDIENTE"){
-    data = data.filter(e => !e.hecha);
-  }
-
-  if(filtroEstado === "HECHA"){
-    data = data.filter(e => e.hecha);
-  }
-
-  data.sort((a,b)=> Number(a.fechaMs || 0) - Number(b.fechaMs || 0));
+function pintarGrupo(idContenedor, data, vacio){
+  const cont = document.getElementById(idContenedor);
 
   if(data.length === 0){
-    lista.innerHTML = `<div class="vacio">No hay entradas.</div>`;
+    cont.innerHTML = `<div class="vacio">${vacio}</div>`;
     return;
   }
 
-  lista.innerHTML = data.map(e=>`
-    <div class="card ${claseTipo(e.tipo)} ${e.hecha ? "hecha" : ""}">
-      <div class="titulo">${esc(e.texto)}</div>
+  cont.innerHTML = data.map(e=>{
+    const faltan = diasHasta(e.fecha);
 
-      <div class="etiqueta">${esc(e.tipo)} · ${esc(e.repeticion || "PUNTUAL")}</div>
+    return `
+      <div class="card ${claseEntrada(e)} ${e.hecha ? "hecha" : ""}">
+        <div class="titulo">${esc(e.texto)}</div>
 
-      <div class="detalle">
-        Fecha: ${esc(e.fecha)} ${e.hora ? "· " + esc(e.hora) : ""}
+        <div class="etiqueta ${faltan <= Number(e.recordatorio || 0) && !e.hecha ? "alerta" : ""}">
+          ${esc(e.tipo)} · ${esc(e.repeticion || "PUNTUAL")}
+        </div>
+
+        <div class="detalle">
+          Fecha: ${esc(e.fecha)} ${e.hora ? "· " + esc(e.hora) : ""}
+        </div>
+
+        <div class="detalle">
+          Aviso: ${esc(textoRecordatorio(e.recordatorio))}
+        </div>
+
+        <div class="detalle">
+          ${
+            faltan < 0
+            ? "Vencido hace " + Math.abs(faltan) + " día(s)"
+            : faltan === 0
+              ? "Toca hoy"
+              : "Faltan " + faltan + " día(s)"
+          }
+        </div>
+
+        <div class="fecha">
+          Creado por: ${esc(e.usuario || "JAVI")} · ${esc(e.creado || "")}
+        </div>
+
+        <div class="acciones">
+          <button class="ok" data-accion="hecha" data-id="${esc(e.id)}">
+            ${e.hecha ? "REABRIR" : "HECHA"}
+          </button>
+          <button class="borrar" data-accion="borrar" data-id="${esc(e.id)}">
+            BORRAR
+          </button>
+        </div>
       </div>
+    `;
+  }).join("");
+}
 
-      <div class="detalle">
-        Aviso: ${esc(textoRecordatorio(e.recordatorio))}
-      </div>
+function pintar(){
+  const ordenadas = [...entradas].sort((a,b)=>
+    Number(a.fechaMs || 0) - Number(b.fechaMs || 0)
+  );
 
-      <div class="fecha">
-        Creado por: ${esc(e.usuario || "JAVI")} · ${esc(e.creado || "")}
-      </div>
+  const recordatorios = ordenadas.filter(e=>{
+    if(e.hecha) return false;
+    const faltan = diasHasta(e.fecha);
+    return faltan <= Number(e.recordatorio || 0);
+  });
 
-      <div class="acciones">
-        <button class="ok" data-accion="hecha" data-id="${esc(e.id)}">
-          ${e.hecha ? "REABRIR" : "HECHA"}
-        </button>
-        <button class="borrar" data-accion="borrar" data-id="${esc(e.id)}">
-          BORRAR
-        </button>
-      </div>
-    </div>
-  `).join("");
+  const pendientes = ordenadas.filter(e=>
+    e.tipo === "TAREA" && !e.hecha
+  );
+
+  const semanales = ordenadas.filter(e=>
+    e.tipo === "TAREA" && e.repeticion === "SEMANAL"
+  );
+
+  const puntuales = ordenadas.filter(e=>
+    e.tipo === "TAREA" && e.repeticion === "PUNTUAL"
+  );
+
+  const diario = ordenadas.filter(e=>
+    e.tipo === "DIARIO" || e.tipo === "ACUERDO" || e.tipo === "AVISO"
+  );
+
+  pintarGrupo("recordatorios", recordatorios, "No hay recordatorios activos.");
+  pintarGrupo("pendientes", pendientes, "No hay tareas pendientes.");
+  pintarGrupo("semanales", semanales, "No hay tareas semanales.");
+  pintarGrupo("puntuales", puntuales, "No hay tareas puntuales.");
+  pintarGrupo("diario", diario, "No hay entradas de diario, acuerdos o avisos.");
 }
 
 function volver(){
@@ -292,10 +341,8 @@ function volver(){
 function activarBotones(){
   document.getElementById("btnVolver").addEventListener("click", volver);
   document.getElementById("btnGuardar").addEventListener("click", guardarEntrada);
-  document.getElementById("filtroTipo").addEventListener("change", pintar);
-  document.getElementById("filtroEstado").addEventListener("change", pintar);
 
-  document.getElementById("lista").addEventListener("click", function(e){
+  document.body.addEventListener("click", function(e){
     const btn = e.target.closest("button");
     if(!btn) return;
 
