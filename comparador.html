@@ -15,7 +15,7 @@ header{background:#17303d;color:white;padding:16px;display:flex;align-items:cent
 .titulo{font-size:24px;font-weight:900;margin-bottom:12px}
 .detalle{color:#5a6872;margin-top:6px;line-height:1.4}
 input,select{width:100%;border:1px solid #c8d0d6;border-radius:14px;padding:14px;font-size:16px;margin-top:10px}
-button{width:100%;border:0;border-radius:16px;padding:14px;font-size:16px;font-weight:900;margin-top:12px;background:#17303d;color:white}
+button{width:100%;border:0;border-radius:16px;padding:14px;font-size:16px;font-weight:900;margin-top:12px;background:#17303d;color:white;cursor:pointer}
 .guardar{background:#17303d}
 .borrar{background:#c00000}
 .mejor{border-left:8px solid #2ea043;background:#f1fff4}
@@ -34,7 +34,7 @@ button{width:100%;border:0;border-radius:16px;padding:14px;font-size:16px;font-w
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">←</button>
+  <button id="btnVolver" class="volver">←</button>
   💰 COMPARADOR
 </header>
 
@@ -65,24 +65,45 @@ button{width:100%;border:0;border-radius:16px;padding:14px;font-size:16px;font-w
     <input id="gratis" type="number" step="1" placeholder="Unidades gratis si las hay">
     <input id="rappel" type="number" step="0.01" placeholder="Rappel % si lo hay">
 
-    <button class="guardar" onclick="guardarOferta()">💾 Guardar oferta</button>
+    <button id="btnGuardar" class="guardar">💾 Guardar oferta</button>
   </div>
 
   <div id="resultado"></div>
 
 </div>
 
-<script>
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion,
+  borrarDocumento
+} from "./monolito-cloud.js";
+
+const COLECCION = "ofertas_comparador_monolito";
+
+let ofertas = [];
+
 function volver(){
   window.location.href="index.html";
 }
 
-function leerOfertas(){
-  return JSON.parse(localStorage.getItem("ofertas_comparador_monolito") || "[]");
+function crearId(texto){
+  return String(texto || "oferta")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"_")
+    .replace(/^_+|_+$/g,"")
+    + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
 }
 
-function guardarOfertas(data){
-  localStorage.setItem("ofertas_comparador_monolito", JSON.stringify(data));
+function esc(txt){
+  return String(txt || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 function n(id){
@@ -93,7 +114,11 @@ function t(id){
   return document.getElementById(id).value.trim();
 }
 
-function guardarOferta(){
+async function guardarLista(){
+  await guardarColeccion(COLECCION, ofertas);
+}
+
+async function guardarOferta(){
   const articulo = t("articulo");
   const proveedor = t("proveedor");
   const precio = n("precio");
@@ -103,27 +128,30 @@ function guardarOferta(){
   const gratis = n("gratis");
   const rappel = n("rappel");
 
-  if(!articulo || !proveedor || precio<=0 || unidades<=0){
+  if(!articulo || !proveedor || precio <= 0 || unidades <= 0){
     alert("Rellena artículo, proveedor, precio y unidades.");
     return;
   }
 
-  const data = leerOfertas();
-
-  data.unshift({
-    id:Date.now(),
-    articulo,
-    proveedor,
+  const nueva = {
+    id: crearId(articulo + "_" + proveedor),
+    articulo: articulo.toUpperCase(),
+    proveedor: proveedor.toUpperCase(),
     precio,
     unidades,
     promo,
     descuento,
     gratis,
     rappel,
-    fecha:new Date().toLocaleString("es-ES")
-  });
+    fecha: new Date().toLocaleString("es-ES"),
+    fechaMs: Date.now(),
+    actualizadoEn: new Date().toISOString(),
+    usuario: localStorage.getItem("usuario") || "JAVI"
+  };
 
-  guardarOfertas(data);
+  ofertas.unshift(nueva);
+
+  await guardarLista();
 
   ["articulo","proveedor","precio","unidades","descuento","gratis","rappel"].forEach(id=>{
     document.getElementById(id).value="";
@@ -135,8 +163,10 @@ function guardarOferta(){
 }
 
 function costeFinal(o){
-  let precio = Number(o.precio);
-  let unidades = Number(o.unidades);
+  let precio = Number(o.precio || 0);
+  let unidades = Number(o.unidades || 0);
+
+  if(unidades <= 0) return Infinity;
 
   if(o.promo === "descuento"){
     precio = precio - (precio * (Number(o.descuento || 0) / 100));
@@ -151,29 +181,43 @@ function costeFinal(o){
   return precio / unidades;
 }
 
-function borrarOferta(id){
+async function borrarOferta(id){
   if(!confirm("¿Eliminar esta oferta del comparador?")) return;
 
-  const data = leerOfertas().filter(o=>o.id!==id);
-  guardarOfertas(data);
+  ofertas = ofertas.filter(o => String(o.id) !== String(id));
+
+  await borrarDocumento(COLECCION, id);
+
   pintar();
 }
 
+function textoPromo(o){
+  if(o.promo === "descuento"){
+    return "Descuento " + (o.descuento || 0) + "%";
+  }
+
+  if(o.promo === "gratis"){
+    return "+" + (o.gratis || 0) + " unidades gratis";
+  }
+
+  return "Sin promoción";
+}
+
 function pintar(){
-  const data = leerOfertas();
+  const data = [...ofertas];
   const cont = document.getElementById("resultado");
 
-  if(data.length===0){
+  if(data.length === 0){
     cont.innerHTML = `<div class="vacio">No hay ofertas guardadas.</div>`;
     return;
   }
 
-  const articulos = [...new Set(data.map(o=>o.articulo))];
+  const articulos = [...new Set(data.map(o => o.articulo))];
 
   let html = "";
 
   articulos.forEach(art=>{
-    const grupo = data.filter(o=>o.articulo===art);
+    const grupo = data.filter(o => o.articulo === art);
 
     let mejorPrecio = Infinity;
     let mejorProveedor = "";
@@ -188,8 +232,8 @@ function pintar(){
 
     html += `
       <div class="ganador">
-        🏆 ${art}<br><br>
-        Mejor compra actual: ${mejorProveedor}
+        🏆 ${esc(art)}<br><br>
+        Mejor compra actual: ${esc(mejorProveedor)}
       </div>
     `;
 
@@ -212,20 +256,20 @@ function pintar(){
 
       html += `
         <div class="card ${clase}">
-          <div class="titulo">${o.proveedor}</div>
+          <div class="titulo">${esc(o.proveedor)}</div>
 
-          <div class="linea">Artículo: ${o.articulo}</div>
-          <div class="linea">Precio base: ${Number(o.precio).toFixed(2)} €</div>
-          <div class="linea">Unidades: ${o.unidades}</div>
-          <div class="linea">Promo: ${textoPromo(o)}</div>
-          <div class="linea">Rappel: ${o.rappel || 0}%</div>
-          <div class="linea">Fecha oferta: ${o.fecha}</div>
+          <div class="linea">Artículo: ${esc(o.articulo)}</div>
+          <div class="linea">Precio base: ${Number(o.precio || 0).toFixed(2)} €</div>
+          <div class="linea">Unidades: ${esc(o.unidades)}</div>
+          <div class="linea">Promo: ${esc(textoPromo(o))}</div>
+          <div class="linea">Rappel: ${Number(o.rappel || 0)}%</div>
+          <div class="linea">Fecha oferta: ${esc(o.fecha)}</div>
 
-          <div class="precioFinal">${c.toFixed(3)} €/unidad</div>
+          <div class="precioFinal">${c === Infinity ? "-" : c.toFixed(3)} €/unidad</div>
 
           <div class="estado ${color}">${estado}</div>
 
-          <button class="borrar" onclick="borrarOferta(${o.id})">🗑 Eliminar oferta</button>
+          <button class="borrar" data-accion="borrar" data-id="${esc(o.id)}">🗑 Eliminar oferta</button>
         </div>
       `;
     });
@@ -234,19 +278,55 @@ function pintar(){
   cont.innerHTML = html;
 }
 
-function textoPromo(o){
-  if(o.promo === "descuento"){
-    return "Descuento " + (o.descuento || 0) + "%";
-  }
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnGuardar").addEventListener("click", guardarOferta);
 
-  if(o.promo === "gratis"){
-    return "+" + (o.gratis || 0) + " unidades gratis";
-  }
+  document.getElementById("resultado").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
 
-  return "Sin promoción";
+    if(btn.dataset.accion === "borrar"){
+      borrarOferta(btn.dataset.id);
+    }
+  });
 }
 
-pintar();
+async function iniciar(){
+  activarBotones();
+
+  escucharColeccion(COLECCION, (lista)=>{
+    ofertas = lista.sort((a,b)=>
+      Number(b.fechaMs || 0) - Number(a.fechaMs || 0)
+    );
+    pintar();
+  });
+
+  const nube = await leerColeccion(COLECCION);
+
+  if(nube.length === 0){
+    const localViejo = localStorage.getItem(COLECCION);
+
+    if(localViejo){
+      try{
+        const recuperadas = JSON.parse(localViejo).map(o => ({
+          ...o,
+          id: o.id ? String(o.id) : crearId(o.articulo + "_" + o.proveedor),
+          fechaMs: o.fechaMs || Date.now(),
+          actualizadoEn: o.actualizadoEn || new Date().toISOString()
+        }));
+
+        if(recuperadas.length > 0){
+          ofertas = recuperadas;
+          await guardarLista();
+          pintar();
+        }
+      }catch(e){}
+    }
+  }
+}
+
+iniciar();
 </script>
 
 </body>
