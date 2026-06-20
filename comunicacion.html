@@ -7,72 +7,19 @@
 
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#eef2f5;
-  color:#17303d;
-}
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:12px}
 header h2{margin:0;font-size:20px}
-button{
-  border:0;
-  border-radius:14px;
-  padding:12px;
-  font-size:15px;
-  font-weight:900;
-  cursor:pointer;
-}
-.volver{
-  background:white;
-  color:#17303d;
-}
+button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;cursor:pointer}
+.volver{background:white;color:#17303d}
 .contenedor{padding:16px}
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.10);
-}
-textarea{
-  width:100%;
-  min-height:110px;
-  padding:12px;
-  border-radius:14px;
-  border:1px solid #ccc;
-  font-size:16px;
-}
-.guardar{
-  width:100%;
-  margin-top:10px;
-  background:#17303d;
-  color:white;
-}
-.comunicacion{
-  border-left:8px solid #f2c94c;
-}
-.fecha{
-  font-size:13px;
-  color:#666;
-  margin-top:8px;
-}
-.hecha{
-  opacity:.55;
-  text-decoration:line-through;
-}
-.acciones{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.10)}
+textarea{width:100%;min-height:110px;padding:12px;border-radius:14px;border:1px solid #ccc;font-size:16px}
+.guardar{width:100%;margin-top:10px;background:#17303d;color:white}
+.comunicacion{border-left:8px solid #f2c94c}
+.fecha{font-size:13px;color:#666;margin-top:8px}
+.hecha{opacity:.55;text-decoration:line-through}
+.acciones{display:flex;gap:8px;margin-top:10px}
 .ok{background:#27ae60;color:white}
 .borrar{background:#c0392b;color:white}
 </style>
@@ -81,7 +28,7 @@ textarea{
 <body>
 
 <header>
-  <button class="volver" onclick="location.href='index.html'">← Volver</button>
+  <button id="btnVolver" class="volver">← Volver</button>
   <h2>COMUNICACIÓN</h2>
 </header>
 
@@ -90,29 +37,50 @@ textarea{
   <div class="card">
     <h3>Nueva comunicación</h3>
     <textarea id="mensaje" placeholder="Escribe aquí la comunicación para el siguiente turno..."></textarea>
-    <button class="guardar" onclick="guardarComunicacion()">GUARDAR COMUNICACIÓN</button>
+    <button id="btnGuardar" class="guardar">GUARDAR COMUNICACIÓN</button>
   </div>
 
   <div id="lista"></div>
 
 </div>
 
-<script>
-const CLAVE = "monolito_comunicaciones";
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion,
+  borrarDocumento
+} from "./monolito-cloud.js";
+
+const COLECCION = "comunicaciones";
+const CLAVE_LOCAL_VIEJA = "monolito_comunicaciones";
+
+let comunicaciones = [];
 
 function usuarioActual(){
-  return localStorage.getItem("usuarioActual") || "JAVI";
+  return localStorage.getItem("usuario") ||
+         localStorage.getItem("usuarioActual") ||
+         "JAVI";
 }
 
-function leer(){
-  return JSON.parse(localStorage.getItem(CLAVE) || "[]");
+function crearId(){
+  return "comunicacion_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
 }
 
-function guardar(data){
-  localStorage.setItem(CLAVE, JSON.stringify(data));
+function esc(txt){
+  return String(txt || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
-async function guardarComunicacion() {
+async function guardarLista(){
+  await guardarColeccion(COLECCION, comunicaciones);
+}
+
+async function guardarComunicacion(){
   const mensaje = document.getElementById("mensaje").value.trim();
 
   if(!mensaje){
@@ -120,61 +88,56 @@ async function guardarComunicacion() {
     return;
   }
 
-  let data = leer();
-
   const nuevaComunicacion = {
-    id: Date.now(),
-    mensaje: mensaje,
+    id: crearId(),
+    mensaje,
     usuario: usuarioActual(),
     fecha: new Date().toLocaleString("es-ES"),
-    hecha: false
+    fechaMs: Date.now(),
+    hecha: false,
+    actualizadoEn: new Date().toISOString()
   };
-  
-  data.unshift(nuevaComunicacion);
-  guardar(data);
 
-  try {
-    if (typeof db !== "undefined") {
-      await db.collection("comunicaciones")
-        .doc(nuevaComunicacion.id.toString())
-        .set(nuevaComunicacion);
+  comunicaciones.unshift(nuevaComunicacion);
 
-      console.log("✅ Comunicación sincronizada con la nube.");
-    }
-  } catch (error) {
-    console.error("⚠️ Aviso: La comunicación se guardó localmente, pero no pudo sincronizarse con la nube.", error);
-  }
+  await guardarLista();
 
   document.getElementById("mensaje").value = "";
   pintar();
+
   alert("Comunicación guardada.");
 }
 
-function marcarHecha(id){
-  let data = leer();
-  data = data.map(c => {
-    if(c.id === id){
-      c.hecha = !c.hecha;
+async function marcarHecha(id){
+  comunicaciones = comunicaciones.map(c => {
+    if(String(c.id) === String(id)){
+      return {
+        ...c,
+        hecha: !c.hecha,
+        actualizadoEn: new Date().toISOString()
+      };
     }
     return c;
   });
-  guardar(data);
+
+  await guardarLista();
   pintar();
 }
 
-function borrarComunicacion(id){
+async function borrarComunicacion(id){
   if(!confirm("¿Borrar esta comunicación?")) return;
 
-  let data = leer().filter(c => c.id !== id);
-  guardar(data);
+  comunicaciones = comunicaciones.filter(c => String(c.id) !== String(id));
+
+  await borrarDocumento(COLECCION, id);
+
   pintar();
 }
 
 function pintar(){
   const lista = document.getElementById("lista");
-  const data = leer();
 
-  if(data.length === 0){
+  if(comunicaciones.length === 0){
     lista.innerHTML = `
       <div class="card">
         No hay comunicaciones pendientes.
@@ -183,16 +146,20 @@ function pintar(){
     return;
   }
 
-  lista.innerHTML = data.map(c => `
+  const ordenadas = [...comunicaciones].sort((a,b)=>
+    Number(b.fechaMs || 0) - Number(a.fechaMs || 0)
+  );
+
+  lista.innerHTML = ordenadas.map(c => `
     <div class="card comunicacion ${c.hecha ? "hecha" : ""}">
-      <strong>${c.usuario}</strong>
-      <p>${c.mensaje}</p>
-      <div class="fecha">${c.fecha}</div>
+      <strong>${esc(c.usuario)}</strong>
+      <p>${esc(c.mensaje)}</p>
+      <div class="fecha">${esc(c.fecha)}</div>
       <div class="acciones">
-        <button class="ok" onclick="marcarHecha(${c.id})">
+        <button class="ok" data-accion="hecha" data-id="${esc(c.id)}">
           ${c.hecha ? "REABRIR" : "HECHA"}
         </button>
-        <button class="borrar" onclick="borrarComunicacion(${c.id})">
+        <button class="borrar" data-accion="borrar" data-id="${esc(c.id)}">
           BORRAR
         </button>
       </div>
@@ -200,7 +167,59 @@ function pintar(){
   `).join("");
 }
 
-pintar();
+function volver(){
+  window.location.href = "index.html";
+}
+
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnGuardar").addEventListener("click", guardarComunicacion);
+
+  document.getElementById("lista").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    const accion = btn.dataset.accion;
+    const id = btn.dataset.id;
+
+    if(accion === "hecha") marcarHecha(id);
+    if(accion === "borrar") borrarComunicacion(id);
+  });
+}
+
+async function iniciar(){
+  activarBotones();
+
+  escucharColeccion(COLECCION, (lista)=>{
+    comunicaciones = lista;
+    pintar();
+  });
+
+  const nube = await leerColeccion(COLECCION);
+
+  if(nube.length === 0){
+    const localViejo = localStorage.getItem(CLAVE_LOCAL_VIEJA);
+
+    if(localViejo){
+      try{
+        const recuperadas = JSON.parse(localViejo).map(c => ({
+          ...c,
+          id: c.id ? String(c.id) : crearId(),
+          fechaMs: c.fechaMs || Date.now(),
+          actualizadoEn: c.actualizadoEn || new Date().toISOString()
+        }));
+
+        if(recuperadas.length > 0){
+          comunicaciones = recuperadas;
+          await guardarLista();
+          pintar();
+        }
+      }catch(e){}
+    }
+  }
+}
+
+iniciar();
 </script>
 
 </body>
