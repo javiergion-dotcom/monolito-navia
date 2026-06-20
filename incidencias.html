@@ -8,109 +8,27 @@
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#eef2f5;
-  color:#17303d;
-}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:22px;
-  font-weight:900;
-}
-
-.volver{
-  background:white;
-  color:#17303d;
-  border:0;
-  border-radius:14px;
-  padding:10px 14px;
-  font-size:16px;
-  font-weight:900;
-}
-
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:12px;font-size:22px;font-weight:900}
+.volver{background:white;color:#17303d;border:0;border-radius:14px;padding:10px 14px;font-size:16px;font-weight:900}
 .contenido{padding:16px}
-
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.10);
-}
-
-.cardPendiente{
-  border:3px solid #c00000;
-  background:#fff0f0;
-}
-
-.titulo{
-  font-size:22px;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
-.detalle{
-  color:#56656e;
-  margin-top:6px;
-  line-height:1.4;
-}
-
-.estado{
-  display:inline-block;
-  padding:8px 14px;
-  border-radius:999px;
-  font-size:13px;
-  font-weight:900;
-  margin-top:10px;
-}
-
-.rojo{
-  background:#ffd6d6;
-  color:#9b0000;
-}
-
-.verde{
-  background:#d4edda;
-  color:#155724;
-}
-
-button{
-  width:100%;
-  border:0;
-  border-radius:14px;
-  padding:13px;
-  margin-top:10px;
-  font-size:15px;
-  font-weight:900;
-  background:#17303d;
-  color:white;
-}
-
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.10)}
+.cardPendiente{border:3px solid #c00000;background:#fff0f0}
+.titulo{font-size:22px;font-weight:900;margin-bottom:10px}
+.detalle{color:#56656e;margin-top:6px;line-height:1.4}
+.estado{display:inline-block;padding:8px 14px;border-radius:999px;font-size:13px;font-weight:900;margin-top:10px}
+.rojo{background:#ffd6d6;color:#9b0000}
+.verde{background:#d4edda;color:#155724}
+button{width:100%;border:0;border-radius:14px;padding:13px;margin-top:10px;font-size:15px;font-weight:900;background:#17303d;color:white;cursor:pointer}
 .resolver{background:#48a530}
-
-.vacio{
-  background:white;
-  border-radius:22px;
-  padding:24px;
-  text-align:center;
-  font-weight:900;
-}
+.vacio{background:white;border-radius:22px;padding:24px;text-align:center;font-weight:900}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">←</button>
+  <button id="btnVolver" class="volver">←</button>
   ⚠️ INCIDENCIAS
 </header>
 
@@ -127,7 +45,16 @@ button{
 
 </div>
 
-<script>
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion
+} from "./monolito-cloud.js";
+
+let incidencias = [];
+let pagosPendientes = [];
+
 function vibrar(){
   if(navigator.vibrate){
     navigator.vibrate(40);
@@ -148,37 +75,36 @@ function volver(){
   window.location.href="index.html";
 }
 
-function leerIncidencias(){
-  return JSON.parse(localStorage.getItem("incidencias") || "[]");
+function esc(txt){
+  return String(txt || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
-function guardarIncidencias(data){
-  localStorage.setItem("incidencias", JSON.stringify(data));
+async function guardarTodo(){
+  await guardarColeccion("incidencias", incidencias);
+  await guardarColeccion("pagos_pendientes", pagosPendientes);
 }
 
-function leerPagosPendientes(){
-  return JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
-}
-
-function guardarPagosPendientes(data){
-  localStorage.setItem("pagos_pendientes", JSON.stringify(data));
-}
-
-function resolverIncidencia(id){
+async function resolverIncidencia(id){
 
   vibrar();
   sonidoClick();
-
-  let incidencias = leerIncidencias();
-  let pagosPendientes = leerPagosPendientes();
 
   const fechaResolucion = new Date().toLocaleString("es-ES");
 
   incidencias = incidencias.map(i=>{
 
-    if(i.id === id){
-      i.resuelta = true;
-      i.fechaResolucion = fechaResolucion;
+    if(String(i.id) === String(id)){
+      return {
+        ...i,
+        resuelta:true,
+        fechaResolucion,
+        actualizadoEn:new Date().toISOString()
+      };
     }
 
     return i;
@@ -186,27 +112,32 @@ function resolverIncidencia(id){
 
   pagosPendientes = pagosPendientes.map(p=>{
 
-    if(p.incidenciaId === id){
+    if(String(p.incidenciaId) === String(id)){
 
-      p.incidenciaResuelta = true;
-      p.fechaResolucionIncidencia = fechaResolucion;
+      const limpio = {
+        ...p,
+        incidenciaResuelta:true,
+        fechaResolucionIncidencia:fechaResolucion,
+        actualizadoEn:new Date().toISOString()
+      };
 
-      delete p.motivoIncidencia;
-      delete p.solucionIncidencia;
-      delete p.fechaIncidencia;
+      delete limpio.motivoIncidencia;
+      delete limpio.solucionIncidencia;
+      delete limpio.fechaIncidencia;
 
-      if(Number(p.pendiente || 0) > 0){
-        p.estado = p.historialPagos && p.historialPagos.length ? "A CUENTA" : "PENDIENTE";
+      if(Number(limpio.pendiente || 0) > 0){
+        limpio.estado = limpio.historialPagos && limpio.historialPagos.length ? "A CUENTA" : "PENDIENTE";
       }else{
-        p.estado = "PENDIENTE";
+        limpio.estado = "PENDIENTE";
       }
+
+      return limpio;
     }
 
     return p;
   });
 
-  guardarIncidencias(incidencias);
-  guardarPagosPendientes(pagosPendientes);
+  await guardarTodo();
 
   alert("Incidencia resuelta. El pago deja de aparecer bloqueado en rojo.");
 
@@ -216,7 +147,6 @@ function resolverIncidencia(id){
 function pintar(){
 
   const lista = document.getElementById("lista");
-  const incidencias = leerIncidencias();
 
   if(incidencias.length === 0){
     lista.innerHTML = `
@@ -235,15 +165,15 @@ function pintar(){
       <div class="card ${!i.resuelta ? "cardPendiente" : ""}">
 
         <div class="titulo">
-          ${i.titulo || "Incidencia"}
+          ${esc(i.titulo || "Incidencia")}
         </div>
 
         <div class="detalle">
-          ${i.texto || ""}
+          ${esc(i.texto || "")}
         </div>
 
         <div class="detalle">
-          Fecha: ${i.fecha || ""}
+          Fecha: ${esc(i.fecha || "")}
         </div>
 
         ${
@@ -254,7 +184,7 @@ function pintar(){
             </div>
 
             <div class="detalle">
-              Resolución: ${i.fechaResolucion || ""}
+              Resolución: ${esc(i.fechaResolucion || "")}
             </div>
           `
           : `
@@ -262,7 +192,7 @@ function pintar(){
               ⚠️ PENDIENTE
             </div>
 
-            <button class="resolver" onclick="resolverIncidencia(${i.id})">
+            <button class="resolver" data-accion="resolver" data-id="${esc(i.id)}">
               ✅ Marcar resuelta
             </button>
           `
@@ -275,7 +205,39 @@ function pintar(){
   lista.innerHTML = html;
 }
 
-pintar();
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+
+  document.getElementById("lista").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    if(btn.dataset.accion === "resolver"){
+      resolverIncidencia(btn.dataset.id);
+    }
+  });
+}
+
+async function iniciar(){
+  activarBotones();
+
+  incidencias = await leerColeccion("incidencias");
+  pagosPendientes = await leerColeccion("pagos_pendientes");
+  pintar();
+
+  escucharColeccion("incidencias", (lista)=>{
+    incidencias = lista.sort((a,b)=>
+      Number(b.fechaMs || 0) - Number(a.fechaMs || 0)
+    );
+    pintar();
+  });
+
+  escucharColeccion("pagos_pendientes", (lista)=>{
+    pagosPendientes = lista;
+  });
+}
+
+iniciar();
 </script>
 
 </body>
