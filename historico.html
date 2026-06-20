@@ -6,148 +6,34 @@
 <title>HISTÓRICO · MONOLITO</title>
 
 <style>
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:#eef2f5;
-  color:#17303d;
-}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-header h2{
-  margin:0;
-  font-size:22px;
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:12px;
-  font-size:15px;
-  font-weight:900;
-  cursor:pointer;
-}
-
-.volver{
-  background:white;
-  color:#17303d;
-}
-
-.contenedor{
-  padding:16px;
-}
-
-.busqueda{
-  width:100%;
-  padding:14px;
-  border-radius:16px;
-  border:1px solid #c5d0d8;
-  font-size:16px;
-  margin-bottom:18px;
-}
-
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-
-.cardIncidencia{
-  border:3px solid #c00000;
-  background:#fff2f2;
-}
-
-.proveedor{
-  font-size:24px;
-  font-weight:900;
-}
-
-.detalle{
-  margin-top:6px;
-  color:#56646f;
-  font-weight:700;
-}
-
-.total{
-  font-size:28px;
-  font-weight:900;
-  margin-top:10px;
-}
-
-.estado{
-  margin-top:10px;
-  padding:10px;
-  border-radius:14px;
-  font-weight:900;
-}
-
-.estadoOK{
-  background:#e7f7ea;
-  color:#1b7f2f;
-}
-
-.estadoIncidencia{
-  background:#ffd6d6;
-  color:#9b0000;
-}
-
-.historialPagos{
-  margin-top:12px;
-  background:#edf7ed;
-  border-radius:14px;
-  padding:12px;
-  font-size:14px;
-}
-
-.lineas{
-  display:none;
-  margin-top:12px;
-  border-top:1px solid #d7dfe5;
-  padding-top:12px;
-}
-
-.linea{
-  padding:10px 0;
-  border-bottom:1px solid #e0e6ea;
-}
-
-.ver{
-  width:100%;
-  background:#17303d;
-  color:white;
-  margin-top:12px;
-}
-
-.vacio{
-  background:white;
-  border-radius:22px;
-  padding:20px;
-  text-align:center;
-  font-weight:900;
-}
-
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:12px}
+header h2{margin:0;font-size:22px}
+button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;cursor:pointer}
+.volver{background:white;color:#17303d}
+.contenedor{padding:16px}
+.busqueda{width:100%;padding:14px;border-radius:16px;border:1px solid #c5d0d8;font-size:16px;margin-bottom:18px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:16px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.cardIncidencia{border:3px solid #c00000;background:#fff2f2}
+.proveedor{font-size:24px;font-weight:900}
+.detalle{margin-top:6px;color:#56646f;font-weight:700}
+.total{font-size:28px;font-weight:900;margin-top:10px}
+.estado{margin-top:10px;padding:10px;border-radius:14px;font-weight:900}
+.estadoOK{background:#e7f7ea;color:#1b7f2f}
+.estadoIncidencia{background:#ffd6d6;color:#9b0000}
+.historialPagos{margin-top:12px;background:#edf7ed;border-radius:14px;padding:12px;font-size:14px}
+.lineas{display:none;margin-top:12px;border-top:1px solid #d7dfe5;padding-top:12px}
+.linea{padding:10px 0;border-bottom:1px solid #e0e6ea}
+.ver{width:100%;background:#17303d;color:white;margin-top:12px}
+.vacio{background:white;border-radius:22px;padding:20px;text-align:center;font-weight:900}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">←</button>
+  <button id="btnVolver" class="volver">←</button>
   <h2>📁 HISTÓRICO</h2>
 </header>
 
@@ -158,90 +44,67 @@ button{
     id="buscar"
     class="busqueda"
     placeholder="Buscar proveedor..."
-    onkeyup="pintar()"
   >
 
   <div id="lista"></div>
 
 </div>
 
-<script>
+<script type="module">
+import {
+  leerColeccion,
+  escucharColeccion
+} from "./monolito-cloud.js";
 
-function leerHistorico(){
-  return JSON.parse(
-    localStorage.getItem("pagos_historico") || "[]"
-  );
-}
+let historico = [];
 
 function euros(n){
-  return Number(n || 0)
-    .toFixed(2)
-    .replace(".",",") + " €";
+  return Number(n || 0).toFixed(2).replace(".",",") + " €";
+}
+
+function esc(txt){
+  return String(txt || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
 function pintar(){
+  const texto = document.getElementById("buscar").value.toLowerCase();
 
-  const data = leerHistorico();
-
-  const texto = document
-    .getElementById("buscar")
-    .value
-    .toLowerCase();
-
-  let html = "";
-
-  const filtrados = data.filter(p=>{
-
-    const proveedor =
-      (p.proveedor || "").toLowerCase();
-
+  let data = historico.filter(p=>{
+    const proveedor = (p.proveedor || "").toLowerCase();
     return proveedor.includes(texto);
   });
 
-  if(filtrados.length === 0){
+  data = data.sort((a,b)=>
+    Number(b.fechaMs || 0) - Number(a.fechaMs || 0)
+  );
 
-    html = `
-      <div class="vacio">
-        No hay registros en histórico
-      </div>
-    `;
+  let html = "";
 
+  if(data.length === 0){
+    html = `<div class="vacio">No hay registros en histórico</div>`;
   }else{
+    data.forEach((p,i)=>{
 
-    filtrados.forEach((p,i)=>{
-
-      const incidencia =
-        p.estado === "INCIDENCIA";
+      const incidencia = p.estado === "INCIDENCIA";
 
       let lineasHTML = "";
 
       if(p.lineas && p.lineas.length){
-
         p.lineas.forEach(l=>{
 
-          const cantidad =
-            Number(l.cantidad || 0);
-
-          const precio =
-            Number(l.precioSinIva || 0);
-
-          const base =
-            Number(l.base || cantidad * precio);
+          const cantidad = Number(l.cantidad || l.unidades || l.uds || 0);
+          const precio = Number(l.precioSinIva || l.precio || l.precioUnidad || 0);
+          const base = Number(l.base || l.subtotal || l.importe || cantidad * precio);
 
           lineasHTML += `
             <div class="linea">
-
-              <b>
-                ${l.articulo || "Artículo"}
-              </b><br>
-
-              ${cantidad}
-              ×
-              ${euros(precio)}
-
-              =
-              <b>${euros(base)}</b>
-
+              <b>${esc(l.articulo || l.nombre || l.producto || "Artículo")}</b><br>
+              ${cantidad} × ${euros(precio)} = <b>${euros(base)}</b>
             </div>
           `;
         });
@@ -250,78 +113,40 @@ function pintar(){
       html += `
         <div class="card ${incidencia ? "cardIncidencia" : ""}">
 
-          <div class="proveedor">
-            ${p.proveedor || "SIN PROVEEDOR"}
-          </div>
+          <div class="proveedor">${esc(p.proveedor || "SIN PROVEEDOR")}</div>
 
-          <div class="detalle">
-            Pedido:
-            ${p.fecha || "-"}
-          </div>
+          <div class="detalle">Pedido: ${esc(p.fecha || "-")}</div>
+          <div class="detalle">Pago: ${esc(p.fechaPago || "-")}</div>
+          <div class="detalle">Tipo: ${esc(p.tipoPago || "-")}</div>
 
-          <div class="detalle">
-            Pago:
-            ${p.fechaPago || "-"}
-          </div>
-
-          <div class="detalle">
-            Tipo:
-            ${p.tipoPago || "-"}
-          </div>
-
-          <div class="total">
-            ${euros(p.total)}
-          </div>
+          <div class="total">${euros(p.total)}</div>
 
           ${
             incidencia
-            ? `
-              <div class="estado estadoIncidencia">
-                ⚠ INCIDENCIA
-              </div>
-            `
-            : `
-              <div class="estado estadoOK">
-                ✔ PAGADO
-              </div>
-            `
+            ? `<div class="estado estadoIncidencia">⚠ INCIDENCIA</div>`
+            : `<div class="estado estadoOK">✔ PAGADO</div>`
           }
 
           ${
-            p.historialPagos &&
-            p.historialPagos.length
-
+            p.historialPagos && p.historialPagos.length
             ? `
               <div class="historialPagos">
-
                 <b>Historial pagos:</b><br><br>
-
                 ${
                   p.historialPagos.map(h=>`
-
-                    • ${h.fecha}
-                    → ${euros(h.importe)}
-                    (${h.tipo})
-
+                    • ${esc(h.fecha)} → ${euros(h.importe)} (${esc(h.tipo)})
                   `).join("<br>")
                 }
-
               </div>
             `
             : ""
           }
 
-          <button
-            class="ver"
-            onclick="ver(${i})"
-          >
+          <button class="ver" data-accion="ver" data-indice="${i}">
             Ver pedido
           </button>
 
-          <div
-            class="lineas"
-            id="lineas${i}"
-          >
+          <div class="lineas" id="lineas${i}">
             ${lineasHTML}
           </div>
 
@@ -334,9 +159,8 @@ function pintar(){
 }
 
 function ver(i){
-
-  const caja =
-    document.getElementById("lineas"+i);
+  const caja = document.getElementById("lineas"+i);
+  if(!caja) return;
 
   caja.style.display =
     caja.style.display === "block"
@@ -348,8 +172,33 @@ function volver(){
   window.location.href = "index.html";
 }
 
-pintar();
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("buscar").addEventListener("input", pintar);
 
+  document.getElementById("lista").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    if(btn.dataset.accion === "ver"){
+      ver(Number(btn.dataset.indice));
+    }
+  });
+}
+
+async function iniciar(){
+  activarBotones();
+
+  historico = await leerColeccion("pagos_historico");
+  pintar();
+
+  escucharColeccion("pagos_historico", (lista)=>{
+    historico = lista;
+    pintar();
+  });
+}
+
+iniciar();
 </script>
 
 </body>
