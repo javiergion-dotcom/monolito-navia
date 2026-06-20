@@ -28,10 +28,12 @@ textarea{min-height:120px}
 .DEFECTO{background:#ffe0e0;color:#c00000}
 .MEJORA{background:#e9e5ff;color:#47308a}
 .SUGERENCIA{background:#e4f5ff;color:#17627f}
-.acciones{display:flex;gap:8px;margin-top:10px}
-.acciones button{flex:1}
+.INCIDENCIA{background:#ffd6d6;color:#9b0000}
+.acciones{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.acciones button{flex:1;min-width:120px}
 .azul{background:#17627f;color:white}
 .ok{background:#48a530;color:white}
+.borrar{background:#c00000;color:white}
 .vacio{text-align:center;font-weight:900;padding:18px}
 </style>
 </head>
@@ -39,7 +41,7 @@ textarea{min-height:120px}
 <body>
 
 <header>
-<button class="volver" onclick="history.back()">←</button>
+<button id="btnVolver" class="volver">←</button>
 <h2>📬 BUZÓN</h2>
 </header>
 
@@ -71,8 +73,8 @@ textarea{min-height:120px}
 <label>Sugerencia / comentario</label>
 <textarea id="mensaje" placeholder="Escribe aquí la sugerencia, defecto detectado o mejora propuesta..."></textarea>
 
-<button class="guardar" onclick="guardarBuzon()">💾 Guardar en buzón</button>
-<button class="limpiar" onclick="limpiarFormulario()">➕ Limpiar formulario</button>
+<button id="btnGuardar" class="guardar">💾 Guardar en buzón</button>
+<button id="btnLimpiar" class="limpiar">➕ Limpiar formulario</button>
 </div>
 
 <div class="card">
@@ -82,22 +84,46 @@ textarea{min-height:120px}
 
 </div>
 
-<script>
-const CLAVE_BUZON = "buzonMonolito";
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion,
+  borrarDocumento
+} from "./monolito-cloud.js";
+
+const COLECCION = "buzon_monolito";
+const CLAVE_LOCAL_VIEJA = "buzonMonolito";
+
+let entradas = [];
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
 }
 
-function leerBuzon(){
-  return JSON.parse(localStorage.getItem(CLAVE_BUZON) || "[]");
+function puedeBorrar(){
+  const u = usuarioActual().toUpperCase();
+  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
 }
 
-function guardarBuzonLocal(data){
-  localStorage.setItem(CLAVE_BUZON, JSON.stringify(data));
+function crearId(){
+  return "BZ-" + Date.now() + "-" + Math.random().toString(36).slice(2,7);
 }
 
-function guardarBuzon(){
+function esc(txt){
+  return String(txt || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+async function guardarLista(){
+  await guardarColeccion(COLECCION, entradas);
+}
+
+async function guardarBuzon(){
   const nombre = document.getElementById("nombre").value.trim();
   const apellidos = document.getElementById("apellidos").value.trim();
   const empresa = document.getElementById("empresa").value.trim();
@@ -111,7 +137,7 @@ function guardarBuzon(){
   }
 
   const entrada = {
-    id: "BZ-" + Date.now(),
+    id: crearId(),
     nombre,
     apellidos,
     empresa,
@@ -120,12 +146,13 @@ function guardarBuzon(){
     mensaje,
     estado: "PENDIENTE",
     creadaPor: usuarioActual(),
-    fecha: new Date().toLocaleString("es-ES")
+    fecha: new Date().toLocaleString("es-ES"),
+    fechaMs: Date.now(),
+    actualizadoEn: new Date().toISOString()
   };
 
-  let data = leerBuzon();
-  data.unshift(entrada);
-  guardarBuzonLocal(data);
+  entradas.unshift(entrada);
+  await guardarLista();
 
   limpiarFormulario();
   pintarBuzon();
@@ -142,23 +169,44 @@ function limpiarFormulario(){
   document.getElementById("mensaje").value = "";
 }
 
-function cambiarEstado(id, estado){
-  let data = leerBuzon();
-  data = data.map(e=>{
-    if(e.id === id){
-      e.estado = estado;
-      e.actualizadoPor = usuarioActual();
-      e.fechaActualizacion = new Date().toLocaleString("es-ES");
+async function cambiarEstado(id, estado){
+  entradas = entradas.map(e=>{
+    if(String(e.id) === String(id)){
+      return {
+        ...e,
+        estado,
+        actualizadoPor: usuarioActual(),
+        fechaActualizacion: new Date().toLocaleString("es-ES"),
+        actualizadoEn: new Date().toISOString()
+      };
     }
     return e;
   });
-  guardarBuzonLocal(data);
+
+  await guardarLista();
+  pintarBuzon();
+}
+
+async function borrarEntrada(id){
+  if(!puedeBorrar()){
+    alert("Solo Javi o Silvia pueden borrar entradas.");
+    return;
+  }
+
+  if(!confirm("¿Borrar esta entrada del buzón?")) return;
+
+  entradas = entradas.filter(e => String(e.id) !== String(id));
+  await borrarDocumento(COLECCION, id);
+
   pintarBuzon();
 }
 
 function pintarBuzon(){
   const cont = document.getElementById("listado");
-  const data = leerBuzon();
+
+  const data = [...entradas].sort((a,b)=>
+    Number(b.fechaMs || 0) - Number(a.fechaMs || 0)
+  );
 
   if(data.length === 0){
     cont.innerHTML = `<div class="vacio">No hay entradas en el buzón.</div>`;
@@ -170,22 +218,27 @@ function pintarBuzon(){
   data.forEach(e=>{
     html += `
       <div class="item">
-        <strong>${e.nombre} ${e.apellidos}</strong>
-        <div class="detalle">${e.empresa} · ${e.cargo}</div>
+        <strong>${esc(e.nombre)} ${esc(e.apellidos)}</strong>
+        <div class="detalle">${esc(e.empresa)} · ${esc(e.cargo)}</div>
 
-        <span class="etiqueta ${e.tipo}">${e.tipo}</span>
-        <span class="etiqueta ${e.estado}">${e.estado}</span>
+        <span class="etiqueta ${esc(e.tipo)}">${esc(e.tipo)}</span>
+        <span class="etiqueta ${esc(e.estado)}">${esc(e.estado)}</span>
 
-        <div style="margin-top:10px">${e.mensaje.replace(/\n/g,"<br>")}</div>
+        <div style="margin-top:10px">${esc(e.mensaje).replace(/\n/g,"<br>")}</div>
 
         <div class="detalle">
-          Registrado por: ${e.creadaPor} · ${e.fecha}
-          ${e.fechaActualizacion ? `<br>Actualizado por: ${e.actualizadoPor} · ${e.fechaActualizacion}` : ""}
+          Registrado por: ${esc(e.creadaPor)} · ${esc(e.fecha)}
+          ${e.fechaActualizacion ? `<br>Actualizado por: ${esc(e.actualizadoPor)} · ${esc(e.fechaActualizacion)}` : ""}
         </div>
 
         <div class="acciones">
-          <button class="azul" onclick="cambiarEstado('${e.id}','REVISADO')">Revisado</button>
-          <button class="ok" onclick="cambiarEstado('${e.id}','SOLUCIONADO')">Solucionado</button>
+          <button class="azul" data-accion="revisado" data-id="${esc(e.id)}">Revisado</button>
+          <button class="ok" data-accion="solucionado" data-id="${esc(e.id)}">Solucionado</button>
+          ${
+            puedeBorrar()
+            ? `<button class="borrar" data-accion="borrar" data-id="${esc(e.id)}">Borrar</button>`
+            : ""
+          }
         </div>
       </div>
     `;
@@ -194,7 +247,66 @@ function pintarBuzon(){
   cont.innerHTML = html;
 }
 
-pintarBuzon();
+function volver(){
+  window.location.href = "index.html";
+}
+
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnGuardar").addEventListener("click", guardarBuzon);
+  document.getElementById("btnLimpiar").addEventListener("click", limpiarFormulario);
+
+  document.getElementById("listado").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    const accion = btn.dataset.accion;
+    const id = btn.dataset.id;
+
+    if(accion === "revisado") cambiarEstado(id, "REVISADO");
+    if(accion === "solucionado") cambiarEstado(id, "SOLUCIONADO");
+    if(accion === "borrar") borrarEntrada(id);
+  });
+}
+
+async function migrarLocalSiHaceFalta(){
+  const nube = await leerColeccion(COLECCION);
+
+  if(nube.length > 0) return;
+
+  const local = localStorage.getItem(CLAVE_LOCAL_VIEJA);
+  if(!local) return;
+
+  try{
+    const recuperadas = JSON.parse(local).map(e=>({
+      ...e,
+      id:e.id || crearId(),
+      fechaMs:e.fechaMs || Date.now(),
+      actualizadoEn:e.actualizadoEn || new Date().toISOString()
+    }));
+
+    if(recuperadas.length > 0){
+      entradas = recuperadas;
+      await guardarLista();
+    }
+  }catch(e){}
+}
+
+async function iniciar(){
+  activarBotones();
+
+  await migrarLocalSiHaceFalta();
+
+  entradas = await leerColeccion(COLECCION);
+  pintarBuzon();
+
+  escucharColeccion(COLECCION, (lista)=>{
+    entradas = lista;
+    pintarBuzon();
+  });
+}
+
+iniciar();
 </script>
 
 </body>
