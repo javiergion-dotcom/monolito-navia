@@ -49,7 +49,7 @@ textarea{width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px s
 
   <button id="btnTotalizar" class="boton totalizar">TOTALIZAR</button>
   <button id="btnHistorial" class="boton historial">📊 VER HISTORIAL</button>
-  <button id="btnBorrar" class="boton borrar">BORRAR</button>
+  <button id="btnBorrar" class="boton borrar">BORRAR CAMBIO DE HOY Y REINICIAR</button>
 
   <div class="info" id="info"></div>
 </div>
@@ -68,13 +68,11 @@ const COLECCION_CAMBIO = "cambio";
 const COLECCION_ESPERADO = "cambio_esperado";
 
 let cantidades = {};
-let bloqueado = false;
 let cambios = [];
 let esperadoCloud = [];
+let cambioHoyCerrado = false;
 
-function volver(){
-  window.location.href="index.html";
-}
+function volver(){ window.location.href="index.html"; }
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
@@ -100,16 +98,10 @@ function idCambioHoy(){
 function obtenerEsperado(){
   const doc = esperadoCloud.find(x => x.id === "actual");
   if(doc) return Number(doc.valor || 0);
-
   return Number(localStorage.getItem("cambio_esperado") || 0);
 }
 
-async function guardarEsperadoManual(valor){
-  if(!esAdmin()) return;
-  await guardarEsperadoAutomatico(valor);
-}
-
-async function guardarEsperadoAutomatico(valor){
+async function guardarEsperado(valor){
   const nuevo = {
     id:"actual",
     valor:Number(valor || 0),
@@ -118,25 +110,24 @@ async function guardarEsperadoAutomatico(valor){
   };
 
   esperadoCloud = [nuevo];
+  localStorage.setItem("cambio_esperado", Number(valor || 0));
 
   await guardarColeccion(COLECCION_ESPERADO, esperadoCloud);
-
-  localStorage.setItem("cambio_esperado", Number(valor || 0));
 }
 
 function registroHoy(){
   return cambios.find(c =>
-    c.id === idCambioHoy() ||
+    String(c.id) === String(idCambioHoy()) ||
     c.fechaISO === hoyISO() ||
     c.clave === claveFecha()
   );
 }
 
 function pintar(){
-  let html="";
+  let html = "";
 
   valores.forEach(v=>{
-    html+=`
+    html += `
       <div class="linea">
         <div>${v} €</div>
         <input
@@ -151,20 +142,15 @@ function pintar(){
   });
 
   document.getElementById("lista").innerHTML = html;
-  activarInputsCambio();
 
-  if(bloqueado){
-    document.querySelectorAll(".inputCambio").forEach(i=>i.disabled=true);
-  }
-}
-
-function activarInputsCambio(){
   document.querySelectorAll(".inputCambio").forEach(input=>{
+    input.disabled = cambioHoyCerrado;
+
     input.addEventListener("focus", ()=>input.select());
     input.addEventListener("click", ()=>input.select());
 
     input.addEventListener("input", ()=>{
-      if(bloqueado) return;
+      if(cambioHoyCerrado) return;
 
       const valor = Number(input.dataset.valor);
       cantidades[valor] = Number(input.value || 0);
@@ -174,7 +160,7 @@ function activarInputsCambio(){
 }
 
 function calcular(){
-  let total=0;
+  let total = 0;
 
   valores.forEach(v=>{
     total += (cantidades[v] || 0) * v;
@@ -185,20 +171,18 @@ function calcular(){
 }
 
 function cargarEsperado(){
-  const e = obtenerEsperado();
   const input = document.getElementById("esperado");
-
-  input.value = e;
+  input.value = obtenerEsperado();
   input.disabled = !esAdmin();
 }
 
 async function totalizar(){
-  if(bloqueado){
-    alert("El cambio de hoy ya está totalizado. Solo Javi o Silvia pueden borrarlo.");
+  if(cambioHoyCerrado){
+    alert("El cambio de hoy ya está totalizado. Si necesitas corregirlo, entra como JAVI o SILVIA y borra el cambio de hoy.");
     return;
   }
 
-  let total=0;
+  let total = 0;
 
   valores.forEach(v=>{
     total += (cantidades[v] || 0) * v;
@@ -207,39 +191,39 @@ async function totalizar(){
   total = Number(total.toFixed(2));
 
   if(total <= 0){
-    alert("Introduce el cambio antes de totalizar");
+    alert("Introduce el cambio antes de totalizar.");
     return;
   }
 
   const esperadoAnterior = obtenerEsperado();
   const diferencia = Number((total - esperadoAnterior).toFixed(2));
+  const esperadoNuevo = Number((esperadoAnterior + diferencia).toFixed(2));
 
-  let texto="";
-  let clase="ok";
+  let texto = "✅ CAMBIO CORRECTO";
+  let clase = "ok";
 
-  if(diferencia === 0){
-    texto="✅ CAMBIO CORRECTO";
-  }else if(diferencia > 0){
-    texto="⚠ SOBRAN " + diferencia.toFixed(2) + " €";
-    clase="error";
-  }else{
-    texto="⚠ FALTAN " + Math.abs(diferencia).toFixed(2) + " €";
-    clase="error";
+  if(diferencia > 0){
+    texto = "⚠ SOBRAN " + diferencia.toFixed(2) + " €";
+    clase = "error";
   }
 
-  const nuevoEsperado = Number((esperadoAnterior + diferencia).toFixed(2));
+  if(diferencia < 0){
+    texto = "⚠ FALTAN " + Math.abs(diferencia).toFixed(2) + " €";
+    clase = "error";
+  }
 
   document.getElementById("resultado").textContent = texto;
   document.getElementById("resultado").className = "resultado " + clase;
-  document.getElementById("esperado").value = nuevoEsperado;
+  document.getElementById("esperado").value = esperadoNuevo;
 
-  await guardarEsperadoAutomatico(nuevoEsperado);
-  await guardar(total, diferencia, esperadoAnterior, nuevoEsperado);
+  await guardarEsperado(esperadoNuevo);
+  await guardarCambio(total,diferencia,esperadoAnterior,esperadoNuevo);
 
-  bloquear();
+  cambioHoyCerrado = true;
+  pintar();
 }
 
-async function guardar(total,diferencia,esperadoAnterior,nuevoEsperado){
+async function guardarCambio(total,diferencia,esperadoAnterior,esperadoNuevo){
   const ahora = new Date();
 
   const registro = {
@@ -249,7 +233,7 @@ async function guardar(total,diferencia,esperadoAnterior,nuevoEsperado){
     total,
     diferencia,
     esperadoAnterior,
-    esperadoNuevo:nuevoEsperado,
+    esperadoNuevo,
     cantidades:{...cantidades},
     nota:document.getElementById("nota").value,
     usuario:usuarioActual(),
@@ -259,48 +243,33 @@ async function guardar(total,diferencia,esperadoAnterior,nuevoEsperado){
     actualizadoEn:new Date().toISOString()
   };
 
-  const existe = cambios.find(c => String(c.id) === String(registro.id));
-
-  if(existe){
-    cambios = cambios.map(c => String(c.id) === String(registro.id) ? registro : c);
-  }else{
-    cambios.unshift(registro);
-  }
+  cambios = cambios.filter(c => String(c.id) !== String(registro.id));
+  cambios.unshift(registro);
 
   await guardarColeccion(COLECCION_CAMBIO, cambios);
 
   document.getElementById("info").textContent =
-    "Guardado por " + usuarioActual() + " · " + ahora.toLocaleTimeString("es-ES");
-}
-
-function bloquear(){
-  bloqueado = true;
-  document.querySelectorAll(".inputCambio").forEach(i=>i.disabled=true);
-}
-
-function desbloquear(){
-  bloqueado = false;
-  document.querySelectorAll(".inputCambio").forEach(i=>i.disabled=false);
+    "Guardado por " + usuarioActual() + " · " + registro.hora;
 }
 
 function cargarRegistroHoy(){
   const r = registroHoy();
 
   if(!r){
+    cambioHoyCerrado = false;
     cantidades = {};
     document.getElementById("resultado").textContent = "";
     document.getElementById("resultado").className = "resultado";
     document.getElementById("nota").value = "";
     document.getElementById("info").textContent = "";
-
-    desbloquear();
     pintar();
     calcular();
     return;
   }
 
+  cambioHoyCerrado = true;
   cantidades = r.cantidades || {};
-  bloquear();
+
   pintar();
   calcular();
 
@@ -322,17 +291,23 @@ function cargarRegistroHoy(){
 
 async function borrar(){
   if(!esAdmin()){
-    alert("Solo Javi o Silvia pueden borrar");
+    alert("Solo Javi o Silvia pueden borrar.");
     return;
   }
 
-  if(!confirm("¿Borrar registro de hoy?")) return;
+  if(!confirm("¿Borrar el cambio de hoy y reiniciar la pantalla?")) return;
 
-  cambios = cambios.filter(c => String(c.id) !== String(idCambioHoy()));
+  cambios = cambios.filter(c =>
+    String(c.id) !== String(idCambioHoy()) &&
+    c.fechaISO !== hoyISO() &&
+    c.clave !== claveFecha()
+  );
+
   await borrarDocumento(COLECCION_CAMBIO, idCambioHoy());
 
+  cambioHoyCerrado = false;
   cantidades = {};
-  desbloquear();
+
   cargarRegistroHoy();
 }
 
@@ -349,46 +324,9 @@ function activarBotones(){
   esperado.addEventListener("focus", function(){this.select()});
   esperado.addEventListener("click", function(){this.select()});
   esperado.addEventListener("change", async function(){
-    await guardarEsperadoManual(Number(this.value || 0));
+    if(!esAdmin()) return;
+    await guardarEsperado(Number(this.value || 0));
   });
-}
-
-async function migrarLocalSiHaceFalta(){
-  const nube = await leerColeccion(COLECCION_CAMBIO);
-  if(nube.length > 0) return;
-
-  const local = localStorage.getItem("cambio");
-  if(!local) return;
-
-  try{
-    const obj = JSON.parse(local);
-    const recuperados = [];
-
-    Object.keys(obj).forEach(clave=>{
-      const r = obj[clave];
-
-      let fechaISO = hoyISO();
-      const partes = clave.split("/");
-
-      if(partes.length === 3){
-        fechaISO = partes[2] + "-" + partes[1].padStart(2,"0") + "-" + partes[0].padStart(2,"0");
-      }
-
-      recuperados.push({
-        ...r,
-        id:"cambio_" + fechaISO.replaceAll("-","_"),
-        fechaISO,
-        clave,
-        fechaMs:new Date(fechaISO + "T12:00:00").getTime(),
-        actualizadoEn:new Date().toISOString()
-      });
-    });
-
-    if(recuperados.length > 0){
-      cambios = recuperados;
-      await guardarColeccion(COLECCION_CAMBIO, cambios);
-    }
-  }catch(e){}
 }
 
 async function iniciar(){
@@ -396,8 +334,6 @@ async function iniciar(){
 
   document.getElementById("btnBorrar").style.display =
     esAdmin() ? "block" : "none";
-
-  await migrarLocalSiHaceFalta();
 
   cambios = await leerColeccion(COLECCION_CAMBIO);
   esperadoCloud = await leerColeccion(COLECCION_ESPERADO);
