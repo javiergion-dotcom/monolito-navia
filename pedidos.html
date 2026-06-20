@@ -21,7 +21,7 @@ input{width:80px;padding:10px;border-radius:12px;border:1px solid #ccc;text-alig
 .botonCero{width:100%;margin-top:10px;padding:10px;border:0;border-radius:12px;font-weight:900;font-size:14px;background:#17303d;color:white}
 .botonCero.activo{background:#ff9800;color:white}
 .totalFinal{font-size:22px;font-weight:900;margin-top:20px}
-button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-weight:900;font-size:16px}
+button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-weight:900;font-size:16px;cursor:pointer}
 .guardar{background:#48a530;color:white}
 .volver{background:white;color:#17303d;width:auto;margin:0 10px 0 0;padding:7px 11px}
 .promo{margin-top:10px;background:#fff6cf;border:2px solid #ffe066;border-radius:12px;padding:10px;font-size:13px;font-weight:900;color:#8a6a00}
@@ -44,54 +44,42 @@ button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">←</button>
+  <button id="btnVolver" class="volver">←</button>
   📝 PEDIDOS
 </header>
 
 <div class="contenedor">
 
-<div id="avisosPedidos"></div>
+  <div id="avisosPedidos"></div>
 
-<select id="proveedor" onchange="cargarArticulos()"></select>
+  <select id="proveedor"></select>
 
-<div id="articulos"></div>
+  <div id="articulos"></div>
 
-<div class="totalFinal" id="totalFinal">TOTAL PAGO: 0,00 €</div>
+  <div class="totalFinal" id="totalFinal">TOTAL PAGO: 0,00 €</div>
 
-<button class="guardar" onclick="guardarPedido()">Guardar pedido</button>
+  <button id="btnGuardarPedido" class="guardar">Guardar pedido</button>
 
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
-  getFirestore,
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAxbU-eWFeKfI74_X_V-A8zX_YOUR_KEY_MATCHED",
-  authDomain: "monolito-ed87d.firebaseapp.com",
-  projectId: "monolito-ed87d",
-  storageBucket: "monolito-ed87d.appspot.com",
-  messagingSenderId: "737849584362",
-  appId: "1:737849584362:web:3d1821bedcd64080cf8593",
-  measurementId: "G-7XCZ0VN7ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion,
+  borrarDocumento
+} from "./monolito-cloud.js";
 
 let pedido = [];
+let articulosGlobal = [];
+let proveedoresGlobal = [];
+let promocionesGlobal = [];
 let avisosCloud = [];
+let historicoPedidos = [];
+let pagosPendientes = [];
 
 function usuarioActual(){
-  return localStorage.getItem("usuario") || "OPERADOR";
+  return localStorage.getItem("usuario") || "JAVI";
 }
 
 function esHostelero(){
@@ -111,16 +99,32 @@ function normalizar(t){
     .replace(/[\u0300-\u036f]/g,"");
 }
 
+function esc(txt){
+  return String(txt || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function crearId(prefijo){
+  return String(prefijo || "pedido")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"_")
+    .replace(/^_+|_+$/g,"")
+    + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
+}
+
 function leerArticulos(){
-  return JSON.parse(localStorage.getItem("articulos") || "[]")
-    .filter(a => a.activo !== false);
+  return articulosGlobal.filter(a => a.activo !== false);
 }
 
 function leerProveedores(){
-  let p = JSON.parse(localStorage.getItem("proveedores") || "[]")
-    .filter(x => x.activo !== false);
+  let p = proveedoresGlobal.filter(x => x.activo !== false);
 
-  if(p.length===0){
+  if(p.length === 0){
     p = [
       {nombre:"CANDELAS"},
       {nombre:"TURRADO"},
@@ -133,7 +137,7 @@ function leerProveedores(){
 }
 
 function leerPromociones(){
-  return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
+  return promocionesGlobal || [];
 }
 
 function pintarAvisosPedidos(){
@@ -150,8 +154,8 @@ function pintarAvisosPedidos(){
   avisosCloud.forEach((a)=>{
     html += `
       <div class="avisoLinea">
-        🛎️ ${a.texto || ""}
-        <button class="btnResolverAviso" onclick="resolverAvisoPedido('${a.id}')">
+        🛎️ ${esc(a.texto || "")}
+        <button class="btnResolverAviso" data-accion="resolverAviso" data-id="${esc(a.id)}">
           ✅ RESUELTO
         </button>
       </div>
@@ -165,40 +169,7 @@ function pintarAvisosPedidos(){
 async function resolverAvisoPedido(id){
   if(!confirm("¿Eliminar aviso de pedidos?")) return;
 
-  try{
-    await deleteDoc(doc(db, "avisos_pedidos", id));
-  }catch(e){
-    console.error(e);
-    alert("No se pudo eliminar el aviso en Firebase.");
-  }
-}
-
-function iniciarAvisosFirebase(){
-  const q = query(
-    collection(db, "avisos_pedidos"),
-    orderBy("fechaMs", "desc")
-  );
-
-  onSnapshot(q, (snap)=>{
-    avisosCloud = [];
-
-    snap.forEach((d)=>{
-      avisosCloud.push({
-        id:d.id,
-        ...d.data()
-      });
-    });
-
-    pintarAvisosPedidos();
-
-  }, (error)=>{
-    console.error(error);
-    document.getElementById("avisosPedidos").innerHTML = `
-      <div class="avisosBox">
-        <div class="avisosTitulo">⚠️ No se pudieron cargar avisos</div>
-      </div>
-    `;
-  });
+  await borrarDocumento("avisos_pedidos", id);
 }
 
 function cargarProveedores(){
@@ -207,7 +178,7 @@ function cargarProveedores(){
   document.getElementById("proveedor").innerHTML =
     `<option value="">Selecciona proveedor</option>` +
     proveedores.map(p =>
-      `<option value="${p.nombre}">${p.nombre}</option>`
+      `<option value="${esc(p.nombre)}">${esc(p.nombre)}</option>`
     ).join("");
 }
 
@@ -377,12 +348,12 @@ function pintar(){
     html += `
     <div class="card ${a.costeCero ? "costeCero" : ""}">
 
-      <div class="nombre">${a.articulo}</div>
+      <div class="nombre">${esc(a.articulo)}</div>
 
       <div class="detalle">
-        ${a.unidadFormato || ""} ·
+        ${esc(a.unidadFormato || "")} ·
         ${Number(a.precioUnidad || 0).toFixed(2)} € ·
-        IVA ${a.iva || 21}%
+        IVA ${Number(a.iva || 21)}%
       </div>
 
       ${avisoPromoHTML(a)}
@@ -397,9 +368,9 @@ function pintar(){
             <input
               type="number"
               placeholder="Hay"
-              value="${a.stockActual}"
-              onchange="stockActual(${i},this.value)"
-              oninput="stockActual(${i},this.value)"
+              value="${esc(a.stockActual)}"
+              data-accion="stockActual"
+              data-indice="${i}"
             >
           </div>
 
@@ -407,13 +378,11 @@ function pintar(){
             <label>CUÁNTAS PIDO</label>
             <input
               class="cantidadPedido"
+              data-accion="stockPedir"
               data-indice="${i}"
               type="number"
               placeholder="Pido"
-              value="${a.pedir}"
-              onchange="stockPedir(${i},this.value)"
-              oninput="stockPedir(${i},this.value)"
-              onkeydown="siguienteConEnter(event, ${i})"
+              value="${esc(a.pedir)}"
             >
           </div>
 
@@ -436,7 +405,8 @@ function pintar(){
         `
           <button
             class="botonCero ${a.costeCero ? "activo" : ""}"
-            onclick="toggleCosteCero(${i})"
+            data-accion="costeCero"
+            data-indice="${i}"
           >
             ${a.costeCero ? "✅ COSTE 0 € ACTIVADO" : "Marcar COSTE 0 €"}
           </button>
@@ -480,6 +450,8 @@ function siguienteConEnter(e,i){
 }
 
 function stockActual(i,v){
+  if(!pedido[i]) return;
+
   pedido[i].stockActual = v;
 
   const celda = document.getElementById("existencias"+i);
@@ -489,6 +461,8 @@ function stockActual(i,v){
 }
 
 function stockPedir(i,v){
+  if(!pedido[i]) return;
+
   pedido[i].pedir = v;
 
   const celda = document.getElementById("existencias"+i);
@@ -505,11 +479,10 @@ function toggleCosteCero(i){
     return;
   }
 
-  pedido[i].costeCero =
-    !pedido[i].costeCero;
+  if(!pedido[i]) return;
 
-  pedido[i].excluirRappel =
-    pedido[i].costeCero;
+  pedido[i].costeCero = !pedido[i].costeCero;
+  pedido[i].excluirRappel = pedido[i].costeCero;
 
   pintar();
 }
@@ -520,20 +493,15 @@ function calcular(){
   pedido.forEach((a,i)=>{
     const precio = precioCaja(a);
 
-    let linea =
-      Number(a.pedir || 0) * precio;
-
-    let lineaPago =
-      a.costeCero ? 0 : linea;
+    let linea = Number(a.pedir || 0) * precio;
+    let lineaPago = a.costeCero ? 0 : linea;
 
     totalPago += lineaPago;
 
-    const celda =
-      document.getElementById("t"+i);
+    const celda = document.getElementById("t"+i);
 
     if(celda){
-      celda.textContent =
-        lineaPago.toFixed(2) + " €";
+      celda.textContent = lineaPago.toFixed(2) + " €";
     }
   });
 
@@ -541,19 +509,17 @@ function calcular(){
     "TOTAL PAGO: " + totalPago.toFixed(2) + " €";
 }
 
-function guardarPedido(){
-  const proveedor =
-    document.getElementById("proveedor").value;
+async function guardarPedido(){
+  const proveedor = document.getElementById("proveedor").value;
 
   if(!proveedor){
     alert("Selecciona proveedor");
     return;
   }
 
-  const lineas =
-    pedido.filter(a =>
-      Number(a.pedir || 0) > 0
-    );
+  const lineas = pedido.filter(a =>
+    Number(a.pedir || 0) > 0
+  );
 
   if(lineas.length === 0){
     alert("Sin cantidades pedidas");
@@ -561,6 +527,7 @@ function guardarPedido(){
   }
 
   const ahora = new Date();
+  const pedidoId = crearId("pedido_" + proveedor);
 
   const lineasFinal = lineas.map(a => {
     const precioOriginalSinIva =
@@ -627,8 +594,11 @@ function guardarPedido(){
   ,0);
 
   const pedidoGuardado = {
+    id: pedidoId,
     proveedor,
     fecha: ahora.toLocaleString("es-ES"),
+    fechaMs: ahora.getTime(),
+    actualizadoEn: ahora.toISOString(),
     usuario: usuarioActual(),
     total: totalPago,
     totalPago,
@@ -637,24 +607,19 @@ function guardarPedido(){
     lineas: lineasFinal
   };
 
-  let historico =
-    JSON.parse(localStorage.getItem("pedidos_historico") || "[]");
-
-  historico.unshift(pedidoGuardado);
-
-  localStorage.setItem(
-    "pedidos_historico",
-    JSON.stringify(historico)
-  );
+  historicoPedidos.unshift(pedidoGuardado);
+  await guardarColeccion("pedidos_historico", historicoPedidos);
 
   if(totalPago > 0){
+    const pagoId = crearId("pago_" + proveedor);
 
-    let pagos =
-      JSON.parse(localStorage.getItem("pagos_pendientes") || "[]");
-
-    pagos.unshift({
+    pagosPendientes.unshift({
+      id: pagoId,
+      pedidoId,
       proveedor,
       fecha: ahora.toLocaleString("es-ES"),
+      fechaMs: ahora.getTime(),
+      actualizadoEn: ahora.toISOString(),
       total: totalPago,
       totalPago,
       pendiente: totalPago,
@@ -663,10 +628,7 @@ function guardarPedido(){
       lineas: lineasFinal.filter(l => !l.costeCero)
     });
 
-    localStorage.setItem(
-      "pagos_pendientes",
-      JSON.stringify(pagos)
-    );
+    await guardarColeccion("pagos_pendientes", pagosPendientes);
   }
 
   if(totalPago === 0){
@@ -675,22 +637,101 @@ function guardarPedido(){
     alert("Pedido guardado correctamente");
   }
 
-  location.reload();
+  document.getElementById("proveedor").value = "";
+  pedido = [];
+  pintar();
 }
 
-Object.assign(window,{
-  volver,
-  cargarArticulos,
-  siguienteConEnter,
-  stockActual,
-  stockPedir,
-  toggleCosteCero,
-  guardarPedido,
-  resolverAvisoPedido
-});
+function activarEventos(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("proveedor").addEventListener("change", cargarArticulos);
+  document.getElementById("btnGuardarPedido").addEventListener("click", guardarPedido);
 
-iniciarAvisosFirebase();
-cargarProveedores();
+  document.getElementById("avisosPedidos").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    if(btn.dataset.accion === "resolverAviso"){
+      resolverAvisoPedido(btn.dataset.id);
+    }
+  });
+
+  document.getElementById("articulos").addEventListener("input", function(e){
+    const el = e.target;
+    const accion = el.dataset.accion;
+    const i = Number(el.dataset.indice);
+
+    if(accion === "stockActual") stockActual(i, el.value);
+    if(accion === "stockPedir") stockPedir(i, el.value);
+  });
+
+  document.getElementById("articulos").addEventListener("keydown", function(e){
+    const el = e.target;
+    if(!el.classList.contains("cantidadPedido")) return;
+
+    const i = Number(el.dataset.indice);
+    siguienteConEnter(e, i);
+  });
+
+  document.getElementById("articulos").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    if(btn.dataset.accion === "costeCero"){
+      toggleCosteCero(Number(btn.dataset.indice));
+    }
+  });
+}
+
+async function iniciar(){
+  activarEventos();
+
+  articulosGlobal = await leerColeccion("articulos");
+  proveedoresGlobal = await leerColeccion("proveedores");
+  promocionesGlobal = await leerColeccion("promociones_monolito");
+  historicoPedidos = await leerColeccion("pedidos_historico");
+  pagosPendientes = await leerColeccion("pagos_pendientes");
+
+  cargarProveedores();
+  pintar();
+
+  escucharColeccion("articulos", (lista)=>{
+    articulosGlobal = lista;
+    const proveedorActual = document.getElementById("proveedor").value;
+    if(proveedorActual) cargarArticulos();
+  });
+
+  escucharColeccion("proveedores", (lista)=>{
+    proveedoresGlobal = lista;
+    cargarProveedores();
+  });
+
+  escucharColeccion("promociones_monolito", (lista)=>{
+    promocionesGlobal = lista;
+    pintar();
+  });
+
+  escucharColeccion("avisos_pedidos", (lista)=>{
+    avisosCloud = lista.sort((a,b)=>
+      Number(b.fechaMs || 0) - Number(a.fechaMs || 0)
+    );
+    pintarAvisosPedidos();
+  });
+
+  escucharColeccion("pedidos_historico", (lista)=>{
+    historicoPedidos = lista.sort((a,b)=>
+      Number(b.fechaMs || 0) - Number(a.fechaMs || 0)
+    );
+  });
+
+  escucharColeccion("pagos_pendientes", (lista)=>{
+    pagosPendientes = lista.sort((a,b)=>
+      Number(b.fechaMs || 0) - Number(a.fechaMs || 0)
+    );
+  });
+}
+
+iniciar();
 </script>
 
 </body>
