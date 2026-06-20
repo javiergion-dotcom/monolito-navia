@@ -48,11 +48,7 @@ textarea{width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px s
   <textarea id="nota" placeholder="Explicación (si falta o sobra)"></textarea>
 
   <button id="btnTotalizar" class="boton totalizar">TOTALIZAR</button>
-
-  <button id="btnHistorial" class="boton historial">
-    📊 VER HISTORIAL
-  </button>
-
+  <button id="btnHistorial" class="boton historial">📊 VER HISTORIAL</button>
   <button id="btnBorrar" class="boton borrar">BORRAR</button>
 
   <div class="info" id="info"></div>
@@ -68,13 +64,13 @@ import {
 
 const valores = [50,20,10,5,2,1,0.50,0.20,0.10,0.05,0.02,0.01];
 
+const COLECCION_CAMBIO = "cambio";
+const COLECCION_ESPERADO = "cambio_esperado";
+
 let cantidades = {};
 let bloqueado = false;
 let cambios = [];
 let esperadoCloud = [];
-
-const COLECCION_CAMBIO = "cambio";
-const COLECCION_ESPERADO = "cambio_esperado";
 
 function volver(){
   window.location.href="index.html";
@@ -85,8 +81,8 @@ function usuarioActual(){
 }
 
 function esAdmin(){
-  let u = usuarioActual().toUpperCase();
-  return u==="JAVI" || u==="JAVIER" || u==="SILVIA";
+  const u = usuarioActual().toUpperCase();
+  return u === "JAVI" || u === "JAVIER" || u === "SILVIA";
 }
 
 function hoyISO(){
@@ -108,15 +104,20 @@ function obtenerEsperado(){
   return Number(localStorage.getItem("cambio_esperado") || 0);
 }
 
-async function guardarEsperado(valor){
+async function guardarEsperadoManual(valor){
   if(!esAdmin()) return;
+  await guardarEsperadoAutomatico(valor);
+}
 
-  esperadoCloud = [{
+async function guardarEsperadoAutomatico(valor){
+  const nuevo = {
     id:"actual",
     valor:Number(valor || 0),
     actualizadoPor:usuarioActual(),
     actualizadoEn:new Date().toISOString()
-  }];
+  };
+
+  esperadoCloud = [nuevo];
 
   await guardarColeccion(COLECCION_ESPERADO, esperadoCloud);
 
@@ -135,14 +136,12 @@ function pintar(){
   let html="";
 
   valores.forEach(v=>{
-    const valorKey = String(v);
-
     html+=`
       <div class="linea">
         <div>${v} €</div>
         <input
           class="inputCambio"
-          data-valor="${valorKey}"
+          data-valor="${String(v)}"
           type="number"
           min="0"
           value="${cantidades[v] || 0}"
@@ -151,9 +150,12 @@ function pintar(){
     `;
   });
 
-  document.getElementById("lista").innerHTML=html;
-
+  document.getElementById("lista").innerHTML = html;
   activarInputsCambio();
+
+  if(bloqueado){
+    document.querySelectorAll(".inputCambio").forEach(i=>i.disabled=true);
+  }
 }
 
 function activarInputsCambio(){
@@ -175,36 +177,42 @@ function calcular(){
   let total=0;
 
   valores.forEach(v=>{
-    total += (cantidades[v]||0)*v;
+    total += (cantidades[v] || 0) * v;
   });
 
   document.getElementById("total").textContent =
-    total.toFixed(2).replace(".",",")+" €";
+    total.toFixed(2).replace(".",",") + " €";
 }
 
 function cargarEsperado(){
-  let e = obtenerEsperado();
-  document.getElementById("esperado").value = e;
+  const e = obtenerEsperado();
+  const input = document.getElementById("esperado");
 
-  if(!esAdmin()){
-    document.getElementById("esperado").disabled = true;
-  }
+  input.value = e;
+  input.disabled = !esAdmin();
 }
 
 async function totalizar(){
+  if(bloqueado){
+    alert("El cambio de hoy ya está totalizado. Solo Javi o Silvia pueden borrarlo.");
+    return;
+  }
+
   let total=0;
 
   valores.forEach(v=>{
-    total += (cantidades[v]||0)*v;
+    total += (cantidades[v] || 0) * v;
   });
+
+  total = Number(total.toFixed(2));
 
   if(total <= 0){
     alert("Introduce el cambio antes de totalizar");
     return;
   }
 
-  let esperado = obtenerEsperado();
-  let diferencia = Number((total - esperado).toFixed(2));
+  const esperadoAnterior = obtenerEsperado();
+  const diferencia = Number((total - esperadoAnterior).toFixed(2));
 
   let texto="";
   let clase="ok";
@@ -219,22 +227,20 @@ async function totalizar(){
     clase="error";
   }
 
+  const nuevoEsperado = Number((esperadoAnterior + diferencia).toFixed(2));
+
   document.getElementById("resultado").textContent = texto;
   document.getElementById("resultado").className = "resultado " + clase;
-
-  let nuevoEsperado = Number((esperado + diferencia).toFixed(2));
   document.getElementById("esperado").value = nuevoEsperado;
 
-  if(esAdmin()){
-    await guardarEsperado(nuevoEsperado);
-  }
+  await guardarEsperadoAutomatico(nuevoEsperado);
+  await guardar(total, diferencia, esperadoAnterior, nuevoEsperado);
 
-  await guardar(total,diferencia,nuevoEsperado);
   bloquear();
 }
 
-async function guardar(total,diferencia,nuevoEsperado){
-  let ahora = new Date();
+async function guardar(total,diferencia,esperadoAnterior,nuevoEsperado){
+  const ahora = new Date();
 
   const registro = {
     id:idCambioHoy(),
@@ -242,7 +248,7 @@ async function guardar(total,diferencia,nuevoEsperado){
     clave:claveFecha(),
     total,
     diferencia,
-    esperadoAnterior:obtenerEsperado(),
+    esperadoAnterior,
     esperadoNuevo:nuevoEsperado,
     cantidades:{...cantidades},
     nota:document.getElementById("nota").value,
@@ -264,39 +270,41 @@ async function guardar(total,diferencia,nuevoEsperado){
   await guardarColeccion(COLECCION_CAMBIO, cambios);
 
   document.getElementById("info").textContent =
-    "Guardado por " + usuarioActual() + " · " +
-    ahora.toLocaleTimeString("es-ES");
+    "Guardado por " + usuarioActual() + " · " + ahora.toLocaleTimeString("es-ES");
 }
 
 function bloquear(){
-  bloqueado=true;
+  bloqueado = true;
+  document.querySelectorAll(".inputCambio").forEach(i=>i.disabled=true);
+}
 
-  document.querySelectorAll(".inputCambio").forEach(i=>{
-    i.disabled=true;
-  });
+function desbloquear(){
+  bloqueado = false;
+  document.querySelectorAll(".inputCambio").forEach(i=>i.disabled=false);
 }
 
 function cargarRegistroHoy(){
   const r = registroHoy();
 
   if(!r){
-    bloqueado = false;
     cantidades = {};
     document.getElementById("resultado").textContent = "";
     document.getElementById("resultado").className = "resultado";
     document.getElementById("nota").value = "";
     document.getElementById("info").textContent = "";
+
+    desbloquear();
     pintar();
     calcular();
     return;
   }
 
   cantidades = r.cantidades || {};
+  bloquear();
   pintar();
   calcular();
 
   document.getElementById("nota").value = r.nota || "";
-
   document.getElementById("info").textContent =
     "Guardado por " + (r.usuario || "OPERADOR") + " · " + (r.hora || "");
 
@@ -310,8 +318,6 @@ function cargarRegistroHoy(){
     document.getElementById("resultado").textContent = "⚠ FALTAN " + Math.abs(Number(r.diferencia || 0)).toFixed(2) + " €";
     document.getElementById("resultado").className = "resultado error";
   }
-
-  bloquear();
 }
 
 async function borrar(){
@@ -323,11 +329,10 @@ async function borrar(){
   if(!confirm("¿Borrar registro de hoy?")) return;
 
   cambios = cambios.filter(c => String(c.id) !== String(idCambioHoy()));
-
   await borrarDocumento(COLECCION_CAMBIO, idCambioHoy());
 
-  bloqueado = false;
   cantidades = {};
+  desbloquear();
   cargarRegistroHoy();
 }
 
@@ -339,16 +344,17 @@ function activarBotones(){
   });
   document.getElementById("btnBorrar").addEventListener("click", borrar);
 
-  document.getElementById("esperado").addEventListener("focus", function(){this.select()});
-  document.getElementById("esperado").addEventListener("click", function(){this.select()});
-  document.getElementById("esperado").addEventListener("change", async function(){
-    await guardarEsperado(Number(this.value || 0));
+  const esperado = document.getElementById("esperado");
+
+  esperado.addEventListener("focus", function(){this.select()});
+  esperado.addEventListener("click", function(){this.select()});
+  esperado.addEventListener("change", async function(){
+    await guardarEsperadoManual(Number(this.value || 0));
   });
 }
 
 async function migrarLocalSiHaceFalta(){
   const nube = await leerColeccion(COLECCION_CAMBIO);
-
   if(nube.length > 0) return;
 
   const local = localStorage.getItem("cambio");
