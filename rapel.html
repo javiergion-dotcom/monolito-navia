@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RAPPEL · MONOLITO</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
@@ -14,7 +15,7 @@ header{background:#17303d;color:white;padding:16px;display:flex;align-items:cent
 label{display:block;font-weight:900;margin-top:10px;font-size:14px}
 input{width:100%;padding:12px;border-radius:12px;border:1px solid #c5ced6;margin-top:6px;font-size:16px}
 .datoAuto{background:#f1f4f7;border-radius:12px;padding:13px;margin-top:6px;font-weight:900;color:#4f5f69}
-button{border:0;border-radius:14px;padding:13px;font-weight:900;font-size:16px}
+button{border:0;border-radius:14px;padding:13px;font-weight:900;font-size:16px;cursor:pointer}
 .guardar{width:100%;background:#48a530;color:white;margin-top:14px}
 .nuevo{width:100%;background:#ff9800;color:white;margin-bottom:14px}
 .borrar{background:#c00000;color:white;width:100%;margin-top:10px}
@@ -29,7 +30,7 @@ button{border:0;border-radius:14px;padding:13px;font-weight:900;font-size:16px}
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">←</button>
+  <button id="btnVolver" class="volver">←</button>
   💶 RAPPEL
 </header>
 
@@ -37,7 +38,7 @@ button{border:0;border-radius:14px;padding:13px;font-weight:900;font-size:16px}
 
 <div class="bloque">
   <label>Año</label>
-  <input id="anio" type="number" onfocus="this.select()" onclick="this.select()">
+  <input id="anio" type="number">
 
   <label>Proveedor</label>
   <input id="proveedor" placeholder="Ej: TURRADO / MAHOU">
@@ -46,21 +47,21 @@ button{border:0;border-radius:14px;padding:13px;font-weight:900;font-size:16px}
   <input id="articulo" placeholder="Ej: MAHOU 5 ESTRELLAS">
 
   <label>Litros por unidad de compra</label>
-  <input id="litrosUnidad" type="number" step="0.001" placeholder="Ej: caja tercios 7.92 / barril 30" onfocus="this.select()" onclick="this.select()">
+  <input id="litrosUnidad" type="number" step="0.001" placeholder="Ej: caja tercios 7.92 / barril 30">
 
   <label>Litros acumulados desde pedidos</label>
   <div class="datoAuto" id="litrosAuto">0,00 litros</div>
 
   <label>Precio litro</label>
-  <input id="precioLitro" type="number" step="0.0001" onfocus="this.select()" onclick="this.select()">
+  <input id="precioLitro" type="number" step="0.0001">
 
   <label>Porcentaje rappel</label>
-  <input id="porcentaje" type="number" step="0.01" onfocus="this.select()" onclick="this.select()">
+  <input id="porcentaje" type="number" step="0.01">
 
-  <button class="guardar" onclick="guardarCondicion()">💾 Guardar condición anual</button>
+  <button id="btnGuardar" class="guardar">💾 Guardar condición anual</button>
 </div>
 
-<button class="nuevo" onclick="limpiarFormulario()">➕ Nueva condición</button>
+<button id="btnNuevo" class="nuevo">➕ Nueva condición</button>
 
 <div id="lista"></div>
 
@@ -68,8 +69,19 @@ button{border:0;border-radius:14px;padding:13px;font-weight:900;font-size:16px}
 
 </div>
 
-<script>
-let editandoIndice = "";
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion,
+  borrarDocumento
+} from "./monolito-cloud.js";
+
+const COLECCION_RAPEL = "rapel_anual";
+
+let condiciones = [];
+let pedidos = [];
+let editandoId = "";
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "OPERADOR";
@@ -101,24 +113,72 @@ function litrosTxt(n){
   return Number(n || 0).toFixed(2).replace(".",",") + " litros";
 }
 
-function leerRapel(){
-  return JSON.parse(localStorage.getItem("rapel_anual") || "[]");
-}
-
-function guardarRapel(data){
-  localStorage.setItem("rapel_anual", JSON.stringify(data));
-}
-
 function normalizar(t){
-  return String(t || "").trim().toUpperCase();
+  return String(t || "")
+    .trim()
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"");
+}
+
+function crearId(anio, proveedor, articulo){
+  return "rapel_" +
+    String(anio) + "_" +
+    normalizar(proveedor).toLowerCase().replace(/[^a-z0-9]+/g,"_") + "_" +
+    normalizar(articulo).toLowerCase().replace(/[^a-z0-9]+/g,"_");
+}
+
+function calcularLitrosAutomaticos(r){
+  let litros = 0;
+
+  pedidos.forEach(p=>{
+    const fecha = p.fechaISO || p.fecha || p.fechaRegistro || "";
+    const textoFecha = String(fecha);
+
+    if(!textoFecha.includes(String(r.anio))){
+      if(p.fechaMs){
+        const anioPedido = new Date(Number(p.fechaMs)).getFullYear();
+        if(Number(anioPedido) !== Number(r.anio)) return;
+      }else{
+        return;
+      }
+    }
+
+    const lineas = p.lineas || [];
+
+    lineas.forEach(l=>{
+      if(l.costeCero || l.excluirRappel) return;
+
+      const proveedorLinea = normalizar(l.proveedor || p.proveedor || "");
+      const articuloLinea = normalizar(l.articulo || l.nombre || l.producto || "");
+
+      if(proveedorLinea !== normalizar(r.proveedor)) return;
+
+      if(
+        !articuloLinea.includes(normalizar(r.articulo)) &&
+        !normalizar(r.articulo).includes(articuloLinea)
+      ){
+        return;
+      }
+
+      const unidades =
+        Number(l.cantidadTotalRappel || 0) ||
+        Number(l.cantidad || l.unidades || l.uds || l.pedir || 0);
+
+      litros += unidades * Number(r.litrosUnidad || 0);
+    });
+  });
+
+  return litros;
 }
 
 function calcularTotal(r){
-  return Number(r.litros || 0) * Number(r.precioLitro || 0) * (Number(r.porcentaje || 0) / 100);
+  const litros = calcularLitrosAutomaticos(r);
+  return litros * Number(r.precioLitro || 0) * (Number(r.porcentaje || 0) / 100);
 }
 
 function limpiarFormulario(){
-  editandoIndice = "";
+  editandoId = "";
   document.getElementById("anio").value = new Date().getFullYear();
   document.getElementById("proveedor").value = "";
   document.getElementById("articulo").value = "";
@@ -128,7 +188,7 @@ function limpiarFormulario(){
   document.getElementById("porcentaje").value = "";
 }
 
-function guardarCondicion(){
+async function guardarCondicion(){
   const anio = Number(document.getElementById("anio").value || new Date().getFullYear());
   const proveedor = normalizar(document.getElementById("proveedor").value);
   const articulo = normalizar(document.getElementById("articulo").value);
@@ -146,62 +206,55 @@ function guardarCondicion(){
     return;
   }
 
-  let data = leerRapel();
-
-  let idx = data.findIndex(r =>
-    Number(r.anio) === anio &&
-    normalizar(r.proveedor) === proveedor &&
-    normalizar(r.articulo) === articulo
-  );
-
-  if(editandoIndice !== ""){
-    idx = Number(editandoIndice);
-  }
-
-  const litrosAutomaticos = idx >= 0 ? Number(data[idx].litros || 0) : 0;
+  const id = editandoId || crearId(anio, proveedor, articulo);
 
   const registro = {
+    id,
     anio,
     proveedor,
     articulo,
     litrosUnidad,
-    litros: litrosAutomaticos,
     precioLitro,
     porcentaje,
     actualizadoPor: usuarioActual(),
-    actualizado: new Date().toLocaleString("es-ES")
+    actualizado: new Date().toLocaleString("es-ES"),
+    actualizadoEn: new Date().toISOString()
   };
 
-  if(idx >= 0){
-    data[idx] = registro;
+  const existe = condiciones.find(r => String(r.id) === String(id));
+
+  if(existe){
+    condiciones = condiciones.map(r => String(r.id) === String(id) ? registro : r);
   }else{
-    data.unshift(registro);
+    condiciones.unshift(registro);
   }
 
-  guardarRapel(data);
+  await guardarColeccion(COLECCION_RAPEL, condiciones);
+
   limpiarFormulario();
   pintar();
 }
 
-function borrarCondicion(i){
+async function borrarCondicion(id){
   if(!confirm("¿Borrar esta condición de rappel?")) return;
-  let data = leerRapel();
-  data.splice(i,1);
-  guardarRapel(data);
+
+  condiciones = condiciones.filter(r => String(r.id) !== String(id));
+  await borrarDocumento(COLECCION_RAPEL, id);
+
   pintar();
 }
 
-function cargarEnFormulario(i){
-  let data = leerRapel();
-  let r = data[i];
+function cargarEnFormulario(id){
+  const r = condiciones.find(x => String(x.id) === String(id));
+  if(!r) return;
 
-  editandoIndice = i;
+  editandoId = r.id;
 
   document.getElementById("anio").value = r.anio || new Date().getFullYear();
   document.getElementById("proveedor").value = r.proveedor || "";
   document.getElementById("articulo").value = r.articulo || "";
   document.getElementById("litrosUnidad").value = r.litrosUnidad || "";
-  document.getElementById("litrosAuto").textContent = litrosTxt(r.litros || 0);
+  document.getElementById("litrosAuto").textContent = litrosTxt(calcularLitrosAutomaticos(r));
   document.getElementById("precioLitro").value = r.precioLitro || "";
   document.getElementById("porcentaje").value = r.porcentaje || "";
 
@@ -209,16 +262,16 @@ function cargarEnFormulario(i){
 }
 
 function pintar(){
-  let data = leerRapel();
   let html = "";
   let totalGeneral = 0;
 
-  if(data.length === 0){
+  if(condiciones.length === 0){
     html = `<div class="vacio">No hay condiciones de rappel todavía.</div>`;
   }
 
-  data.forEach((r,i)=>{
-    let total = calcularTotal(r);
+  condiciones.forEach((r)=>{
+    const litros = calcularLitrosAutomaticos(r);
+    const total = calcularTotal(r);
     totalGeneral += total;
 
     html += `
@@ -227,14 +280,14 @@ function pintar(){
         <div class="detalle">Proveedor: <strong>${r.proveedor}</strong></div>
         <div class="detalle">Año: ${r.anio}</div>
         <div class="detalle">Litros por unidad de compra: <strong>${litrosTxt(r.litrosUnidad)}</strong></div>
-        <div class="detalle">Litros acumulados desde pedidos: <strong>${litrosTxt(r.litros)}</strong></div>
+        <div class="detalle">Litros acumulados desde pedidos: <strong>${litrosTxt(litros)}</strong></div>
         <div class="detalle">Precio litro: ${euros(r.precioLitro)}</div>
         <div class="detalle">Porcentaje: ${Number(r.porcentaje || 0).toFixed(2).replace(".",",")}%</div>
         <div class="totalLinea">TOTAL GENERADO: ${euros(total)}</div>
         <div class="detalle">Última actualización: ${r.actualizado || ""} · ${r.actualizadoPor || ""}</div>
 
-        <button class="guardar" onclick="cargarEnFormulario(${i})">Editar condición</button>
-        <button class="borrar" onclick="borrarCondicion(${i})">🗑 Borrar</button>
+        <button class="guardar" data-accion="editar" data-id="${r.id}">Editar condición</button>
+        <button class="borrar" data-accion="borrar" data-id="${r.id}">🗑 Borrar</button>
       </div>
     `;
   });
@@ -243,8 +296,50 @@ function pintar(){
   document.getElementById("totalGeneral").textContent = "TOTAL GENERAL: " + euros(totalGeneral);
 }
 
-limpiarFormulario();
-pintar();
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnGuardar").addEventListener("click", guardarCondicion);
+  document.getElementById("btnNuevo").addEventListener("click", limpiarFormulario);
+
+  ["anio","litrosUnidad","precioLitro","porcentaje"].forEach(id=>{
+    const el = document.getElementById(id);
+    el.addEventListener("focus", function(){this.select()});
+    el.addEventListener("click", function(){this.select()});
+  });
+
+  document.getElementById("lista").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    const accion = btn.dataset.accion;
+    const id = btn.dataset.id;
+
+    if(accion === "editar") cargarEnFormulario(id);
+    if(accion === "borrar") borrarCondicion(id);
+  });
+}
+
+async function iniciar(){
+  activarBotones();
+  limpiarFormulario();
+
+  condiciones = await leerColeccion(COLECCION_RAPEL);
+  pedidos = await leerColeccion("pedidos_historico");
+
+  pintar();
+
+  escucharColeccion(COLECCION_RAPEL, (lista)=>{
+    condiciones = lista;
+    pintar();
+  });
+
+  escucharColeccion("pedidos_historico", (lista)=>{
+    pedidos = lista;
+    pintar();
+  });
+}
+
+iniciar();
 </script>
 
 </body>
