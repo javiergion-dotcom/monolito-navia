@@ -3,221 +3,59 @@
 <head>
 <title>VENTAS · MONOLITO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#eef2f5;
-  color:#17303d;
-}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:20px 18px;
-  font-weight:900;
-  font-size:28px;
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.volver{
-  background:white;
-  color:#17303d;
-  border:0;
-  border-radius:14px;
-  padding:12px 18px;
-  font-weight:900;
-  font-size:22px;
-}
-
-.mes{
-  margin-left:auto;
-  background:#ff9800;
-  color:white;
-  border:0;
-  border-radius:12px;
-  padding:11px 16px;
-  font-weight:900;
-  font-size:18px;
-}
-
-.contenedor{
-  padding:22px;
-}
-
-.fecha{
-  font-size:24px;
-  font-weight:900;
-  margin-bottom:14px;
-}
-
-input,textarea{
-  width:100%;
-  padding:18px;
-  border-radius:14px;
-  border:1px solid #ccc;
-  margin-bottom:16px;
-  font-size:22px;
-}
-
-textarea{
-  min-height:110px;
-  resize:vertical;
-}
-
-.bloque{
-  padding:22px;
-  border-radius:22px;
-  margin-bottom:18px;
-  box-shadow:0 8px 18px rgba(0,0,0,.10);
-}
-
+body{margin:0;font-family:Arial,sans-serif;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:20px 18px;font-weight:900;font-size:28px;display:flex;align-items:center;gap:14px}
+.volver{background:white;color:#17303d;border:0;border-radius:14px;padding:12px 18px;font-weight:900;font-size:22px}
+.mes{margin-left:auto;background:#ff9800;color:white;border:0;border-radius:12px;padding:11px 16px;font-weight:900;font-size:18px}
+.contenedor{padding:22px}
+.fecha{font-size:24px;font-weight:900;margin-bottom:14px}
+input,textarea{width:100%;padding:18px;border-radius:14px;border:1px solid #ccc;margin-bottom:16px;font-size:22px}
+textarea{min-height:110px;resize:vertical}
+.bloque{padding:22px;border-radius:22px;margin-bottom:18px;box-shadow:0 8px 18px rgba(0,0,0,.10)}
 .manana{background:linear-gradient(#f7fbff,#eaf5ff)}
 .tarde{background:linear-gradient(#fffaf0,#fff1d6)}
 .totalDia{background:white}
-
-.titulo{
-  font-weight:900;
-  font-size:24px;
-  margin-bottom:14px;
-}
-
-.total{
-  font-size:24px;
-  font-weight:900;
-  margin-top:8px;
-}
-
-.info{
-  font-size:17px;
-  color:#4f5f69;
-  margin-top:12px;
-  font-weight:700;
-}
-
-.aviso{
-  color:#b00000;
-  font-weight:900;
-  font-size:17px;
-  margin-top:10px;
-}
-
-.errorNota{
-  background:#fff8e8;
-  border:1px solid #ffd58a;
-}
-
-.guardar{
-  width:100%;
-  background:#48a530;
-  color:white;
-  border:0;
-  border-radius:16px;
-  padding:20px;
-  font-weight:900;
-  font-size:22px;
-  margin-bottom:18px;
-}
-
-.borrar{
-  width:100%;
-  background:#c00000;
-  color:white;
-  border:0;
-  border-radius:16px;
-  padding:18px;
-  font-weight:900;
-  font-size:20px;
-  margin-top:14px;
-}
-
-.bloqueado{
-  background:#f2f2f2;
-  color:#666;
-}
-
-.modalFondo{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.72);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-  padding:22px;
-}
-
-.modal{
-  background:white;
-  border-radius:22px;
-  padding:24px;
-  max-width:520px;
-  width:100%;
-  text-align:center;
-}
-
-.modal h3{
-  margin-top:0;
-  color:#c00000;
-  font-size:26px;
-}
-
-.modal p{
-  line-height:1.5;
-  font-weight:700;
-  font-size:20px;
-}
-
-.irCambio{
-  width:100%;
-  background:#17303d;
-  color:white;
-  border:0;
-  border-radius:14px;
-  padding:17px;
-  font-weight:900;
-  font-size:20px;
-  margin-top:12px;
-}
-
-.continuar{
-  width:100%;
-  background:#c00000;
-  color:white;
-  border:0;
-  border-radius:14px;
-  padding:17px;
-  font-weight:900;
-  font-size:20px;
-  margin-top:12px;
-}
+.titulo{font-weight:900;font-size:24px;margin-bottom:14px}
+.total{font-size:24px;font-weight:900;margin-top:8px}
+.info{font-size:17px;color:#4f5f69;margin-top:12px;font-weight:700}
+.aviso{color:#b00000;font-weight:900;font-size:17px;margin-top:10px}
+.errorNota{background:#fff8e8;border:1px solid #ffd58a}
+.guardar{width:100%;background:#48a530;color:white;border:0;border-radius:16px;padding:20px;font-weight:900;font-size:22px;margin-bottom:18px}
+.borrar{width:100%;background:#c00000;color:white;border:0;border-radius:16px;padding:18px;font-weight:900;font-size:20px;margin-top:14px}
+.bloqueado{background:#f2f2f2;color:#666}
+.modalFondo{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:9999;padding:22px}
+.modal{background:white;border-radius:22px;padding:24px;max-width:520px;width:100%;text-align:center}
+.modal h3{margin-top:0;color:#c00000;font-size:26px}
+.modal p{line-height:1.5;font-weight:700;font-size:20px}
+.irCambio{width:100%;background:#17303d;color:white;border:0;border-radius:14px;padding:17px;font-weight:900;font-size:20px;margin-top:12px}
+.continuar{width:100%;background:#c00000;color:white;border:0;border-radius:14px;padding:17px;font-weight:900;font-size:20px;margin-top:12px}
+button{cursor:pointer}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">‹ Volver</button>
+  <button id="btnVolver" class="volver">‹ Volver</button>
   💰 VENTAS
-  <button class="mes" onclick="verMes()">📊 Mes</button>
+  <button id="btnMes" class="mes">📊 Mes</button>
 </header>
 
 <div class="contenedor">
 
   <div class="fecha" id="fechaTexto"></div>
 
-  <input type="date" id="selectorFecha" onchange="cambiarFecha()">
+  <input type="date" id="selectorFecha">
 
   <div class="bloque manana">
     <div class="titulo">☀️ MAÑANA</div>
 
-    <input id="maA" placeholder="Operador 1 mañana" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
-    <input id="maB" placeholder="Operador 2 mañana" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
+    <input id="maA" placeholder="Operador 1 mañana" type="number">
+    <input id="maB" placeholder="Operador 2 mañana" type="number">
 
     <div class="total" id="totalMa">TOTAL MAÑANA: 0,00 €</div>
     <div class="aviso" id="avisoMa"></div>
@@ -226,8 +64,8 @@ textarea{
   <div class="bloque tarde">
     <div class="titulo">🌆 TARDE</div>
 
-    <input id="taA" placeholder="Operador 1 tarde" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
-    <input id="taB" placeholder="Operador 2 tarde" type="number" onfocus="this.select()" onclick="this.select()" oninput="calcular()">
+    <input id="taA" placeholder="Operador 1 tarde" type="number">
+    <input id="taB" placeholder="Operador 2 tarde" type="number">
 
     <div class="total" id="totalTa">TOTAL TARDE: 0,00 €</div>
     <div class="aviso" id="avisoTa"></div>
@@ -239,15 +77,15 @@ textarea{
     <div class="info" id="infoRegistro"></div>
   </div>
 
-  <button class="guardar" id="btnGuardar" onclick="intentarGuardarVentas()">💾 GUARDAR VENTAS</button>
+  <button class="guardar" id="btnGuardar">💾 GUARDAR VENTAS</button>
 
   <div class="bloque errorNota">
     <div class="titulo">⚠ Aviso de error / corrección</div>
-    <textarea id="notaError" placeholder="Si hubo un error, escribe aquí qué pasó. No modifica las ventas registradas." oninput="guardarNotaError()"></textarea>
+    <textarea id="notaError" placeholder="Si hubo un error, escribe aquí qué pasó. No modifica las ventas registradas."></textarea>
     <div class="info" id="infoNota"></div>
   </div>
 
-  <button class="borrar" id="btnBorrar" onclick="borrarDia()">🗑 Borrar registro del día</button>
+  <button class="borrar" id="btnBorrar">🗑 Borrar registro del día</button>
 
 </div>
 
@@ -258,20 +96,33 @@ textarea{
       Debes realizar el control de cambio antes de registrar ventas.
       <br><br>
       Si continúas sin hacerlo, quedará registrado con tu usuario,
-      fecha y hora, y el sistema podrá bloquearse.
+      fecha y hora.
       <br><br>
       ¿Quieres hacer el control ahora?
     </p>
 
-    <button class="irCambio" onclick="irACambio()">IR A CAMBIO</button>
-    <button class="continuar" onclick="continuarBajoResponsabilidad()">CONTINUAR BAJO RESPONSABILIDAD</button>
+    <button id="btnIrCambio" class="irCambio">IR A CAMBIO</button>
+    <button id="btnContinuar" class="continuar">CONTINUAR BAJO RESPONSABILIDAD</button>
   </div>
 </div>
 
-<script>
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion,
+  borrarDocumento
+} from "./monolito-cloud.js";
+
 let fechaActual = hoyISO();
 let cargando = false;
 let guardarSinCambio = false;
+
+let ventas = [];
+let cambios = [];
+
+const COLECCION_VENTAS = "ventas";
+const COLECCION_CAMBIO = "cambio";
 
 function volver(){
   window.location.href="index.html";
@@ -309,6 +160,10 @@ function claveFecha(fecha){
   return d.toLocaleDateString("es-ES");
 }
 
+function idVenta(fecha){
+  return "venta_" + fecha.replaceAll("-","_");
+}
+
 function numero(v){
   return Number(v || 0);
 }
@@ -322,15 +177,28 @@ function maBInput(){return document.getElementById("maB")}
 function taAInput(){return document.getElementById("taA")}
 function taBInput(){return document.getElementById("taB")}
 
-document.getElementById("selectorFecha").value = fechaActual;
-actualizarFechaTexto();
-cargar();
+function ventaDelDia(){
+  return ventas.find(v => v.fechaISO === fechaActual || v.clave === claveFecha(fechaActual));
+}
 
-function cambiarFecha(){
-  fechaActual = document.getElementById("selectorFecha").value;
-  guardarSinCambio = false;
-  actualizarFechaTexto();
-  cargar();
+function hayCambioDelDia(){
+  const clave = claveFecha(fechaActual);
+
+  const enNube = cambios.some(c =>
+    c.fechaISO === fechaActual ||
+    c.clave === clave ||
+    c.fecha === clave ||
+    c.fechaTexto === clave
+  );
+
+  if(enNube) return true;
+
+  try{
+    let cambioLocal = JSON.parse(localStorage.getItem("cambio") || "{}");
+    return !!cambioLocal[clave];
+  }catch(e){
+    return false;
+  }
 }
 
 function actualizarFechaTexto(){
@@ -369,9 +237,11 @@ function pintarAvisos(maA,maB,taA,taB){
       : "";
 }
 
-function hayCambioDelDia(){
-  let cambio = JSON.parse(localStorage.getItem("cambio") || "{}");
-  return !!cambio[claveFecha(fechaActual)];
+function cambiarFecha(){
+  fechaActual = document.getElementById("selectorFecha").value;
+  guardarSinCambio = false;
+  actualizarFechaTexto();
+  cargar();
 }
 
 function intentarGuardarVentas(){
@@ -393,7 +263,11 @@ function continuarBajoResponsabilidad(){
   guardarVentas();
 }
 
-function guardarVentas(){
+async function guardarListaVentas(){
+  await guardarColeccion(COLECCION_VENTAS, ventas);
+}
+
+async function guardarVentas(){
   let maA = numero(maAInput().value);
   let maB = numero(maBInput().value);
   let taA = numero(taAInput().value);
@@ -408,16 +282,20 @@ function guardarVentas(){
     return;
   }
 
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
   let operador = usuarioActual();
   let ahora = new Date();
   let clave = claveFecha(fechaActual);
-  let anterior = data[clave] || {};
+  let anterior = ventaDelDia() || {};
 
-  data[clave] = {
+  const registro = {
+    id:idVenta(fechaActual),
+    fechaISO:fechaActual,
+    clave:clave,
+
     operador: anterior.operador || operador,
     hora: anterior.hora || ahora.toLocaleTimeString("es-ES"),
     fechaRegistro: anterior.fechaRegistro || ahora.toLocaleDateString("es-ES"),
+    fechaMs:new Date(fechaActual + "T12:00:00").getTime(),
 
     mañanaA: maA,
     mañanaB: maB,
@@ -434,17 +312,27 @@ function guardarVentas(){
 
     notaError: anterior.notaError || "",
     notaPor: anterior.notaPor || "",
-    notaHora: anterior.notaHora || ""
+    notaHora: anterior.notaHora || "",
+
+    actualizadoEn:new Date().toISOString()
   };
 
-  localStorage.setItem("ventas", JSON.stringify(data));
+  const existe = ventas.find(v => String(v.id) === String(registro.id));
+
+  if(existe){
+    ventas = ventas.map(v => String(v.id) === String(registro.id) ? registro : v);
+  }else{
+    ventas.unshift(registro);
+  }
+
+  await guardarListaVentas();
 
   document.getElementById("infoRegistro").textContent =
     "Guardado por " +
-    data[clave].operador +
+    registro.operador +
     " · " +
-    data[clave].hora +
-    (data[clave].sinCambioPrevio ? " · ⚠ SIN CONTROL DE CAMBIO" : "");
+    registro.hora +
+    (registro.sinCambioPrevio ? " · ⚠ SIN CONTROL DE CAMBIO" : "");
 
   aplicarBloqueo();
 
@@ -454,8 +342,7 @@ function guardarVentas(){
 function cargar(){
   cargando = true;
 
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  let d = data[claveFecha(fechaActual)];
+  let d = ventaDelDia();
 
   maAInput().value = "";
   maBInput().value = "";
@@ -496,8 +383,7 @@ function cargar(){
 }
 
 function aplicarBloqueo(){
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  let existe = !!data[claveFecha(fechaActual)];
+  let existe = !!ventaDelDia();
   let admin = puedeAdministrar();
 
   [maAInput(),maBInput(),taAInput(),taBInput()].forEach(input=>{
@@ -512,30 +398,37 @@ function aplicarBloqueo(){
     admin ? "block" : "none";
 }
 
-function guardarNotaError(){
+async function guardarNotaError(){
   let texto = document.getElementById("notaError").value.trim();
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  let clave = claveFecha(fechaActual);
+  let d = ventaDelDia();
 
-  if(!data[clave]){
+  if(!d){
     document.getElementById("infoNota").textContent =
       texto ? "Nota pendiente: guarda ventas para dejarla asociada al día." : "";
     return;
   }
 
-  data[clave].notaError = texto;
-  data[clave].notaPor = usuarioActual();
-  data[clave].notaHora = new Date().toLocaleTimeString("es-ES");
+  ventas = ventas.map(v=>{
+    if(String(v.id) !== String(d.id)) return v;
 
-  localStorage.setItem("ventas", JSON.stringify(data));
+    return {
+      ...v,
+      notaError:texto,
+      notaPor:usuarioActual(),
+      notaHora:new Date().toLocaleTimeString("es-ES"),
+      actualizadoEn:new Date().toISOString()
+    };
+  });
+
+  await guardarListaVentas();
 
   document.getElementById("infoNota").textContent =
     texto
-      ? "Nota registrada por " + data[clave].notaPor + " · " + data[clave].notaHora
+      ? "Nota registrada por " + usuarioActual() + " · " + new Date().toLocaleTimeString("es-ES")
       : "";
 }
 
-function borrarDia(){
+async function borrarDia(){
   if(!puedeAdministrar()){
     alert("Solo Javi o Silvia pueden borrar.");
     return;
@@ -543,14 +436,95 @@ function borrarDia(){
 
   if(!confirm("¿Borrar las ventas de este día?")) return;
 
-  let data = JSON.parse(localStorage.getItem("ventas") || "{}");
-  delete data[claveFecha(fechaActual)];
+  ventas = ventas.filter(v => String(v.id) !== String(idVenta(fechaActual)));
 
-  localStorage.setItem("ventas", JSON.stringify(data));
+  await borrarDocumento(COLECCION_VENTAS, idVenta(fechaActual));
 
   guardarSinCambio = false;
   cargar();
 }
+
+function activarEventos(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnMes").addEventListener("click", verMes);
+  document.getElementById("selectorFecha").addEventListener("change", cambiarFecha);
+
+  [maAInput(),maBInput(),taAInput(),taBInput()].forEach(input=>{
+    input.addEventListener("focus", ()=>input.select());
+    input.addEventListener("click", ()=>input.select());
+    input.addEventListener("input", calcular);
+  });
+
+  document.getElementById("btnGuardar").addEventListener("click", intentarGuardarVentas);
+  document.getElementById("btnBorrar").addEventListener("click", borrarDia);
+  document.getElementById("notaError").addEventListener("input", guardarNotaError);
+  document.getElementById("btnIrCambio").addEventListener("click", irACambio);
+  document.getElementById("btnContinuar").addEventListener("click", continuarBajoResponsabilidad);
+}
+
+async function migrarLocalSiHaceFalta(){
+  const nube = await leerColeccion(COLECCION_VENTAS);
+
+  if(nube.length > 0) return;
+
+  const local = localStorage.getItem("ventas");
+  if(!local) return;
+
+  try{
+    const obj = JSON.parse(local);
+    const recuperadas = [];
+
+    Object.keys(obj).forEach(clave=>{
+      const v = obj[clave];
+      let partes = clave.split("/");
+      let fechaISO = hoyISO();
+
+      if(partes.length === 3){
+        fechaISO = partes[2] + "-" + partes[1].padStart(2,"0") + "-" + partes[0].padStart(2,"0");
+      }
+
+      recuperadas.push({
+        ...v,
+        id:idVenta(fechaISO),
+        fechaISO,
+        clave,
+        fechaMs:new Date(fechaISO + "T12:00:00").getTime(),
+        actualizadoEn:v.actualizadoEn || new Date().toISOString()
+      });
+    });
+
+    if(recuperadas.length > 0){
+      ventas = recuperadas;
+      await guardarListaVentas();
+    }
+  }catch(e){}
+}
+
+async function iniciar(){
+  activarEventos();
+
+  document.getElementById("selectorFecha").value = fechaActual;
+  actualizarFechaTexto();
+
+  await migrarLocalSiHaceFalta();
+
+  ventas = await leerColeccion(COLECCION_VENTAS);
+  cambios = await leerColeccion(COLECCION_CAMBIO);
+
+  cargar();
+
+  escucharColeccion(COLECCION_VENTAS, (lista)=>{
+    ventas = lista;
+    cargar();
+  });
+
+  escucharColeccion(COLECCION_CAMBIO, (lista)=>{
+    cambios = lista;
+    aplicarBloqueo();
+  });
+}
+
+iniciar();
 </script>
 
 </body>
