@@ -8,584 +8,320 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
-
-header{
-  background:#17303d;
-  color:white;
-  padding:16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-button{
-  border:0;
-  border-radius:14px;
-  padding:10px 14px;
-  font-weight:800;
-  font-size:15px;
-  cursor:pointer;
-}
-
+header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:12px}
+header h2{margin:0;font-size:20px}
+button{border:0;border-radius:14px;padding:12px;font-size:15px;font-weight:900;cursor:pointer}
 .volver{background:white;color:#17303d}
-
-.contenido{padding:16px}
-
-.card{
-  background:white;
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-
-label{
-  display:block;
-  font-weight:900;
-  margin-top:12px;
-  margin-bottom:8px;
-}
-
-input,select,textarea{
-  width:100%;
-  padding:12px;
-  border-radius:14px;
-  border:1px solid #b8c2ca;
-  font-size:16px;
-}
-
-textarea{
-  min-height:110px;
-  margin-top:6px;
-}
-
-.guardar{
-  background:#48a530;
-  color:white;
-  width:100%;
-  margin-top:14px;
-  font-size:17px;
-}
-
-.limpiar{
-  background:#ff9800;
-  color:white;
-  width:100%;
-  margin-top:10px;
-}
-
-.eliminar{
-  background:#ff0000;
-  color:white;
-  width:100%;
-  margin-top:10px;
-}
-
-.fechaTitulo{
-  font-size:21px;
-  font-weight:900;
-  margin-bottom:8px;
-}
-
-.detalle{
-  color:#4f5f69;
-  margin-top:6px;
-  font-size:14px;
-}
-
-.recordatorio{
-  border-top:1px solid #dfe6ec;
-  padding-top:12px;
-  margin-top:12px;
-}
-
-.recordatorio.hecho{
-  opacity:.55;
-}
-
-.etiqueta{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:900;
-  margin-top:8px;
-}
-
-.alta{background:#ffe0e0;color:#c00000}
-.media{background:#fff3c4;color:#9a7300}
-.baja{background:#e4f5ff;color:#17627f}
-.hecha{background:#e5ffe5;color:#1a7f1a}
-.fija{background:#e9e5ff;color:#47308a}
-
-.acciones{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-}
-
-.acciones button{
-  flex:1;
-  margin-top:0;
-}
-
-.ok{
-  background:#48a530;
-  color:white;
-}
-
-.rojo{
-  background:#c00000;
-  color:white;
-}
-
-.azul{
-  background:#17627f;
-  color:white;
-}
-
-.vacio{
-  background:white;
-  border-radius:22px;
-  padding:20px;
-  text-align:center;
-  font-weight:800;
-}
-
-.tareaFija{
-  border-top:1px solid #dfe6ec;
-  padding-top:12px;
-  margin-top:12px;
-}
-
-.tareaFija.okFija{
-  opacity:.55;
-}
-
-.checkGrande{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-}
-
-.checkGrande input{
-  width:24px;
-  height:24px;
-  margin-top:2px;
-}
-
-.miniTexto{
-  color:#4f5f69;
-  font-size:14px;
-  margin-top:4px;
-}
+.contenedor{padding:16px}
+.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.10)}
+label{display:block;font-weight:900;margin-top:12px}
+input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:6px}
+textarea{min-height:90px}
+.guardar{width:100%;background:#17303d;color:white;margin-top:14px}
+.tarea{border-left:8px solid #17303d}
+.acuerdo{border-left:8px solid #ff9800;background:#fff8ea}
+.aviso{border-left:8px solid #f2c94c}
+.diario{border-left:8px solid #48a530;background:#f1fff4}
+.hecha{opacity:.55;text-decoration:line-through}
+.titulo{font-size:20px;font-weight:900}
+.detalle{margin-top:6px;color:#56646f;font-weight:700}
+.fecha{font-size:13px;color:#666;margin-top:8px}
+.acciones{display:flex;gap:8px;margin-top:10px}
+.ok{background:#27ae60;color:white}
+.borrar{background:#c0392b;color:white}
+.vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:900}
+.filtros{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.etiqueta{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;margin-top:8px;background:#eef2f5}
 </style>
 </head>
 
 <body>
 
 <header>
-  <button class="volver" onclick="volver()">← Volver</button>
-  <h2>📅 CALENDARIO</h2>
+  <button id="btnVolver" class="volver">← Volver</button>
+  <h2>📅 CALENDARIO / DIARIO</h2>
 </header>
 
-<div class="contenido">
+<div class="contenedor">
 
   <div class="card">
-    <div class="fechaTitulo">✅ Tareas fijas de esta semana</div>
-    <div class="detalle" id="semanaTexto"></div>
-    <div id="tareasFijas"></div>
-  </div>
+    <div class="titulo">Nueva entrada</div>
 
-  <div class="card">
-    <div class="fechaTitulo">➕ Recordatorio puntual</div>
-
-    <label>Elegir día</label>
-    <input type="date" id="fecha" onchange="cargarDia()">
-
-    <label>Título</label>
-    <input id="titulo" placeholder="Ej: Revisar cambio / Proveedor especial / Evento">
-
-    <label>Prioridad</label>
-    <select id="prioridad">
-      <option value="MEDIA">MEDIA</option>
-      <option value="ALTA">ALTA</option>
-      <option value="BAJA">BAJA</option>
+    <label>Tipo</label>
+    <select id="tipo">
+      <option value="TAREA">TAREA</option>
+      <option value="AVISO">AVISO</option>
+      <option value="ACUERDO">ACUERDO</option>
+      <option value="DIARIO">DIARIO</option>
     </select>
 
-    <label>Nota</label>
-    <textarea id="nota" placeholder="Escribe aquí lo importante de ese día: abrir a las 9, refuerzo de personal, comprobar cambio, proveedor especial..."></textarea>
+    <label>Fecha</label>
+    <input id="fecha" type="date">
 
-    <button class="guardar" onclick="guardarNota()">💾 Guardar recordatorio puntual</button>
-    <button class="limpiar" onclick="nuevoRecordatorio()">➕ Nuevo / limpiar pantalla</button>
-    <button class="eliminar" onclick="eliminarNota()">🗑 Eliminar recordatorio de este día</button>
+    <label>Hora opcional</label>
+    <input id="hora" type="time">
+
+    <label>Recordar antes</label>
+    <select id="recordatorio">
+      <option value="0">El mismo día</option>
+      <option value="1">1 día antes</option>
+      <option value="7">1 semana antes</option>
+      <option value="15">15 días antes</option>
+      <option value="30">1 mes antes</option>
+    </select>
+
+    <label>Repetición</label>
+    <select id="repeticion">
+      <option value="PUNTUAL">PUNTUAL</option>
+      <option value="SEMANAL">SEMANAL</option>
+      <option value="ANUAL">ANUAL</option>
+    </select>
+
+    <label>Texto</label>
+    <textarea id="texto" placeholder="Ej: Una semana antes recordar acuerdo Mahou. En Navidad abrimos a las 10:00. En estas fechas solemos comprar más refrescos..."></textarea>
+
+    <button id="btnGuardar" class="guardar">💾 GUARDAR</button>
   </div>
 
   <div class="card">
-    <div class="fechaTitulo">Recordatorios próximos 7 días</div>
-    <div id="proximos"></div>
+    <div class="titulo">Filtrar</div>
+    <div class="filtros">
+      <select id="filtroTipo">
+        <option value="">Todos</option>
+        <option value="TAREA">TAREAS</option>
+        <option value="AVISO">AVISOS</option>
+        <option value="ACUERDO">ACUERDOS</option>
+        <option value="DIARIO">DIARIO</option>
+      </select>
+
+      <select id="filtroEstado">
+        <option value="">Todo</option>
+        <option value="PENDIENTE">Pendiente</option>
+        <option value="HECHA">Hecha</option>
+      </select>
+    </div>
   </div>
+
+  <div id="lista"></div>
 
 </div>
 
-<script>
+<script type="module">
+import {
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion,
+  borrarDocumento
+} from "./monolito-cloud.js";
+
+const COLECCION = "calendario";
+let entradas = [];
+
+function usuarioActual(){
+  return localStorage.getItem("usuario") || "JAVI";
+}
+
+function crearId(){
+  return "calendario_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
+}
+
+function hoyISO(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function esc(txt){
+  return String(txt || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+async function guardarLista(){
+  await guardarColeccion(COLECCION, entradas);
+}
+
+async function guardarEntrada(){
+  const tipo = document.getElementById("tipo").value;
+  const fecha = document.getElementById("fecha").value;
+  const hora = document.getElementById("hora").value;
+  const recordatorio = Number(document.getElementById("recordatorio").value || 0);
+  const repeticion = document.getElementById("repeticion").value;
+  const texto = document.getElementById("texto").value.trim();
+
+  if(!fecha){
+    alert("Elige una fecha.");
+    return;
+  }
+
+  if(!texto){
+    alert("Escribe el texto.");
+    return;
+  }
+
+  const nueva = {
+    id: crearId(),
+    tipo,
+    fecha,
+    hora,
+    recordatorio,
+    repeticion,
+    texto,
+    hecha:false,
+    usuario:usuarioActual(),
+    creado:new Date().toLocaleString("es-ES"),
+    fechaMs:new Date(fecha + "T00:00:00").getTime(),
+    actualizadoEn:new Date().toISOString()
+  };
+
+  entradas.unshift(nueva);
+  await guardarLista();
+
+  document.getElementById("texto").value = "";
+  document.getElementById("hora").value = "";
+  document.getElementById("tipo").value = "TAREA";
+  document.getElementById("recordatorio").value = "0";
+  document.getElementById("repeticion").value = "PUNTUAL";
+
+  pintar();
+  alert("Entrada guardada.");
+}
+
+async function marcarHecha(id){
+  entradas = entradas.map(e=>{
+    if(String(e.id) === String(id)){
+      return {
+        ...e,
+        hecha:!e.hecha,
+        actualizadoEn:new Date().toISOString()
+      };
+    }
+    return e;
+  });
+
+  await guardarLista();
+  pintar();
+}
+
+async function borrarEntrada(id){
+  if(!confirm("¿Borrar esta entrada?")) return;
+
+  entradas = entradas.filter(e => String(e.id) !== String(id));
+  await borrarDocumento(COLECCION, id);
+  pintar();
+}
+
+function claseTipo(tipo){
+  if(tipo === "ACUERDO") return "acuerdo";
+  if(tipo === "AVISO") return "aviso";
+  if(tipo === "DIARIO") return "diario";
+  return "tarea";
+}
+
+function textoRecordatorio(dias){
+  dias = Number(dias || 0);
+  if(dias === 0) return "El mismo día";
+  if(dias === 1) return "1 día antes";
+  if(dias === 7) return "1 semana antes";
+  if(dias === 15) return "15 días antes";
+  if(dias === 30) return "1 mes antes";
+  return dias + " días antes";
+}
+
+function pintar(){
+  const lista = document.getElementById("lista");
+  const filtroTipo = document.getElementById("filtroTipo").value;
+  const filtroEstado = document.getElementById("filtroEstado").value;
+
+  let data = [...entradas];
+
+  if(filtroTipo){
+    data = data.filter(e => e.tipo === filtroTipo);
+  }
+
+  if(filtroEstado === "PENDIENTE"){
+    data = data.filter(e => !e.hecha);
+  }
+
+  if(filtroEstado === "HECHA"){
+    data = data.filter(e => e.hecha);
+  }
+
+  data.sort((a,b)=> Number(a.fechaMs || 0) - Number(b.fechaMs || 0));
+
+  if(data.length === 0){
+    lista.innerHTML = `<div class="vacio">No hay entradas.</div>`;
+    return;
+  }
+
+  lista.innerHTML = data.map(e=>`
+    <div class="card ${claseTipo(e.tipo)} ${e.hecha ? "hecha" : ""}">
+      <div class="titulo">${esc(e.texto)}</div>
+
+      <div class="etiqueta">${esc(e.tipo)} · ${esc(e.repeticion || "PUNTUAL")}</div>
+
+      <div class="detalle">
+        Fecha: ${esc(e.fecha)} ${e.hora ? "· " + esc(e.hora) : ""}
+      </div>
+
+      <div class="detalle">
+        Aviso: ${esc(textoRecordatorio(e.recordatorio))}
+      </div>
+
+      <div class="fecha">
+        Creado por: ${esc(e.usuario || "JAVI")} · ${esc(e.creado || "")}
+      </div>
+
+      <div class="acciones">
+        <button class="ok" data-accion="hecha" data-id="${esc(e.id)}">
+          ${e.hecha ? "REABRIR" : "HECHA"}
+        </button>
+        <button class="borrar" data-accion="borrar" data-id="${esc(e.id)}">
+          BORRAR
+        </button>
+      </div>
+    </div>
+  `).join("");
+}
+
 function volver(){
   window.location.href = "index.html";
 }
 
-function usuarioActual(){
-  return localStorage.getItem("usuario") || "OPERADOR";
-}
+function activarBotones(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnGuardar").addEventListener("click", guardarEntrada);
+  document.getElementById("filtroTipo").addEventListener("change", pintar);
+  document.getElementById("filtroEstado").addEventListener("change", pintar);
 
-function hoyISO(){
-  const d = new Date();
-  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-  return d.toISOString().slice(0,10);
-}
+  document.getElementById("lista").addEventListener("click", function(e){
+    const btn = e.target.closest("button");
+    if(!btn) return;
 
-function fechaBonita(iso){
-  const d = new Date(iso + "T12:00:00");
-  return d.toLocaleDateString("es-ES", {
-    weekday:"long",
-    day:"numeric",
-    month:"long",
-    year:"numeric"
+    const accion = btn.dataset.accion;
+    const id = btn.dataset.id;
+
+    if(accion === "hecha") marcarHecha(id);
+    if(accion === "borrar") borrarEntrada(id);
   });
 }
 
-function clasePrioridad(p){
-  if(p === "ALTA") return "alta";
-  if(p === "BAJA") return "baja";
-  return "media";
-}
-
-/* =========================
-   RECORDATORIOS PUNTUALES
-========================= */
-
-function leerCalendario(){
-  return JSON.parse(localStorage.getItem("calendario") || "{}");
-}
-
-function guardarCalendario(data){
-  localStorage.setItem("calendario", JSON.stringify(data));
-}
-
-function cargarDia(){
-  const fecha = document.getElementById("fecha").value;
-  const data = leerCalendario();
-  const r = data[fecha];
-
-  document.getElementById("titulo").value = r?.titulo || "";
-  document.getElementById("prioridad").value = r?.prioridad || "MEDIA";
-  document.getElementById("nota").value = r?.texto || "";
-}
-
-function nuevoRecordatorio(){
+async function iniciar(){
+  activarBotones();
   document.getElementById("fecha").value = hoyISO();
-  document.getElementById("titulo").value = "";
-  document.getElementById("prioridad").value = "MEDIA";
-  document.getElementById("nota").value = "";
-}
 
-function guardarNota(){
-  const fecha = document.getElementById("fecha").value;
-  const titulo = document.getElementById("titulo").value.trim();
-  const texto = document.getElementById("nota").value.trim();
-  const prioridad = document.getElementById("prioridad").value;
-
-  if(!fecha){
-    alert("Elige una fecha.");
-    return;
-  }
-
-  if(!titulo && !texto){
-    alert("Escribe título o nota.");
-    return;
-  }
-
-  let data = leerCalendario();
-  const anterior = data[fecha] || {};
-
-  data[fecha] = {
-    fecha,
-    tipo:"PUNTUAL",
-    titulo: titulo || "Recordatorio",
-    texto,
-    prioridad,
-    hecha: anterior.hecha || false,
-    creadaPor: anterior.creadaPor || usuarioActual(),
-    fechaCreacion: anterior.fechaCreacion || new Date().toLocaleString("es-ES"),
-    actualizadaPor: usuarioActual(),
-    fechaGuardado: new Date().toLocaleString("es-ES")
-  };
-
-  guardarCalendario(data);
-  pintarProximos();
-
-  alert("Recordatorio puntual guardado.");
-}
-
-function eliminarNota(){
-  const fecha = document.getElementById("fecha").value;
-
-  if(!fecha){
-    alert("Elige una fecha.");
-    return;
-  }
-
-  if(!confirm("¿Eliminar el recordatorio puntual de este día?")) return;
-
-  let data = leerCalendario();
-  delete data[fecha];
-
-  guardarCalendario(data);
-  nuevoRecordatorio();
-  pintarProximos();
-}
-
-function marcarHecho(fecha){
-  let data = leerCalendario();
-  if(!data[fecha]) return;
-
-  data[fecha].hecha = true;
-  data[fecha].hechaPor = usuarioActual();
-  data[fecha].fechaHecha = new Date().toLocaleString("es-ES");
-
-  guardarCalendario(data);
-  cargarDia();
-  pintarProximos();
-}
-
-function reabrir(fecha){
-  let data = leerCalendario();
-  if(!data[fecha]) return;
-
-  data[fecha].hecha = false;
-  data[fecha].reabiertaPor = usuarioActual();
-  data[fecha].fechaReabierta = new Date().toLocaleString("es-ES");
-
-  guardarCalendario(data);
-  cargarDia();
-  pintarProximos();
-}
-
-function borrarDesdeLista(fecha){
-  if(!confirm("¿Borrar este recordatorio?")) return;
-
-  let data = leerCalendario();
-  delete data[fecha];
-
-  guardarCalendario(data);
-  cargarDia();
-  pintarProximos();
-}
-
-/* =========================
-   TAREAS FIJAS SEMANALES
-========================= */
-
-const TAREAS_FIJAS_BASE = [
-  {
-    id:"control_cambio",
-    titulo:"Control de cambio semanal",
-    nota:"Revisar si hubo cambios importantes en el sistema, precios, proveedores o funcionamiento.",
-    prioridad:"ALTA"
-  },
-  {
-    id:"revisar_incidencias",
-    titulo:"Revisar incidencias pendientes",
-    nota:"Comprobar incidencias abiertas, rojas o amarillas, y dejar anotado lo que sigue pendiente.",
-    prioridad:"ALTA"
-  },
-  {
-    id:"revisar_proveedores",
-    titulo:"Revisar proveedores",
-    nota:"Mirar si hay cambios de precios, pedidos pendientes, promociones o avisos importantes.",
-    prioridad:"MEDIA"
-  },
-  {
-    id:"revisar_pagos",
-    titulo:"Revisar pagos",
-    nota:"Comprobar pagos pendientes, vencimientos y facturas que haya que marcar como pagadas.",
-    prioridad:"MEDIA"
-  },
-  {
-    id:"revisar_promociones",
-    titulo:"Revisar promociones activas",
-    nota:"Comprobar promociones vigentes, fechas y si están bien aplicadas.",
-    prioridad:"MEDIA"
-  },
-  {
-    id:"limpieza_revision",
-    titulo:"Revisión general semanal",
-    nota:"Revisión rápida del estado general: avisos, tareas, documentos, pedidos e incidencias.",
-    prioridad:"BAJA"
-  }
-];
-
-function leerTareasFijas(){
-  let tareas = JSON.parse(localStorage.getItem("tareasFijasCalendario") || "null");
-
-  if(!tareas || !Array.isArray(tareas)){
-    localStorage.setItem("tareasFijasCalendario", JSON.stringify(TAREAS_FIJAS_BASE));
-    return TAREAS_FIJAS_BASE;
-  }
-
-  return tareas;
-}
-
-function inicioSemanaISO(){
-  const d = new Date();
-  d.setHours(0,0,0,0);
-
-  const dia = d.getDay();
-  const diff = dia === 0 ? -6 : 1 - dia;
-
-  d.setDate(d.getDate() + diff);
-  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-
-  return d.toISOString().slice(0,10);
-}
-
-function finSemanaISO(){
-  const ini = new Date(inicioSemanaISO() + "T12:00:00");
-  ini.setDate(ini.getDate() + 6);
-  ini.setMinutes(ini.getMinutes() - ini.getTimezoneOffset());
-  return ini.toISOString().slice(0,10);
-}
-
-function claveSemana(){
-  return "tareasFijasSemana_" + inicioSemanaISO();
-}
-
-function leerEstadoSemana(){
-  return JSON.parse(localStorage.getItem(claveSemana()) || "{}");
-}
-
-function guardarEstadoSemana(estado){
-  localStorage.setItem(claveSemana(), JSON.stringify(estado));
-}
-
-function pintarTareasFijas(){
-  const cont = document.getElementById("tareasFijas");
-  const semanaTexto = document.getElementById("semanaTexto");
-
-  const tareas = leerTareasFijas();
-  const estado = leerEstadoSemana();
-
-  semanaTexto.innerHTML = `Semana del <strong>${fechaBonita(inicioSemanaISO())}</strong> al <strong>${fechaBonita(finSemanaISO())}</strong>`;
-
-  let html = "";
-
-  tareas.forEach(t=>{
-    const hecha = estado[t.id]?.hecha || false;
-
-    html += `
-      <div class="tareaFija ${hecha ? "okFija" : ""}">
-        <div class="checkGrande">
-          <input type="checkbox" ${hecha ? "checked" : ""} onchange="toggleTareaFija('${t.id}')">
-          <div>
-            <div><strong>${t.titulo}</strong></div>
-            ${t.nota ? `<div class="miniTexto">${t.nota}</div>` : ""}
-            <div class="etiqueta fija">FIJA SEMANAL</div>
-            <div class="etiqueta ${clasePrioridad(t.prioridad)}">${t.prioridad || "MEDIA"}</div>
-            ${
-              hecha
-              ? `<div class="detalle">Hecha por: ${estado[t.id].hechaPor || "OPERADOR"} · ${estado[t.id].fechaHecha || "-"}</div>`
-              : `<div class="detalle">Pendiente esta semana</div>`
-            }
-          </div>
-        </div>
-      </div>
-    `;
+  escucharColeccion(COLECCION, (lista)=>{
+    entradas = lista;
+    pintar();
   });
 
-  cont.innerHTML = html || `<div class="vacio">No hay tareas fijas configuradas.</div>`;
+  const nube = await leerColeccion(COLECCION);
+  entradas = nube;
+  pintar();
 }
 
-function toggleTareaFija(id){
-  let estado = leerEstadoSemana();
-
-  if(estado[id]?.hecha){
-    estado[id] = {
-      hecha:false,
-      reabiertaPor: usuarioActual(),
-      fechaReabierta: new Date().toLocaleString("es-ES")
-    };
-  }else{
-    estado[id] = {
-      hecha:true,
-      hechaPor: usuarioActual(),
-      fechaHecha: new Date().toLocaleString("es-ES")
-    };
-  }
-
-  guardarEstadoSemana(estado);
-  pintarTareasFijas();
-}
-
-/* =========================
-   LISTADO PRÓXIMOS 7 DÍAS
-========================= */
-
-function pintarProximos(){
-  const data = leerCalendario();
-  const cont = document.getElementById("proximos");
-
-  const hoy = new Date();
-  hoy.setHours(0,0,0,0);
-
-  const limite = new Date(hoy);
-  limite.setDate(hoy.getDate() + 7);
-
-  let items = Object.values(data).filter(r=>{
-    if(!r.fecha || r.hecha) return false;
-    const f = new Date(r.fecha + "T12:00:00");
-    return f >= hoy && f <= limite;
-  });
-
-  items.sort((a,b)=>a.fecha.localeCompare(b.fecha));
-
-  if(items.length === 0){
-    cont.innerHTML = `<div class="vacio">No hay recordatorios puntuales pendientes en los próximos 7 días.</div>`;
-    return;
-  }
-
-  let html = "";
-
-  items.forEach(r=>{
-    html += `
-      <div class="recordatorio ${r.hecha ? "hecho" : ""}">
-        <div class="fechaTitulo">${fechaBonita(r.fecha)}</div>
-        <div><strong>${r.titulo || "Recordatorio"}</strong></div>
-        ${r.texto ? `<div style="margin-top:8px">${r.texto.replace(/\n/g,"<br>")}</div>` : ""}
-
-        <div class="etiqueta ${clasePrioridad(r.prioridad)}">${r.prioridad || "MEDIA"}</div>
-
-        <div class="detalle">
-          Guardado por: ${r.creadaPor || "OPERADOR"} · ${r.fechaGuardado || "-"}
-        </div>
-
-        <div class="acciones">
-          <button class="ok" onclick="marcarHecho('${r.fecha}')">Hecho</button>
-          <button class="rojo" onclick="borrarDesdeLista('${r.fecha}')">Borrar</button>
-        </div>
-      </div>
-    `;
-  });
-
-  cont.innerHTML = html;
-}
-
-/* =========================
-   ARRANQUE
-========================= */
-
-document.getElementById("fecha").value = hoyISO();
-cargarDia();
-pintarTareasFijas();
-pintarProximos();
+iniciar();
 </script>
 
 </body>
