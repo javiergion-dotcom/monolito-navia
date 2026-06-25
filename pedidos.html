@@ -9,21 +9,23 @@
 body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
 header{background:#17303d;color:white;padding:16px;font-weight:900;font-size:20px}
 .contenedor{padding:16px}
-select,.buscador{width:100%;padding:12px;border-radius:14px;margin-bottom:12px;font-size:16px;border:1px solid #ccc;box-sizing:border-box}
-.card{background:white;border-radius:18px;padding:14px;margin-bottom:12px}
-.nombre{font-weight:900;font-size:18px}
-.detalle{color:#4f5f69;font-size:14px;margin-top:4px}
-.stockBox{margin-top:12px}
-.stockFila{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.stockCol{border-radius:14px;padding:12px;text-align:center}
-.stockCol.almacen{background:#eef7ff;border:2px solid #cfe5ff}
-.stockCol.pedido{background:#f1fff1;border:2px solid #bde9bd}
-.stockCol label{display:block;font-size:13px;font-weight:900;margin-bottom:7px;color:#17303d}
-.stockCol input{width:90%;padding:10px;border-radius:12px;border:1px solid #ccc;text-align:center;font-size:22px;font-weight:900}
-.promo{margin-top:10px;background:#fff6cf;border:2px solid #ffe066;border-radius:12px;padding:10px;font-size:13px;font-weight:900;color:#8a6a00}
-.promoOk{margin-top:8px;background:#e5ffe5;border:2px solid #8bd98b;border-radius:12px;padding:9px;font-size:13px;font-weight:900;color:#1a7f1a}
-.totalFinal{font-size:22px;font-weight:900;margin-top:20px}
-button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-weight:900;font-size:16px;cursor:pointer}
+select,.buscador{width:100%;padding:14px;border-radius:18px;margin-bottom:16px;font-size:18px;border:2px solid #111;box-sizing:border-box;background:white}
+.buscador{border:1px solid #d5dde3}
+.card{background:white;border-radius:24px;padding:18px;margin-bottom:18px}
+.nombre{font-weight:900;font-size:23px}
+.detalle{color:#4f5f69;font-size:17px;margin-top:8px}
+.stockBox{margin-top:18px}
+.stockFila{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.stockCol{border-radius:18px;padding:12px;text-align:center}
+.stockCol.almacen{background:#eef7ff;border:3px solid #cfe5ff}
+.stockCol.pedido{background:#f1fff1;border:3px solid #bde9bd}
+.stockCol label{display:block;font-size:18px;font-weight:900;margin-bottom:10px;color:#17303d}
+.stockCol input{width:90%;padding:14px;border-radius:16px;border:1px solid #ccc;text-align:center;font-size:34px;font-weight:900;color:#666}
+.promo{margin-top:14px;background:#fff6cf;border:2px solid #ffe066;border-radius:14px;padding:12px;font-size:15px;font-weight:900;color:#8a6a00}
+.promoOk{margin-top:10px;background:#e5ffe5;border:2px solid #8bd98b;border-radius:14px;padding:12px;font-size:15px;font-weight:900;color:#1a7f1a}
+.promoAuto{margin-top:10px;background:#eaf2ff;border:2px solid #9fc5ff;border-radius:14px;padding:12px;font-size:15px;font-weight:900;color:#174b8a}
+.totalFinal{font-size:30px;font-weight:900;margin-top:22px}
+button{width:100%;padding:16px;margin-top:18px;border:0;border-radius:18px;font-weight:900;font-size:18px;cursor:pointer}
 .guardar{background:#48a530;color:white}
 .volver{background:white;color:#17303d;width:auto;margin:0 10px 0 0;padding:7px 11px}
 .avisosBox{background:#fff8db;border:3px solid #f0c94a;border-radius:18px;padding:14px;margin-bottom:16px}
@@ -50,7 +52,7 @@ button{width:100%;padding:14px;margin-top:15px;border:0;border-radius:14px;font-
 
   <div id="articulos"></div>
 
-  <div class="totalFinal" id="totalFinal">TOTAL PAGO: 0,00 €</div>
+  <div class="totalFinal" id="totalFinal">TOTAL PAGO: 0.00 €</div>
 
   <button id="btnGuardarPedido" class="guardar">Guardar pedido</button>
 
@@ -104,6 +106,48 @@ function crearId(prefijo){
     .replace(/[^a-z0-9]+/g,"_")
     .replace(/^_+|_+$/g,"")
     + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
+}
+
+function parseFecha(valor, finDia=false){
+  if(!valor) return null;
+
+  const txt = String(valor).trim();
+
+  if(txt.includes("/")){
+    const p = txt.split("/");
+    if(p.length === 3){
+      const d = Number(p[0]);
+      const m = Number(p[1]) - 1;
+      const y = Number(p[2]);
+      const fecha = new Date(y,m,d);
+      if(finDia) fecha.setHours(23,59,59,999);
+      else fecha.setHours(0,0,0,0);
+      return fecha;
+    }
+  }
+
+  const fecha = new Date(txt);
+  if(isNaN(fecha.getTime())) return null;
+
+  if(finDia) fecha.setHours(23,59,59,999);
+  else fecha.setHours(0,0,0,0);
+
+  return fecha;
+}
+
+function promoVigente(p){
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  const inicio = parseFecha(p.fechaInicio || p.inicio || p.desde || "", false);
+  const fin = parseFecha(p.fechaFin || p.fin || p.hasta || "", true);
+
+  if(inicio && hoy < inicio) return false;
+  if(fin && hoy > fin) return false;
+
+  if(p.activa === false) return false;
+
+  return true;
 }
 
 function leerArticulos(){
@@ -179,39 +223,86 @@ function cargarArticulos(){
 
   pedido = articulos.map(a => ({
     ...a,
-    stockActual:"",
-    pedir:""
+    stockActual:"0",
+    pedir:"0",
+    esPromoAutomatica:false
   }));
+
+  añadirPromosAutomaticasProveedor(proveedor);
 
   pintar();
 }
 
+function esPromoAutomatica(p){
+  return p.automatica === true ||
+         p.auto === true ||
+         p.autoPedido === true ||
+         p.pedirSiempre === true ||
+         p.añadirAutomaticamente === true ||
+         p.anadirAutomaticamente === true ||
+         normalizar(p.tipoAplicacion).includes("MIENTRAS") ||
+         normalizar(p.tipoAplicacion).includes("SIEMPRE") ||
+         normalizar(p.aplicacion).includes("MIENTRAS") ||
+         normalizar(p.aplicacion).includes("SIEMPRE");
+}
+
+function nombrePromo(p){
+  return p.articulo ||
+         p.producto ||
+         p.nombreArticulo ||
+         p.promocion ||
+         p.nombre ||
+         "PROMOCIÓN";
+}
+
+function añadirPromosAutomaticasProveedor(proveedor){
+  const promos = leerPromociones().filter(p =>
+    normalizar(p.proveedor) === normalizar(proveedor) &&
+    promoVigente(p) &&
+    esPromoAutomatica(p)
+  );
+
+  promos.forEach(p=>{
+    const nombre = nombrePromo(p);
+
+    const yaExiste = pedido.some(a =>
+      normalizar(a.articulo) === normalizar(nombre)
+    );
+
+    if(yaExiste) return;
+
+    const conCargo = Number(p.unidadesConCargo || p.conCargo || p.pagadas || p.cargo || 0);
+    const gratis = Number(p.unidadesGratis || p.unidadesCoste0 || p.sinCargo || p.gratis || 0);
+
+    pedido.push({
+      articulo:nombre,
+      proveedor:proveedor,
+      unidadFormato:p.unidadFormato || p.formatoTexto || "PROMO",
+      precioUnidad:Number(p.precioUnidad || p.precio || 0),
+      formato:Number(p.formato || 1),
+      iva:Number(p.iva || 21),
+      stockActual:"0",
+      pedir:String(conCargo > 0 ? conCargo : 0),
+      esPromoAutomatica:true,
+      promoAutomatica:p,
+      cantidadGratisAutomatica:gratis
+    });
+  });
+}
+
 function promoArticulo(a){
+  if(a.promoAutomatica) return a.promoAutomatica;
+
   const promos = leerPromociones();
 
   const nombreArticulo = normalizar(a.articulo);
   const proveedorArticulo = normalizar(a.proveedor);
 
-  const hoy = new Date();
-  hoy.setHours(0,0,0,0);
-
   return promos.find(p => {
+    if(!promoVigente(p)) return false;
+
     const proveedorPromo = normalizar(p.proveedor);
-
     if(proveedorPromo !== proveedorArticulo) return false;
-
-    const inicio = p.fechaInicio || p.inicio || p.desde || "";
-    const fin = p.fechaFin || p.fin || p.hasta || "";
-
-    if(inicio){
-      const dInicio = new Date(inicio + "T00:00:00");
-      if(hoy < dInicio) return false;
-    }
-
-    if(fin){
-      const dFin = new Date(fin + "T23:59:59");
-      if(hoy > dFin) return false;
-    }
 
     const textoPromo = normalizar(
       (p.articulo || "") + " " +
@@ -248,20 +339,42 @@ function datosPromo(a){
     0
   );
 
-  if(conCargo <= 0 || gratis <= 0) return null;
+  const descuento = Number(
+    promo.descuento ||
+    promo.porcentaje ||
+    promo.porcentajeDescuento ||
+    0
+  );
 
-  const cantidad = Number(a.pedir || 0);
-  const bloques = Math.floor(cantidad / conCargo);
-  const gratisTotal = bloques * gratis;
+  if(conCargo <= 0 && gratis <= 0 && descuento <= 0) return null;
+
+  const pedidoUsuario = Number(a.pedir || 0);
+
+  let cantidadCargo = pedidoUsuario;
+  let cantidadGratis = 0;
+
+  if(conCargo > 0 && gratis > 0 && pedidoUsuario > 0){
+    const bloques = Math.ceil(pedidoUsuario / conCargo);
+    cantidadCargo = bloques * conCargo;
+    cantidadGratis = bloques * gratis;
+  }
+
+  if(a.esPromoAutomatica && conCargo <= 0 && gratis > 0){
+    cantidadCargo = 0;
+    cantidadGratis = gratis;
+  }
 
   return {
     promo,
     conCargo,
     gratis,
-    cantidad,
-    bloques,
-    gratisTotal,
-    textoPedido: gratisTotal > 0 ? cantidad + " + " + gratisTotal : ""
+    descuento,
+    pedidoUsuario,
+    cantidadCargo,
+    cantidadGratis,
+    textoPedido: cantidadGratis > 0
+      ? cantidadCargo + " con cargo + " + cantidadGratis + " sin cargo"
+      : cantidadCargo + " con cargo"
   };
 }
 
@@ -270,17 +383,38 @@ function avisoPromoHTML(a){
 
   if(!d) return "";
 
-  let html = `
-    <div class="promo">
-      🎁 PROMO ACTIVA · ${d.conCargo} + ${d.gratis} SIN CARGO
-    </div>
-  `;
+  let html = "";
 
-  if(d.cantidad > 0 && d.gratisTotal > 0){
+  if(a.esPromoAutomatica){
+    html += `
+      <div class="promoAuto">
+        🔵 PROMO AUTOMÁTICA CONFIGURADA<br>
+        Aparece sola mientras esté vigente.
+      </div>
+    `;
+  }
+
+  if(d.conCargo > 0 && d.gratis > 0){
+    html += `
+      <div class="promo">
+        🎁 PROMO ACTIVA · ${d.conCargo} + ${d.gratis} SIN CARGO
+      </div>
+    `;
+  }
+
+  if(d.descuento > 0){
+    html += `
+      <div class="promo">
+        🎁 DESCUENTO ACTIVO · ${d.descuento}%
+      </div>
+    `;
+  }
+
+  if((d.pedidoUsuario > 0 || a.esPromoAutomatica) && (d.cantidadCargo > 0 || d.cantidadGratis > 0)){
     html += `
       <div class="promoOk">
         ✅ SE APLICA AUTOMÁTICAMENTE<br>
-        ${d.cantidad} con cargo + ${d.gratisTotal} sin cargo
+        ${d.textoPedido}
       </div>
     `;
   }
@@ -292,15 +426,23 @@ function precioCaja(a){
   return Number(a.precioUnidad || 0) * Number(a.formato || 1);
 }
 
+function precioConPromo(a){
+  const precio = precioCaja(a);
+  const d = datosPromo(a);
+
+  if(d && d.descuento > 0){
+    return precio * (1 - d.descuento / 100);
+  }
+
+  return precio;
+}
+
 function pintar(){
   const busqueda = normalizar(document.getElementById("buscarArticulo").value);
   let html = "";
 
   pedido.forEach((a,i)=>{
     if(busqueda && !normalizar(a.articulo).includes(busqueda)) return;
-
-    const precio = precioCaja(a);
-    const lineaPago = Number(a.pedir || 0) * precio;
 
     html += `
     <div class="card">
@@ -330,7 +472,7 @@ function pintar(){
           </div>
 
           <div class="stockCol pedido">
-            <label>🛒 PEDIR</label>
+            <label>🛒 PEDIDO</label>
             <input
               class="cantidadPedido"
               data-accion="stockPedir"
@@ -375,19 +517,131 @@ function stockActual(i,v){
 function stockPedir(i,v){
   if(!pedido[i]) return;
   pedido[i].pedir = v;
-  pintar();
+  calcular();
 }
 
 function calcular(){
   let totalPago = 0;
 
   pedido.forEach((a)=>{
-    const precio = precioCaja(a);
-    totalPago += Number(a.pedir || 0) * precio;
+    const d = datosPromo(a);
+    const cantidad = d ? d.cantidadCargo : Number(a.pedir || 0);
+    const precio = precioConPromo(a);
+
+    totalPago += cantidad * precio;
   });
 
   document.getElementById("totalFinal").textContent =
     "TOTAL PAGO: " + totalPago.toFixed(2) + " €";
+}
+
+function crearLineasDeArticulo(a, proveedor){
+  const precioOriginalSinIva = precioCaja(a);
+  const precioFinal = precioConPromo(a);
+  const dPromo = datosPromo(a);
+
+  const cantidadBase = Number(a.pedir || 0);
+
+  if(cantidadBase <= 0 && !a.esPromoAutomatica){
+    return [];
+  }
+
+  const cantidadCargo = dPromo ? dPromo.cantidadCargo : cantidadBase;
+  const cantidadGratis = dPromo ? dPromo.cantidadGratis : 0;
+  const subtotal = cantidadCargo * precioFinal;
+
+  const lineas = [];
+
+  if(cantidadCargo > 0){
+    lineas.push({
+      articulo: a.articulo,
+      nombre: a.articulo,
+      producto: a.articulo,
+      proveedor: proveedor,
+
+      tipoLinea: "CON_CARGO",
+      cantidad: cantidadCargo,
+      unidades: cantidadCargo,
+      uds: cantidadCargo,
+      pedir: cantidadCargo,
+
+      unidadFormato: a.unidadFormato || "",
+      formato: Number(a.formato || 1),
+      iva: Number(a.iva || 21),
+      tipoIva: Number(a.iva || 21),
+
+      precioOriginalSinIva: precioOriginalSinIva,
+      precioSinIva: precioFinal,
+      precio: precioFinal,
+      precioUnidad: precioFinal,
+      precio_unitario: precioFinal,
+      importeUnidad: precioFinal,
+
+      subtotal: subtotal,
+      importe: subtotal,
+      totalLinea: subtotal,
+
+      stockActual:a.stockActual || "0",
+
+      promocionActiva: dPromo ? true : false,
+      promocionTexto: dPromo ? (
+        dPromo.conCargo > 0 && dPromo.gratis > 0
+          ? dPromo.conCargo + " + " + dPromo.gratis
+          : dPromo.descuento + "% descuento"
+      ) : "",
+      unidadesConCargoPromo: dPromo ? dPromo.conCargo : 0,
+      unidadesGratisPromo: dPromo ? dPromo.gratis : 0,
+      unidadesGratisCalculadas: cantidadGratis,
+      textoPedidoPromo: dPromo ? dPromo.textoPedido : "",
+      esPromoAutomatica:a.esPromoAutomatica === true
+    });
+  }
+
+  if(cantidadGratis > 0){
+    lineas.push({
+      articulo: a.articulo,
+      nombre: a.articulo,
+      producto: a.articulo,
+      proveedor: proveedor,
+
+      tipoLinea: "SIN_CARGO_PROMO",
+      cantidad: cantidadGratis,
+      unidades: cantidadGratis,
+      uds: cantidadGratis,
+      pedir: cantidadGratis,
+
+      unidadFormato: a.unidadFormato || "",
+      formato: Number(a.formato || 1),
+      iva: Number(a.iva || 21),
+      tipoIva: Number(a.iva || 21),
+
+      precioOriginalSinIva: precioOriginalSinIva,
+      precioSinIva: 0,
+      precio: 0,
+      precioUnidad: 0,
+      precio_unitario: 0,
+      importeUnidad: 0,
+
+      subtotal: 0,
+      importe: 0,
+      totalLinea: 0,
+
+      stockActual:a.stockActual || "0",
+
+      promocionActiva: true,
+      promocionTexto: dPromo ? dPromo.conCargo + " + " + dPromo.gratis : "",
+      unidadesConCargoPromo: dPromo ? dPromo.conCargo : 0,
+      unidadesGratisPromo: dPromo ? dPromo.gratis : 0,
+      unidadesGratisCalculadas: cantidadGratis,
+      textoPedidoPromo: dPromo ? dPromo.textoPedido : "",
+      sinCargo:true,
+      costeCero:true,
+      excluirRappel:false,
+      esPromoAutomatica:a.esPromoAutomatica === true
+    });
+  }
+
+  return lineas;
 }
 
 async function guardarPedido(){
@@ -398,111 +652,20 @@ async function guardarPedido(){
     return;
   }
 
-  const lineas = pedido.filter(a =>
-    Number(a.pedir || 0) > 0
-  );
+  const lineasFinal = [];
 
-  if(lineas.length === 0){
+  pedido.forEach(a=>{
+    const lineas = crearLineasDeArticulo(a, proveedor);
+    lineasFinal.push(...lineas);
+  });
+
+  if(lineasFinal.length === 0){
     alert("Sin cantidades pedidas");
     return;
   }
 
   const ahora = new Date();
   const pedidoId = crearId("pedido_" + proveedor);
-
-  const lineasFinal = [];
-
-  lineas.forEach(a => {
-    const precioOriginalSinIva =
-      Number(a.precioUnidad || 0) *
-      Number(a.formato || 1);
-
-    const dPromo = datosPromo(a);
-    const cantidadCargo = Number(a.pedir || 0);
-    const cantidadGratis = dPromo ? dPromo.gratisTotal : 0;
-    const subtotal = cantidadCargo * precioOriginalSinIva;
-
-    lineasFinal.push({
-      articulo: a.articulo,
-      nombre: a.articulo,
-      producto: a.articulo,
-      proveedor: proveedor,
-
-      tipoLinea: "CON_CARGO",
-      cantidad: cantidadCargo,
-      unidades: cantidadCargo,
-      uds: cantidadCargo,
-      pedir: a.pedir || "",
-
-      unidadFormato: a.unidadFormato || "",
-      formato: Number(a.formato || 1),
-      iva: Number(a.iva || 21),
-      tipoIva: Number(a.iva || 21),
-
-      precioOriginalSinIva: precioOriginalSinIva,
-      precioSinIva: precioOriginalSinIva,
-      precio: precioOriginalSinIva,
-      precioUnidad: precioOriginalSinIva,
-      precio_unitario: precioOriginalSinIva,
-      importeUnidad: precioOriginalSinIva,
-
-      subtotal: subtotal,
-      importe: subtotal,
-      totalLinea: subtotal,
-
-      stockActual:a.stockActual || "",
-
-      promocionActiva: dPromo ? true : false,
-      promocionTexto: dPromo ? (dPromo.conCargo + " + " + dPromo.gratis) : "",
-      unidadesConCargoPromo: dPromo ? dPromo.conCargo : 0,
-      unidadesGratisPromo: dPromo ? dPromo.gratis : 0,
-      unidadesGratisCalculadas: cantidadGratis,
-      textoPedidoPromo: dPromo && dPromo.textoPedido ? dPromo.textoPedido : ""
-    });
-
-    if(cantidadGratis > 0){
-      lineasFinal.push({
-        articulo: a.articulo,
-        nombre: a.articulo,
-        producto: a.articulo,
-        proveedor: proveedor,
-
-        tipoLinea: "SIN_CARGO_PROMO",
-        cantidad: cantidadGratis,
-        unidades: cantidadGratis,
-        uds: cantidadGratis,
-        pedir: cantidadGratis,
-
-        unidadFormato: a.unidadFormato || "",
-        formato: Number(a.formato || 1),
-        iva: Number(a.iva || 21),
-        tipoIva: Number(a.iva || 21),
-
-        precioOriginalSinIva: precioOriginalSinIva,
-        precioSinIva: 0,
-        precio: 0,
-        precioUnidad: 0,
-        precio_unitario: 0,
-        importeUnidad: 0,
-
-        subtotal: 0,
-        importe: 0,
-        totalLinea: 0,
-
-        stockActual:a.stockActual || "",
-
-        promocionActiva: true,
-        promocionTexto: dPromo.conCargo + " + " + dPromo.gratis,
-        unidadesConCargoPromo: dPromo.conCargo,
-        unidadesGratisPromo: dPromo.gratis,
-        unidadesGratisCalculadas: cantidadGratis,
-        textoPedidoPromo: dPromo.textoPedido || "",
-        sinCargo:true,
-        costeCero:true,
-        excluirRappel:false
-      });
-    }
-  });
 
   const totalPago = lineasFinal.reduce((t,l)=>
     t + Number(l.subtotal || 0)
@@ -583,6 +746,12 @@ function activarEventos(){
     const i = Number(el.dataset.indice);
     siguienteConEnter(e, i);
   });
+
+  document.getElementById("articulos").addEventListener("blur", function(e){
+    const el = e.target;
+    if(!el.classList.contains("cantidadPedido")) return;
+    pintar();
+  }, true);
 }
 
 async function iniciar(){
@@ -610,7 +779,9 @@ async function iniciar(){
 
   escucharColeccion("promociones_monolito", (lista)=>{
     promocionesGlobal = lista;
-    pintar();
+    const proveedorActual = document.getElementById("proveedor").value;
+    if(proveedorActual) cargarArticulos();
+    else pintar();
   });
 
   escucharColeccion("avisos_pedidos", (lista)=>{
