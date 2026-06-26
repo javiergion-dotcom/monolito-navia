@@ -3,633 +3,669 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CONFIGURACIÓN · MONOLITO</title>
+<title>PEDIDOS · MONOLITO</title>
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
-header{background:#17303d;color:white;padding:16px;display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px}
-.volver{background:white;color:#17303d;border:0;border-radius:12px;padding:8px 12px;font-weight:900}
-.contenido{padding:16px}
-.card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
-.titulo{font-size:22px;font-weight:900;margin-bottom:10px}
-label{display:block;font-weight:900;margin-top:12px;margin-bottom:6px}
-input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px}
-textarea{min-height:80px}
-button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
-.guardar{width:100%;background:#48a530;color:white;margin-top:14px}
-.nuevo{width:100%;background:#ff9800;color:white;margin-top:10px}
-.borrar{width:100%;background:#c00000;color:white;margin-top:10px}
-.editar{background:#2196f3;color:white}
-.desactivar{background:#ff9800;color:white}
-.reactivar{background:#48a530;color:white}
-.linea{border-top:1px solid #dfe6ec;padding-top:12px;margin-top:12px}
-.nombre{font-size:18px;font-weight:900}
-.detalle{color:#4f5f69;margin-top:5px;font-size:14px}
-.botones{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.botones button{flex:1}
-.inactivo{opacity:.45}
-.aviso{background:#fff3cd;color:#7a4d00;border-radius:14px;padding:12px;font-weight:900;margin-top:10px}
-.rojoAviso{background:#ffe0e0;color:#c00000;border-radius:14px;padding:12px;font-weight:900;margin-top:10px}
-.vacio{background:#eef2f5;border-radius:18px;padding:16px;text-align:center;font-weight:900;margin-top:10px}
+body{margin:0;font-family:Arial;background:#eef2f5;color:#17303d}
+header{background:#17303d;color:white;padding:16px;font-weight:900;font-size:20px}
+.contenedor{padding:16px}
+select,.buscador{width:100%;padding:14px;border-radius:18px;margin-bottom:14px;font-size:18px;border:1px solid #ccd6dd;box-sizing:border-box;background:white}
+.card{background:white;border-radius:24px;padding:18px;margin-bottom:18px}
+.nombre{font-weight:900;font-size:22px}
+.detalle{color:#4f5f69;font-size:15px;margin-top:6px}
+.stockFila{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.stockCol{border-radius:18px;padding:12px;text-align:center}
+.almacen{background:#eef7ff;border:3px solid #cfe5ff}
+.pedidoBox{background:#f1fff1;border:3px solid #bde9bd}
+.stockCol label{display:block;font-size:17px;font-weight:900;margin-bottom:8px}
+.stockCol input{width:90%;padding:14px;border-radius:16px;border:1px solid #ccc;text-align:center;font-size:30px;font-weight:900}
+button{width:100%;padding:15px;margin-top:14px;border:0;border-radius:16px;font-weight:900;font-size:17px}
+.guardar{background:#48a530;color:white}
+.volver{background:white;color:#17303d;width:auto;margin:0 10px 0 0;padding:7px 11px}
+.totalFinal{font-size:26px;font-weight:900;margin-top:20px}
+.avisosBox,.promosBox{background:#fff8db;border:3px solid #f0c94a;border-radius:20px;padding:14px;margin-bottom:16px}
+.promosBox{background:#eef6ff;border-color:#8dbdf5}
+.tituloBox{font-weight:900;font-size:18px;margin-bottom:10px}
+.promoLinea{background:white;border-radius:14px;padding:11px;margin-top:8px;font-weight:900}
+.promoPendiente{border-left:8px solid #f0c94a}
+.promoRevisada{border-left:8px solid #48a530;opacity:.85}
+.promoDetalle{background:#fff6cf;border:2px solid #ffe066;border-radius:14px;padding:12px;margin-top:12px;font-weight:900;color:#7a6200}
+.promoBotones{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.si{background:#48a530;color:white}
+.no{background:#c44;color:white}
 </style>
 </head>
 
 <body>
 
-<script>
-const sesionProteccion = JSON.parse(localStorage.getItem("sesion_monolito") || "{}");
-
-const usuarioProteccion = String(
-  localStorage.getItem("usuario") ||
-  sesionProteccion.usuario ||
-  sesionProteccion.nombre ||
-  ""
-).trim().toUpperCase();
-
-const nivelProteccion = String(
-  localStorage.getItem("nivel") ||
-  sesionProteccion.nivel ||
-  ""
-).trim().toUpperCase();
-
-const rolProteccion = String(
-  localStorage.getItem("rol") ||
-  sesionProteccion.rol ||
-  ""
-).trim().toUpperCase();
-
-const autorizadoProteccion =
-  usuarioProteccion.includes("JAVI") ||
-  usuarioProteccion.includes("JAVIER") ||
-  usuarioProteccion.includes("SILVIA") ||
-  nivelProteccion === "HOSTELERIA" ||
-  rolProteccion === "ADMIN";
-
-if(!autorizadoProteccion){
-  const pinRescate = prompt("Acceso configuración. PIN administrador:");
-
-  if(pinRescate !== "0000"){
-    alert("⚠ ACCESO NO PERMITIDO");
-    window.location.href = "index.html";
-  }else{
-    localStorage.setItem("usuario","JAVIER");
-    localStorage.setItem("nivel","HOSTELERIA");
-    localStorage.setItem("rol","ADMIN");
-  }
-}
-</script>
-
 <header>
-  <button class="volver" onclick="volver()">←</button>
-  ⚙️ CONFIGURACIÓN
+  <button id="btnVolver" class="volver">←</button>
+  📝 PEDIDOS
 </header>
 
-<div class="contenido">
+<div class="contenedor">
 
-  <div class="card">
-    <div class="titulo">Usuarios</div>
+  <div id="avisosPedidos"></div>
+  <div id="promosActivas"></div>
 
-    <div class="aviso" id="estadoCloud">Comprobando cloud...</div>
+  <select id="proveedor"></select>
+  <input id="buscarArticulo" class="buscador" placeholder="🔍 Buscar artículo...">
 
-    <label>Nombre usuario</label>
-    <input id="usuarioNombre" placeholder="Ej: SILVIA">
+  <div id="promosProveedor"></div>
+  <div id="articulos"></div>
 
-    <label>PIN</label>
-    <input id="usuarioPin" type="number" placeholder="Ej: 1234">
+  <div class="totalFinal" id="totalFinal">TOTAL PAGO: 0,00 €</div>
 
-    <label>Nivel</label>
-    <select id="usuarioNivel">
-      <option value="HOSTELERIA">HOSTELERÍA</option>
-      <option value="OPERADOR">OPERADOR</option>
-      <option value="DEMO">DEMO</option>
-    </select>
-
-    <label>Rol</label>
-    <select id="usuarioRol">
-      <option value="ADMIN">ADMIN</option>
-      <option value="OPERADOR">OPERADOR</option>
-      <option value="DEMO">DEMO</option>
-    </select>
-
-    <button class="guardar" onclick="guardarUsuario()">💾 Guardar usuario</button>
-
-    <div id="listaUsuarios"></div>
-  </div>
-
-  <div class="card">
-    <div class="titulo">Promociones</div>
-
-    <label>Proveedor</label>
-    <input id="promoProveedor" placeholder="Ej: TURRADO">
-
-    <label>Promoción</label>
-    <input id="promoNombre" placeholder="Ej: MAHOU 5 + 2">
-
-    <label>% descuento</label>
-    <input id="promoDescuento" type="number" step="0.01">
-
-    <label>Unidades con cargo</label>
-    <input id="promoCargo" type="number" step="1">
-
-    <label>Unidades coste 0 €</label>
-    <input id="promoGratis" type="number" step="1">
-
-    <label>Fecha inicio</label>
-    <input id="promoInicio" type="date">
-
-    <label>Fecha fin</label>
-    <input id="promoFin" type="date">
-
-    <label>Nota</label>
-    <textarea id="promoNota"></textarea>
-
-    <button class="guardar" onclick="guardarPromocion()">💾 Guardar promoción</button>
-    <button class="nuevo" onclick="limpiarPromocion()">➕ Nueva promoción</button>
-
-    <div class="aviso">PEDIDOS leerá automáticamente las promociones activas.</div>
-
-    <div id="listaPromociones"></div>
-  </div>
-
-  <div class="card">
-    <div class="titulo">Control pedidos</div>
-
-    <label>Activar “Cuántas hay”</label>
-    <select id="activarCuantasHay">
-      <option value="SI">SI</option>
-      <option value="NO">NO</option>
-    </select>
-
-    <label>Activar “Cuántas pido”</label>
-    <select id="activarCuantasPido">
-      <option value="SI">SI</option>
-      <option value="NO">NO</option>
-    </select>
-
-    <label>Frecuencia control stock</label>
-    <select id="frecuenciaControl">
-      <option value="SIEMPRE">SIEMPRE</option>
-      <option value="SEMANAL">SEMANAL</option>
-      <option value="MENSUAL">MENSUAL</option>
-      <option value="PERSONALIZADO">PERSONALIZADO</option>
-    </select>
-
-    <label>Cada cuántos pedidos</label>
-    <input type="number" id="cadaPedidos" placeholder="Ej: 4">
-
-    <button class="guardar" onclick="guardarControlPedidos()">💾 Guardar control pedidos</button>
-  </div>
-
-  <div class="card">
-    <div class="titulo">Sistema</div>
-
-    <div class="rojoAviso">Zona delicada. Solo usar para limpiar pruebas.</div>
-
-    <button class="borrar" onclick="borrarCalendario()">Borrar calendario</button>
-    <button class="borrar" onclick="borrarDocumentos()">Borrar documentos</button>
-    <button class="borrar" onclick="borrarPagos()">Borrar pagos pendientes</button>
-    <button class="borrar" onclick="borrarHistoricoPedidos()">Borrar histórico pagos</button>
-    <button class="borrar" onclick="borrarIncidencias()">Borrar incidencias</button>
-  </div>
+  <button id="btnGuardarPedido" class="guardar">Guardar pedido</button>
 
 </div>
 
 <script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-
 import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  setDoc,
-  deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  leerColeccion,
+  guardarColeccion,
+  escucharColeccion,
+  borrarDocumento
+} from "./monolito-cloud.js";
 
-const firebaseConfig = {
-  apiKey: "PEGA_AQUI_TU_API_KEY_REAL",
-  authDomain: "monolito-ed87d.firebaseapp.com",
-  projectId: "monolito-ed87d",
-  storageBucket: "monolito-ed87d.appspot.com",
-  messagingSenderId: "737849584362",
-  appId: "1:737849584362:web:3d1821bedcd64080cf8593",
-  measurementId: "G-7XCZ0VN7ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-let editandoUsuario = "";
-let editandoPromo = "";
-let usuariosCloud = [];
-
-window.volver = function(){
-  window.location.href = "index.html";
-};
+let pedido = [];
+let articulosGlobal = [];
+let proveedoresGlobal = [];
+let promocionesGlobal = [];
+let avisosCloud = [];
+let historicoPedidos = [];
+let pagosPendientes = [];
+let decisionesPromo = {};
 
 function usuarioActual(){
-  return localStorage.getItem("usuario") || "OPERADOR";
+  return localStorage.getItem("usuario") || "JAVI";
+}
+
+function volver(){
+  window.location.href = "index.html";
 }
 
 function normalizar(t){
-  return String(t || "").trim().toUpperCase();
+  return String(t || "")
+    .trim()
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"");
 }
 
-function idUsuario(nombre){
-  return normalizar(nombre).replaceAll(" ","_");
+function esc(t){
+  return String(t || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
-/* ================= USUARIOS ================= */
-
-async function leerUsuariosCloud(){
-  try{
-    const snap = await getDocs(collection(db,"usuarios"));
-    let data = [];
-
-    snap.forEach(d=>{
-      const u = d.data();
-
-      data.push({
-        id:d.id,
-        nombre:String(u.nombre || "").trim().toUpperCase(),
-        pin:String(u.pin || "").trim(),
-        nivel:String(u.nivel || "OPERADOR").trim().toUpperCase(),
-        rol:String(u.rol || "OPERADOR").trim().toUpperCase(),
-        activo:u.activo !== false,
-        fijo:u.fijo === true,
-        actualizado:u.actualizado || "",
-        actualizadoPor:u.actualizadoPor || ""
-      });
-    });
-
-    usuariosCloud = data;
-    localStorage.setItem("usuarios_monolito", JSON.stringify(data));
-
-    document.getElementById("estadoCloud").textContent =
-      "✅ Usuarios sincronizados con cloud · " + data.length;
-
-    return data;
-
-  }catch(e){
-    console.error(e);
-
-    document.getElementById("estadoCloud").textContent =
-      "⚠️ Cloud no disponible. Usando copia local.";
-
-    usuariosCloud = JSON.parse(localStorage.getItem("usuarios_monolito") || "[]");
-
-    return usuariosCloud;
-  }
+function crearId(prefijo){
+  return String(prefijo || "id")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"_")
+    .replace(/^_+|_+$/g,"")
+    + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
 }
 
-window.guardarUsuario = async function(){
-  const nombre = normalizar(document.getElementById("usuarioNombre").value);
-  const pin = String(document.getElementById("usuarioPin").value || "").trim();
-  const nivel = document.getElementById("usuarioNivel").value;
-  const rol = document.getElementById("usuarioRol").value;
-
-  if(!nombre){
-    alert("Falta el nombre.");
-    return;
-  }
-
-  if(!pin){
-    alert("Falta el PIN.");
-    return;
-  }
-
-  const anterior =
-    editandoUsuario !== ""
-    ? usuariosCloud[Number(editandoUsuario)] || {}
-    : {};
-
-  const registro = {
-    nombre,
-    pin,
-    nivel,
-    rol,
-    activo: anterior.activo !== false,
-    fijo: anterior.fijo === true,
-    actualizadoPor: usuarioActual(),
-    actualizado: new Date().toLocaleString("es-ES")
+function ahoraAuditoria(){
+  const d = new Date();
+  return {
+    fecha: d.toLocaleDateString("es-ES"),
+    hora: d.toLocaleTimeString("es-ES"),
+    fechaHora: d.toLocaleString("es-ES"),
+    fechaMs: d.getTime(),
+    iso: d.toISOString(),
+    operador: usuarioActual()
   };
-
-  try{
-    await setDoc(doc(db,"usuarios",idUsuario(nombre)),registro);
-    alert("Usuario guardado en cloud.");
-  }catch(e){
-    console.error(e);
-    alert("No se pudo guardar en cloud.");
-    return;
-  }
-
-  limpiarUsuario();
-  await pintarUsuarios();
-};
-
-function limpiarUsuario(){
-  editandoUsuario = "";
-  document.getElementById("usuarioNombre").value = "";
-  document.getElementById("usuarioPin").value = "";
-  document.getElementById("usuarioNivel").value = "OPERADOR";
-  document.getElementById("usuarioRol").value = "OPERADOR";
 }
 
-window.editarUsuario = function(i){
-  const u = usuariosCloud[i];
-
-  editandoUsuario = i;
-
-  document.getElementById("usuarioNombre").value = u.nombre || "";
-  document.getElementById("usuarioPin").value = u.pin || "";
-  document.getElementById("usuarioNivel").value = u.nivel || "OPERADOR";
-  document.getElementById("usuarioRol").value = u.rol || "OPERADOR";
-
-  window.scrollTo({top:0,behavior:"smooth"});
-};
-
-window.toggleUsuario = async function(i){
-  const u = usuariosCloud[i];
-  if(!u) return;
-
-  try{
-    await setDoc(doc(db,"usuarios",idUsuario(u.nombre)),{
-      ...u,
-      activo:u.activo === false ? true : false,
-      actualizado:new Date().toLocaleString("es-ES"),
-      actualizadoPor:usuarioActual()
-    });
-
-    await pintarUsuarios();
-
-  }catch(e){
-    console.error(e);
-    alert("No se pudo cambiar el estado.");
-  }
-};
-
-window.eliminarUsuario = async function(i){
-  const u = usuariosCloud[i];
-  if(!u) return;
-
-  if(u.fijo){
-    alert("Este usuario base no se elimina.");
-    return;
-  }
-
-  if(!confirm("¿Eliminar por completo a " + u.nombre + "?")) return;
-
-  try{
-    await deleteDoc(doc(db,"usuarios",idUsuario(u.nombre)));
-    await pintarUsuarios();
-  }catch(e){
-    console.error(e);
-    alert("No se pudo eliminar.");
-  }
-};
-
-async function pintarUsuarios(){
-  const data = await leerUsuariosCloud();
-  let html = "";
-
-  if(data.length === 0){
-    html = `<div class="vacio">No hay usuarios.</div>`;
-  }
-
-  data.forEach((u,i)=>{
-    html += `
-      <div class="linea ${u.activo === false ? "inactivo" : ""}">
-        <div class="nombre">${u.nombre}</div>
-        <div class="detalle">PIN: ${u.pin ? "••••" : "-"}</div>
-        <div class="detalle">Nivel: <strong>${u.nivel}</strong> · Rol: <strong>${u.rol}</strong></div>
-        <div class="detalle">Estado: <strong>${u.activo === false ? "INACTIVO" : "ACTIVO"}</strong></div>
-        <div class="detalle">Actualizado: ${u.actualizado || "-"}</div>
-
-        <div class="botones">
-          <button class="editar" onclick="editarUsuario(${i})">Editar</button>
-          <button class="${u.activo === false ? "reactivar" : "desactivar"}" onclick="toggleUsuario(${i})">
-            ${u.activo === false ? "Activar" : "Desactivar"}
-          </button>
-          ${u.fijo ? "" : `<button class="borrar" onclick="eliminarUsuario(${i})">Eliminar</button>`}
-        </div>
-      </div>
-    `;
-  });
-
-  document.getElementById("listaUsuarios").innerHTML = html;
-}
-
-/* ================= PROMOCIONES ================= */
-
-function leerPromociones(){
+/* PROMOCIONES VIENEN DE CONFIGURACIÓN LOCAL */
+function leerPromocionesLocal(){
   return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
 }
 
-function guardarPromociones(data){
-  localStorage.setItem("promociones_monolito", JSON.stringify(data));
+function promoVigente(p){
+  if(p.activa === false) return false;
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  if(p.inicio){
+    const ini = new Date(p.inicio + "T00:00:00");
+    if(hoy < ini) return false;
+  }
+
+  if(p.fin){
+    const fin = new Date(p.fin + "T23:59:59");
+    if(hoy > fin) return false;
+  }
+
+  return true;
 }
 
-window.limpiarPromocion = function(){
-  editandoPromo = "";
-  document.getElementById("promoProveedor").value = "";
-  document.getElementById("promoNombre").value = "";
-  document.getElementById("promoDescuento").value = "";
-  document.getElementById("promoCargo").value = "";
-  document.getElementById("promoGratis").value = "";
-  document.getElementById("promoInicio").value = "";
-  document.getElementById("promoFin").value = "";
-  document.getElementById("promoNota").value = "";
-};
+function leerPromosVigentes(){
+  promocionesGlobal = leerPromocionesLocal();
+  return promocionesGlobal.filter(promoVigente);
+}
 
-window.guardarPromocion = function(){
-  const proveedor = normalizar(document.getElementById("promoProveedor").value);
-  const nombre = document.getElementById("promoNombre").value.trim().toUpperCase();
+function idPromo(p){
+  return p.id || normalizar((p.proveedor || "") + "_" + (p.nombre || ""));
+}
 
-  if(!proveedor){
-    alert("Falta proveedor.");
+function pintarPromosActivas(){
+  const promos = leerPromosVigentes();
+
+  if(promos.length === 0){
+    document.getElementById("promosActivas").innerHTML = "";
     return;
   }
 
-  if(!nombre){
-    alert("Falta promoción.");
-    return;
-  }
+  let html = `<div class="promosBox"><div class="tituloBox">🎁 PROMOCIONES ACTIVAS</div>`;
 
-  let data = leerPromociones();
-  let idx = editandoPromo !== "" ? Number(editandoPromo) : -1;
-  const anterior = idx >= 0 ? data[idx] : {};
+  promos.forEach(p=>{
+    const id = idPromo(p);
+    const rev = decisionesPromo[id];
 
-  const registro = {
-    id: anterior.id || Date.now(),
-    proveedor,
-    nombre,
-    descuento:Number(document.getElementById("promoDescuento").value || 0),
-    cargo:Number(document.getElementById("promoCargo").value || 0),
-    gratis:Number(document.getElementById("promoGratis").value || 0),
-    inicio:document.getElementById("promoInicio").value,
-    fin:document.getElementById("promoFin").value,
-    nota:document.getElementById("promoNota").value.trim(),
-    activa:anterior.activa !== false,
-    actualizadoPor:usuarioActual(),
-    actualizado:new Date().toLocaleString("es-ES")
-  };
-
-  if(idx >= 0){
-    data[idx] = registro;
-  }else{
-    data.unshift(registro);
-  }
-
-  guardarPromociones(data);
-  limpiarPromocion();
-  pintarPromociones();
-};
-
-window.editarPromocion = function(i){
-  const p = leerPromociones()[i];
-
-  editandoPromo = i;
-
-  document.getElementById("promoProveedor").value = p.proveedor || "";
-  document.getElementById("promoNombre").value = p.nombre || "";
-  document.getElementById("promoDescuento").value = p.descuento || "";
-  document.getElementById("promoCargo").value = p.cargo || "";
-  document.getElementById("promoGratis").value = p.gratis || "";
-  document.getElementById("promoInicio").value = p.inicio || "";
-  document.getElementById("promoFin").value = p.fin || "";
-  document.getElementById("promoNota").value = p.nota || "";
-
-  window.scrollTo({top:0,behavior:"smooth"});
-};
-
-window.togglePromocion = function(i){
-  let data = leerPromociones();
-  data[i].activa = data[i].activa === false ? true : false;
-  guardarPromociones(data);
-  pintarPromociones();
-};
-
-window.borrarPromocion = function(i){
-  if(!confirm("¿Borrar esta promoción?")) return;
-  let data = leerPromociones();
-  data.splice(i,1);
-  guardarPromociones(data);
-  pintarPromociones();
-};
-
-function pintarPromociones(){
-  const data = leerPromociones();
-  let html = "";
-
-  if(data.length === 0){
-    html = `<div class="vacio">No hay promociones guardadas.</div>`;
-  }
-
-  data.forEach((p,i)=>{
     html += `
-      <div class="linea ${p.activa === false ? "inactivo" : ""}">
-        <div class="nombre">${p.nombre}</div>
-        <div class="detalle">Proveedor: <strong>${p.proveedor}</strong></div>
-        <div class="detalle">% descuento: ${Number(p.descuento || 0).toFixed(2).replace(".",",")}%</div>
-        <div class="detalle">${p.cargo || 0} con cargo · ${p.gratis || 0} coste 0 €</div>
-        <div class="detalle">Inicio: ${p.inicio || "-"} · Fin: ${p.fin || "-"}</div>
-        ${p.nota ? `<div class="detalle">Nota: ${p.nota}</div>` : ""}
-        <div class="detalle">Estado: <strong>${p.activa === false ? "INACTIVA" : "ACTIVA"}</strong></div>
+      <div class="promoLinea ${rev ? "promoRevisada" : "promoPendiente"}">
+        ${rev ? "🟢" : "🟡"} ${esc(p.proveedor)} · ${esc(p.nombre)}
+      </div>
+    `;
+  });
 
-        <div class="botones">
-          <button class="editar" onclick="editarPromocion(${i})">Editar</button>
-          <button class="${p.activa === false ? "reactivar" : "desactivar"}" onclick="togglePromocion(${i})">
-            ${p.activa === false ? "Activar" : "Desactivar"}
-          </button>
-          <button class="borrar" onclick="borrarPromocion(${i})">Borrar</button>
+  html += `</div>`;
+  document.getElementById("promosActivas").innerHTML = html;
+}
+
+function promosDelProveedor(){
+  const proveedor = document.getElementById("proveedor").value;
+  return leerPromosVigentes().filter(p =>
+    normalizar(p.proveedor) === normalizar(proveedor)
+  );
+}
+
+function pintarPromosProveedor(){
+  const promos = promosDelProveedor();
+
+  if(promos.length === 0){
+    document.getElementById("promosProveedor").innerHTML = "";
+    return;
+  }
+
+  let html = `<div class="promosBox"><div class="tituloBox">🎁 PROMOCIONES DEL PROVEEDOR</div>`;
+
+  promos.forEach((p,i)=>{
+    const id = idPromo(p);
+    const dec = decisionesPromo[id];
+
+    html += `
+      <div class="promoDetalle">
+        <div>${dec ? "🟢 REVISADA" : "🟡 PENDIENTE"} · ${esc(p.nombre)}</div>
+        <div style="margin-top:6px">
+          ${Number(p.descuento || 0) > 0 ? `${Number(p.descuento)}% descuento<br>` : ""}
+          ${Number(p.cargo || 0)} con cargo · ${Number(p.gratis || 0)} coste 0 €
+        </div>
+        ${p.nota ? `<div style="margin-top:6px">${esc(p.nota)}</div>` : ""}
+        <div class="promoBotones">
+          <button class="si" data-accion="promoSi" data-indice="${i}">SÍ</button>
+          <button class="no" data-accion="promoNo" data-indice="${i}">NO</button>
         </div>
       </div>
     `;
   });
 
-  document.getElementById("listaPromociones").innerHTML = html;
+  html += `</div>`;
+  document.getElementById("promosProveedor").innerHTML = html;
 }
 
-/* ================= CONTROL PEDIDOS ================= */
+function registrarDecisionPromo(p, decision){
+  const id = idPromo(p);
 
-function leerControlPedidos(){
-  return JSON.parse(
-    localStorage.getItem("control_pedidos_monolito") ||
-    JSON.stringify({
-      activarCuantasHay:"SI",
-      activarCuantasPido:"SI",
-      frecuencia:"SIEMPRE",
-      cadaPedidos:4
-    })
-  );
-}
-
-window.guardarControlPedidos = function(){
-  const data = {
-    activarCuantasHay:document.getElementById("activarCuantasHay").value,
-    activarCuantasPido:document.getElementById("activarCuantasPido").value,
-    frecuencia:document.getElementById("frecuenciaControl").value,
-    cadaPedidos:Number(document.getElementById("cadaPedidos").value || 0)
+  decisionesPromo[id] = {
+    promoId:id,
+    proveedor:p.proveedor,
+    nombre:p.nombre,
+    decision,
+    ...ahoraAuditoria()
   };
 
-  localStorage.setItem("control_pedidos_monolito", JSON.stringify(data));
-
-  alert("Configuración pedidos guardada.");
-};
-
-function pintarControlPedidos(){
-  const data = leerControlPedidos();
-
-  document.getElementById("activarCuantasHay").value = data.activarCuantasHay || "SI";
-  document.getElementById("activarCuantasPido").value = data.activarCuantasPido || "SI";
-  document.getElementById("frecuenciaControl").value = data.frecuencia || "SIEMPRE";
-  document.getElementById("cadaPedidos").value = data.cadaPedidos || 4;
+  pintarPromosActivas();
+  pintarPromosProveedor();
 }
 
-/* ================= SISTEMA ================= */
+/* AVISOS */
+function pintarAvisosPedidos(){
+  if(avisosCloud.length === 0){
+    document.getElementById("avisosPedidos").innerHTML = "";
+    return;
+  }
 
-function confirmarTexto(texto){
-  return prompt(texto + "\n\nEscribe BORRAR para confirmar:") === "BORRAR";
+  let html = `<div class="avisosBox"><div class="tituloBox">🛎️ AVISOS PARA PEDIDOS</div>`;
+
+  avisosCloud.forEach(a=>{
+    html += `
+      <div class="promoLinea">
+        ${esc(a.texto || "")}
+        <button class="si" data-accion="resolverAviso" data-id="${esc(a.id)}">✅ RESUELTO</button>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  document.getElementById("avisosPedidos").innerHTML = html;
 }
 
-function borrarClave(clave,nombre){
-  if(!confirmarTexto("Vas a borrar " + nombre + ".")) return;
-  localStorage.removeItem(clave);
-  alert(nombre + " borrado.");
+async function resolverAvisoPedido(id){
+  if(!confirm("¿Eliminar aviso de pedidos?")) return;
+  await borrarDocumento("avisos_pedidos", id);
 }
 
-window.borrarCalendario = function(){
-  borrarClave("calendario","calendario");
-};
+/* PROVEEDORES Y ARTÍCULOS */
+function cargarProveedores(){
+  let proveedores = (proveedoresGlobal || []).filter(p=>p.activo !== false);
 
-window.borrarDocumentos = function(){
-  borrarClave("documentos_monolito","documentos");
-};
+  if(proveedores.length === 0){
+    proveedores = [
+      {nombre:"CANDELAS"},
+      {nombre:"TURRADO"},
+      {nombre:"SANPEDRO"},
+      {nombre:"DEO"}
+    ];
+  }
 
-window.borrarPagos = function(){
-  borrarClave("pagos_pendientes","pagos pendientes");
-};
+  document.getElementById("proveedor").innerHTML =
+    `<option value="">Selecciona proveedor</option>` +
+    proveedores.map(p=>`<option value="${esc(p.nombre)}">${esc(p.nombre)}</option>`).join("");
+}
 
-window.borrarHistoricoPedidos = function(){
-  borrarClave("pagos_historico","histórico pagos");
-};
+function cargarArticulos(){
+  const proveedor = document.getElementById("proveedor").value;
 
-window.borrarIncidencias = function(){
-  borrarClave("incidencias","incidencias");
-};
+  pedido = (articulosGlobal || [])
+    .filter(a=>a.activo !== false)
+    .filter(a=>normalizar(a.proveedor) === normalizar(proveedor))
+    .map(a=>({
+      ...a,
+      stockActual:"",
+      pedir:""
+    }));
 
-/* ================= START ================= */
+  pintarPromosProveedor();
+  pintar();
+}
 
+function precioCaja(a){
+  return Number(a.precioUnidad || 0) * Number(a.formato || 1);
+}
+
+function descuentoArticulo(a){
+  const promos = promosDelProveedor().filter(p => Number(p.descuento || 0) > 0);
+
+  const promo = promos.find(p=>{
+    const nombrePromo = normalizar(p.nombre || "");
+    const nombreArticulo = normalizar(a.articulo || "");
+
+    return nombreArticulo.includes(nombrePromo) || nombrePromo.includes(nombreArticulo);
+  });
+
+  return promo ? Number(promo.descuento || 0) : 0;
+}
+
+function precioFinal(a){
+  const precio = precioCaja(a);
+  const dto = descuentoArticulo(a);
+
+  if(dto > 0){
+    return precio * (1 - dto / 100);
+  }
+
+  return precio;
+}
+
+function pintar(){
+  const busqueda = normalizar(document.getElementById("buscarArticulo").value || "");
+  let html = "";
+
+  pedido.forEach((a,i)=>{
+    if(busqueda && !normalizar(a.articulo).includes(busqueda)) return;
+
+    const dto = descuentoArticulo(a);
+
+    html += `
+      <div class="card">
+        <div class="nombre">${esc(a.articulo)}</div>
+        <div class="detalle">
+          ${esc(a.unidadFormato || "")} · ${Number(a.precioUnidad || 0).toFixed(2)} € · IVA ${Number(a.iva || 21)}%
+          ${dto > 0 ? ` · 🎁 ${dto}% dto` : ""}
+        </div>
+
+        <div class="stockFila">
+          <div class="stockCol almacen">
+            <label>📦 ALMACÉN</label>
+            <input type="number" placeholder="0" value="${esc(a.stockActual)}" data-accion="stockActual" data-indice="${i}">
+          </div>
+
+          <div class="stockCol pedidoBox">
+            <label>🛒 PEDIDO</label>
+            <input class="cantidadPedido" type="number" placeholder="0" value="${esc(a.pedir)}" data-accion="stockPedir" data-indice="${i}">
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("articulos").innerHTML = html;
+  calcular();
+}
+
+function stockActual(i,v){
+  if(!pedido[i]) return;
+  pedido[i].stockActual = v;
+}
+
+function stockPedir(i,v){
+  if(!pedido[i]) return;
+  pedido[i].pedir = v;
+  calcular();
+}
+
+function calcular(){
+  let total = 0;
+
+  pedido.forEach(a=>{
+    total += Number(a.pedir || 0) * precioFinal(a);
+  });
+
+  document.getElementById("totalFinal").textContent =
+    "TOTAL PAGO: " + total.toFixed(2).replace(".",",") + " €";
+}
+
+/* ENTER AL SIGUIENTE */
+function siguientePedido(e){
+  if(e.key !== "Enter") return;
+
+  const actual = e.target;
+  if(!actual.classList.contains("cantidadPedido")) return;
+
+  e.preventDefault();
+
+  const inputs = Array.from(document.querySelectorAll(".cantidadPedido"));
+  const pos = inputs.indexOf(actual);
+
+  if(inputs[pos+1]){
+    inputs[pos+1].focus();
+    inputs[pos+1].select();
+  }
+}
+
+/* GUARDAR */
+function crearLineaCargo(a, proveedor){
+  const cantidad = Number(a.pedir || 0);
+  if(cantidad <= 0) return null;
+
+  const precioOriginal = precioCaja(a);
+  const dto = descuentoArticulo(a);
+  const precio = precioFinal(a);
+  const subtotal = cantidad * precio;
+
+  return {
+    articulo:a.articulo,
+    nombre:a.articulo,
+    producto:a.articulo,
+    proveedor,
+    tipoLinea:"CON_CARGO",
+    cantidad,
+    unidades:cantidad,
+    uds:cantidad,
+    pedir:cantidad,
+    unidadFormato:a.unidadFormato || "",
+    formato:Number(a.formato || 1),
+    iva:Number(a.iva || 21),
+    tipoIva:Number(a.iva || 21),
+    precioOriginalSinIva:precioOriginal,
+    precioSinIva:precio,
+    precio,
+    precioUnidad:precio,
+    descuentoAplicado:dto,
+    subtotal,
+    importe:subtotal,
+    totalLinea:subtotal,
+    stockActual:a.stockActual || "",
+    ...ahoraAuditoria()
+  };
+}
+
+function crearLineasPromosAceptadas(proveedor){
+  const lineas = [];
+  const promos = promosDelProveedor();
+
+  promos.forEach(p=>{
+    const id = idPromo(p);
+    const dec = decisionesPromo[id];
+
+    if(!dec || dec.decision !== "SI") return;
+
+    const cargo = Number(p.cargo || 0);
+    const gratis = Number(p.gratis || 0);
+    const articulo = p.nombre || "PROMOCIÓN";
+
+    if(cargo > 0){
+      lineas.push({
+        articulo,
+        nombre:articulo,
+        producto:articulo,
+        proveedor,
+        tipoLinea:"PROMO_CON_CARGO",
+        promoId:id,
+        promocion:p.nombre,
+        cantidad:cargo,
+        unidades:cargo,
+        uds:cargo,
+        pedir:cargo,
+        precioSinIva:0,
+        precio:0,
+        precioUnidad:0,
+        subtotal:0,
+        importe:0,
+        totalLinea:0,
+        ...ahoraAuditoria()
+      });
+    }
+
+    if(gratis > 0){
+      lineas.push({
+        articulo,
+        nombre:articulo,
+        producto:articulo,
+        proveedor,
+        tipoLinea:"PROMO_SIN_CARGO",
+        promoId:id,
+        promocion:p.nombre,
+        cantidad:gratis,
+        unidades:gratis,
+        uds:gratis,
+        pedir:gratis,
+        precioSinIva:0,
+        precio:0,
+        precioUnidad:0,
+        subtotal:0,
+        importe:0,
+        totalLinea:0,
+        sinCargo:true,
+        costeCero:true,
+        origenCosteCero:"CONFIGURACION_PROMOCION",
+        ...ahoraAuditoria()
+      });
+    }
+  });
+
+  return lineas;
+}
+
+async function guardarPedido(){
+  const proveedor = document.getElementById("proveedor").value;
+
+  if(!proveedor){
+    alert("Selecciona proveedor");
+    return;
+  }
+
+  const lineasFinal = [];
+
+  pedido.forEach(a=>{
+    const linea = crearLineaCargo(a, proveedor);
+    if(linea) lineasFinal.push(linea);
+  });
+
+  lineasFinal.push(...crearLineasPromosAceptadas(proveedor));
+
+  if(lineasFinal.length === 0){
+    alert("Sin cantidades pedidas");
+    return;
+  }
+
+  const auditoria = ahoraAuditoria();
+  const pedidoId = crearId("pedido_" + proveedor);
+  const totalPago = lineasFinal.reduce((t,l)=>t + Number(l.subtotal || 0),0);
+
+  const decisionesProveedor = Object.values(decisionesPromo)
+    .filter(d=>normalizar(d.proveedor) === normalizar(proveedor));
+
+  const pedidoGuardado = {
+    id:pedidoId,
+    proveedor,
+    fecha:auditoria.fechaHora,
+    fechaMs:auditoria.fechaMs,
+    actualizadoEn:auditoria.iso,
+    usuario:auditoria.operador,
+    operador:auditoria.operador,
+    total:totalPago,
+    totalPago,
+    pendiente:totalPago,
+    estado:"PENDIENTE",
+    decisionesPromociones:decisionesProveedor,
+    lineas:lineasFinal
+  };
+
+  historicoPedidos.unshift(pedidoGuardado);
+  await guardarColeccion("pedidos_historico", historicoPedidos);
+
+  pagosPendientes.unshift({
+    id:crearId("pago_" + proveedor),
+    pedidoId,
+    proveedor,
+    fecha:auditoria.fechaHora,
+    fechaMs:auditoria.fechaMs,
+    actualizadoEn:auditoria.iso,
+    usuario:auditoria.operador,
+    operador:auditoria.operador,
+    total:totalPago,
+    totalPago,
+    pendiente:totalPago,
+    estado:"PENDIENTE",
+    decisionesPromociones:decisionesProveedor,
+    lineas:lineasFinal
+  });
+
+  await guardarColeccion("pagos_pendientes", pagosPendientes);
+
+  alert("Pedido guardado correctamente");
+
+  document.getElementById("proveedor").value = "";
+  document.getElementById("buscarArticulo").value = "";
+  pedido = [];
+  pintarPromosProveedor();
+  pintar();
+}
+
+/* EVENTOS */
+function activarEventos(){
+  document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("proveedor").addEventListener("change", cargarArticulos);
+  document.getElementById("buscarArticulo").addEventListener("input", pintar);
+  document.getElementById("btnGuardarPedido").addEventListener("click", guardarPedido);
+
+  document.getElementById("avisosPedidos").addEventListener("click", e=>{
+    const btn = e.target.closest("button");
+    if(btn && btn.dataset.accion === "resolverAviso"){
+      resolverAvisoPedido(btn.dataset.id);
+    }
+  });
+
+  document.getElementById("promosProveedor").addEventListener("click", e=>{
+    const btn = e.target.closest("button");
+    if(!btn) return;
+
+    const promos = promosDelProveedor();
+    const promo = promos[Number(btn.dataset.indice)];
+    if(!promo) return;
+
+    if(btn.dataset.accion === "promoSi") registrarDecisionPromo(promo,"SI");
+    if(btn.dataset.accion === "promoNo") registrarDecisionPromo(promo,"NO");
+  });
+
+  document.getElementById("articulos").addEventListener("input", e=>{
+    const el = e.target;
+    const i = Number(el.dataset.indice);
+
+    if(el.dataset.accion === "stockActual") stockActual(i, el.value);
+    if(el.dataset.accion === "stockPedir") stockPedir(i, el.value);
+  });
+
+  document.getElementById("articulos").addEventListener("keydown", siguientePedido);
+
+  document.getElementById("articulos").addEventListener("focusin", e=>{
+    const el = e.target;
+    if(el.tagName === "INPUT"){
+      setTimeout(()=>el.select(),30);
+    }
+  });
+}
+
+/* INICIO */
 async function iniciar(){
-  await pintarUsuarios();
-  pintarPromociones();
-  pintarControlPedidos();
+  activarEventos();
+
+  articulosGlobal = await leerColeccion("articulos");
+  proveedoresGlobal = await leerColeccion("proveedores");
+  historicoPedidos = await leerColeccion("pedidos_historico");
+  pagosPendientes = await leerColeccion("pagos_pendientes");
+
+  promocionesGlobal = leerPromocionesLocal();
+
+  cargarProveedores();
+  pintarPromosActivas();
+  pintar();
+
+  escucharColeccion("articulos", lista=>{
+    articulosGlobal = lista;
+    if(document.getElementById("proveedor").value) cargarArticulos();
+  });
+
+  escucharColeccion("proveedores", lista=>{
+    proveedoresGlobal = lista;
+    cargarProveedores();
+  });
+
+  escucharColeccion("avisos_pedidos", lista=>{
+    avisosCloud = lista.sort((a,b)=>Number(b.fechaMs || 0)-Number(a.fechaMs || 0));
+    pintarAvisosPedidos();
+  });
+
+  escucharColeccion("pedidos_historico", lista=>{
+    historicoPedidos = lista.sort((a,b)=>Number(b.fechaMs || 0)-Number(a.fechaMs || 0));
+  });
+
+  escucharColeccion("pagos_pendientes", lista=>{
+    pagosPendientes = lista.sort((a,b)=>Number(b.fechaMs || 0)-Number(a.fechaMs || 0));
+  });
 }
 
 iniciar();
-
 </script>
 
 </body>
