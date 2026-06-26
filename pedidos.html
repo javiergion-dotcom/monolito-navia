@@ -33,8 +33,6 @@ button{width:100%;padding:15px;margin-top:14px;border:0;border-radius:16px;font-
 .promoBotones{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .si{background:#48a530;color:white}
 .no{background:#c44;color:white}
-.regaloGrid{display:grid;grid-template-columns:1fr 90px;gap:8px;align-items:center;margin-top:8px}
-.regaloGrid input{padding:9px;border-radius:12px;border:1px solid #ccc;text-align:center;font-size:18px;font-weight:900}
 </style>
 </head>
 
@@ -78,7 +76,6 @@ let avisosCloud = [];
 let historicoPedidos = [];
 let pagosPendientes = [];
 let decisionesPromo = {};
-let regalosElegidos = {};
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "JAVI";
@@ -105,13 +102,6 @@ function esc(t){
     .replaceAll("'","&#039;");
 }
 
-function valor(o, claves, def=""){
-  for(const c of claves){
-    if(o && o[c] !== undefined && o[c] !== null && o[c] !== "") return o[c];
-  }
-  return def;
-}
-
 function crearId(prefijo){
   return String(prefijo || "id")
     .toLowerCase()
@@ -133,69 +123,121 @@ function ahoraAuditoria(){
   };
 }
 
-function parseFecha(v,fin=false){
-  if(!v) return null;
-  const txt = String(v).trim();
-
-  if(txt.includes("/")){
-    const p = txt.split("/");
-    if(p.length === 3){
-      const d = new Date(Number(p[2]), Number(p[1])-1, Number(p[0]));
-      d.setHours(fin?23:0, fin?59:0, fin?59:0, fin?999:0);
-      return d;
-    }
-  }
-
-  const d = new Date(txt);
-  if(isNaN(d.getTime())) return null;
-  d.setHours(fin?23:0, fin?59:0, fin?59:0, fin?999:0);
-  return d;
+/* PROMOCIONES VIENEN DE CONFIGURACIÓN LOCAL */
+function leerPromocionesLocal(){
+  return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
 }
 
 function promoVigente(p){
-  const activa = valor(p,["activa","activo","estado"],"");
-  if(activa === false) return false;
-  if(normalizar(activa).includes("NO")) return false;
-  if(normalizar(activa).includes("INACTIVA")) return false;
+  if(p.activa === false) return false;
 
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
 
-  const ini = parseFecha(valor(p,["fechaInicio","fecha inicio","inicio","desde","fechaDesde"],""), false);
-  const fin = parseFecha(valor(p,["fechaFin","fecha fin","fin","hasta","fechaHasta"],""), true);
+  if(p.inicio){
+    const ini = new Date(p.inicio + "T00:00:00");
+    if(hoy < ini) return false;
+  }
 
-  if(ini && hoy < ini) return false;
-  if(fin && hoy > fin) return false;
+  if(p.fin){
+    const fin = new Date(p.fin + "T23:59:59");
+    if(hoy > fin) return false;
+  }
 
   return true;
 }
 
 function leerPromosVigentes(){
-  return (promocionesGlobal || []).filter(promoVigente);
-}
-
-function nombrePromo(p){
-  return valor(p,["nombre","promocion","promoción","titulo","articulo","producto","nombreArticulo"],"PROMOCIÓN");
+  promocionesGlobal = leerPromocionesLocal();
+  return promocionesGlobal.filter(promoVigente);
 }
 
 function idPromo(p){
-  return p.id || normalizar((proveedorPromo(p) || "") + "_" + nombrePromo(p));
+  return p.id || normalizar((p.proveedor || "") + "_" + (p.nombre || ""));
 }
 
-function proveedorPromo(p){
-  return valor(p,["proveedor","proveedorNombre","empresa"],"");
+function pintarPromosActivas(){
+  const promos = leerPromosVigentes();
+
+  if(promos.length === 0){
+    document.getElementById("promosActivas").innerHTML = "";
+    return;
+  }
+
+  let html = `<div class="promosBox"><div class="tituloBox">🎁 PROMOCIONES ACTIVAS</div>`;
+
+  promos.forEach(p=>{
+    const id = idPromo(p);
+    const rev = decisionesPromo[id];
+
+    html += `
+      <div class="promoLinea ${rev ? "promoRevisada" : "promoPendiente"}">
+        ${rev ? "🟢" : "🟡"} ${esc(p.proveedor)} · ${esc(p.nombre)}
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  document.getElementById("promosActivas").innerHTML = html;
 }
 
-function tipoPromo(p){
-  const t = normalizar(valor(p,["tipo","tipoPromo","modo"],""));
-  const dto = Number(valor(p,["descuento","% descuento","porcentaje","porcentajeDescuento"],0));
-  const regalos = valor(p,["regalos","opcionesRegalo","opciones regalo"],null);
-
-  if(t.includes("DESCUENTO") || dto > 0) return "DESCUENTO";
-  if(t.includes("CRUZ") || t.includes("REGALO") || Array.isArray(regalos)) return "CRUZADA";
-  return "UNIDADES";
+function promosDelProveedor(){
+  const proveedor = document.getElementById("proveedor").value;
+  return leerPromosVigentes().filter(p =>
+    normalizar(p.proveedor) === normalizar(proveedor)
+  );
 }
 
+function pintarPromosProveedor(){
+  const promos = promosDelProveedor();
+
+  if(promos.length === 0){
+    document.getElementById("promosProveedor").innerHTML = "";
+    return;
+  }
+
+  let html = `<div class="promosBox"><div class="tituloBox">🎁 PROMOCIONES DEL PROVEEDOR</div>`;
+
+  promos.forEach((p,i)=>{
+    const id = idPromo(p);
+    const dec = decisionesPromo[id];
+
+    html += `
+      <div class="promoDetalle">
+        <div>${dec ? "🟢 REVISADA" : "🟡 PENDIENTE"} · ${esc(p.nombre)}</div>
+        <div style="margin-top:6px">
+          ${Number(p.descuento || 0) > 0 ? `${Number(p.descuento)}% descuento<br>` : ""}
+          ${Number(p.cargo || 0)} con cargo · ${Number(p.gratis || 0)} coste 0 €
+        </div>
+        ${p.nota ? `<div style="margin-top:6px">${esc(p.nota)}</div>` : ""}
+        <div class="promoBotones">
+          <button class="si" data-accion="promoSi" data-indice="${i}">SÍ</button>
+          <button class="no" data-accion="promoNo" data-indice="${i}">NO</button>
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  document.getElementById("promosProveedor").innerHTML = html;
+}
+
+function registrarDecisionPromo(p, decision){
+  const id = idPromo(p);
+
+  decisionesPromo[id] = {
+    promoId:id,
+    proveedor:p.proveedor,
+    nombre:p.nombre,
+    decision,
+    ...ahoraAuditoria()
+  };
+
+  pintarPromosActivas();
+  pintarPromosProveedor();
+}
+
+/* AVISOS */
 function pintarAvisosPedidos(){
   if(avisosCloud.length === 0){
     document.getElementById("avisosPedidos").innerHTML = "";
@@ -222,30 +264,7 @@ async function resolverAvisoPedido(id){
   await borrarDocumento("avisos_pedidos", id);
 }
 
-function pintarPromosActivas(){
-  const promos = leerPromosVigentes();
-
-  if(promos.length === 0){
-    document.getElementById("promosActivas").innerHTML = "";
-    return;
-  }
-
-  let html = `<div class="promosBox"><div class="tituloBox">🎁 PROMOCIONES ACTIVAS</div>`;
-
-  promos.forEach(p=>{
-    const id = idPromo(p);
-    const rev = decisionesPromo[id];
-    html += `
-      <div class="promoLinea ${rev ? "promoRevisada" : "promoPendiente"}">
-        ${rev ? "🟢" : "🟡"} ${esc(proveedorPromo(p))} · ${esc(nombrePromo(p))}
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-  document.getElementById("promosActivas").innerHTML = html;
-}
-
+/* PROVEEDORES Y ARTÍCULOS */
 function cargarProveedores(){
   let proveedores = (proveedoresGlobal || []).filter(p=>p.activo !== false);
 
@@ -279,125 +298,31 @@ function cargarArticulos(){
   pintar();
 }
 
-function promosDelProveedor(){
-  const proveedor = document.getElementById("proveedor").value;
-  return leerPromosVigentes().filter(p=>normalizar(proveedorPromo(p)) === normalizar(proveedor));
-}
-
-function descripcionPromo(p){
-  const tipo = tipoPromo(p);
-
-  if(tipo === "DESCUENTO"){
-    const dto = Number(valor(p,["descuento","% descuento","porcentaje","porcentajeDescuento"],0));
-    return dto + "% de descuento";
-  }
-
-  if(tipo === "CRUZADA"){
-    const compra = valor(p,["compraTexto","condicion","condición","base"],"Compra configurada");
-    const regalo = valor(p,["regaloTexto","regalo"],"Regalo configurado");
-    return compra + " → " + regalo;
-  }
-
-  const cargo = Number(valor(p,["unidadesConCargo","unidades con cargo","conCargo","pagadas","cargo"],0));
-  const gratis = Number(valor(p,["unidadesGratis","unidades coste 0","unidadesCoste0","sinCargo","gratis"],0));
-  return cargo + " + " + gratis + " sin cargo";
-}
-
-function pintarPromosProveedor(){
-  const promos = promosDelProveedor();
-
-  if(promos.length === 0){
-    document.getElementById("promosProveedor").innerHTML = "";
-    return;
-  }
-
-  let html = `<div class="promosBox"><div class="tituloBox">🎁 PROMOCIONES DEL PROVEEDOR</div>`;
-
-  promos.forEach((p,idx)=>{
-    const id = idPromo(p);
-    const decision = decisionesPromo[id];
-
-    html += `
-      <div class="promoDetalle">
-        <div>${decision ? "🟢 REVISADA" : "🟡 PENDIENTE"} · ${esc(nombrePromo(p))}</div>
-        <div style="margin-top:6px">${esc(descripcionPromo(p))}</div>
-        ${valor(p,["nota","observaciones"],"") ? `<div style="margin-top:6px">${esc(valor(p,["nota","observaciones"],""))}</div>` : ""}
-        ${p.regalos || p.opcionesRegalo || p["opciones regalo"] ? pintarRegalosPromo(p) : ""}
-        <div class="promoBotones">
-          <button class="si" data-accion="promoSi" data-indice="${idx}">SÍ</button>
-          <button class="no" data-accion="promoNo" data-indice="${idx}">NO</button>
-        </div>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-  document.getElementById("promosProveedor").innerHTML = html;
-}
-
-function pintarRegalosPromo(p){
-  const regalos = valor(p,["regalos","opcionesRegalo","opciones regalo"],[]);
-  if(!Array.isArray(regalos) || regalos.length === 0) return "";
-
-  const pid = idPromo(p);
-  if(!regalosElegidos[pid]) regalosElegidos[pid] = {};
-
-  let html = `<div style="margin-top:10px">Reparto del regalo:</div>`;
-
-  regalos.forEach((r,i)=>{
-    const nombre = typeof r === "string" ? r : (r.nombre || r.articulo || r.producto || "Regalo");
-    const val = regalosElegidos[pid][i] || "";
-    html += `
-      <div class="regaloGrid">
-        <div>${esc(nombre)}</div>
-        <input type="number" placeholder="0" value="${esc(val)}" data-accion="regaloPromo" data-promo="${esc(pid)}" data-regalo="${i}">
-      </div>
-    `;
-  });
-
-  return html;
-}
-
-function registrarDecisionPromo(p, decision){
-  const id = idPromo(p);
-  decisionesPromo[id] = {
-    promoId:id,
-    proveedor:proveedorPromo(p),
-    nombre:nombrePromo(p),
-    decision,
-    ...ahoraAuditoria()
-  };
-
-  pintarPromosActivas();
-  pintarPromosProveedor();
-}
-
 function precioCaja(a){
   return Number(a.precioUnidad || 0) * Number(a.formato || 1);
 }
 
 function descuentoArticulo(a){
-  const promos = promosDelProveedor().filter(p=>tipoPromo(p) === "DESCUENTO");
+  const promos = promosDelProveedor().filter(p => Number(p.descuento || 0) > 0);
 
   const promo = promos.find(p=>{
-    const txt = normalizar(
-      valor(p,["articulo","producto","nombreArticulo","nombre","promocion","promoción"],"")
-    );
+    const nombrePromo = normalizar(p.nombre || "");
+    const nombreArticulo = normalizar(a.articulo || "");
 
-    if(!txt) return false;
-
-    return normalizar(a.articulo).includes(txt) || txt.includes(normalizar(a.articulo));
+    return nombreArticulo.includes(nombrePromo) || nombrePromo.includes(nombreArticulo);
   });
 
-  if(!promo) return 0;
-
-  return Number(valor(promo,["descuento","% descuento","porcentaje","porcentajeDescuento"],0));
+  return promo ? Number(promo.descuento || 0) : 0;
 }
 
 function precioFinal(a){
-  const dto = descuentoArticulo(a);
   const precio = precioCaja(a);
-  if(dto > 0) return precio * (1 - dto / 100);
+  const dto = descuentoArticulo(a);
+
+  if(dto > 0){
+    return precio * (1 - dto / 100);
+  }
+
   return precio;
 }
 
@@ -459,8 +384,10 @@ function calcular(){
     "TOTAL PAGO: " + total.toFixed(2).replace(".",",") + " €";
 }
 
+/* ENTER AL SIGUIENTE */
 function siguientePedido(e){
   if(e.key !== "Enter") return;
+
   const actual = e.target;
   if(!actual.classList.contains("cantidadPedido")) return;
 
@@ -475,6 +402,7 @@ function siguientePedido(e){
   }
 }
 
+/* GUARDAR */
 function crearLineaCargo(a, proveedor){
   const cantidad = Number(a.pedir || 0);
   if(cantidad <= 0) return null;
@@ -502,8 +430,6 @@ function crearLineaCargo(a, proveedor){
     precioSinIva:precio,
     precio,
     precioUnidad:precio,
-    precio_unitario:precio,
-    importeUnidad:precio,
     descuentoAplicado:dto,
     subtotal,
     importe:subtotal,
@@ -514,8 +440,8 @@ function crearLineaCargo(a, proveedor){
 }
 
 function crearLineasPromosAceptadas(proveedor){
-  const promos = promosDelProveedor();
   const lineas = [];
+  const promos = promosDelProveedor();
 
   promos.forEach(p=>{
     const id = idPromo(p);
@@ -523,96 +449,56 @@ function crearLineasPromosAceptadas(proveedor){
 
     if(!dec || dec.decision !== "SI") return;
 
-    const tipo = tipoPromo(p);
+    const cargo = Number(p.cargo || 0);
+    const gratis = Number(p.gratis || 0);
+    const articulo = p.nombre || "PROMOCIÓN";
 
-    if(tipo === "UNIDADES"){
-      const articulo = valor(p,["articulo","producto","nombreArticulo"],nombrePromo(p));
-      const cargo = Number(valor(p,["unidadesConCargo","unidades con cargo","conCargo","pagadas","cargo"],0));
-      const gratis = Number(valor(p,["unidadesGratis","unidades coste 0","unidadesCoste0","sinCargo","gratis"],0));
-      const precio = Number(valor(p,["precioUnidad","precio"],0));
-
-      if(cargo > 0){
-        lineas.push({
-          articulo,
-          nombre:articulo,
-          producto:articulo,
-          proveedor,
-          tipoLinea:"PROMO_CON_CARGO",
-          promoId:id,
-          promocion:nombrePromo(p),
-          cantidad:cargo,
-          unidades:cargo,
-          uds:cargo,
-          pedir:cargo,
-          precioSinIva:precio,
-          precio,
-          precioUnidad:precio,
-          subtotal:cargo * precio,
-          importe:cargo * precio,
-          totalLinea:cargo * precio,
-          ...ahoraAuditoria()
-        });
-      }
-
-      if(gratis > 0){
-        lineas.push({
-          articulo,
-          nombre:articulo,
-          producto:articulo,
-          proveedor,
-          tipoLinea:"PROMO_SIN_CARGO",
-          promoId:id,
-          promocion:nombrePromo(p),
-          cantidad:gratis,
-          unidades:gratis,
-          uds:gratis,
-          pedir:gratis,
-          precioSinIva:0,
-          precio:0,
-          precioUnidad:0,
-          subtotal:0,
-          importe:0,
-          totalLinea:0,
-          sinCargo:true,
-          costeCero:true,
-          origenCosteCero:"CONFIGURACION_PROMOCION",
-          ...ahoraAuditoria()
-        });
-      }
+    if(cargo > 0){
+      lineas.push({
+        articulo,
+        nombre:articulo,
+        producto:articulo,
+        proveedor,
+        tipoLinea:"PROMO_CON_CARGO",
+        promoId:id,
+        promocion:p.nombre,
+        cantidad:cargo,
+        unidades:cargo,
+        uds:cargo,
+        pedir:cargo,
+        precioSinIva:0,
+        precio:0,
+        precioUnidad:0,
+        subtotal:0,
+        importe:0,
+        totalLinea:0,
+        ...ahoraAuditoria()
+      });
     }
 
-    if(tipo === "CRUZADA"){
-      const regalos = valor(p,["regalos","opcionesRegalo","opciones regalo"],[]);
-
-      regalos.forEach((r,i)=>{
-        const nombre = typeof r === "string" ? r : (r.nombre || r.articulo || r.producto || "Regalo");
-        const cantidad = Number(regalosElegidos[id]?.[i] || 0);
-
-        if(cantidad > 0){
-          lineas.push({
-            articulo:nombre,
-            nombre,
-            producto:nombre,
-            proveedor,
-            tipoLinea:"PROMO_REGALO_SIN_CARGO",
-            promoId:id,
-            promocion:nombrePromo(p),
-            cantidad,
-            unidades:cantidad,
-            uds:cantidad,
-            pedir:cantidad,
-            precioSinIva:0,
-            precio:0,
-            precioUnidad:0,
-            subtotal:0,
-            importe:0,
-            totalLinea:0,
-            sinCargo:true,
-            costeCero:true,
-            origenCosteCero:"CONFIGURACION_PROMOCION_CRUZADA",
-            ...ahoraAuditoria()
-          });
-        }
+    if(gratis > 0){
+      lineas.push({
+        articulo,
+        nombre:articulo,
+        producto:articulo,
+        proveedor,
+        tipoLinea:"PROMO_SIN_CARGO",
+        promoId:id,
+        promocion:p.nombre,
+        cantidad:gratis,
+        unidades:gratis,
+        uds:gratis,
+        pedir:gratis,
+        precioSinIva:0,
+        precio:0,
+        precioUnidad:0,
+        subtotal:0,
+        importe:0,
+        totalLinea:0,
+        sinCargo:true,
+        costeCero:true,
+        origenCosteCero:"CONFIGURACION_PROMOCION",
+        ...ahoraAuditoria()
       });
     }
   });
@@ -668,10 +554,8 @@ async function guardarPedido(){
   historicoPedidos.unshift(pedidoGuardado);
   await guardarColeccion("pedidos_historico", historicoPedidos);
 
-  const pagoId = crearId("pago_" + proveedor);
-
   pagosPendientes.unshift({
-    id:pagoId,
+    id:crearId("pago_" + proveedor),
     pedidoId,
     proveedor,
     fecha:auditoria.fechaHora,
@@ -698,6 +582,7 @@ async function guardarPedido(){
   pintar();
 }
 
+/* EVENTOS */
 function activarEventos(){
   document.getElementById("btnVolver").addEventListener("click", volver);
   document.getElementById("proveedor").addEventListener("change", cargarArticulos);
@@ -723,17 +608,6 @@ function activarEventos(){
     if(btn.dataset.accion === "promoNo") registrarDecisionPromo(promo,"NO");
   });
 
-  document.getElementById("promosProveedor").addEventListener("input", e=>{
-    const el = e.target;
-    if(el.dataset.accion !== "regaloPromo") return;
-
-    const pid = el.dataset.promo;
-    const i = el.dataset.regalo;
-
-    if(!regalosElegidos[pid]) regalosElegidos[pid] = {};
-    regalosElegidos[pid][i] = el.value;
-  });
-
   document.getElementById("articulos").addEventListener("input", e=>{
     const el = e.target;
     const i = Number(el.dataset.indice);
@@ -752,24 +626,16 @@ function activarEventos(){
   });
 }
 
+/* INICIO */
 async function iniciar(){
   activarEventos();
 
   articulosGlobal = await leerColeccion("articulos");
   proveedoresGlobal = await leerColeccion("proveedores");
-
-  const promos1 = await leerColeccion("promociones_monolito");
-  let promos2 = [];
-  try{
-    promos2 = await leerColeccion("promociones");
-  }catch(e){
-    promos2 = [];
-  }
-
-  promocionesGlobal = [...(promos1 || []), ...(promos2 || [])];
-
   historicoPedidos = await leerColeccion("pedidos_historico");
   pagosPendientes = await leerColeccion("pagos_pendientes");
+
+  promocionesGlobal = leerPromocionesLocal();
 
   cargarProveedores();
   pintarPromosActivas();
@@ -783,13 +649,6 @@ async function iniciar(){
   escucharColeccion("proveedores", lista=>{
     proveedoresGlobal = lista;
     cargarProveedores();
-  });
-
-  escucharColeccion("promociones_monolito", lista=>{
-    promocionesGlobal = lista || [];
-    pintarPromosActivas();
-    pintarPromosProveedor();
-    pintar();
   });
 
   escucharColeccion("avisos_pedidos", lista=>{
