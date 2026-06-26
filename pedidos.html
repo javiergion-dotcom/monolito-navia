@@ -16,7 +16,7 @@ select,.buscador{width:100%;padding:14px;border-radius:18px;margin-bottom:14px;f
 .stockFila{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
 .stockCol{border-radius:18px;padding:12px;text-align:center}
 .almacen{background:#eef7ff;border:3px solid #cfe5ff}
-.pedido{background:#f1fff1;border:3px solid #bde9bd}
+.pedidoBox{background:#f1fff1;border:3px solid #bde9bd}
 .stockCol label{display:block;font-size:17px;font-weight:900;margin-bottom:8px}
 .stockCol input{width:90%;padding:14px;border-radius:16px;border:1px solid #ccc;text-align:center;font-size:30px;font-weight:900}
 button{width:100%;padding:15px;margin-top:14px;border:0;border-radius:16px;font-weight:900;font-size:17px}
@@ -78,6 +78,7 @@ let avisosCloud = [];
 let historicoPedidos = [];
 let pagosPendientes = [];
 let decisionesPromo = {};
+let regalosElegidos = {};
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "JAVI";
@@ -102,6 +103,13 @@ function esc(t){
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
+}
+
+function valor(o, claves, def=""){
+  for(const c of claves){
+    if(o && o[c] !== undefined && o[c] !== null && o[c] !== "") return o[c];
+  }
+  return def;
 }
 
 function crearId(prefijo){
@@ -145,13 +153,16 @@ function parseFecha(v,fin=false){
 }
 
 function promoVigente(p){
-  if(p.activa === false) return false;
+  const activa = valor(p,["activa","activo","estado"],"");
+  if(activa === false) return false;
+  if(normalizar(activa).includes("NO")) return false;
+  if(normalizar(activa).includes("INACTIVA")) return false;
 
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
 
-  const ini = parseFecha(p.fechaInicio || p.inicio || p.desde || "", false);
-  const fin = parseFecha(p.fechaFin || p.fin || p.hasta || "", true);
+  const ini = parseFecha(valor(p,["fechaInicio","fecha inicio","inicio","desde","fechaDesde"],""), false);
+  const fin = parseFecha(valor(p,["fechaFin","fecha fin","fin","hasta","fechaHasta"],""), true);
 
   if(ini && hoy < ini) return false;
   if(fin && hoy > fin) return false;
@@ -164,21 +175,24 @@ function leerPromosVigentes(){
 }
 
 function nombrePromo(p){
-  return p.nombre || p.promocion || p.titulo || p.articulo || p.producto || "PROMOCIÓN";
+  return valor(p,["nombre","promocion","promoción","titulo","articulo","producto","nombreArticulo"],"PROMOCIÓN");
 }
 
 function idPromo(p){
-  return p.id || normalizar((p.proveedor || "") + "_" + nombrePromo(p));
+  return p.id || normalizar((proveedorPromo(p) || "") + "_" + nombrePromo(p));
 }
 
 function proveedorPromo(p){
-  return p.proveedor || p.proveedorNombre || "";
+  return valor(p,["proveedor","proveedorNombre","empresa"],"");
 }
 
 function tipoPromo(p){
-  const t = normalizar(p.tipo || p.tipoPromo || p.modo || "");
-  if(t.includes("DESCUENTO") || Number(p.descuento || p.porcentaje || p.porcentajeDescuento || 0) > 0) return "DESCUENTO";
-  if(t.includes("CRUZ") || t.includes("REGALO") || Array.isArray(p.regalos) || Array.isArray(p.opcionesRegalo)) return "CRUZADA";
+  const t = normalizar(valor(p,["tipo","tipoPromo","modo"],""));
+  const dto = Number(valor(p,["descuento","% descuento","porcentaje","porcentajeDescuento"],0));
+  const regalos = valor(p,["regalos","opcionesRegalo","opciones regalo"],null);
+
+  if(t.includes("DESCUENTO") || dto > 0) return "DESCUENTO";
+  if(t.includes("CRUZ") || t.includes("REGALO") || Array.isArray(regalos)) return "CRUZADA";
   return "UNIDADES";
 }
 
@@ -274,18 +288,18 @@ function descripcionPromo(p){
   const tipo = tipoPromo(p);
 
   if(tipo === "DESCUENTO"){
-    const dto = Number(p.descuento || p.porcentaje || p.porcentajeDescuento || 0);
+    const dto = Number(valor(p,["descuento","% descuento","porcentaje","porcentajeDescuento"],0));
     return dto + "% de descuento";
   }
 
   if(tipo === "CRUZADA"){
-    const compra = p.compraTexto || p.condicion || p.base || "";
-    const regalo = p.regaloTexto || p.regalo || "";
-    return (compra || "Compra configurada") + " → " + (regalo || "Regalo configurado");
+    const compra = valor(p,["compraTexto","condicion","condición","base"],"Compra configurada");
+    const regalo = valor(p,["regaloTexto","regalo"],"Regalo configurado");
+    return compra + " → " + regalo;
   }
 
-  const cargo = Number(p.unidadesConCargo || p.conCargo || p.pagadas || p.cargo || 0);
-  const gratis = Number(p.unidadesGratis || p.unidadesCoste0 || p.sinCargo || p.gratis || 0);
+  const cargo = Number(valor(p,["unidadesConCargo","unidades con cargo","conCargo","pagadas","cargo"],0));
+  const gratis = Number(valor(p,["unidadesGratis","unidades coste 0","unidadesCoste0","sinCargo","gratis"],0));
   return cargo + " + " + gratis + " sin cargo";
 }
 
@@ -307,9 +321,8 @@ function pintarPromosProveedor(){
       <div class="promoDetalle">
         <div>${decision ? "🟢 REVISADA" : "🟡 PENDIENTE"} · ${esc(nombrePromo(p))}</div>
         <div style="margin-top:6px">${esc(descripcionPromo(p))}</div>
-        ${p.nota ? `<div style="margin-top:6px">${esc(p.nota)}</div>` : ""}
-        ${p.observaciones ? `<div style="margin-top:6px">${esc(p.observaciones)}</div>` : ""}
-        ${p.regalos || p.opcionesRegalo ? pintarRegalosPromo(p) : ""}
+        ${valor(p,["nota","observaciones"],"") ? `<div style="margin-top:6px">${esc(valor(p,["nota","observaciones"],""))}</div>` : ""}
+        ${p.regalos || p.opcionesRegalo || p["opciones regalo"] ? pintarRegalosPromo(p) : ""}
         <div class="promoBotones">
           <button class="si" data-accion="promoSi" data-indice="${idx}">SÍ</button>
           <button class="no" data-accion="promoNo" data-indice="${idx}">NO</button>
@@ -323,17 +336,21 @@ function pintarPromosProveedor(){
 }
 
 function pintarRegalosPromo(p){
-  const regalos = p.regalos || p.opcionesRegalo || [];
+  const regalos = valor(p,["regalos","opcionesRegalo","opciones regalo"],[]);
   if(!Array.isArray(regalos) || regalos.length === 0) return "";
+
+  const pid = idPromo(p);
+  if(!regalosElegidos[pid]) regalosElegidos[pid] = {};
 
   let html = `<div style="margin-top:10px">Reparto del regalo:</div>`;
 
   regalos.forEach((r,i)=>{
     const nombre = typeof r === "string" ? r : (r.nombre || r.articulo || r.producto || "Regalo");
+    const val = regalosElegidos[pid][i] || "";
     html += `
       <div class="regaloGrid">
         <div>${esc(nombre)}</div>
-        <input type="number" placeholder="0" data-accion="regaloPromo" data-promo="${esc(idPromo(p))}" data-regalo="${i}">
+        <input type="number" placeholder="0" value="${esc(val)}" data-accion="regaloPromo" data-promo="${esc(pid)}" data-regalo="${i}">
       </div>
     `;
   });
@@ -364,10 +381,7 @@ function descuentoArticulo(a){
 
   const promo = promos.find(p=>{
     const txt = normalizar(
-      (p.articulo || "") + " " +
-      (p.producto || "") + " " +
-      (p.nombreArticulo || "") + " " +
-      (p.nombre || "")
+      valor(p,["articulo","producto","nombreArticulo","nombre","promocion","promoción"],"")
     );
 
     if(!txt) return false;
@@ -377,7 +391,7 @@ function descuentoArticulo(a){
 
   if(!promo) return 0;
 
-  return Number(promo.descuento || promo.porcentaje || promo.porcentajeDescuento || 0);
+  return Number(valor(promo,["descuento","% descuento","porcentaje","porcentajeDescuento"],0));
 }
 
 function precioFinal(a){
@@ -410,7 +424,7 @@ function pintar(){
             <input type="number" placeholder="0" value="${esc(a.stockActual)}" data-accion="stockActual" data-indice="${i}">
           </div>
 
-          <div class="stockCol pedido">
+          <div class="stockCol pedidoBox">
             <label>🛒 PEDIDO</label>
             <input class="cantidadPedido" type="number" placeholder="0" value="${esc(a.pedir)}" data-accion="stockPedir" data-indice="${i}">
           </div>
@@ -475,32 +489,26 @@ function crearLineaCargo(a, proveedor){
     nombre:a.articulo,
     producto:a.articulo,
     proveedor,
-
     tipoLinea:"CON_CARGO",
     cantidad,
     unidades:cantidad,
     uds:cantidad,
     pedir:cantidad,
-
     unidadFormato:a.unidadFormato || "",
     formato:Number(a.formato || 1),
     iva:Number(a.iva || 21),
     tipoIva:Number(a.iva || 21),
-
     precioOriginalSinIva:precioOriginal,
     precioSinIva:precio,
     precio,
     precioUnidad:precio,
     precio_unitario:precio,
     importeUnidad:precio,
-
     descuentoAplicado:dto,
     subtotal,
     importe:subtotal,
     totalLinea:subtotal,
-
     stockActual:a.stockActual || "",
-
     ...ahoraAuditoria()
   };
 }
@@ -518,9 +526,10 @@ function crearLineasPromosAceptadas(proveedor){
     const tipo = tipoPromo(p);
 
     if(tipo === "UNIDADES"){
-      const articulo = p.articulo || p.producto || p.nombreArticulo || nombrePromo(p);
-      const cargo = Number(p.unidadesConCargo || p.conCargo || p.pagadas || p.cargo || 0);
-      const gratis = Number(p.unidadesGratis || p.unidadesCoste0 || p.sinCargo || p.gratis || 0);
+      const articulo = valor(p,["articulo","producto","nombreArticulo"],nombrePromo(p));
+      const cargo = Number(valor(p,["unidadesConCargo","unidades con cargo","conCargo","pagadas","cargo"],0));
+      const gratis = Number(valor(p,["unidadesGratis","unidades coste 0","unidadesCoste0","sinCargo","gratis"],0));
+      const precio = Number(valor(p,["precioUnidad","precio"],0));
 
       if(cargo > 0){
         lineas.push({
@@ -535,12 +544,12 @@ function crearLineasPromosAceptadas(proveedor){
           unidades:cargo,
           uds:cargo,
           pedir:cargo,
-          precioSinIva:Number(p.precioUnidad || p.precio || 0),
-          precio:Number(p.precioUnidad || p.precio || 0),
-          precioUnidad:Number(p.precioUnidad || p.precio || 0),
-          subtotal:cargo * Number(p.precioUnidad || p.precio || 0),
-          importe:cargo * Number(p.precioUnidad || p.precio || 0),
-          totalLinea:cargo * Number(p.precioUnidad || p.precio || 0),
+          precioSinIva:precio,
+          precio,
+          precioUnidad:precio,
+          subtotal:cargo * precio,
+          importe:cargo * precio,
+          totalLinea:cargo * precio,
           ...ahoraAuditoria()
         });
       }
@@ -573,12 +582,11 @@ function crearLineasPromosAceptadas(proveedor){
     }
 
     if(tipo === "CRUZADA"){
-      const regalos = p.regalos || p.opcionesRegalo || [];
+      const regalos = valor(p,["regalos","opcionesRegalo","opciones regalo"],[]);
 
       regalos.forEach((r,i)=>{
         const nombre = typeof r === "string" ? r : (r.nombre || r.articulo || r.producto || "Regalo");
-        const input = document.querySelector(`[data-accion="regaloPromo"][data-promo="${CSS.escape(id)}"][data-regalo="${i}"]`);
-        const cantidad = Number(input ? input.value : 0);
+        const cantidad = Number(regalosElegidos[id]?.[i] || 0);
 
         if(cantidad > 0){
           lineas.push({
@@ -636,7 +644,6 @@ async function guardarPedido(){
 
   const auditoria = ahoraAuditoria();
   const pedidoId = crearId("pedido_" + proveedor);
-
   const totalPago = lineasFinal.reduce((t,l)=>t + Number(l.subtotal || 0),0);
 
   const decisionesProveedor = Object.values(decisionesPromo)
@@ -716,6 +723,17 @@ function activarEventos(){
     if(btn.dataset.accion === "promoNo") registrarDecisionPromo(promo,"NO");
   });
 
+  document.getElementById("promosProveedor").addEventListener("input", e=>{
+    const el = e.target;
+    if(el.dataset.accion !== "regaloPromo") return;
+
+    const pid = el.dataset.promo;
+    const i = el.dataset.regalo;
+
+    if(!regalosElegidos[pid]) regalosElegidos[pid] = {};
+    regalosElegidos[pid][i] = el.value;
+  });
+
   document.getElementById("articulos").addEventListener("input", e=>{
     const el = e.target;
     const i = Number(el.dataset.indice);
@@ -739,7 +757,17 @@ async function iniciar(){
 
   articulosGlobal = await leerColeccion("articulos");
   proveedoresGlobal = await leerColeccion("proveedores");
-  promocionesGlobal = await leerColeccion("promociones_monolito");
+
+  const promos1 = await leerColeccion("promociones_monolito");
+  let promos2 = [];
+  try{
+    promos2 = await leerColeccion("promociones");
+  }catch(e){
+    promos2 = [];
+  }
+
+  promocionesGlobal = [...(promos1 || []), ...(promos2 || [])];
+
   historicoPedidos = await leerColeccion("pedidos_historico");
   pagosPendientes = await leerColeccion("pagos_pendientes");
 
@@ -758,7 +786,7 @@ async function iniciar(){
   });
 
   escucharColeccion("promociones_monolito", lista=>{
-    promocionesGlobal = lista;
+    promocionesGlobal = lista || [];
     pintarPromosActivas();
     pintarPromosProveedor();
     pintar();
