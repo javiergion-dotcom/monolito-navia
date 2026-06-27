@@ -123,37 +123,38 @@ function ahoraAuditoria(){
   };
 }
 
-/* PROMOCIONES VIENEN DE CONFIGURACIÓN LOCAL */
-function leerPromocionesLocal(){
-  return JSON.parse(localStorage.getItem("promociones_monolito") || "[]");
-}
+/* PROMOCIONES DESDE FIREBASE */
 
 function promoVigente(p){
   if(p.activa === false) return false;
+  if(p.activo === false) return false;
+  if(p.visibleEnPedidos === false) return false;
 
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
 
-  if(p.inicio){
-    const ini = new Date(p.inicio + "T00:00:00");
+  const inicio = p.inicio || p.fechaInicio || "";
+  const fin = p.fin || p.fechaFin || "";
+
+  if(inicio){
+    const ini = new Date(inicio + "T00:00:00");
     if(hoy < ini) return false;
   }
 
-  if(p.fin){
-    const fin = new Date(p.fin + "T23:59:59");
-    if(hoy > fin) return false;
+  if(fin){
+    const f = new Date(fin + "T23:59:59");
+    if(hoy > f) return false;
   }
 
   return true;
 }
 
 function leerPromosVigentes(){
-  promocionesGlobal = leerPromocionesLocal();
-  return promocionesGlobal.filter(promoVigente);
+  return (promocionesGlobal || []).filter(promoVigente);
 }
 
 function idPromo(p){
-  return p.id || normalizar((p.proveedor || "") + "_" + (p.nombre || ""));
+  return p.id || normalizar((p.proveedor || p.proveedorNormalizado || "") + "_" + (p.nombre || p.promocion || ""));
 }
 
 function pintarPromosActivas(){
@@ -172,7 +173,7 @@ function pintarPromosActivas(){
 
     html += `
       <div class="promoLinea ${rev ? "promoRevisada" : "promoPendiente"}">
-        ${rev ? "🟢" : "🟡"} ${esc(p.proveedor)} · ${esc(p.nombre)}
+        ${rev ? "🟢" : "🟡"} ${esc(p.proveedor || p.proveedorNormalizado || "")} · ${esc(p.nombre || p.promocion || "")}
       </div>
     `;
   });
@@ -183,9 +184,11 @@ function pintarPromosActivas(){
 
 function promosDelProveedor(){
   const proveedor = document.getElementById("proveedor").value;
-  return leerPromosVigentes().filter(p =>
-    normalizar(p.proveedor) === normalizar(proveedor)
-  );
+
+  return leerPromosVigentes().filter(p=>{
+    const provPromo = normalizar(p.proveedor || p.proveedorNormalizado || "");
+    return provPromo === normalizar(proveedor);
+  });
 }
 
 function pintarPromosProveedor(){
@@ -204,10 +207,10 @@ function pintarPromosProveedor(){
 
     html += `
       <div class="promoDetalle">
-        <div>${dec ? "🟢 REVISADA" : "🟡 PENDIENTE"} · ${esc(p.nombre)}</div>
+        <div>${dec ? "🟢 REVISADA" : "🟡 PENDIENTE"} · ${esc(p.nombre || p.promocion || "")}</div>
         <div style="margin-top:6px">
           ${Number(p.descuento || 0) > 0 ? `${Number(p.descuento)}% descuento<br>` : ""}
-          ${Number(p.cargo || 0)} con cargo · ${Number(p.gratis || 0)} coste 0 €
+          ${Number(p.cargo || 0)} con cargo · ${Number(p.gratis || 0)} gratis / regalo
         </div>
         ${p.nota ? `<div style="margin-top:6px">${esc(p.nota)}</div>` : ""}
         <div class="promoBotones">
@@ -227,8 +230,8 @@ function registrarDecisionPromo(p, decision){
 
   decisionesPromo[id] = {
     promoId:id,
-    proveedor:p.proveedor,
-    nombre:p.nombre,
+    proveedor:p.proveedor || p.proveedorNormalizado || "",
+    nombre:p.nombre || p.promocion || "",
     decision,
     ...ahoraAuditoria()
   };
@@ -238,6 +241,7 @@ function registrarDecisionPromo(p, decision){
 }
 
 /* AVISOS */
+
 function pintarAvisosPedidos(){
   if(avisosCloud.length === 0){
     document.getElementById("avisosPedidos").innerHTML = "";
@@ -265,6 +269,7 @@ async function resolverAvisoPedido(id){
 }
 
 /* PROVEEDORES Y ARTÍCULOS */
+
 function cargarProveedores(){
   let proveedores = (proveedoresGlobal || []).filter(p=>p.activo !== false);
 
@@ -306,7 +311,7 @@ function descuentoArticulo(a){
   const promos = promosDelProveedor().filter(p => Number(p.descuento || 0) > 0);
 
   const promo = promos.find(p=>{
-    const nombrePromo = normalizar(p.nombre || "");
+    const nombrePromo = normalizar(p.nombre || p.promocion || "");
     const nombreArticulo = normalizar(a.articulo || "");
 
     return nombreArticulo.includes(nombrePromo) || nombrePromo.includes(nombreArticulo);
@@ -384,7 +389,8 @@ function calcular(){
     "TOTAL PAGO: " + total.toFixed(2).replace(".",",") + " €";
 }
 
-/* ENTER AL SIGUIENTE */
+/* ENTER */
+
 function siguientePedido(e){
   if(e.key !== "Enter") return;
 
@@ -403,6 +409,7 @@ function siguientePedido(e){
 }
 
 /* GUARDAR */
+
 function crearLineaCargo(a, proveedor){
   const cantidad = Number(a.pedir || 0);
   if(cantidad <= 0) return null;
@@ -451,7 +458,7 @@ function crearLineasPromosAceptadas(proveedor){
 
     const cargo = Number(p.cargo || 0);
     const gratis = Number(p.gratis || 0);
-    const articulo = p.nombre || "PROMOCIÓN";
+    const articulo = p.nombre || p.promocion || "PROMOCIÓN";
 
     if(cargo > 0){
       lineas.push({
@@ -461,7 +468,7 @@ function crearLineasPromosAceptadas(proveedor){
         proveedor,
         tipoLinea:"PROMO_CON_CARGO",
         promoId:id,
-        promocion:p.nombre,
+        promocion:articulo,
         cantidad:cargo,
         unidades:cargo,
         uds:cargo,
@@ -482,9 +489,9 @@ function crearLineasPromosAceptadas(proveedor){
         nombre:articulo,
         producto:articulo,
         proveedor,
-        tipoLinea:"PROMO_SIN_CARGO",
+        tipoLinea:"PROMO_GRATIS_REGALO",
         promoId:id,
-        promocion:p.nombre,
+        promocion:articulo,
         cantidad:gratis,
         unidades:gratis,
         uds:gratis,
@@ -496,8 +503,9 @@ function crearLineasPromosAceptadas(proveedor){
         importe:0,
         totalLinea:0,
         sinCargo:true,
-        costeCero:true,
-        origenCosteCero:"CONFIGURACION_PROMOCION",
+        gratis:true,
+        regalo:true,
+        origen:"CONFIGURACION_PROMOCION",
         ...ahoraAuditoria()
       });
     }
@@ -578,11 +586,14 @@ async function guardarPedido(){
   document.getElementById("proveedor").value = "";
   document.getElementById("buscarArticulo").value = "";
   pedido = [];
+  decisionesPromo = {};
+  pintarPromosActivas();
   pintarPromosProveedor();
   pintar();
 }
 
 /* EVENTOS */
+
 function activarEventos(){
   document.getElementById("btnVolver").addEventListener("click", volver);
   document.getElementById("proveedor").addEventListener("change", cargarArticulos);
@@ -627,15 +638,15 @@ function activarEventos(){
 }
 
 /* INICIO */
+
 async function iniciar(){
   activarEventos();
 
   articulosGlobal = await leerColeccion("articulos");
   proveedoresGlobal = await leerColeccion("proveedores");
+  promocionesGlobal = await leerColeccion("promociones_monolito");
   historicoPedidos = await leerColeccion("pedidos_historico");
   pagosPendientes = await leerColeccion("pagos_pendientes");
-
-  promocionesGlobal = leerPromocionesLocal();
 
   cargarProveedores();
   pintarPromosActivas();
@@ -649,6 +660,13 @@ async function iniciar(){
   escucharColeccion("proveedores", lista=>{
     proveedoresGlobal = lista;
     cargarProveedores();
+  });
+
+  escucharColeccion("promociones_monolito", lista=>{
+    promocionesGlobal = lista.sort((a,b)=>Number(b.fechaMs || 0)-Number(a.fechaMs || 0));
+    pintarPromosActivas();
+    pintarPromosProveedor();
+    pintar();
   });
 
   escucharColeccion("avisos_pedidos", lista=>{
