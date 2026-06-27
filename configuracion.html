@@ -14,7 +14,6 @@ header{background:#17303d;color:white;padding:16px;display:flex;align-items:cent
 .card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
 .cardRoja{background:#fff1f1;border:3px solid #c00000}
 .titulo{font-size:22px;font-weight:900;margin-bottom:10px}
-.subtitulo{font-size:17px;font-weight:900;margin-top:10px;color:#4f5f69}
 label{display:block;font-weight:900;margin-top:12px;margin-bottom:6px}
 input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px}
 textarea{min-height:80px}
@@ -139,18 +138,23 @@ function usuarioActual(){
   return localStorage.getItem("usuario") || "JAVI";
 }
 
+function valor(id){
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+}
+
 function normalizar(t){
   return String(t || "")
     .trim()
     .toUpperCase()
     .normalize("NFD")
-    .replace(/[\\u0300-\\u036f]/g,"");
+    .replace(/[\u0300-\u036f]/g,"");
 }
 
 function crearId(prefijo){
   return String(prefijo || "id")
     .toLowerCase()
-    .normalize("NFD").replace(/[\\u0300-\\u036f]/g,"")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
     .replace(/[^a-z0-9]+/g,"_")
     .replace(/^_+|_+$/g,"")
     + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
@@ -186,12 +190,21 @@ window.limpiarUsuario = function(){
 };
 
 window.guardarUsuario = async function(){
-  const nombre = normalizar(document.getElementById("usuarioNombre").value);
-  const clave = String(document.getElementById("usuarioClave").value || "").trim();
-  const rol = document.getElementById("usuarioRol").value;
+  const nombre = normalizar(valor("usuarioNombre"));
+  const clave = String(valor("usuarioClave") || "").trim();
+  const rol = valor("usuarioRol") || "USUARIO";
 
-  if(!nombre){ alert("Falta usuario."); return; }
-  if(!clave){ alert("Falta contraseña."); return; }
+  if(!nombre){
+    alert("Falta usuario.");
+    document.getElementById("usuarioNombre").focus();
+    return;
+  }
+
+  if(!clave){
+    alert("Falta contraseña.");
+    document.getElementById("usuarioClave").focus();
+    return;
+  }
 
   const idx = editandoUsuario !== "" ? Number(editandoUsuario) : -1;
   const anterior = idx >= 0 ? usuariosCloud[idx] : {};
@@ -199,11 +212,11 @@ window.guardarUsuario = async function(){
 
   const registro = {
     id: anterior.id || crearId("usuario_" + nombre),
-    nombre,
+    nombre:nombre,
     usuario:nombre,
-    clave,
+    clave:clave,
     password:clave,
-    rol,
+    rol:rol,
     activo: anterior.activo !== false,
     creadoPor: anterior.creadoPor || usuarioActual(),
     actualizadoPor: usuarioActual(),
@@ -219,8 +232,8 @@ window.guardarUsuario = async function(){
   }
 
   await guardarUsuarios();
-  limpiarUsuario();
   await pintarUsuarios();
+  limpiarUsuario();
 
   alert("Usuario guardado.");
 };
@@ -307,8 +320,8 @@ window.limpiarPromocion = function(){
 };
 
 window.guardarPromocion = async function(){
-  const proveedor = normalizar(document.getElementById("promoProveedor").value);
-  const nombre = normalizar(document.getElementById("promoNombre").value);
+  const proveedor = normalizar(valor("promoProveedor"));
+  const nombre = normalizar(valor("promoNombre"));
 
   if(!proveedor){ alert("Falta proveedor."); return; }
   if(!nombre){ alert("Falta promoción."); return; }
@@ -327,16 +340,16 @@ window.guardarPromocion = async function(){
     tipo:"PROMOCION",
     visibleEnPedidos:true,
 
-    descuento:Number(document.getElementById("promoDescuento").value || 0),
-    cargo:Number(document.getElementById("promoCargo").value || 0),
-    gratis:Number(document.getElementById("promoGratis").value || 0),
+    descuento:Number(valor("promoDescuento") || 0),
+    cargo:Number(valor("promoCargo") || 0),
+    gratis:Number(valor("promoGratis") || 0),
 
-    inicio:document.getElementById("promoInicio").value,
-    fin:document.getElementById("promoFin").value,
-    fechaInicio:document.getElementById("promoInicio").value,
-    fechaFin:document.getElementById("promoFin").value,
+    inicio:valor("promoInicio"),
+    fin:valor("promoFin"),
+    fechaInicio:valor("promoInicio"),
+    fechaFin:valor("promoFin"),
 
-    nota:document.getElementById("promoNota").value.trim(),
+    nota:String(valor("promoNota") || "").trim(),
 
     activa:anterior.activa !== false,
     activo:anterior.activa !== false,
@@ -354,8 +367,8 @@ window.guardarPromocion = async function(){
   }
 
   await guardarPromociones();
-  limpiarPromocion();
   await pintarPromociones();
+  limpiarPromocion();
 
   alert("Promoción guardada en la nube.");
 };
