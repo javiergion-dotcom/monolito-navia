@@ -12,7 +12,9 @@ header{background:#17303d;color:white;padding:16px;display:flex;align-items:cent
 .volver{background:white;color:#17303d;border:0;border-radius:12px;padding:8px 12px;font-weight:900}
 .contenido{padding:16px}
 .card{background:white;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.cardRoja{background:#fff1f1;border:3px solid #c00000}
 .titulo{font-size:22px;font-weight:900;margin-bottom:10px}
+.subtitulo{font-size:17px;font-weight:900;margin-top:10px;color:#4f5f69}
 label{display:block;font-weight:900;margin-top:12px;margin-bottom:6px}
 input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px}
 textarea{min-height:80px}
@@ -20,6 +22,7 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
 .guardar{width:100%;background:#48a530;color:white;margin-top:14px}
 .nuevo{width:100%;background:#ff9800;color:white;margin-top:10px}
 .borrar{width:100%;background:#c00000;color:white;margin-top:10px}
+.botonRojo{width:100%;background:#c00000;color:white;margin-top:10px}
 .editar{background:#2196f3;color:white}
 .desactivar{background:#ff9800;color:white}
 .reactivar{background:#48a530;color:white}
@@ -43,6 +46,28 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
 </header>
 
 <div class="contenido">
+
+  <div class="card">
+    <div class="titulo">Usuarios</div>
+
+    <label>Usuario</label>
+    <input id="usuarioNombre" placeholder="Ej: CAMARERO">
+
+    <label>Contraseña</label>
+    <input id="usuarioClave" placeholder="Ej: 1234">
+
+    <label>Rol</label>
+    <select id="usuarioRol">
+      <option value="ADMIN">ADMIN</option>
+      <option value="USUARIO">USUARIO</option>
+      <option value="CAMARERO">CAMARERO</option>
+    </select>
+
+    <button class="guardar" onclick="guardarUsuario()">💾 Guardar usuario</button>
+    <button class="nuevo" onclick="limpiarUsuario()">➕ Nuevo usuario</button>
+
+    <div id="listaUsuarios"></div>
+  </div>
 
   <div class="card">
     <div class="titulo">Promociones</div>
@@ -79,6 +104,20 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
     <div id="listaPromociones"></div>
   </div>
 
+  <div class="card cardRoja">
+    <div class="titulo" style="color:#c00000">⚠️ Mantenimiento delicado</div>
+    <div class="rojoAviso">Zona delicada. Cada botón borra datos de la nube. Usar solo si estás seguro.</div>
+
+    <button class="botonRojo" onclick="vaciarColeccion('pedidos_historico','PEDIDOS HISTÓRICO')">🗑️ Borrar pedidos histórico</button>
+    <button class="botonRojo" onclick="vaciarColeccion('pagos_pendientes','PAGOS PENDIENTES')">🗑️ Borrar pagos pendientes</button>
+    <button class="botonRojo" onclick="vaciarColeccion('incidencias','INCIDENCIAS')">🗑️ Borrar incidencias</button>
+    <button class="botonRojo" onclick="vaciarColeccion('avisos_pedidos','AVISOS PEDIDOS')">🗑️ Borrar avisos pedidos</button>
+    <button class="botonRojo" onclick="vaciarColeccion('promociones_monolito','PROMOCIONES')">🗑️ Borrar promociones</button>
+    <button class="botonRojo" onclick="vaciarColeccion('articulos','ARTÍCULOS')">🗑️ Borrar artículos</button>
+    <button class="botonRojo" onclick="vaciarColeccion('proveedores','PROVEEDORES')">🗑️ Borrar proveedores</button>
+    <button class="botonRojo" onclick="reinicioTotal()">🔥 REINICIO TOTAL DEL PROGRAMA</button>
+  </div>
+
 </div>
 
 <script type="module">
@@ -87,7 +126,9 @@ import {
   guardarColeccion
 } from "./monolito-cloud.js";
 
+let usuariosCloud = [];
 let promocionesCloud = [];
+let editandoUsuario = "";
 let editandoPromo = "";
 
 window.volver = function(){
@@ -103,17 +144,144 @@ function normalizar(t){
     .trim()
     .toUpperCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"");
+    .replace(/[\\u0300-\\u036f]/g,"");
 }
 
 function crearId(prefijo){
-  return String(prefijo || "promo")
+  return String(prefijo || "id")
     .toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .normalize("NFD").replace(/[\\u0300-\\u036f]/g,"")
     .replace(/[^a-z0-9]+/g,"_")
     .replace(/^_+|_+$/g,"")
     + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
 }
+
+function esc(t){
+  return String(t || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/* USUARIOS */
+
+async function leerUsuarios(){
+  usuariosCloud = await leerColeccion("usuarios_monolito");
+  usuariosCloud = usuariosCloud.sort((a,b)=>String(a.nombre || "").localeCompare(String(b.nombre || "")));
+  return usuariosCloud;
+}
+
+async function guardarUsuarios(){
+  await guardarColeccion("usuarios_monolito", usuariosCloud);
+}
+
+window.limpiarUsuario = function(){
+  editandoUsuario = "";
+  document.getElementById("usuarioNombre").value = "";
+  document.getElementById("usuarioClave").value = "";
+  document.getElementById("usuarioRol").value = "USUARIO";
+  document.getElementById("usuarioNombre").focus();
+};
+
+window.guardarUsuario = async function(){
+  const nombre = normalizar(document.getElementById("usuarioNombre").value);
+  const clave = String(document.getElementById("usuarioClave").value || "").trim();
+  const rol = document.getElementById("usuarioRol").value;
+
+  if(!nombre){ alert("Falta usuario."); return; }
+  if(!clave){ alert("Falta contraseña."); return; }
+
+  const idx = editandoUsuario !== "" ? Number(editandoUsuario) : -1;
+  const anterior = idx >= 0 ? usuariosCloud[idx] : {};
+  const ahora = new Date();
+
+  const registro = {
+    id: anterior.id || crearId("usuario_" + nombre),
+    nombre,
+    usuario:nombre,
+    clave,
+    password:clave,
+    rol,
+    activo: anterior.activo !== false,
+    creadoPor: anterior.creadoPor || usuarioActual(),
+    actualizadoPor: usuarioActual(),
+    actualizado: ahora.toLocaleString("es-ES"),
+    actualizadoEn: ahora.toISOString(),
+    fechaMs: anterior.fechaMs || ahora.getTime()
+  };
+
+  if(idx >= 0){
+    usuariosCloud[idx] = registro;
+  }else{
+    usuariosCloud.unshift(registro);
+  }
+
+  await guardarUsuarios();
+  limpiarUsuario();
+  await pintarUsuarios();
+
+  alert("Usuario guardado.");
+};
+
+window.editarUsuario = function(i){
+  const u = usuariosCloud[i];
+  editandoUsuario = i;
+
+  document.getElementById("usuarioNombre").value = u.nombre || u.usuario || "";
+  document.getElementById("usuarioClave").value = u.clave || u.password || "";
+  document.getElementById("usuarioRol").value = u.rol || "USUARIO";
+
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
+window.toggleUsuario = async function(i){
+  usuariosCloud[i].activo = usuariosCloud[i].activo === false ? true : false;
+  usuariosCloud[i].actualizado = new Date().toLocaleString("es-ES");
+  usuariosCloud[i].actualizadoEn = new Date().toISOString();
+  usuariosCloud[i].actualizadoPor = usuarioActual();
+
+  await guardarUsuarios();
+  await pintarUsuarios();
+};
+
+window.borrarUsuario = async function(i){
+  if(!confirm("¿Borrar este usuario?")) return;
+  usuariosCloud.splice(i,1);
+  await guardarUsuarios();
+  await pintarUsuarios();
+};
+
+async function pintarUsuarios(){
+  const data = await leerUsuarios();
+  let html = "";
+
+  if(data.length === 0){
+    html = `<div class="vacio">No hay usuarios guardados.</div>`;
+  }
+
+  data.forEach((u,i)=>{
+    html += `
+      <div class="linea ${u.activo === false ? "inactivo" : ""}">
+        <div class="nombre">${esc(u.nombre || u.usuario || "SIN USUARIO")}</div>
+        <div class="detalle">Rol: <strong>${esc(u.rol || "USUARIO")}</strong></div>
+        <div class="detalle">Estado: <strong>${u.activo === false ? "INACTIVO" : "ACTIVO"}</strong></div>
+        <div class="botones">
+          <button class="editar" onclick="editarUsuario(${i})">Editar</button>
+          <button class="${u.activo === false ? "reactivar" : "desactivar"}" onclick="toggleUsuario(${i})">
+            ${u.activo === false ? "Activar" : "Desactivar"}
+          </button>
+          <button class="borrar" onclick="borrarUsuario(${i})">Borrar</button>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById("listaUsuarios").innerHTML = html;
+}
+
+/* PROMOCIONES */
 
 async function leerPromociones(){
   promocionesCloud = await leerColeccion("promociones_monolito");
@@ -135,7 +303,6 @@ window.limpiarPromocion = function(){
   document.getElementById("promoInicio").value = "";
   document.getElementById("promoFin").value = "";
   document.getElementById("promoNota").value = "";
-
   document.getElementById("promoProveedor").focus();
 };
 
@@ -148,19 +315,15 @@ window.guardarPromocion = async function(){
 
   const idx = editandoPromo !== "" ? Number(editandoPromo) : -1;
   const anterior = idx >= 0 ? promocionesCloud[idx] : {};
-
   const ahora = new Date();
 
   const registro = {
     id: anterior.id || crearId("promo_" + proveedor + "_" + nombre),
-
     proveedor,
     nombre,
     promocion:nombre,
-
     proveedorNormalizado:proveedor,
     nombreNormalizado:nombre,
-
     tipo:"PROMOCION",
     visibleEnPedidos:true,
 
@@ -199,7 +362,6 @@ window.guardarPromocion = async function(){
 
 window.editarPromocion = function(i){
   const p = promocionesCloud[i];
-
   editandoPromo = i;
 
   document.getElementById("promoProveedor").value = p.proveedor || p.proveedorNormalizado || "";
@@ -212,11 +374,6 @@ window.editarPromocion = function(i){
   document.getElementById("promoNota").value = p.nota || "";
 
   window.scrollTo({top:0,behavior:"smooth"});
-
-  setTimeout(()=>{
-    document.getElementById("promoProveedor").focus();
-    document.getElementById("promoProveedor").select();
-  },300);
 };
 
 window.togglePromocion = async function(i){
@@ -233,9 +390,7 @@ window.togglePromocion = async function(i){
 
 window.borrarPromocion = async function(i){
   if(!confirm("¿Borrar esta promoción?")) return;
-
   promocionesCloud.splice(i,1);
-
   await guardarPromociones();
   await pintarPromociones();
 };
@@ -251,14 +406,13 @@ async function pintarPromociones(){
   data.forEach((p,i)=>{
     html += `
       <div class="linea ${p.activa === false ? "inactivo" : ""}">
-        <div class="nombre">${p.nombre || p.promocion || "SIN NOMBRE"}</div>
-        <div class="detalle">Proveedor: <strong>${p.proveedor || p.proveedorNormalizado || "-"}</strong></div>
+        <div class="nombre">${esc(p.nombre || p.promocion || "SIN NOMBRE")}</div>
+        <div class="detalle">Proveedor: <strong>${esc(p.proveedor || p.proveedorNormalizado || "-")}</strong></div>
         <div class="detalle">% descuento: ${Number(p.descuento || 0).toFixed(2).replace(".",",")}%</div>
         <div class="detalle">${p.cargo || 0} con cargo · ${p.gratis || 0} gratis / regalo</div>
         <div class="detalle">Inicio: ${p.inicio || p.fechaInicio || "-"} · Fin: ${p.fin || p.fechaFin || "-"}</div>
-        ${p.nota ? `<div class="detalle">Nota: ${p.nota}</div>` : ""}
+        ${p.nota ? `<div class="detalle">Nota: ${esc(p.nota)}</div>` : ""}
         <div class="detalle">Estado: <strong>${p.activa === false ? "INACTIVA" : "ACTIVA"}</strong></div>
-
         <div class="botones">
           <button class="editar" onclick="editarPromocion(${i})">Editar</button>
           <button class="${p.activa === false ? "reactivar" : "desactivar"}" onclick="togglePromocion(${i})">
@@ -272,6 +426,58 @@ async function pintarPromociones(){
 
   document.getElementById("listaPromociones").innerHTML = html;
 }
+
+/* MANTENIMIENTO */
+
+window.vaciarColeccion = async function(nombreColeccion, nombreVisible){
+  const aviso1 = confirm("⚠️ Vas a borrar: " + nombreVisible + ". ¿Seguro?");
+  if(!aviso1) return;
+
+  const texto = prompt("Para confirmar escribe BORRAR");
+  if(texto !== "BORRAR"){
+    alert("Cancelado.");
+    return;
+  }
+
+  await guardarColeccion(nombreColeccion, []);
+
+  if(nombreColeccion === "usuarios_monolito") await pintarUsuarios();
+  if(nombreColeccion === "promociones_monolito") await pintarPromociones();
+
+  alert(nombreVisible + " borrado.");
+};
+
+window.reinicioTotal = async function(){
+  const aviso1 = confirm("🔥 REINICIO TOTAL. Esto borra datos principales del programa. ¿Seguro?");
+  if(!aviso1) return;
+
+  const texto = prompt("Para confirmar escribe REINICIAR");
+  if(texto !== "REINICIAR"){
+    alert("Cancelado.");
+    return;
+  }
+
+  const colecciones = [
+    "pedidos_historico",
+    "pagos_pendientes",
+    "incidencias",
+    "avisos_pedidos",
+    "promociones_monolito",
+    "articulos",
+    "proveedores"
+  ];
+
+  for(const c of colecciones){
+    await guardarColeccion(c, []);
+  }
+
+  await pintarUsuarios();
+  await pintarPromociones();
+
+  alert("Reinicio total completado.");
+};
+
+/* ENTER */
 
 function activarEnterSiguienteCampo(){
   const campos = Array.from(document.querySelectorAll("input, select, textarea"));
@@ -292,22 +498,22 @@ function activarEnterSiguienteCampo(){
     campo.addEventListener("keydown", (e)=>{
       if(e.key === "Enter"){
         e.preventDefault();
-
         const siguiente = campos[index + 1];
 
         if(siguiente){
           siguiente.focus();
           if(siguiente.select) siguiente.select();
-        }else{
-          document.querySelector(".guardar")?.focus();
         }
       }
     });
   });
 }
 
+/* INICIO */
+
 async function iniciar(){
   activarEnterSiguienteCampo();
+  await pintarUsuarios();
   await pintarPromociones();
 }
 
