@@ -59,7 +59,7 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
     <label>Unidades con cargo</label>
     <input id="promoCargo" type="number" step="1">
 
-    <label>Unidades coste 0 €</label>
+    <label>Unidades gratis / regalo</label>
     <input id="promoGratis" type="number" step="1">
 
     <label>Fecha inicio</label>
@@ -135,6 +135,8 @@ window.limpiarPromocion = function(){
   document.getElementById("promoInicio").value = "";
   document.getElementById("promoFin").value = "";
   document.getElementById("promoNota").value = "";
+
+  document.getElementById("promoProveedor").focus();
 };
 
 window.guardarPromocion = async function(){
@@ -151,9 +153,16 @@ window.guardarPromocion = async function(){
 
   const registro = {
     id: anterior.id || crearId("promo_" + proveedor + "_" + nombre),
+
     proveedor,
     nombre,
     promocion:nombre,
+
+    proveedorNormalizado:proveedor,
+    nombreNormalizado:nombre,
+
+    tipo:"PROMOCION",
+    visibleEnPedidos:true,
 
     descuento:Number(document.getElementById("promoDescuento").value || 0),
     cargo:Number(document.getElementById("promoCargo").value || 0),
@@ -193,7 +202,7 @@ window.editarPromocion = function(i){
 
   editandoPromo = i;
 
-  document.getElementById("promoProveedor").value = p.proveedor || "";
+  document.getElementById("promoProveedor").value = p.proveedor || p.proveedorNormalizado || "";
   document.getElementById("promoNombre").value = p.nombre || p.promocion || "";
   document.getElementById("promoDescuento").value = p.descuento || "";
   document.getElementById("promoCargo").value = p.cargo || "";
@@ -203,12 +212,19 @@ window.editarPromocion = function(i){
   document.getElementById("promoNota").value = p.nota || "";
 
   window.scrollTo({top:0,behavior:"smooth"});
+
+  setTimeout(()=>{
+    document.getElementById("promoProveedor").focus();
+    document.getElementById("promoProveedor").select();
+  },300);
 };
 
 window.togglePromocion = async function(i){
   promocionesCloud[i].activa = promocionesCloud[i].activa === false ? true : false;
   promocionesCloud[i].activo = promocionesCloud[i].activa;
+  promocionesCloud[i].visibleEnPedidos = promocionesCloud[i].activa;
   promocionesCloud[i].actualizado = new Date().toLocaleString("es-ES");
+  promocionesCloud[i].actualizadoEn = new Date().toISOString();
   promocionesCloud[i].actualizadoPor = usuarioActual();
 
   await guardarPromociones();
@@ -236,9 +252,9 @@ async function pintarPromociones(){
     html += `
       <div class="linea ${p.activa === false ? "inactivo" : ""}">
         <div class="nombre">${p.nombre || p.promocion || "SIN NOMBRE"}</div>
-        <div class="detalle">Proveedor: <strong>${p.proveedor || "-"}</strong></div>
+        <div class="detalle">Proveedor: <strong>${p.proveedor || p.proveedorNormalizado || "-"}</strong></div>
         <div class="detalle">% descuento: ${Number(p.descuento || 0).toFixed(2).replace(".",",")}%</div>
-        <div class="detalle">${p.cargo || 0} con cargo · ${p.gratis || 0} coste 0 €</div>
+        <div class="detalle">${p.cargo || 0} con cargo · ${p.gratis || 0} gratis / regalo</div>
         <div class="detalle">Inicio: ${p.inicio || p.fechaInicio || "-"} · Fin: ${p.fin || p.fechaFin || "-"}</div>
         ${p.nota ? `<div class="detalle">Nota: ${p.nota}</div>` : ""}
         <div class="detalle">Estado: <strong>${p.activa === false ? "INACTIVA" : "ACTIVA"}</strong></div>
@@ -257,7 +273,41 @@ async function pintarPromociones(){
   document.getElementById("listaPromociones").innerHTML = html;
 }
 
+function activarEnterSiguienteCampo(){
+  const campos = Array.from(document.querySelectorAll("input, select, textarea"));
+
+  campos.forEach((campo, index)=>{
+    campo.addEventListener("focus", ()=>{
+      setTimeout(()=>{
+        if(campo.select) campo.select();
+      },50);
+    });
+
+    campo.addEventListener("click", ()=>{
+      setTimeout(()=>{
+        if(campo.select) campo.select();
+      },50);
+    });
+
+    campo.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){
+        e.preventDefault();
+
+        const siguiente = campos[index + 1];
+
+        if(siguiente){
+          siguiente.focus();
+          if(siguiente.select) siguiente.select();
+        }else{
+          document.querySelector(".guardar")?.focus();
+        }
+      }
+    });
+  });
+}
+
 async function iniciar(){
+  activarEnterSiguienteCampo();
   await pintarPromociones();
 }
 
