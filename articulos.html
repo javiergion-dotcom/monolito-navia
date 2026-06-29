@@ -171,10 +171,10 @@ function pintar(){
       <div class="card ${a.activo === false ? "inactivo" : ""}">
         <div class="nombre">${a.articulo || "SIN NOMBRE"}</div>
         <div class="detalle">${a.proveedor || "SIN PROVEEDOR"} · ${a.unidadFormato || "SIN FORMATO"}</div>
-        <div class="detalle">Precio unidad/base sin IVA: ${Number(a.precioUnidad || 0).toFixed(4)} €</div>
+        <div class="detalle">Precio unidad/base sin IVA: ${dinero(a.precioUnidad)}</div>
         <div class="detalle">Formato: ${a.formato || 1}</div>
         <div class="detalle">IVA: ${a.iva || 21}%</div>
-        <div class="precioFinal">Precio compra sin IVA: ${precioCompra(a).toFixed(2)} €</div>
+        <div class="precioFinal">Precio compra sin IVA: ${dinero(precioCompra(a))}</div>
 
         ${puedeEditar() ? `
           <div class="botones">
