@@ -132,7 +132,12 @@ function articulosIniciales(){
 function precioCompra(a){
   return Number(a.precioUnidad || 0) * Number(a.formato || 1);
 }
-
+function dinero(n){
+  return Number(n || 0).toLocaleString("es-ES", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " €";
+}
 async function cargarProveedores(){
   proveedoresGlobal = await leerColeccion("proveedores");
   proveedoresGlobal = proveedoresGlobal.filter(p => p.activo !== false);
