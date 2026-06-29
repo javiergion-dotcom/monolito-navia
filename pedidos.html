@@ -44,7 +44,6 @@ button{width:100%;padding:15px;margin-top:14px;border:0;border-radius:16px;font-
 </header>
 
 <div class="contenedor">
-
   <div id="avisosPedidos"></div>
   <div id="promosActivas"></div>
 
@@ -57,7 +56,6 @@ button{width:100%;padding:15px;margin-top:14px;border:0;border-radius:16px;font-
   <div class="totalFinal" id="totalFinal">TOTAL PAGO: 0,00 €</div>
 
   <button id="btnGuardarPedido" class="guardar">Guardar pedido</button>
-
 </div>
 
 <script type="module">
@@ -102,6 +100,13 @@ function esc(t){
     .replaceAll("'","&#039;");
 }
 
+function dinero(n){
+  return Number(n || 0).toLocaleString("es-ES", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " €";
+}
+
 function crearId(prefijo){
   return String(prefijo || "id")
     .toLowerCase()
@@ -123,7 +128,7 @@ function ahoraAuditoria(){
   };
 }
 
-/* PROMOCIONES DESDE FIREBASE */
+/* PROMOCIONES */
 
 function promoVigente(p){
   if(p.activa === false) return false;
@@ -154,7 +159,19 @@ function leerPromosVigentes(){
 }
 
 function idPromo(p){
-  return p.id || normalizar((p.proveedor || p.proveedorNormalizado || "") + "_" + (p.nombre || p.promocion || ""));
+  return String(
+    p.id ||
+    normalizar((p.proveedor || p.proveedorNormalizado || "") + "_" + (p.nombre || p.promocion || ""))
+  );
+}
+
+function promosDelProveedor(){
+  const proveedor = document.getElementById("proveedor").value;
+
+  return leerPromosVigentes().filter(p=>{
+    const provPromo = normalizar(p.proveedor || p.proveedorNormalizado || "");
+    return provPromo === normalizar(proveedor);
+  });
 }
 
 function pintarPromosActivas(){
@@ -180,15 +197,6 @@ function pintarPromosActivas(){
 
   html += `</div>`;
   document.getElementById("promosActivas").innerHTML = html;
-}
-
-function promosDelProveedor(){
-  const proveedor = document.getElementById("proveedor").value;
-
-  return leerPromosVigentes().filter(p=>{
-    const provPromo = normalizar(p.proveedor || p.proveedorNormalizado || "");
-    return provPromo === normalizar(proveedor);
-  });
 }
 
 function pintarPromosProveedor(){
@@ -232,12 +240,16 @@ function registrarDecisionPromo(p, decision){
     promoId:id,
     proveedor:p.proveedor || p.proveedorNormalizado || "",
     nombre:p.nombre || p.promocion || "",
+    descuento:Number(p.descuento || 0),
+    cargo:Number(p.cargo || 0),
+    gratis:Number(p.gratis || 0),
     decision,
     ...ahoraAuditoria()
   };
 
   pintarPromosActivas();
   pintarPromosProveedor();
+  calcular();
 }
 
 /* AVISOS */
@@ -303,26 +315,35 @@ function cargarArticulos(){
   pintar();
 }
 
-function precioCaja(a){
-  return Number(a.precioUnidad || 0) * Number(a.formato || 1);
+/* IMPORTANTE:
+   El precioUnidad es el precio del formato completo:
+   caja, barril, tanque o kilos.
+   NO se multiplica por formato.
+*/
+function precioCompra(a){
+  return Number(a.precioUnidad || a.precio || a.precioSinIva || 0);
 }
 
-function descuentoArticulo(a){
-  const promos = promosDelProveedor().filter(p => Number(p.descuento || 0) > 0);
+function descuentoProveedorAceptado(){
+  const promos = promosDelProveedor();
 
-  const promo = promos.find(p=>{
-    const nombrePromo = normalizar(p.nombre || p.promocion || "");
-    const nombreArticulo = normalizar(a.articulo || "");
+  let dto = 0;
 
-    return nombreArticulo.includes(nombrePromo) || nombrePromo.includes(nombreArticulo);
+  promos.forEach(p=>{
+    const id = idPromo(p);
+    const dec = decisionesPromo[id];
+
+    if(dec && dec.decision === "SI"){
+      dto = Math.max(dto, Number(p.descuento || 0));
+    }
   });
 
-  return promo ? Number(promo.descuento || 0) : 0;
+  return dto;
 }
 
 function precioFinal(a){
-  const precio = precioCaja(a);
-  const dto = descuentoArticulo(a);
+  const precio = precioCompra(a);
+  const dto = descuentoProveedorAceptado();
 
   if(dto > 0){
     return precio * (1 - dto / 100);
@@ -338,24 +359,24 @@ function pintar(){
   pedido.forEach((a,i)=>{
     if(busqueda && !normalizar(a.articulo).includes(busqueda)) return;
 
-    const dto = descuentoArticulo(a);
+    const dto = descuentoProveedorAceptado();
 
     html += `
       <div class="card">
         <div class="nombre">${esc(a.articulo)}</div>
         <div class="detalle">
-          ${esc(a.unidadFormato || "")} · ${Number(a.precioUnidad || 0).toFixed(2)} € · IVA ${Number(a.iva || 21)}%
+          ${esc(a.unidadFormato || "")} ${a.formato ? "· " + esc(a.formato) : ""} · ${dinero(precioCompra(a))} · IVA ${Number(a.iva || 21)}%
           ${dto > 0 ? ` · 🎁 ${dto}% dto` : ""}
         </div>
 
         <div class="stockFila">
           <div class="stockCol almacen">
-            <label>📦 ALMACÉN</label>
+            <label>📦 ¿CUÁNTAS HAY?</label>
             <input type="number" placeholder="0" value="${esc(a.stockActual)}" data-accion="stockActual" data-indice="${i}">
           </div>
 
           <div class="stockCol pedidoBox">
-            <label>🛒 PEDIDO</label>
+            <label>🛒 ¿CUÁNTAS PIDO?</label>
             <input class="cantidadPedido" type="number" placeholder="0" value="${esc(a.pedir)}" data-accion="stockPedir" data-indice="${i}">
           </div>
         </div>
@@ -386,7 +407,10 @@ function calcular(){
   });
 
   document.getElementById("totalFinal").textContent =
-    "TOTAL PAGO: " + total.toFixed(2).replace(".",",") + " €";
+    "TOTAL PAGO: " + total.toLocaleString("es-ES", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " €";
 }
 
 /* ENTER */
@@ -414,8 +438,8 @@ function crearLineaCargo(a, proveedor){
   const cantidad = Number(a.pedir || 0);
   if(cantidad <= 0) return null;
 
-  const precioOriginal = precioCaja(a);
-  const dto = descuentoArticulo(a);
+  const precioOriginal = precioCompra(a);
+  const dto = descuentoProveedorAceptado();
   const precio = precioFinal(a);
   const subtotal = cantidad * precio;
 
@@ -456,32 +480,8 @@ function crearLineasPromosAceptadas(proveedor){
 
     if(!dec || dec.decision !== "SI") return;
 
-    const cargo = Number(p.cargo || 0);
     const gratis = Number(p.gratis || 0);
     const articulo = p.nombre || p.promocion || "PROMOCIÓN";
-
-    if(cargo > 0){
-      lineas.push({
-        articulo,
-        nombre:articulo,
-        producto:articulo,
-        proveedor,
-        tipoLinea:"PROMO_CON_CARGO",
-        promoId:id,
-        promocion:articulo,
-        cantidad:cargo,
-        unidades:cargo,
-        uds:cargo,
-        pedir:cargo,
-        precioSinIva:0,
-        precio:0,
-        precioUnidad:0,
-        subtotal:0,
-        importe:0,
-        totalLinea:0,
-        ...ahoraAuditoria()
-      });
-    }
 
     if(gratis > 0){
       lineas.push({
@@ -647,6 +647,10 @@ async function iniciar(){
   promocionesGlobal = await leerColeccion("promociones_monolito");
   historicoPedidos = await leerColeccion("pedidos_historico");
   pagosPendientes = await leerColeccion("pagos_pendientes");
+
+  promocionesGlobal = promocionesGlobal.sort((a,b)=>Number(b.fechaMs || 0)-Number(a.fechaMs || 0));
+  historicoPedidos = historicoPedidos.sort((a,b)=>Number(b.fechaMs || 0)-Number(a.fechaMs || 0));
+  pagosPendientes = pagosPendientes.sort((a,b)=>Number(b.fechaMs || 0)-Number(a.fechaMs || 0));
 
   cargarProveedores();
   pintarPromosActivas();
