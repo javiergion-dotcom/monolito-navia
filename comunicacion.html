@@ -18,10 +18,13 @@ textarea{width:100%;min-height:110px;padding:12px;border-radius:14px;border:1px 
 .guardar{width:100%;margin-top:10px;background:#17303d;color:white}
 .comunicacion{border-left:8px solid #f2c94c}
 .fecha{font-size:13px;color:#666;margin-top:8px}
-.hecha{opacity:.55;text-decoration:line-through}
+.hecha{opacity:.55}
+.hecha p{text-decoration:line-through}
 .acciones{display:flex;gap:8px;margin-top:10px}
-.ok{background:#27ae60;color:white}
-.borrar{background:#c0392b;color:white}
+.ok{background:#27ae60;color:white;flex:1}
+.borrar{background:#c0392b;color:white;flex:1}
+.estado{font-size:13px;color:#666;margin-top:8px}
+.error{background:#fdecea;color:#8a1f11;border-left:8px solid #c0392b}
 </style>
 </head>
 
@@ -38,6 +41,7 @@ textarea{width:100%;min-height:110px;padding:12px;border-radius:14px;border:1px 
     <h3>Nueva comunicación</h3>
     <textarea id="mensaje" placeholder="Escribe aquí la comunicación para el siguiente turno..."></textarea>
     <button id="btnGuardar" class="guardar">GUARDAR COMUNICACIÓN</button>
+    <div id="estado" class="estado"></div>
   </div>
 
   <div id="lista"></div>
@@ -53,9 +57,11 @@ import {
 } from "./monolito-cloud.js";
 
 const COLECCION = "comunicaciones";
+const CLAVE_LOCAL = "monolito_comunicaciones";
 const CLAVE_LOCAL_VIEJA = "monolito_comunicaciones";
 
 let comunicaciones = [];
+let guardando = false;
 
 function usuarioActual(){
   return localStorage.getItem("usuario") ||
@@ -76,19 +82,50 @@ function esc(txt){
     .replaceAll("'","&#039;");
 }
 
+function estado(txt){
+  document.getElementById("estado").textContent = txt || "";
+}
+
+function normalizar(c){
+  return {
+    id: c.id ? String(c.id) : crearId(),
+    mensaje: c.mensaje || "",
+    usuario: c.usuario || "JAVI",
+    fecha: c.fecha || new Date().toLocaleString("es-ES"),
+    fechaMs: Number(c.fechaMs || Date.now()),
+    hecha: Boolean(c.hecha),
+    actualizadoEn: c.actualizadoEn || new Date().toISOString()
+  };
+}
+
+function ordenarLista(lista){
+  return [...lista].sort((a,b)=>Number(b.fechaMs || 0) - Number(a.fechaMs || 0));
+}
+
+function guardarLocal(){
+  localStorage.setItem(CLAVE_LOCAL, JSON.stringify(comunicaciones));
+}
+
 async function guardarLista(){
+  guardarLocal();
   await guardarColeccion(COLECCION, comunicaciones);
 }
 
 async function guardarComunicacion(){
-  const mensaje = document.getElementById("mensaje").value.trim();
+  if(guardando) return;
+
+  const campo = document.getElementById("mensaje");
+  const mensaje = campo.value.trim();
 
   if(!mensaje){
     alert("Escribe una comunicación.");
     return;
   }
 
-  const nuevaComunicacion = {
+  guardando = true;
+  estado("Guardando comunicación...");
+
+  const nueva = normalizar({
     id: crearId(),
     mensaje,
     usuario: usuarioActual(),
@@ -96,31 +133,43 @@ async function guardarComunicacion(){
     fechaMs: Date.now(),
     hecha: false,
     actualizadoEn: new Date().toISOString()
-  };
+  });
 
-  comunicaciones.unshift(nuevaComunicacion);
+  comunicaciones.unshift(nueva);
 
-  await guardarLista();
-
-  document.getElementById("mensaje").value = "";
-  pintar();
-
-  alert("Comunicación guardada.");
+  try{
+    await guardarLista();
+    campo.value = "";
+    pintar();
+    estado("Comunicación guardada correctamente.");
+  }catch(error){
+    console.error(error);
+    estado("Error al guardar. Se conserva copia local.");
+    pintar();
+  }finally{
+    guardando = false;
+  }
 }
 
 async function marcarHecha(id){
   comunicaciones = comunicaciones.map(c => {
     if(String(c.id) === String(id)){
-      return {
+      return normalizar({
         ...c,
         hecha: !c.hecha,
         actualizadoEn: new Date().toISOString()
-      };
+      });
     }
     return c;
   });
 
-  await guardarLista();
+  try{
+    await guardarLista();
+  }catch(error){
+    console.error(error);
+    guardarLocal();
+  }
+
   pintar();
 }
 
@@ -128,10 +177,15 @@ async function borrarComunicacion(id){
   if(!confirm("¿Borrar esta comunicación?")) return;
 
   comunicaciones = comunicaciones.filter(c => String(c.id) !== String(id));
-
-  await borrarDocumento(COLECCION, id);
-
+  guardarLocal();
   pintar();
+
+  try{
+    await borrarDocumento(COLECCION, id);
+  }catch(error){
+    console.error(error);
+    estado("No se pudo borrar en la nube. Revisa conexión.");
+  }
 }
 
 function pintar(){
@@ -146,9 +200,7 @@ function pintar(){
     return;
   }
 
-  const ordenadas = [...comunicaciones].sort((a,b)=>
-    Number(b.fechaMs || 0) - Number(a.fechaMs || 0)
-  );
+  const ordenadas = ordenarLista(comunicaciones);
 
   lista.innerHTML = ordenadas.map(c => `
     <div class="card comunicacion ${c.hecha ? "hecha" : ""}">
@@ -187,34 +239,55 @@ function activarBotones(){
   });
 }
 
+async function recuperarLocalSiExiste(){
+  const local = localStorage.getItem(CLAVE_LOCAL_VIEJA);
+  if(!local) return [];
+
+  try{
+    return JSON.parse(local).map(normalizar);
+  }catch(e){
+    return [];
+  }
+}
+
 async function iniciar(){
   activarBotones();
+  pintar();
 
   escucharColeccion(COLECCION, (lista)=>{
-    comunicaciones = lista;
+    comunicaciones = ordenarLista((lista || []).map(normalizar));
+    guardarLocal();
     pintar();
   });
 
-  const nube = await leerColeccion(COLECCION);
+  try{
+    const nube = await leerColeccion(COLECCION);
+    comunicaciones = ordenarLista((nube || []).map(normalizar));
 
-  if(nube.length === 0){
-    const localViejo = localStorage.getItem(CLAVE_LOCAL_VIEJA);
+    if(comunicaciones.length === 0){
+      const recuperadas = await recuperarLocalSiExiste();
 
-    if(localViejo){
-      try{
-        const recuperadas = JSON.parse(localViejo).map(c => ({
-          ...c,
-          id: c.id ? String(c.id) : crearId(),
-          fechaMs: c.fechaMs || Date.now(),
-          actualizadoEn: c.actualizadoEn || new Date().toISOString()
-        }));
+      if(recuperadas.length > 0){
+        comunicaciones = ordenarLista(recuperadas);
+        await guardarLista();
+      }
+    }
 
-        if(recuperadas.length > 0){
-          comunicaciones = recuperadas;
-          await guardarLista();
-          pintar();
-        }
-      }catch(e){}
+    pintar();
+  }catch(error){
+    console.error(error);
+
+    const recuperadas = await recuperarLocalSiExiste();
+
+    comunicaciones = ordenarLista(recuperadas);
+    pintar();
+
+    if(comunicaciones.length === 0){
+      document.getElementById("lista").innerHTML = `
+        <div class="card error">
+          No se pudo cargar comunicación desde la nube.
+        </div>
+      `;
     }
   }
 }
