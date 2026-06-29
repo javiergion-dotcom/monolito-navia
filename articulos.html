@@ -175,7 +175,6 @@ function pintar(){
         <div class="detalle">Formato: ${a.formato || 1}</div>
         <div class="detalle">IVA: ${a.iva || 21}%</div>
         <div class="precioFinal">Precio compra sin IVA: ${dinero(precioCompra(a))}</div>
-
         ${puedeEditar() ? `
           <div class="botones">
             <button class="editar" data-accion="editar" data-id="${a.id}">Editar</button>
