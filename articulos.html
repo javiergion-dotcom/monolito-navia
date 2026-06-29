@@ -68,8 +68,13 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
       <label>Formato / unidades</label>
       <input id="formato" type="number" step="0.01">
 
-      <label>Texto formato</label>
-      <input id="unidadFormato" placeholder="CAJA 24, PACK 6, LATA 3KG...">
+      <label>Tipo de formato</label>
+<select id="unidadFormato">
+  <option value="CAJA">CAJA</option>
+  <option value="BARRIL">BARRIL</option>
+  <option value="TANQUE">TANQUE</option>
+  <option value="KILOS">KILOS</option>
+</select>
 
       <label>IVA</label>
       <select id="iva">
