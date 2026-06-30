@@ -27,12 +27,14 @@ button{width:100%;padding:15px;margin-top:14px;border:0;border-radius:16px;font-
 .promosBox{background:#eef6ff;border-color:#8dbdf5}
 .tituloBox{font-weight:900;font-size:18px;margin-bottom:10px}
 .promoLinea{background:white;border-radius:14px;padding:11px;margin-top:8px;font-weight:900}
-.promoPendiente{border-left:8px solid #f0c94a}
-.promoRevisada{border-left:8px solid #48a530;opacity:.9}
 .promoDetalle{background:#fff6cf;border:2px solid #ffe066;border-radius:14px;padding:12px;margin-top:12px;font-weight:900;color:#7a6200}
-.promoBotones{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.promoCantidad{margin-top:10px;background:white;border-radius:14px;padding:10px}
+.promoCantidad label{display:block;font-size:15px;margin-bottom:6px}
+.promoCantidad input{width:100%;padding:13px;border-radius:14px;border:1px solid #ccc;text-align:center;font-size:26px;font-weight:900}
+.promoOk{border-left:8px solid #48a530}
+.promoNo{border-left:8px solid #f0c94a}
+.promoError{background:#ffe0e0;border:2px solid #c00000;color:#9b0000;border-radius:14px;padding:10px;margin-top:8px}
 .si{background:#48a530;color:white}
-.no{background:#c44;color:white}
 </style>
 </head>
 
@@ -75,7 +77,7 @@ let promocionesGlobal = [];
 let avisosCloud = [];
 let historicoPedidos = [];
 let pagosPendientes = [];
-let decisionesPromo = {};
+let cantidadesPromo = {};
 
 function usuarioActual(){
   return localStorage.getItem("usuario") || "JAVI";
@@ -130,6 +132,28 @@ function ahoraAuditoria(){
   };
 }
 
+/* PRECIOS */
+
+function precioCompra(a){
+  const posibles = [
+    a.precioUnidad,
+    a.precioCompra,
+    a.precioCompraSinIva,
+    a.precioSinIva,
+    a.precioBase,
+    a.precio,
+    a.coste,
+    a.costeSinIva
+  ];
+
+  for(const v of posibles){
+    const n = Number(v);
+    if(!isNaN(n) && n > 0) return n;
+  }
+
+  return 0;
+}
+
 /* PROMOCIONES */
 
 function promoVigente(p){
@@ -179,6 +203,58 @@ function promosDelProveedor(){
   });
 }
 
+function articulosDelProveedor(){
+  const proveedor = document.getElementById("proveedor").value;
+  return (articulosGlobal || [])
+    .filter(a=>a.activo !== false)
+    .filter(a=>normalizar(a.proveedor) === normalizar(proveedor));
+}
+
+function buscarArticuloPromo(p){
+  const articulos = articulosDelProveedor();
+
+  const textoPromo = normalizar(
+    p.articulo ||
+    p.producto ||
+    p.nombreArticulo ||
+    p.nombre ||
+    p.promocion ||
+    ""
+  );
+
+  const articuloDirecto = normalizar(p.articulo || p.producto || p.nombreArticulo || "");
+
+  if(articuloDirecto){
+    const exacto = articulos.find(a=>normalizar(a.articulo) === articuloDirecto);
+    if(exacto) return exacto;
+  }
+
+  let mejor = null;
+  let mejorPuntos = 0;
+
+  articulos.forEach(a=>{
+    const art = normalizar(a.articulo || "");
+    if(!art) return;
+
+    let puntos = 0;
+
+    if(textoPromo.includes(art)) puntos += 100;
+    if(art.includes(textoPromo) && textoPromo.length > 3) puntos += 80;
+
+    const tokens = art.split(/[^A-Z0-9]+/).filter(x=>x.length >= 3);
+    tokens.forEach(tok=>{
+      if(textoPromo.includes(tok)) puntos += 10;
+    });
+
+    if(puntos > mejorPuntos){
+      mejorPuntos = puntos;
+      mejor = a;
+    }
+  });
+
+  return mejorPuntos > 0 ? mejor : null;
+}
+
 function pintarPromosActivas(){
   const promos = leerPromosVigentes();
 
@@ -191,11 +267,11 @@ function pintarPromosActivas(){
 
   promos.forEach((p,i)=>{
     const id = idPromo(p,i);
-    const rev = decisionesPromo[id];
+    const cant = Number(cantidadesPromo[id] || 0);
 
     html += `
-      <div class="promoLinea ${rev ? "promoRevisada" : "promoPendiente"}">
-        ${rev ? "🟢" : "🟡"} ${esc(p.proveedor || p.proveedorNormalizado || "")} · ${esc(p.nombre || p.promocion || "")}
+      <div class="promoLinea ${cant > 0 ? "promoOk" : "promoNo"}">
+        ${cant > 0 ? "🟢" : "🟡"} ${esc(p.proveedor || p.proveedorNormalizado || "")} · ${esc(p.nombre || p.promocion || "")}
       </div>
     `;
   });
@@ -216,20 +292,47 @@ function pintarPromosProveedor(){
 
   promos.forEach((p,i)=>{
     const id = idPromo(p,i);
-    const dec = decisionesPromo[id];
+    const cant = Number(cantidadesPromo[id] || 0);
+    const art = buscarArticuloPromo(p);
+    const precio = art ? precioCompra(art) : 0;
+    const cargo = Number(p.cargo || 0);
+    const gratis = Number(p.gratis || 0);
+    const descuento = Number(p.descuento || 0);
+
+    const unidadesCargo = cant * cargo;
+    const unidadesGratis = cant * gratis;
+    const precioFinal = descuento > 0 ? precio * (1 - descuento / 100) : precio;
+    const totalPromo = unidadesCargo * precioFinal;
 
     html += `
-      <div class="promoDetalle">
-        <div>${dec ? "🟢 " + dec.decision : "🟡 PENDIENTE"} · ${esc(p.nombre || p.promocion || "")}</div>
+      <div class="promoDetalle ${cant > 0 ? "promoOk" : "promoNo"}">
+        <div>🎁 ${esc(p.nombre || p.promocion || "PROMOCIÓN")}</div>
         <div style="margin-top:6px">
-          ${Number(p.descuento || 0) > 0 ? `${Number(p.descuento)}% descuento<br>` : ""}
-          ${Number(p.cargo || 0)} con cargo · ${Number(p.gratis || 0)} gratis / regalo
+          ${cargo} con cargo · ${gratis} gratis / regalo
+          ${descuento > 0 ? `<br>${descuento}% descuento` : ""}
         </div>
-        ${p.nota ? `<div style="margin-top:6px">${esc(p.nota)}</div>` : ""}
-        <div class="promoBotones">
-          <button class="si" data-accion="promoSi" data-indice="${i}">SÍ</button>
-          <button class="no" data-accion="promoNo" data-indice="${i}">NO</button>
+
+        ${art ? `
+          <div style="margin-top:6px">
+            Artículo detectado: ${esc(art.articulo)} · ${dinero(precio)}
+          </div>
+        ` : `
+          <div class="promoError">
+            No encuentro artículo para valorar esta promoción.
+          </div>
+        `}
+
+        <div class="promoCantidad">
+          <label>Nº promociones</label>
+          <input type="number" min="0" step="1" value="${esc(cant)}" data-accion="cantidadPromo" data-indice="${i}">
         </div>
+
+        ${cant > 0 ? `
+          <div style="margin-top:8px">
+            Con cargo: ${unidadesCargo} · Gratis: ${unidadesGratis}<br>
+            Total promo: ${dinero(totalPromo)}
+          </div>
+        ` : ""}
       </div>
     `;
   });
@@ -238,23 +341,19 @@ function pintarPromosProveedor(){
   document.getElementById("promosProveedor").innerHTML = html;
 }
 
-function registrarDecisionPromo(p, indice, decision){
-  const id = idPromo(p,indice);
+function cambiarCantidadPromo(indice, valor){
+  const promos = promosDelProveedor();
+  const promo = promos[indice];
+  if(!promo) return;
 
-  decisionesPromo[id] = {
-    promoId:id,
-    proveedor:p.proveedor || p.proveedorNormalizado || "",
-    nombre:p.nombre || p.promocion || "",
-    descuento:Number(p.descuento || 0),
-    cargo:Number(p.cargo || 0),
-    gratis:Number(p.gratis || 0),
-    decision,
-    ...ahoraAuditoria()
-  };
+  const id = idPromo(promo, indice);
+  const n = Math.max(0, Math.floor(Number(valor || 0)));
+
+  cantidadesPromo[id] = n;
 
   pintarPromosActivas();
   pintarPromosProveedor();
-  pintar();
+  calcular();
 }
 
 /* AVISOS */
@@ -307,6 +406,8 @@ function cargarProveedores(){
 function cargarArticulos(){
   const proveedor = document.getElementById("proveedor").value;
 
+  cantidadesPromo = {};
+
   pedido = (articulosGlobal || [])
     .filter(a=>a.activo !== false)
     .filter(a=>normalizar(a.proveedor) === normalizar(proveedor))
@@ -316,58 +417,9 @@ function cargarArticulos(){
       pedir:""
     }));
 
+  pintarPromosActivas();
   pintarPromosProveedor();
   pintar();
-}
-
-function precioCompra(a){
-  const posibles = [
-    a.precioUnidad,
-    a.precioCompra,
-    a.precioCompraSinIva,
-    a.precioSinIva,
-    a.precioBase,
-    a.precio,
-    a.importe,
-    a.total,
-    a.coste,
-    a.costeSinIva
-  ];
-
-  for(const v of posibles){
-    const n = Number(v);
-    if(!isNaN(n) && n > 0) return n;
-  }
-
-  return 0;
-}
-
-function descuentoTotalAceptado(){
-  const promos = promosDelProveedor();
-  let totalDto = 0;
-
-  promos.forEach((p,i)=>{
-    const id = idPromo(p,i);
-    const dec = decisionesPromo[id];
-
-    if(dec && dec.decision === "SI"){
-      totalDto += Number(p.descuento || 0);
-    }
-  });
-
-  if(totalDto > 100) totalDto = 100;
-  return totalDto;
-}
-
-function precioFinal(a){
-  const precio = precioCompra(a);
-  const dto = descuentoTotalAceptado();
-
-  if(dto > 0){
-    return precio * (1 - dto / 100);
-  }
-
-  return precio;
 }
 
 function pintar(){
@@ -377,7 +429,6 @@ function pintar(){
   pedido.forEach((a,i)=>{
     if(busqueda && !normalizar(a.articulo).includes(busqueda)) return;
 
-    const dto = descuentoTotalAceptado();
     const precio = precioCompra(a);
 
     html += `
@@ -387,7 +438,6 @@ function pintar(){
           ${esc(a.unidadFormato || "")} ${a.formato ? "· " + esc(a.formato) : ""}
           · Precio: ${dinero(precio)}
           · IVA ${Number(a.iva || 21)}%
-          ${dto > 0 ? ` · 🎁 ${dto}% dto` : ""}
         </div>
 
         <div class="stockFila">
@@ -420,12 +470,37 @@ function stockPedir(i,v){
   calcular();
 }
 
+function calcularPromos(){
+  const promos = promosDelProveedor();
+  let total = 0;
+
+  promos.forEach((p,i)=>{
+    const id = idPromo(p,i);
+    const cant = Number(cantidadesPromo[id] || 0);
+    if(cant <= 0) return;
+
+    const art = buscarArticuloPromo(p);
+    if(!art) return;
+
+    const cargo = Number(p.cargo || 0);
+    const descuento = Number(p.descuento || 0);
+    const precio = precioCompra(art);
+    const precioFinal = descuento > 0 ? precio * (1 - descuento / 100) : precio;
+
+    total += cant * cargo * precioFinal;
+  });
+
+  return total;
+}
+
 function calcular(){
   let total = 0;
 
   pedido.forEach(a=>{
-    total += Number(a.pedir || 0) * precioFinal(a);
+    total += Number(a.pedir || 0) * precioCompra(a);
   });
+
+  total += calcularPromos();
 
   document.getElementById("totalFinal").textContent =
     "TOTAL PAGO: " + total.toLocaleString("es-ES", {
@@ -459,9 +534,7 @@ function crearLineaCargo(a, proveedor){
   const cantidad = Number(a.pedir || 0);
   if(cantidad <= 0) return null;
 
-  const precioOriginal = precioCompra(a);
-  const dto = descuentoTotalAceptado();
-  const precio = precioFinal(a);
+  const precio = precioCompra(a);
   const subtotal = cantidad * precio;
 
   return {
@@ -470,6 +543,7 @@ function crearLineaCargo(a, proveedor){
     producto:a.articulo,
     proveedor,
     tipoLinea:"CON_CARGO",
+    origen:"PEDIDO_MANUAL",
     cantidad,
     unidades:cantidad,
     uds:cantidad,
@@ -478,11 +552,11 @@ function crearLineaCargo(a, proveedor){
     formato:Number(a.formato || 1),
     iva:Number(a.iva || 21),
     tipoIva:Number(a.iva || 21),
-    precioOriginalSinIva:precioOriginal,
+    precioOriginalSinIva:precio,
     precioSinIva:precio,
     precio,
     precioUnidad:precio,
-    descuentoAplicado:dto,
+    descuentoAplicado:0,
     subtotal,
     importe:subtotal,
     totalLinea:subtotal,
@@ -491,66 +565,105 @@ function crearLineaCargo(a, proveedor){
   };
 }
 
-function crearLineasPromosAceptadas(proveedor){
+function crearLineasPromos(proveedor){
   const lineas = [];
   const promos = promosDelProveedor();
 
-  promos.forEach((p,i)=>{
+  for(let i=0;i<promos.length;i++){
+    const p = promos[i];
     const id = idPromo(p,i);
-    const dec = decisionesPromo[id];
+    const numeroPromos = Number(cantidadesPromo[id] || 0);
 
-    if(!dec || dec.decision !== "SI") return;
+    if(numeroPromos <= 0) continue;
 
-    const gratis = Number(p.gratis || 0);
+    const art = buscarArticuloPromo(p);
+
+    if(!art){
+      throw new Error("No encuentro artículo para la promoción: " + (p.nombre || p.promocion || "PROMOCIÓN"));
+    }
+
     const cargo = Number(p.cargo || 0);
-    const articulo = p.nombre || p.promocion || "PROMOCIÓN";
+    const gratis = Number(p.gratis || 0);
+    const descuento = Number(p.descuento || 0);
 
-    lineas.push({
-      articulo,
-      nombre:articulo,
-      producto:articulo,
-      proveedor,
-      tipoLinea:"PROMOCION_REVISADA",
-      promoId:id,
-      promocion:articulo,
-      cantidadConCargo:cargo,
-      cantidadGratis:gratis,
-      descuento:Number(p.descuento || 0),
-      subtotal:0,
-      importe:0,
-      totalLinea:0,
-      sinCargo:true,
-      origen:"CONFIGURACION_PROMOCION",
-      ...ahoraAuditoria()
-    });
+    const cantidadCargo = numeroPromos * cargo;
+    const cantidadGratis = numeroPromos * gratis;
 
-    if(gratis > 0){
+    const precioOriginal = precioCompra(art);
+    const precio = descuento > 0 ? precioOriginal * (1 - descuento / 100) : precioOriginal;
+    const subtotal = cantidadCargo * precio;
+
+    const nombrePromo = p.nombre || p.promocion || "PROMOCIÓN";
+
+    if(cantidadCargo > 0){
       lineas.push({
-        articulo,
-        nombre:articulo,
-        producto:articulo,
+        articulo:art.articulo,
+        nombre:art.articulo,
+        producto:art.articulo,
+        proveedor,
+        tipoLinea:"PROMO_CON_CARGO",
+        origen:"PROMOCION",
+        promoId:id,
+        promocion:nombrePromo,
+        numeroPromos,
+        cantidad:cantidadCargo,
+        unidades:cantidadCargo,
+        uds:cantidadCargo,
+        pedir:cantidadCargo,
+        cantidadConCargo:cantidadCargo,
+        cantidadGratis:0,
+        unidadFormato:art.unidadFormato || "",
+        formato:Number(art.formato || 1),
+        iva:Number(art.iva || 21),
+        tipoIva:Number(art.iva || 21),
+        precioOriginalSinIva:precioOriginal,
+        precioSinIva:precio,
+        precio,
+        precioUnidad:precio,
+        descuentoAplicado:descuento,
+        subtotal,
+        importe:subtotal,
+        totalLinea:subtotal,
+        ...ahoraAuditoria()
+      });
+    }
+
+    if(cantidadGratis > 0){
+      lineas.push({
+        articulo:art.articulo,
+        nombre:art.articulo,
+        producto:art.articulo,
         proveedor,
         tipoLinea:"PROMO_GRATIS_REGALO",
+        origen:"PROMOCION",
         promoId:id,
-        promocion:articulo,
-        cantidad:gratis,
-        unidades:gratis,
-        uds:gratis,
-        pedir:gratis,
+        promocion:nombrePromo,
+        numeroPromos,
+        cantidad:cantidadGratis,
+        unidades:cantidadGratis,
+        uds:cantidadGratis,
+        pedir:cantidadGratis,
+        cantidadConCargo:0,
+        cantidadGratis:cantidadGratis,
+        unidadFormato:art.unidadFormato || "",
+        formato:Number(art.formato || 1),
+        iva:Number(art.iva || 21),
+        tipoIva:Number(art.iva || 21),
+        precioOriginalSinIva:precioOriginal,
         precioSinIva:0,
         precio:0,
         precioUnidad:0,
+        descuentoAplicado:0,
         subtotal:0,
         importe:0,
         totalLinea:0,
         sinCargo:true,
         gratis:true,
         regalo:true,
-        origen:"CONFIGURACION_PROMOCION",
         ...ahoraAuditoria()
       });
     }
-  });
+  }
 
   return lineas;
 }
@@ -570,11 +683,14 @@ async function guardarPedido(){
     if(linea) lineasFinal.push(linea);
   });
 
-  lineasFinal.push(...crearLineasPromosAceptadas(proveedor));
+  try{
+    lineasFinal.push(...crearLineasPromos(proveedor));
+  }catch(e){
+    alert(e.message);
+    return;
+  }
 
-  const lineasConCargo = lineasFinal.filter(l => l.tipoLinea === "CON_CARGO");
-
-  if(lineasConCargo.length === 0){
+  if(lineasFinal.length === 0){
     alert("Sin cantidades pedidas");
     return;
   }
@@ -583,8 +699,18 @@ async function guardarPedido(){
   const pedidoId = crearId("pedido_" + proveedor);
   const totalPago = lineasFinal.reduce((t,l)=>t + Number(l.subtotal || 0),0);
 
-  const decisionesProveedor = Object.values(decisionesPromo)
-    .filter(d=>normalizar(d.proveedor) === normalizar(proveedor));
+  const promocionesPedido = promosDelProveedor().map((p,i)=>{
+    const id = idPromo(p,i);
+    return {
+      promoId:id,
+      proveedor:p.proveedor || p.proveedorNormalizado || proveedor,
+      nombre:p.nombre || p.promocion || "",
+      cargo:Number(p.cargo || 0),
+      gratis:Number(p.gratis || 0),
+      descuento:Number(p.descuento || 0),
+      numeroPromos:Number(cantidadesPromo[id] || 0)
+    };
+  }).filter(p=>p.numeroPromos > 0);
 
   const pedidoGuardado = {
     id:pedidoId,
@@ -598,7 +724,7 @@ async function guardarPedido(){
     totalPago,
     pendiente:totalPago,
     estado:"PENDIENTE",
-    decisionesPromociones:decisionesProveedor,
+    promocionesPedido,
     lineas:lineasFinal
   };
 
@@ -618,7 +744,7 @@ async function guardarPedido(){
     totalPago,
     pendiente:totalPago,
     estado:"PENDIENTE",
-    decisionesPromociones:decisionesProveedor,
+    promocionesPedido,
     lineas:lineasFinal
   });
 
@@ -629,7 +755,7 @@ async function guardarPedido(){
   document.getElementById("proveedor").value = "";
   document.getElementById("buscarArticulo").value = "";
   pedido = [];
-  decisionesPromo = {};
+  cantidadesPromo = {};
   pintarPromosActivas();
   pintarPromosProveedor();
   pintar();
@@ -650,17 +776,11 @@ function activarEventos(){
     }
   });
 
-  document.getElementById("promosProveedor").addEventListener("click", e=>{
-    const btn = e.target.closest("button");
-    if(!btn) return;
-
-    const promos = promosDelProveedor();
-    const indice = Number(btn.dataset.indice);
-    const promo = promos[indice];
-    if(!promo) return;
-
-    if(btn.dataset.accion === "promoSi") registrarDecisionPromo(promo, indice, "SI");
-    if(btn.dataset.accion === "promoNo") registrarDecisionPromo(promo, indice, "NO");
+  document.getElementById("promosProveedor").addEventListener("input", e=>{
+    const el = e.target;
+    if(el.dataset.accion === "cantidadPromo"){
+      cambiarCantidadPromo(Number(el.dataset.indice), el.value);
+    }
   });
 
   document.getElementById("articulos").addEventListener("input", e=>{
