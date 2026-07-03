@@ -186,3 +186,33 @@ export async function borrarDocumento(nombreColeccion, id){
     return false;
   }
 }
+export async function borrarColeccion(nombreColeccion){
+
+  try{
+
+    const querySnapshot =
+      await getDocs(collection(db, nombreColeccion));
+
+    for(const documento of querySnapshot.docs){
+
+      await deleteDoc(
+        doc(db, nombreColeccion, documento.id)
+      );
+
+    }
+
+    localStorage.removeItem(nombreColeccion);
+
+    return true;
+
+  }catch(error){
+
+    console.error(
+      "Error borrando colección:",
+      nombreColeccion,
+      error
+    );
+
+    return false;
+  }
+}
