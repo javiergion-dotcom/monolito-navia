@@ -14,7 +14,8 @@ button{border:0;border-radius:14px;padding:11px 14px;font-weight:800;font-size:1
 .volver{background:white;color:#17303d}
 .contenido{padding:16px;width:100%}
 .nuevo{width:100%;background:#ff9800;color:white;margin-bottom:12px;font-size:17px}
-.base{width:100%;background:#17303d;color:white;margin-bottom:14px;font-size:17px}
+.base{width:100%;background:#17303d;color:white;margin-bottom:12px;font-size:17px}
+.borrar{width:100%;background:#b00020;color:white;margin-bottom:14px;font-size:17px}
 #lista{width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
 .card{background:white;border-radius:22px;padding:16px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
 .card.inactivo{opacity:.45}
@@ -47,6 +48,7 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
   <div id="vistaLista">
     <button id="btnNuevo" class="nuevo">➕ Nuevo artículo</button>
     <button id="btnBase" class="base">📦 Cargar artículos base</button>
+    <button id="btnBorrarTodo" class="borrar">🗑️ Borrar todos los artículos</button>
     <div id="lista"></div>
   </div>
 
@@ -69,12 +71,12 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
       <input id="formato" type="number" step="0.01">
 
       <label>Tipo de formato</label>
-<select id="unidadFormato">
-  <option value="CAJA">CAJA</option>
-  <option value="BARRIL">BARRIL</option>
-  <option value="TANQUE">TANQUE</option>
-  <option value="KILOS">KILOS</option>
-</select>
+      <select id="unidadFormato">
+        <option value="CAJA">CAJA</option>
+        <option value="BARRIL">BARRIL</option>
+        <option value="TANQUE">TANQUE</option>
+        <option value="KILOS">KILOS</option>
+      </select>
 
       <label>IVA</label>
       <select id="iva">
@@ -94,7 +96,8 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
 import {
   leerColeccion,
   guardarColeccion,
-  escucharColeccion
+  escucharColeccion,
+  borrarColeccion
 } from "./monolito-cloud.js";
 
 let articulos = [];
@@ -132,12 +135,14 @@ function articulosIniciales(){
 function precioCompra(a){
   return Number(a.precioUnidad || 0) * Number(a.formato || 1);
 }
+
 function dinero(n){
   return Number(n || 0).toLocaleString("es-ES", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }) + " €";
 }
+
 async function cargarProveedores(){
   proveedoresGlobal = await leerColeccion("proveedores");
   proveedoresGlobal = proveedoresGlobal.filter(p => p.activo !== false);
@@ -204,6 +209,27 @@ async function cargarArticulosBase(){
     await guardarLista();
     pintar();
     alert("Artículos base cargados en la nube.");
+  }
+}
+
+async function borrarTodosLosArticulos(){
+  if(!puedeEditar()) return;
+
+  const ok1 = confirm("¿Seguro que quieres borrar TODOS los artículos?");
+  if(!ok1) return;
+
+  const ok2 = confirm("Esta acción no se puede deshacer. ¿Confirmas el borrado total?");
+  if(!ok2) return;
+
+  const borrado = await borrarColeccion("articulos");
+
+  if(borrado){
+    articulos = [];
+    localStorage.removeItem("articulos");
+    pintar();
+    alert("Artículos borrados correctamente.");
+  }else{
+    alert("No se pudieron borrar los artículos.");
   }
 }
 
@@ -327,6 +353,7 @@ function activarBotones(){
   document.getElementById("btnVolver").addEventListener("click", volver);
   document.getElementById("btnNuevo").addEventListener("click", abrirNuevo);
   document.getElementById("btnBase").addEventListener("click", cargarArticulosBase);
+  document.getElementById("btnBorrarTodo").addEventListener("click", borrarTodosLosArticulos);
   document.getElementById("btnGuardar").addEventListener("click", guardarFicha);
   document.getElementById("btnCancelar").addEventListener("click", cerrarFicha);
 
