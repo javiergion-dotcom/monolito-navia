@@ -122,7 +122,8 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
 <script type="module">
 import {
   leerColeccion,
-  guardarColeccion
+  guardarColeccion,
+  borrarColeccion
 } from "./monolito-cloud.js";
 
 let usuariosCloud = [];
@@ -452,12 +453,18 @@ window.vaciarColeccion = async function(nombreColeccion, nombreVisible){
     return;
   }
 
-  await guardarColeccion(nombreColeccion, []);
+  const ok = await borrarColeccion(nombreColeccion);
 
-  if(nombreColeccion === "usuarios_monolito") await pintarUsuarios();
-  if(nombreColeccion === "promociones_monolito") await pintarPromociones();
+  if(ok){
+    localStorage.removeItem(nombreColeccion);
 
-  alert(nombreVisible + " borrado.");
+    if(nombreColeccion === "usuarios_monolito") await pintarUsuarios();
+    if(nombreColeccion === "promociones_monolito") await pintarPromociones();
+
+    alert(nombreVisible + " borrado correctamente.");
+  }else{
+    alert("No se pudo borrar " + nombreVisible + ".");
+  }
 };
 
 window.reinicioTotal = async function(){
@@ -481,7 +488,8 @@ window.reinicioTotal = async function(){
   ];
 
   for(const c of colecciones){
-    await guardarColeccion(c, []);
+    await borrarColeccion(c);
+    localStorage.removeItem(c);
   }
 
   await pintarUsuarios();
