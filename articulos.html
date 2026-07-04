@@ -31,10 +31,12 @@ button{border:0;border-radius:14px;padding:11px 14px;font-weight:800;font-size:1
 .ficha{background:white;border-radius:24px;padding:16px;box-shadow:0 10px 22px rgba(0,0,0,.16);width:100%}
 label{display:block;font-weight:800;margin-top:12px}
 input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca;font-size:16px;margin-top:6px}
+input[readonly]{background:#eef2f5;font-weight:900}
 .guardar{width:100%;background:#48a530;color:white;margin-top:16px}
 .cancelar{width:100%;background:#dfe6ec;color:#17303d;margin-top:10px}
 .oculto{display:none}
 .vacio{background:white;border-radius:22px;padding:18px;text-align:center;font-weight:800}
+.ayuda{font-size:13px;color:#5d6b75;font-weight:800;margin-top:6px}
 </style>
 </head>
 
@@ -50,7 +52,7 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
   <div id="vistaLista">
     <button id="btnNuevo" class="nuevo">➕ Nuevo artículo</button>
     <button id="btnImportar" class="importar">📄 Importar carta digital</button>
-    <input id="archivoCarta" type="file" accept=".txt,.csv,.html,.htm,*/*" class="oculto">
+    <input id="archivoCarta" type="file" accept=".txt,.csv,.html,.htm,.xlsx,*/*" class="oculto">
     <button id="btnBase" class="base">📦 Cargar artículos base</button>
     <button id="btnBorrarTodo" class="borrar">🗑️ Borrar todos los artículos</button>
     <div id="lista"></div>
@@ -62,26 +64,16 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
 
       <input type="hidden" id="idArticulo">
 
-      <label>Proveedor</label>
-      <select id="proveedor"></select>
-
       <label>Artículo</label>
       <input id="articulo">
 
+      <label>Proveedor</label>
+      <input id="proveedor" list="listaProveedores" autocomplete="off">
+      <datalist id="listaProveedores"></datalist>
+      <div class="ayuda">Escribe el inicio del proveedor. Enter o Tab lo completa.</div>
+
       <label>Precio compra sin IVA</label>
-      <input id="precioUnidad" type="number" step="0.0001">
-
-      <label>Formato / unidades</label>
-      <input id="formato" type="number" step="0.01">
-
-      <label>Tipo de formato</label>
-      <select id="unidadFormato">
-        <option value="UNIDAD">UNIDAD</option>
-        <option value="CAJA">CAJA</option>
-        <option value="BARRIL">BARRIL</option>
-        <option value="TANQUE">TANQUE</option>
-        <option value="KILOS">KILOS</option>
-      </select>
+      <input id="precioUnidad" type="text" inputmode="decimal">
 
       <label>IVA</label>
       <select id="iva">
@@ -91,9 +83,15 @@ input,select{width:100%;padding:12px;border-radius:14px;border:1px solid #b8c2ca
       </select>
 
       <label>Precio de venta</label>
-      <input id="precioVenta" type="number" step="0.01">
+      <input id="precioVenta" type="text" inputmode="decimal">
 
-      <button id="btnGuardar" class="guardar">💾 Guardar artículo</button>
+      <label>Stock máximo</label>
+      <input id="stockMaximo" type="number" step="1">
+
+      <input id="formato" type="hidden" value="1">
+      <input id="unidadFormato" type="hidden" value="UNIDAD">
+
+      <button id="btnGuardar" class="guardar">💾 Guardar y siguiente</button>
       <button id="btnCancelar" class="cancelar">Cancelar</button>
     </div>
   </div>
@@ -110,6 +108,7 @@ import {
 
 let articulos = [];
 let proveedoresGlobal = [];
+let indiceEditando = -1;
 
 function usuarioActual(){
   const u = localStorage.getItem("usuario") || "JAVI";
@@ -131,15 +130,33 @@ function crearId(texto){
     + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,7);
 }
 
-function precioCompra(a){
-  return Number(a.precioUnidad || 0) * Number(a.formato || 1);
-}
-
 function dinero(n){
   return Number(n || 0).toLocaleString("es-ES", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }) + " €";
+}
+
+function precioCompra(a){
+  return Number(a.precioUnidad || 0) * Number(a.formato || 1);
+}
+
+function parseNumero(valor){
+  let t = String(valor || "").trim().replace(",",".");
+  let n = parseFloat(t);
+  if(isNaN(n)) n = 0;
+  return Math.round(n * 100) / 100;
+}
+
+function formatearPrecio(id){
+  const el = document.getElementById(id);
+  const n = parseNumero(el.value);
+  el.value = n.toFixed(2).replace(".",",");
+  return n;
+}
+
+function nombreProveedor(p){
+  return String(p.nombre || p.proveedor || p.empresa || "").trim().toUpperCase();
 }
 
 async function cargarProveedores(){
@@ -148,20 +165,34 @@ async function cargarProveedores(){
 
   if(proveedoresGlobal.length === 0){
     proveedoresGlobal = [
-      {nombre:""},
       {nombre:"CANDELAS"},
       {nombre:"TURRADO"},
       {nombre:"SANPEDRO"},
       {nombre:"DEO"}
     ];
   }
+
+  cargarListaProveedores();
 }
 
-function cargarSelectProveedores(){
-  const sel = document.getElementById("proveedor");
-  sel.innerHTML = proveedoresGlobal.map(p =>
-    `<option value="${p.nombre || ""}">${p.nombre || "SIN PROVEEDOR"}</option>`
-  ).join("");
+function cargarListaProveedores(){
+  const dl = document.getElementById("listaProveedores");
+  dl.innerHTML = proveedoresGlobal.map(p=>{
+    const n = nombreProveedor(p);
+    return n ? `<option value="${n}"></option>` : "";
+  }).join("");
+}
+
+function completarProveedor(){
+  const input = document.getElementById("proveedor");
+  const escrito = input.value.trim().toUpperCase();
+  if(!escrito) return;
+
+  const encontrado = proveedoresGlobal.find(p =>
+    nombreProveedor(p).startsWith(escrito)
+  );
+
+  input.value = encontrado ? nombreProveedor(encontrado) : escrito;
 }
 
 function pintar(){
@@ -177,8 +208,8 @@ function pintar(){
         <div class="nombre">${a.articulo || "SIN NOMBRE"}</div>
         <div class="detalle">${a.proveedor || "SIN PROVEEDOR"} · ${a.unidadFormato || "UNIDAD"}</div>
         <div class="detalle">Precio compra sin IVA: ${dinero(a.precioUnidad)}</div>
-        <div class="detalle">Formato: ${a.formato || 1}</div>
         <div class="detalle">IVA: ${a.iva || 21}%</div>
+        <div class="detalle">Stock máximo: ${a.stockMaximo || 0}</div>
         <div class="precioFinal">Compra total sin IVA: ${dinero(precioCompra(a))}</div>
         <div class="venta">Venta: ${dinero(a.precioVenta)}</div>
         ${puedeEditar() ? `
@@ -207,9 +238,9 @@ async function cargarArticulosBase(){
 
   if(confirm("¿Cargar artículos base?")){
     articulos = [
-      {id:"cafe_natural", proveedor:"CANDELAS", articulo:"CAFÉ NATURAL", precioUnidad:17.00, formato:3, unidadFormato:"KILOS", iva:10, precioVenta:1.40, activo:true},
-      {id:"coca_cola_lata_33cl", proveedor:"SANPEDRO", articulo:"COCA COLA LATA 33CL", precioUnidad:0.56, formato:24, unidadFormato:"CAJA", iva:21, precioVenta:2.50, activo:true},
-      {id:"mahou_5_estrellas_13", proveedor:"TURRADO", articulo:"MAHOU 5 ESTRELLAS 1/3", precioUnidad:17.96, formato:1, unidadFormato:"CAJA", iva:21, precioVenta:2.60, activo:true}
+      {id:"cafe_natural", proveedor:"CANDELAS", articulo:"CAFÉ NATURAL", precioUnidad:17.00, formato:1, unidadFormato:"UNIDAD", iva:10, precioVenta:1.40, stockMaximo:0, activo:true},
+      {id:"coca_cola_lata_33cl", proveedor:"SANPEDRO", articulo:"COCA COLA LATA 33CL", precioUnidad:0.56, formato:1, unidadFormato:"UNIDAD", iva:21, precioVenta:2.50, stockMaximo:0, activo:true},
+      {id:"mahou_5_estrellas_13", proveedor:"TURRADO", articulo:"MAHOU 5 ESTRELLAS 1/3", precioUnidad:17.96, formato:1, unidadFormato:"UNIDAD", iva:21, precioVenta:2.60, stockMaximo:0, activo:true}
     ];
     await guardarLista();
     pintar();
@@ -241,26 +272,26 @@ async function borrarTodosLosArticulos(){
 function abrirNuevo(){
   if(!puedeEditar()) return;
 
-  cargarSelectProveedores();
+  indiceEditando = -1;
 
   document.getElementById("tituloFicha").textContent = "Nuevo artículo";
   document.getElementById("idArticulo").value = "";
-  document.getElementById("proveedor").value = "";
+  document.getElementById("articulo").readOnly = false;
   document.getElementById("articulo").value = "";
+  document.getElementById("proveedor").value = "";
   document.getElementById("precioUnidad").value = "";
-  document.getElementById("formato").value = "1";
-  document.getElementById("unidadFormato").value = "UNIDAD";
   document.getElementById("iva").value = "21";
   document.getElementById("precioVenta").value = "";
+  document.getElementById("stockMaximo").value = "";
 
   document.getElementById("vistaLista").classList.add("oculto");
   document.getElementById("vistaFicha").classList.remove("oculto");
+
+  setTimeout(()=>document.getElementById("articulo").focus(),100);
 }
 
 function abrirEditar(id){
   if(!puedeEditar()) return;
-
-  cargarSelectProveedores();
 
   const a = articulos.find(x => x.id === id);
   if(!a){
@@ -268,22 +299,32 @@ function abrirEditar(id){
     return;
   }
 
+  indiceEditando = articulos.findIndex(x => x.id === id);
+
   document.getElementById("tituloFicha").textContent = "Editar artículo";
   document.getElementById("idArticulo").value = a.id;
-  document.getElementById("proveedor").value = a.proveedor || "";
+  document.getElementById("articulo").readOnly = true;
   document.getElementById("articulo").value = a.articulo || "";
-  document.getElementById("precioUnidad").value = a.precioUnidad || 0;
-  document.getElementById("formato").value = a.formato || 1;
-  document.getElementById("unidadFormato").value = a.unidadFormato || "UNIDAD";
+  document.getElementById("proveedor").value = a.proveedor || "";
+  document.getElementById("precioUnidad").value = Number(a.precioUnidad || 0).toFixed(2).replace(".",",");
   document.getElementById("iva").value = a.iva || 21;
-  document.getElementById("precioVenta").value = a.precioVenta || 0;
+  document.getElementById("precioVenta").value = Number(a.precioVenta || 0).toFixed(2).replace(".",",");
+  document.getElementById("stockMaximo").value = a.stockMaximo || "";
 
   document.getElementById("vistaLista").classList.add("oculto");
   document.getElementById("vistaFicha").classList.remove("oculto");
+
+  setTimeout(()=>{
+    const p = document.getElementById("proveedor");
+    p.focus();
+    p.select();
+  },100);
 }
 
-async function guardarFicha(){
+async function guardarFicha(guardarYSiguiente){
   if(!puedeEditar()) return;
+
+  completarProveedor();
 
   const articulo = document.getElementById("articulo").value.trim().toUpperCase();
 
@@ -296,15 +337,19 @@ async function guardarFicha(){
   const id = idActual || crearId(articulo);
   const anterior = articulos.find(x => x.id === id);
 
+  const precioUnidad = formatearPrecio("precioUnidad");
+  const precioVenta = formatearPrecio("precioVenta");
+
   const nuevo = {
     id,
-    proveedor: document.getElementById("proveedor").value,
+    proveedor: document.getElementById("proveedor").value.trim().toUpperCase(),
     articulo,
-    precioUnidad: parseFloat(document.getElementById("precioUnidad").value || 0),
-    formato: parseFloat(document.getElementById("formato").value || 1),
-    unidadFormato: document.getElementById("unidadFormato").value.trim().toUpperCase(),
+    precioUnidad,
+    formato: 1,
+    unidadFormato: "UNIDAD",
     iva: parseFloat(document.getElementById("iva").value || 21),
-    precioVenta: parseFloat(document.getElementById("precioVenta").value || 0),
+    precioVenta,
+    stockMaximo: parseFloat(document.getElementById("stockMaximo").value || 0),
     activo: anterior ? anterior.activo !== false : true,
     actualizadoPor: usuarioActual(),
     actualizadoEn: new Date().toISOString()
@@ -314,16 +359,24 @@ async function guardarFicha(){
     articulos = articulos.map(a => a.id === id ? nuevo : a);
   }else{
     articulos.unshift(nuevo);
+    indiceEditando = 0;
   }
 
   await guardarLista();
-  cerrarFicha();
+
+  if(guardarYSiguiente === true && indiceEditando >= 0 && indiceEditando < articulos.length - 1){
+    const siguiente = articulos[indiceEditando + 1];
+    cerrarFicha(false);
+    abrirEditar(siguiente.id);
+  }else{
+    cerrarFicha(true);
+  }
 }
 
-function cerrarFicha(){
+function cerrarFicha(pintarAhora){
   document.getElementById("vistaFicha").classList.add("oculto");
   document.getElementById("vistaLista").classList.remove("oculto");
-  pintar();
+  if(pintarAhora !== false) pintar();
 }
 
 async function desactivarArticulo(id){
@@ -436,6 +489,7 @@ async function importarCartaDigitalDesdeArchivo(file){
     unidadFormato: "UNIDAD",
     iva: 21,
     precioVenta: Number(x.precioVenta || 0),
+    stockMaximo: 0,
     activo: true,
     origen: "CARTA DIGITAL",
     actualizadoPor: usuarioActual(),
@@ -450,6 +504,36 @@ async function importarCartaDigitalDesdeArchivo(file){
   alert("Importación terminada: " + nuevos.length + " artículos creados.");
 }
 
+function activarTecladoRapido(){
+  document.getElementById("proveedor").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      e.preventDefault();
+      completarProveedor();
+      document.getElementById("precioUnidad").focus();
+      document.getElementById("precioUnidad").select();
+    }
+
+    if(e.key === "Tab"){
+      completarProveedor();
+    }
+  });
+
+  document.getElementById("precioUnidad").addEventListener("blur", function(){
+    formatearPrecio("precioUnidad");
+  });
+
+  document.getElementById("precioVenta").addEventListener("blur", function(){
+    formatearPrecio("precioVenta");
+  });
+
+  document.getElementById("stockMaximo").addEventListener("keydown", async function(e){
+    if(e.key === "Enter"){
+      e.preventDefault();
+      await guardarFicha(true);
+    }
+  });
+}
+
 function volver(){
   window.location.href = "index.html";
 }
@@ -459,10 +543,14 @@ function activarBotones(){
   document.getElementById("btnNuevo").addEventListener("click", abrirNuevo);
   document.getElementById("btnBase").addEventListener("click", cargarArticulosBase);
   document.getElementById("btnBorrarTodo").addEventListener("click", borrarTodosLosArticulos);
-  document.getElementById("btnGuardar").addEventListener("click", guardarFicha);
-  document.getElementById("btnCancelar").addEventListener("click", cerrarFicha);
+  document.getElementById("btnGuardar").addEventListener("click", function(){
+    guardarFicha(true);
+  });
+  document.getElementById("btnCancelar").addEventListener("click", function(){
+    cerrarFicha(true);
+  });
 
-  document.getElementById("btnImportar").addEventListener("click", ()=>{
+  document.getElementById("btnImportar").addEventListener("click", function(){
     document.getElementById("archivoCarta").click();
   });
 
@@ -483,6 +571,8 @@ function activarBotones(){
     if(accion === "desactivar") desactivarArticulo(id);
     if(accion === "reactivar") reactivarArticulo(id);
   });
+
+  activarTecladoRapido();
 }
 
 async function iniciar(){
