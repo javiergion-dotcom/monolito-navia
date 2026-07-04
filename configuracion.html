@@ -123,7 +123,8 @@ button{border:0;border-radius:14px;padding:12px;font-weight:900;font-size:15px}
 import {
   leerColeccion,
   guardarColeccion,
-  borrarColeccion
+  borrarColeccion,
+  borrarDocumento
 } from "./monolito-cloud.js";
 
 let usuariosCloud = [];
@@ -261,10 +262,24 @@ window.toggleUsuario = async function(i){
 };
 
 window.borrarUsuario = async function(i){
-  if(!confirm("¿Borrar este usuario?")) return;
-  usuariosCloud.splice(i,1);
-  await guardarUsuarios();
-  await pintarUsuarios();
+  const u = usuariosCloud[i];
+
+  if(!u){
+    alert("No se encontró el usuario.");
+    return;
+  }
+
+  if(!confirm("¿Borrar este usuario definitivamente?")) return;
+
+  const ok = await borrarDocumento("usuarios_monolito", u.id);
+
+  if(ok){
+    usuariosCloud = usuariosCloud.filter(x => String(x.id) !== String(u.id));
+    await pintarUsuarios();
+    alert("Usuario borrado correctamente.");
+  }else{
+    alert("No se pudo borrar el usuario.");
+  }
 };
 
 async function pintarUsuarios(){
@@ -403,10 +418,24 @@ window.togglePromocion = async function(i){
 };
 
 window.borrarPromocion = async function(i){
-  if(!confirm("¿Borrar esta promoción?")) return;
-  promocionesCloud.splice(i,1);
-  await guardarPromociones();
-  await pintarPromociones();
+  const p = promocionesCloud[i];
+
+  if(!p){
+    alert("No se encontró la promoción.");
+    return;
+  }
+
+  if(!confirm("¿Borrar esta promoción definitivamente?")) return;
+
+  const ok = await borrarDocumento("promociones_monolito", p.id);
+
+  if(ok){
+    promocionesCloud = promocionesCloud.filter(x => String(x.id) !== String(p.id));
+    await pintarPromociones();
+    alert("Promoción borrada correctamente.");
+  }else{
+    alert("No se pudo borrar la promoción.");
+  }
 };
 
 async function pintarPromociones(){
