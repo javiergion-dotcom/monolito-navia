@@ -41,11 +41,16 @@ export async function leerColeccion(nombreColeccion){
     querySnapshot.forEach((documento)=>{
 
       lista.push({
-        id: documento.id,
-        ...documento.data()
+        ...documento.data(),
+        id: documento.id
       });
 
     });
+
+    localStorage.setItem(
+      nombreColeccion,
+      JSON.stringify(lista)
+    );
 
     return lista;
 
@@ -85,7 +90,7 @@ export async function guardarColeccion(nombreColeccion, datos){
       const limpio = {
         ...item,
         id:id,
-        actualizado:new Date().toISOString()
+        actualizadoEn:new Date().toISOString()
       };
 
       await setDoc(
@@ -128,8 +133,8 @@ export function escucharColeccion(nombreColeccion, callback){
         snapshot.forEach((documento)=>{
 
           lista.push({
-            id: documento.id,
-            ...documento.data()
+            ...documento.data(),
+            id: documento.id
           });
 
         });
@@ -174,9 +179,37 @@ export async function borrarDocumento(nombreColeccion, id){
 
   try{
 
+    if(!id){
+      throw new Error("Falta ID del documento");
+    }
+
+    const idLimpio = String(id);
+
     await deleteDoc(
-      doc(db, nombreColeccion, id)
+      doc(db, nombreColeccion, idLimpio)
     );
+
+    const local =
+      localStorage.getItem(nombreColeccion);
+
+    if(local){
+      try{
+        const lista = JSON.parse(local);
+
+        if(Array.isArray(lista)){
+          const nuevaLista =
+            lista.filter(item => String(item.id) !== idLimpio);
+
+          localStorage.setItem(
+            nombreColeccion,
+            JSON.stringify(nuevaLista)
+          );
+        }
+
+      }catch(e){
+        console.error("Error actualizando localStorage tras borrar:", e);
+      }
+    }
 
     return true;
 
@@ -186,6 +219,7 @@ export async function borrarDocumento(nombreColeccion, id){
     return false;
   }
 }
+
 export async function borrarColeccion(nombreColeccion){
 
   try{
