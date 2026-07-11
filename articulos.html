@@ -10,6 +10,21 @@
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef2f5;color:#17303d}
 header{background:#17303d;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
 header h2{margin:0;font-size:22px}
+.cabeceraModos{display:flex;align-items:center;gap:10px;margin-left:auto}
+.modoCabecera{border-radius:14px;padding:11px 16px;font-weight:900;font-size:16px}
+.modoCabecera.activo{background:#17303d;color:white;border:2px solid white}
+.modoCabecera.masivo{background:#fdfaf5;color:#17303d;border:2px solid #d8cdb9}
+.modoCabecera.masivo.activo{background:#f4dfb8;border-color:#17303d}
+.panelMasivo{background:#fdfaf5;border:3px solid #d8cdb9;border-radius:24px;padding:20px;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.panelMasivo h3{margin-top:0;font-size:24px}
+.herramientaMasiva{background:white;border-radius:20px;padding:18px;margin-top:14px}
+.iniciarMasiva{width:100%;background:#17303d;color:white;margin-top:16px;font-size:17px}
+.salirMasiva{width:100%;background:#dfe6ec;color:#17303d;margin-top:10px}
+@media(max-width:700px){
+  header{align-items:flex-start;flex-wrap:wrap}
+  .cabeceraModos{width:100%;margin-left:0}
+  .modoCabecera{flex:1;font-size:14px;padding:10px 8px}
+}
 button{border:0;border-radius:14px;padding:11px 14px;font-weight:800;font-size:15px;cursor:pointer}
 .volver{background:white;color:#17303d}
 .contenido{padding:16px;width:100%}
@@ -44,7 +59,11 @@ input[readonly]{background:#eef2f5;font-weight:900}
 
 <header>
   <button id="btnVolver" class="volver">← Volver</button>
-  <h2>📦 ARTÍCULOS</h2>
+
+  <div class="cabeceraModos">
+    <button id="btnModoArticulos" class="modoCabecera activo">📦 ARTÍCULOS</button>
+    <button id="btnModoMasivo" class="modoCabecera masivo">📦 MODIFICACIÓN MASIVA</button>
+  </div>
 </header>
 
 <div class="contenido">
@@ -56,6 +75,35 @@ input[readonly]{background:#eef2f5;font-weight:900}
     <button id="btnBase" class="base">📦 Cargar artículos base</button>
     <button id="btnBorrarTodo" class="borrar">🗑️ Borrar todos los artículos</button>
     <div id="lista"></div>
+  </div>
+
+  <div id="vistaMasiva" class="oculto">
+    <div class="panelMasivo">
+      <h3>📦 Modificación masiva de artículos</h3>
+
+      <p>
+        Zona preparada para realizar cambios sobre muchos artículos sin alterar
+        el funcionamiento habitual del módulo.
+      </p>
+
+      <div class="herramientaMasiva">
+        <strong>📋 Revisión secuencial de artículos</strong>
+
+        <p>
+          Revisa los artículos uno a uno. Utiliza TAB para avanzar por los campos
+          y ENTER en el último campo para guardar y abrir automáticamente el
+          siguiente artículo.
+        </p>
+
+        <button id="btnIniciarMasiva" class="iniciarMasiva">
+          ▶ Iniciar revisión secuencial
+        </button>
+      </div>
+
+      <button id="btnSalirMasiva" class="salirMasiva">
+        ← Volver a artículos
+      </button>
+    </div>
   </div>
 
   <div id="vistaFicha" class="oculto">
@@ -109,6 +157,9 @@ import {
 let articulos = [];
 let proveedoresGlobal = [];
 let indiceEditando = -1;
+let modoMasivo = false;
+let colaMasiva = [];
+let posicionMasiva = -1;
 
 function usuarioActual(){
   const u = localStorage.getItem("usuario") || "JAVI";
@@ -269,12 +320,82 @@ async function borrarTodosLosArticulos(){
   }
 }
 
+function mostrarVistaLista(){
+  modoMasivo = false;
+  colaMasiva = [];
+  posicionMasiva = -1;
+
+  document.getElementById("vistaFicha").classList.add("oculto");
+  document.getElementById("vistaMasiva").classList.add("oculto");
+  document.getElementById("vistaLista").classList.remove("oculto");
+
+  document.getElementById("btnModoArticulos").classList.add("activo");
+  document.getElementById("btnModoMasivo").classList.remove("activo");
+
+  pintar();
+}
+
+function abrirModificacionMasiva(){
+  if(!puedeEditar()) return;
+
+  modoMasivo = false;
+
+  document.getElementById("vistaLista").classList.add("oculto");
+  document.getElementById("vistaFicha").classList.add("oculto");
+  document.getElementById("vistaMasiva").classList.remove("oculto");
+
+  document.getElementById("btnModoArticulos").classList.remove("activo");
+  document.getElementById("btnModoMasivo").classList.add("activo");
+}
+
+function iniciarRevisionMasiva(){
+  if(!puedeEditar()) return;
+
+  colaMasiva = articulos.map(a => a.id);
+  posicionMasiva = 0;
+
+  if(colaMasiva.length === 0){
+    alert("No hay artículos para revisar.");
+    return;
+  }
+
+  modoMasivo = true;
+  abrirEditarMasivoActual();
+}
+
+function abrirEditarMasivoActual(){
+  const id = colaMasiva[posicionMasiva];
+
+  if(!id){
+    alert("Revisión masiva terminada.");
+    mostrarVistaLista();
+    return;
+  }
+
+  abrirEditar(id, true);
+}
+
+function abrirSiguienteMasivo(){
+  posicionMasiva++;
+
+  if(posicionMasiva >= colaMasiva.length){
+    alert("Has terminado de revisar todos los artículos.");
+    mostrarVistaLista();
+    return;
+  }
+
+  abrirEditarMasivoActual();
+}
+
 function abrirNuevo(){
   if(!puedeEditar()) return;
 
   indiceEditando = -1;
 
+  modoMasivo = false;
   document.getElementById("tituloFicha").textContent = "Nuevo artículo";
+  document.getElementById("btnGuardar").textContent = "💾 Guardar";
+  document.getElementById("btnCancelar").textContent = "Cancelar";
   document.getElementById("idArticulo").value = "";
   document.getElementById("articulo").readOnly = false;
   document.getElementById("articulo").value = "";
@@ -290,20 +411,28 @@ function abrirNuevo(){
   setTimeout(()=>document.getElementById("articulo").focus(),100);
 }
 
-function abrirEditar(id){
+function abrirEditar(id, desdeMasiva = false){
   if(!puedeEditar()) return;
 
   const a = articulos.find(x => x.id === id);
   if(!a){
     alert("No se encontró el artículo.");
+    if(desdeMasiva) abrirSiguienteMasivo();
     return;
   }
 
+  modoMasivo = desdeMasiva;
   indiceEditando = articulos.findIndex(x => x.id === id);
 
-  document.getElementById("tituloFicha").textContent = "Editar artículo";
+  document.getElementById("tituloFicha").textContent =
+    modoMasivo
+      ? `Modificación masiva · ${posicionMasiva + 1} de ${colaMasiva.length}`
+      : "Editar artículo";
+
   document.getElementById("idArticulo").value = a.id;
-  document.getElementById("articulo").readOnly = true;
+
+  /* En modificación masiva también se puede corregir el nombre */
+  document.getElementById("articulo").readOnly = !modoMasivo;
   document.getElementById("articulo").value = a.articulo || "";
   document.getElementById("proveedor").value = a.proveedor || "";
   document.getElementById("precioUnidad").value = Number(a.precioUnidad || 0).toFixed(2).replace(".",",");
@@ -311,13 +440,23 @@ function abrirEditar(id){
   document.getElementById("precioVenta").value = Number(a.precioVenta || 0).toFixed(2).replace(".",",");
   document.getElementById("stockMaximo").value = a.stockMaximo || "";
 
+  document.getElementById("btnGuardar").textContent =
+    modoMasivo ? "💾 Guardar y siguiente artículo" : "💾 Guardar";
+
+  document.getElementById("btnCancelar").textContent =
+    modoMasivo ? "Salir de modificación masiva" : "Cancelar";
+
   document.getElementById("vistaLista").classList.add("oculto");
+  document.getElementById("vistaMasiva").classList.add("oculto");
   document.getElementById("vistaFicha").classList.remove("oculto");
 
   setTimeout(()=>{
-    const p = document.getElementById("proveedor");
-    p.focus();
-    p.select();
+    const primerCampo = modoMasivo
+      ? document.getElementById("articulo")
+      : document.getElementById("proveedor");
+
+    primerCampo.focus();
+    primerCampo.select();
   },100);
 }
 
@@ -364,10 +503,8 @@ async function guardarFicha(guardarYSiguiente){
 
   await guardarLista();
 
-  if(guardarYSiguiente === true && indiceEditando >= 0 && indiceEditando < articulos.length - 1){
-    const siguiente = articulos[indiceEditando + 1];
-    cerrarFicha(false);
-    abrirEditar(siguiente.id);
+  if(modoMasivo && guardarYSiguiente === true){
+    abrirSiguienteMasivo();
   }else{
     cerrarFicha(true);
   }
@@ -375,8 +512,13 @@ async function guardarFicha(guardarYSiguiente){
 
 function cerrarFicha(pintarAhora){
   document.getElementById("vistaFicha").classList.add("oculto");
-  document.getElementById("vistaLista").classList.remove("oculto");
-  if(pintarAhora !== false) pintar();
+
+  if(modoMasivo){
+    abrirModificacionMasiva();
+  }else{
+    document.getElementById("vistaLista").classList.remove("oculto");
+    if(pintarAhora !== false) pintar();
+  }
 }
 
 async function desactivarArticulo(id){
@@ -529,7 +671,7 @@ function activarTecladoRapido(){
   document.getElementById("stockMaximo").addEventListener("keydown", async function(e){
     if(e.key === "Enter"){
       e.preventDefault();
-      await guardarFicha(true);
+      await guardarFicha(modoMasivo);
     }
   });
 }
@@ -540,14 +682,22 @@ function volver(){
 
 function activarBotones(){
   document.getElementById("btnVolver").addEventListener("click", volver);
+  document.getElementById("btnModoArticulos").addEventListener("click", mostrarVistaLista);
+  document.getElementById("btnModoMasivo").addEventListener("click", abrirModificacionMasiva);
+  document.getElementById("btnIniciarMasiva").addEventListener("click", iniciarRevisionMasiva);
+  document.getElementById("btnSalirMasiva").addEventListener("click", mostrarVistaLista);
   document.getElementById("btnNuevo").addEventListener("click", abrirNuevo);
   document.getElementById("btnBase").addEventListener("click", cargarArticulosBase);
   document.getElementById("btnBorrarTodo").addEventListener("click", borrarTodosLosArticulos);
   document.getElementById("btnGuardar").addEventListener("click", function(){
-    guardarFicha(true);
+    guardarFicha(modoMasivo);
   });
   document.getElementById("btnCancelar").addEventListener("click", function(){
-    cerrarFicha(true);
+    if(modoMasivo){
+      abrirModificacionMasiva();
+    }else{
+      cerrarFicha(true);
+    }
   });
 
   document.getElementById("btnImportar").addEventListener("click", function(){
